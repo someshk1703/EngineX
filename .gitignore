@@ -23,6 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment variables (secrets — never commit)
+.env
+.env.local
+.env.*.local
+
 # Project planning / internal docs (not for public repo)
 context.md
 enhancement.md
@@ -31,3 +36,4 @@ implementation..md
 docs/
 specs/
 readme/
+nextStep.md

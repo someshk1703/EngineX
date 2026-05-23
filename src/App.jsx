@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { CATEGORIES, ALL_CHAPTERS as CHAPTERS } from './data/topics'
 import { getDocsUrl } from './data/docsMap'
+import { supabase, signInWithGoogle, signInWithGitHub, signOut } from './services/supabaseClient'
 import {
   generateChapterContent,
   generateChapterQuiz,
@@ -1673,6 +1674,123 @@ function DashboardView({ progress, onOpenChapter }) {
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
+// ─── Login Screen ─────────────────────────────────────────────────────────────
+function LoginScreen() {
+  const [loading, setLoading] = useState(null) // 'google' | 'github' | null
+  const [error, setError]     = useState(null)
+
+  const handleGoogle = async () => {
+    setLoading('google'); setError(null)
+    const { error: err } = await signInWithGoogle()
+    if (err) { setError(err.message); setLoading(null) }
+  }
+
+  const handleGitHub = async () => {
+    setLoading('github'); setError(null)
+    const { error: err } = await signInWithGitHub()
+    if (err) { setError(err.message); setLoading(null) }
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'var(--bg-primary)', padding: 24,
+    }}>
+      {/* Background grid */}
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 0,
+        backgroundImage: 'linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px)',
+        backgroundSize: '40px 40px',
+        pointerEvents: 'none',
+      }} />
+
+      <div style={{
+        position: 'relative', zIndex: 1,
+        background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+        borderRadius: 16, padding: '52px 48px', maxWidth: 420, width: '100%', textAlign: 'center',
+        boxShadow: '0 0 60px rgba(0,212,255,0.06)',
+      }}>
+        {/* Logo */}
+        <div style={{ marginBottom: 12 }}>
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '2rem', letterSpacing: 4,
+            color: 'var(--accent-cyan)', textShadow: '0 0 20px rgba(0,212,255,0.4)',
+          }}>
+            ENGINE<span style={{ color: 'var(--text-primary)' }}>X</span>
+          </span>
+        </div>
+
+        <p style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', marginBottom: 36, letterSpacing: 1 }}>
+          FAANG &amp; Big 4 Interview Prep Console
+        </p>
+
+        <p style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '1rem', marginBottom: 28 }}>
+          Sign in to continue
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Google */}
+          <button
+            onClick={handleGoogle}
+            disabled={!!loading}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+              padding: '13px 20px', borderRadius: 10, border: '1px solid var(--border-color)',
+              background: loading === 'google' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.04)',
+              color: 'var(--text-primary)', cursor: loading ? 'not-allowed' : 'pointer',
+              fontSize: '0.95rem', fontWeight: 500, transition: 'all 0.2s',
+              opacity: loading && loading !== 'google' ? 0.5 : 1,
+            }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'rgba(255,255,255,0.08)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}
+          >
+            {/* Google SVG */}
+            <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden>
+              <path fill="#EA4335" d="M24 9.5c3.1 0 5.5 1.3 7.2 2.4l5.3-5.3C33.5 3.6 29.1 1.5 24 1.5 14.7 1.5 6.9 7.3 3.5 15.4l6.2 4.8C11.4 13.9 17.2 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 2.9-2.2 5.3-4.6 6.9l7.1 5.5C43.3 37.3 46.5 31.4 46.5 24.5z"/>
+              <path fill="#FBBC05" d="M9.7 28.8A14.9 14.9 0 0 1 9.5 24c0-1.7.3-3.3.7-4.8l-6.2-4.8A23.5 23.5 0 0 0 1.5 24c0 3.8.9 7.4 2.5 10.6l5.7-5.8z"/>
+              <path fill="#34A853" d="M24 46.5c5.2 0 9.5-1.7 12.7-4.6l-7.1-5.5c-1.8 1.2-4 1.9-5.6 1.9-6.8 0-12.6-4.5-14.3-10.7l-5.7 5.8C6.9 40.7 14.7 46.5 24 46.5z"/>
+            </svg>
+            {loading === 'google' ? 'Redirecting…' : 'Continue with Google'}
+          </button>
+
+          {/* GitHub */}
+          <button
+            onClick={handleGitHub}
+            disabled={!!loading}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+              padding: '13px 20px', borderRadius: 10, border: '1px solid var(--border-color)',
+              background: loading === 'github' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.04)',
+              color: 'var(--text-primary)', cursor: loading ? 'not-allowed' : 'pointer',
+              fontSize: '0.95rem', fontWeight: 500, transition: 'all 0.2s',
+              opacity: loading && loading !== 'github' ? 0.5 : 1,
+            }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'rgba(255,255,255,0.08)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}
+          >
+            {/* GitHub SVG */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.1.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.42.36.81 1.1.81 2.22v3.29c0 .32.21.69.82.57A12 12 0 0 0 12 .3"/>
+            </svg>
+            {loading === 'github' ? 'Redirecting…' : 'Continue with GitHub'}
+          </button>
+        </div>
+
+        {error && (
+          <p style={{ marginTop: 20, color: 'var(--accent-red, #ff4444)', fontSize: '0.85rem', fontFamily: 'var(--font-mono)' }}>
+            ⚠ {error}
+          </p>
+        )}
+
+        <p style={{ marginTop: 32, color: 'var(--text-secondary)', fontSize: '0.75rem', lineHeight: 1.6 }}>
+          By signing in you agree to use this app for personal interview preparation only.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [view, setView] = useState('library')   // 'library' | 'chapter' | 'quiz' | 'dashboard'
   const [selectedChapter, setSelectedChapter] = useState(null)
@@ -1681,6 +1799,23 @@ export default function App() {
   const [apiConfigured, setApiConfigured] = useState(hasApiKey)
   const [providerLabel, setProviderLabel] = useState(() => getProvider().toUpperCase())
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem(THEME_KEY) !== 'light')
+  const [user, setUser] = useState(undefined) // undefined = loading, null = logged out, object = logged in
+  const [authLoading, setAuthLoading] = useState(true)
+
+  // ── Supabase auth ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setAuthLoading(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      setAuthLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     const theme = darkMode ? 'dark' : 'light'
@@ -1725,6 +1860,20 @@ export default function App() {
   }
 
   const overallPct = Math.round((CHAPTERS.filter(c => progress[c.id]?.read).length / CHAPTERS.length) * 100)
+
+  // Auth loading splash
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-cyan)', fontSize: '0.85rem', letterSpacing: 2, opacity: 0.7 }}>
+          INITIALIZING…
+        </span>
+      </div>
+    )
+  }
+
+  // Not authenticated → login screen
+  if (!user) return <LoginScreen />
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -1811,6 +1960,41 @@ export default function App() {
             >
               ⚙ SETTINGS
             </button>
+
+            {/* User avatar + logout */}
+            {user && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                {user.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt={user.user_metadata?.full_name || user.email}
+                    referrerPolicy="no-referrer"
+                    style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid var(--border-color)', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 30, height: 30, borderRadius: '50%', border: '1px solid var(--border-color)',
+                    background: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.75rem', color: '#000',
+                  }}>
+                    {(user.user_metadata?.full_name || user.email || '?')[0].toUpperCase()}
+                  </div>
+                )}
+                <button
+                  onClick={() => signOut()}
+                  style={{
+                    background: 'none', border: '1px solid var(--border-color)', borderRadius: 6,
+                    color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px 10px',
+                    fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: 0.5,
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--text-secondary)' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-color)' }}
+                >
+                  Sign out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
