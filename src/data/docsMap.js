@@ -1,0 +1,186 @@
+// Maps chapter titles (lowercase, normalized) to official documentation URLs
+// Used by the "Official Docs" button in ChapterView
+
+export const DOCS_MAP = {
+  // ─── DSA ───────────────────────────────────────────────────────────────────
+  'arrays and strings':       'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array',
+  'linked lists':             'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array',
+  'stacks and queues':        'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array',
+  'hash maps and hash sets':  'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map',
+  'trees and binary trees':   'https://en.wikipedia.org/wiki/Binary_tree',
+  'binary search trees':      'https://en.wikipedia.org/wiki/Binary_search_tree',
+  'heaps and priority queues': 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array',
+  'graphs and graph traversal': 'https://en.wikipedia.org/wiki/Graph_(abstract_data_type)',
+  'tries':                    'https://en.wikipedia.org/wiki/Trie',
+  'segment trees':            'https://cp-algorithms.com/data_structures/segment_tree.html',
+  'union find / disjoint sets': 'https://en.wikipedia.org/wiki/Disjoint-set_data_structure',
+  'sorting algorithms':       'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort',
+  'binary search':            'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf',
+  'two pointers technique':   'https://en.wikipedia.org/wiki/Two-pointer_technique',
+  'sliding window':           'https://en.wikipedia.org/wiki/Sliding_window_protocol',
+  'recursion and backtracking': 'https://developer.mozilla.org/en-US/docs/Glossary/Recursion',
+  'dynamic programming':      'https://en.wikipedia.org/wiki/Dynamic_programming',
+  'greedy algorithms':        'https://en.wikipedia.org/wiki/Greedy_algorithm',
+  'bit manipulation':         'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_AND',
+  'math and number theory':   'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math',
+  'complexity analysis':      'https://en.wikipedia.org/wiki/Big_O_notation',
+  'string manipulation algorithms': 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String',
+  'advanced graph algorithms': 'https://en.wikipedia.org/wiki/Graph_theory',
+  'topological sort':         'https://en.wikipedia.org/wiki/Topological_sorting',
+  'intervals and sweep line': 'https://en.wikipedia.org/wiki/Sweep_line_algorithm',
+  'monotonic stack and queue': 'https://en.wikipedia.org/wiki/Stack_(abstract_data_type)',
+
+  // ─── System Design ─────────────────────────────────────────────────────────
+  'system design fundamentals': 'https://github.com/donnemartin/system-design-primer',
+  'scalability and load balancing': 'https://aws.amazon.com/elasticloadbalancing/',
+  'caching strategies':       'https://redis.io/docs/manual/client-side-caching/',
+  'databases: sql vs nosql':  'https://www.postgresql.org/docs/',
+  'message queues and event streaming': 'https://kafka.apache.org/documentation/',
+  'api design: rest and graphql': 'https://graphql.org/learn/',
+  'microservices architecture': 'https://microservices.io/',
+  'distributed systems concepts': 'https://en.wikipedia.org/wiki/Distributed_computing',
+  'cdn and edge computing':   'https://developers.cloudflare.com/cache/',
+  'rate limiting and throttling': 'https://www.nginx.com/blog/rate-limiting-nginx/',
+  'search systems':           'https://www.elastic.co/guide/index.html',
+  'design patterns in system design': 'https://refactoring.guru/design-patterns',
+  'url shortener design':     'https://github.com/donnemartin/system-design-primer',
+  'twitter/news feed design': 'https://github.com/donnemartin/system-design-primer',
+  'uber/maps system design':  'https://github.com/donnemartin/system-design-primer',
+  'payment system design':    'https://stripe.com/docs',
+  'notification system design': 'https://firebase.google.com/docs/cloud-messaging',
+  'video streaming design':   'https://aws.amazon.com/solutions/implementations/video-streaming/',
+  'monitoring and observability': 'https://opentelemetry.io/docs/',
+  'consensus algorithms':     'https://raft.github.io/',
+
+  // ─── Full Stack ─────────────────────────────────────────────────────────────
+  'html & css fundamentals':  'https://developer.mozilla.org/en-US/docs/Web/HTML',
+  'javascript deep dive':     'https://developer.mozilla.org/en-US/docs/Web/JavaScript',
+  'typescript essentials':    'https://www.typescriptlang.org/docs/',
+  'react fundamentals':       'https://react.dev/',
+  'react hooks deep dive':    'https://react.dev/reference/react',
+  'state management':         'https://redux.js.org/introduction/getting-started',
+  'css-in-js and styling systems': 'https://styled-components.com/docs',
+  'nextjs and ssr':           'https://nextjs.org/docs',
+  'nodejs and express':       'https://nodejs.org/en/docs',
+  'restful api design':       'https://restfulapi.net/',
+  'graphql apis':             'https://graphql.org/learn/',
+  'authentication and authorization': 'https://auth0.com/docs',
+  'websockets and real-time': 'https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API',
+  'web performance optimization': 'https://web.dev/performance/',
+  'testing strategies':       'https://jestjs.io/docs/getting-started',
+  'web accessibility':        'https://developer.mozilla.org/en-US/docs/Web/Accessibility',
+  'browser apis and web apis': 'https://developer.mozilla.org/en-US/docs/Web/API',
+  'bundlers and build tools': 'https://vitejs.dev/guide/',
+  'progressive web apps':     'https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps',
+  'micro-frontends':          'https://micro-frontends.org/',
+  'react performance':        'https://react.dev/learn/render-and-commit',
+  'server-side rendering vs csr': 'https://nextjs.org/docs/pages/building-your-application/rendering',
+  'web security fundamentals': 'https://developer.mozilla.org/en-US/docs/Web/Security',
+  'frontend system design':   'https://www.patterns.dev/',
+
+  // ─── Cloud & DevOps ─────────────────────────────────────────────────────────
+  'docker and containerization': 'https://docs.docker.com/',
+  'kubernetes fundamentals':  'https://kubernetes.io/docs/home/',
+  'ci/cd pipelines':          'https://docs.github.com/en/actions',
+  'aws core services':        'https://docs.aws.amazon.com/',
+  'azure fundamentals':       'https://learn.microsoft.com/en-us/azure/',
+  'google cloud platform':    'https://cloud.google.com/docs',
+  'infrastructure as code':   'https://developer.hashicorp.com/terraform/docs',
+  'gitops and deployment strategies': 'https://argo-cd.readthedocs.io/',
+  'service mesh and istio':   'https://istio.io/latest/docs/',
+  'observability stack':      'https://grafana.com/docs/',
+  'cloud security':           'https://aws.amazon.com/security/',
+  'serverless architecture':  'https://docs.aws.amazon.com/lambda/',
+  'networking fundamentals':  'https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL',
+  'linux and shell scripting': 'https://www.gnu.org/software/bash/manual/bash.html',
+  'site reliability engineering': 'https://sre.google/sre-book/table-of-contents/',
+  'helm and package management': 'https://helm.sh/docs/',
+  'cloud cost optimization':  'https://aws.amazon.com/aws-cost-management/',
+  'multi-cloud strategies':   'https://cloud.google.com/architecture/multicloud',
+  'edge computing':           'https://developers.cloudflare.com/workers/',
+  'platform engineering':     'https://platformengineering.org/',
+  'chaos engineering':        'https://principlesofchaos.org/',
+  'gitops workflows':         'https://www.gitops.tech/',
+
+  // ─── Databases ─────────────────────────────────────────────────────────────
+  'sql deep dive':            'https://www.postgresql.org/docs/',
+  'database indexing':        'https://use-the-index-luke.com/',
+  'query optimization':       'https://explain.depesz.com/',
+  'acid transactions':        'https://www.postgresql.org/docs/current/transaction-iso.html',
+  'postgresql advanced':      'https://www.postgresql.org/docs/',
+  'mongodb and document stores': 'https://www.mongodb.com/docs/',
+  'redis in depth':           'https://redis.io/docs/',
+  'database sharding and replication': 'https://www.postgresql.org/docs/current/high-availability.html',
+  'time series databases':    'https://docs.influxdata.com/',
+  'graph databases':          'https://neo4j.com/docs/',
+  'elasticsearch':            'https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html',
+  'database design patterns': 'https://www.postgresql.org/docs/',
+  'orm and query builders':   'https://www.prisma.io/docs',
+  'data warehousing':         'https://docs.snowflake.com/',
+  'vector databases':         'https://www.pinecone.io/learn/vector-database/',
+  'database migrations':      'https://flyway.org/documentation/',
+
+  // ─── Security ──────────────────────────────────────────────────────────────
+  'owasp top 10':             'https://owasp.org/www-project-top-ten/',
+  'authentication deep dive': 'https://auth0.com/docs/authenticate',
+  'oauth 2.0 and oidc':       'https://oauth.net/2/',
+  'jwt and session management': 'https://jwt.io/introduction',
+  'sql injection and xss':    'https://owasp.org/www-community/attacks/SQL_Injection',
+  'cryptography basics':      'https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API',
+  'api security':             'https://owasp.org/www-project-api-security/',
+  'secrets management':       'https://www.vaultproject.io/docs',
+  'penetration testing basics': 'https://owasp.org/www-project-web-security-testing-guide/',
+  'zero trust architecture':  'https://www.nist.gov/publications/zero-trust-architecture',
+  'tls and https':            'https://letsencrypt.org/docs/',
+  'supply chain security':    'https://slsa.dev/',
+  'compliance frameworks':    'https://www.iso.org/isoiec-27001-information-security.html',
+  'cloud security posture management': 'https://www.cspm.com/',
+
+  // ─── CS Fundamentals ───────────────────────────────────────────────────────
+  'operating systems':        'https://pages.cs.wisc.edu/~remzi/OSTEP/',
+  'computer networks':        'https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics',
+  'memory management':        'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_management',
+  'concurrency and parallelism': 'https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick',
+  'compilers and interpreters': 'https://en.wikipedia.org/wiki/Compiler',
+  'cpu architecture':         'https://en.wikipedia.org/wiki/Computer_architecture',
+  'http/2 and http/3':        'https://developer.mozilla.org/en-US/docs/Web/HTTP',
+  'tcp/ip deep dive':         'https://developer.mozilla.org/en-US/docs/Glossary/TCP',
+  'dns and networking':       'https://developer.mozilla.org/en-US/docs/Glossary/DNS',
+  'functional programming':   'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function',
+  'object-oriented design':   'https://refactoring.guru/design-patterns',
+  'design patterns':          'https://refactoring.guru/design-patterns',
+  'solid principles':         'https://en.wikipedia.org/wiki/SOLID',
+  'event loop and async js':  'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop',
+  'the web browser internals': 'https://web.dev/howbrowserswork/',
+  'encoding and serialization': 'https://developer.mozilla.org/en-US/docs/Glossary/Serialization',
+
+  // ─── Soft Skills ───────────────────────────────────────────────────────────
+  'engineering leadership':   'https://www.amazon.com/Manager%27s-Path-Leaders-Navigating-Growth/dp/1491973897',
+  'communication skills':     'https://www.amazon.com/Crucial-Conversations-Talking-Stakes-Second/dp/0071771328',
+  'behavioral interviews':    'https://www.amazon.com/Cracking-Coding-Interview-Programming-Questions/dp/0984782850',
+  'system design interviews': 'https://www.amazon.com/System-Design-Interview-insiders-Second/dp/B08CMF2CQF',
+  'agile and scrum':          'https://www.scrum.org/resources/what-scrum-module',
+  'mentoring and code review': 'https://google.github.io/eng-practices/review/',
+  'technical writing':        'https://developers.google.com/tech-writing',
+  'stakeholder management':   'https://www.pmi.org/learning/library/stakeholder-management-key-success-factor-8240',
+  'engineering metrics':      'https://dora.dev/',
+  'remote work effectiveness': 'https://www.notion.so/help/guides/remote-work',
+  'career growth in tech':    'https://staffeng.com/',
+  'conflict resolution':      'https://www.shrm.org/topics-tools/topics/conflict-resolution',
+}
+
+/**
+ * Look up the official docs URL for a chapter, falling back to a Google search.
+ * @param {string} title
+ * @returns {string}
+ */
+export function getDocsUrl(title) {
+  const key = title.toLowerCase().trim()
+  // Exact match
+  if (DOCS_MAP[key]) return DOCS_MAP[key]
+  // Partial match
+  const partialKey = Object.keys(DOCS_MAP).find((k) => key.includes(k) || k.includes(key))
+  if (partialKey) return DOCS_MAP[partialKey]
+  // Fallback: Google search
+  return `https://www.google.com/search?q=${encodeURIComponent(title + ' documentation interview')}`
+}

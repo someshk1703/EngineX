@@ -1,0 +1,18 @@
+{
+  "toolkit": {
+    "version": "0.5.0",
+    "installedAt": "2026-05-23T10:47:18.498Z",
+    "domain": "EngineX",
+    "techStack": "javascript"
+  },
+  "components": {
+    "agents": true,
+    "instructions": false,
+    "constitution": false,
+    "templates": true,
+    "scripts": true,
+    "skills": true,
+    "prompts": true,
+    "issueTemplates": true
+  }
+}
