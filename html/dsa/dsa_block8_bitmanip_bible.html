@@ -1,0 +1,655 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{display:flex;height:100vh;min-height:640px;overflow:hidden;font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.sidebar{width:210px;min-width:210px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 0;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 14px 8px}
+.tbtn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 14px;border:none;background:transparent;text-align:left;cursor:pointer;font-size:12.5px;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;line-height:1.4}
+.tbtn:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.tbtn.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left:2px solid #378ADD;font-weight:500}
+.tnum{font-size:11px;color:var(--color-text-tertiary);min-width:16px;flex-shrink:0}
+.main{flex:1;overflow-y:auto;padding:0;min-width:0}
+.stabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);padding:0 18px;position:sticky;top:0;background:var(--color-background-primary);z-index:10;overflow-x:auto;gap:0}
+.stab{padding:9px 11px;font-size:11.5px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.stab:hover{color:var(--color-text-primary)}
+.stab.active{color:#185FA5;border-bottom:2px solid #378ADD}
+.cnt{padding:18px}
+.th{font-size:19px;font-weight:500;margin-bottom:3px}
+.ts{font-size:12.5px;color:var(--color-text-secondary);margin-bottom:16px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-tertiary);margin-bottom:7px}
+.ct{font-size:13.5px;color:var(--color-text-secondary);line-height:1.7}
+.hl{background:var(--color-background-secondary);border-left:3px solid #378ADD;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:9px 13px;margin:8px 0;font-size:13px;color:var(--color-text-primary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;font-family:var(--font-mono);font-size:11.5px;line-height:1.6;color:var(--color-text-primary);overflow-x:auto;white-space:pre;margin:8px 0}
+.ctbl{width:100%;font-size:12.5px;border-collapse:collapse}
+.ctbl th{text-align:left;padding:5px 7px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.ctbl td{padding:6px 7px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);vertical-align:top;font-size:12.5px}
+.ctbl td:first-child{font-weight:500;color:var(--color-text-primary)}
+.og{color:#3B6D11;font-weight:500}.om{color:#854F0B;font-weight:500}.ob{color:#A32D2D;font-weight:500}
+.pc{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px;margin-bottom:9px}
+.pn{font-size:13.5px;font-weight:500;margin-bottom:4px}
+.trig{font-size:11.5px;color:#185FA5;background:#E6F1FB;padding:3px 9px;border-radius:var(--border-radius-md);display:inline-block;margin:3px 0}
+.pw{font-size:12.5px;color:var(--color-text-secondary);margin-top:5px;line-height:1.6}
+.sr{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12.5px}
+.sr:last-child{border-bottom:none}
+.si{color:var(--color-text-tertiary);min-width:52px;font-size:10.5px;font-weight:500;text-transform:uppercase;padding-top:2px}
+.sth{color:#0C447C;font-weight:500;min-width:130px}
+.sw{color:var(--color-text-secondary)}
+.prb{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:11px;margin-bottom:7px}
+.diff{font-size:11px;font-weight:500;padding:2px 7px;border-radius:var(--border-radius-md);display:inline-block;margin-bottom:5px}
+.easy{background:#EAF3DE;color:#27500A}.medium{background:#FAEEDA;color:#633806}.hard{background:#FAECE7;color:#712B13}
+.pname{font-size:13.5px;font-weight:500;margin-bottom:3px}
+.pmeta{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.ipill{display:flex;gap:7px;align-items:flex-start;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6}
+.dot{width:5px;height:5px;border-radius:50%;background:#378ADD;margin-top:7px;flex-shrink:0}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 7px;border-radius:var(--border-radius-md);margin:2px}
+.tp{background:#EEEDFE;color:#3C3489}.tt{background:#E1F5EE;color:#085041}.ta{background:#FAEEDA;color:#633806}
+.bitrow{display:flex;gap:4px;font-family:var(--font-mono);font-size:13px;margin:4px 0}
+.bit{width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:var(--border-radius-md);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary)}
+.bit1{background:#E6F1FB;color:#0C447C;font-weight:500}
+</style>
+
+<h2 class="sr-only">Block 8: Bit manipulation — interactive DSA study bible covering 5 topics</h2>
+<div class="app">
+<div class="sidebar">
+  <div class="sidebar-title">Block 8 — Bits</div>
+  <button class="tbtn active" onclick="sel(0)"><span class="tnum">1</span>Bit Operations</button>
+  <button class="tbtn" onclick="sel(1)"><span class="tnum">2</span>Common Tricks</button>
+  <button class="tbtn" onclick="sel(2)"><span class="tnum">3</span>Bit Masking</button>
+  <button class="tbtn" onclick="sel(3)"><span class="tnum">4</span>Two's Complement</button>
+  <button class="tbtn" onclick="sel(4)"><span class="tnum">5</span>Interview Problems</button>
+</div>
+<div class="main" id="main">
+  <div class="stabs" id="stabs"></div>
+  <div class="cnt" id="cnt"></div>
+</div>
+</div>
+
+<script>
+const TABS=["Definition","Mechanics","Complexity","Variants","Patterns","Smell→Pattern","Java Code","Worked Example","Practice","Interview"];
+
+const D=[
+{title:"Bit Operations",sub:"AND · OR · XOR · NOT · Left shift · Right shift",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Bit manipulation operates directly on the binary representation of integers using six core operators: AND (&), OR (|), XOR (^), NOT (~), left shift (&lt;&lt;), and right shift (&gt;&gt;). These run as single CPU instructions — no loops, no comparisons — making them the fastest possible operations on a number.</div></div>
+<div class="hl">Each operator answers a different question: AND = "are both bits 1?", OR = "is at least one bit 1?", XOR = "are the bits different?", NOT = "flip everything".</div>
+<div class="card"><div class="lbl">The six operators at a glance</div><div class="ct"><strong>AND (&):</strong> 1 only if both bits are 1. Used for masking/checking.<br><strong>OR (|):</strong> 1 if either bit is 1. Used for setting bits.<br><strong>XOR (^):</strong> 1 if bits differ. Used for toggling, finding differences.<br><strong>NOT (~):</strong> flips every bit. In Java, ~x = -x-1 (two's complement).<br><strong>Left shift (&lt;&lt;):</strong> shifts bits left, fills with 0. Equivalent to ×2 per shift.<br><strong>Right shift (&gt;&gt;):</strong> shifts bits right. Arithmetic (sign-preserving) in Java for &gt;&gt;, logical (zero-fill) for &gt;&gt;&gt;.</div></div>`,
+
+`<div class="card"><div class="lbl">Truth tables (bit by bit)</div></div>
+<div class="bitrow"><div class="bit">A</div><div class="bit">B</div><div class="bit">AND</div><div class="bit">OR</div><div class="bit">XOR</div></div>
+<div class="bitrow"><div class="bit">0</div><div class="bit">0</div><div class="bit">0</div><div class="bit">0</div><div class="bit">0</div></div>
+<div class="bitrow"><div class="bit">0</div><div class="bit">1</div><div class="bit">0</div><div class="bit1">1</div><div class="bit1">1</div></div>
+<div class="bitrow"><div class="bit">1</div><div class="bit">0</div><div class="bit">0</div><div class="bit1">1</div><div class="bit1">1</div></div>
+<div class="bitrow"><div class="bit">1</div><div class="bit">1</div><div class="bit1">1</div><div class="bit1">1</div><div class="bit">0</div></div>
+<div class="card" style="margin-top:12px"><div class="lbl">Shift mechanics</div><div class="ct">Left shift x &lt;&lt; k: every bit moves k positions left, k zeros fill from the right. This multiplies x by 2^k (unless overflow). Right shift x &gt;&gt; k: bits move k positions right. In Java, &gt;&gt; is arithmetic — it fills with the SIGN BIT (preserves negative numbers correctly). &gt;&gt;&gt; is logical — always fills with 0, ignoring sign. This distinction matters enormously for negative numbers.</div></div>
+<div class="code">5  &lt;&lt; 1  = 10   (0101 → 1010, ×2)
+5  &gt;&gt; 1  = 2    (0101 → 0010, ÷2 floor)
+-8 &gt;&gt; 1  = -4   (sign bit preserved: arithmetic shift)
+-8 &gt;&gt;&gt; 1 = 2147483644  (logical shift: sign bit treated as data!)</div>`,
+
+`<table class="ctbl"><tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>AND / OR / XOR / NOT</td><td class="og">O(1)</td><td class="og">O(1)</td><td>Single CPU instruction, operates on all bits in parallel (word-size)</td></tr>
+<tr><td>Left / Right shift</td><td class="og">O(1)</td><td class="og">O(1)</td><td>Single instruction regardless of shift amount (for word-size types)</td></tr>
+<tr><td>Bit operations on array of n bits</td><td class="og">O(n/64)</td><td class="og">O(n/64)</td><td>Pack n bits into n/64 longs — 64× speedup over boolean array</td></tr>
+</table>
+<div class="hl" style="margin-top:10px">Bit operations are the fastest tool in your toolbox — always O(1) regardless of the magnitude of the numbers (within fixed-width int/long).</div>`,
+
+`<div class="pc"><div class="pn">Bitwise AND (&)</div><div class="pw">Masking — isolate specific bits. Check if a bit is set. Compute x & (x-1) to clear lowest set bit. x & -x to isolate lowest set bit.</div></div>
+<div class="pc"><div class="pn">Bitwise OR (|)</div><div class="pw">Setting bits — combine flags. mask | (1&lt;&lt;i) sets bit i without affecting others.</div></div>
+<div class="pc"><div class="pn">Bitwise XOR (^)</div><div class="pw">Toggling bits, finding differences, swapping without temp variable, finding unique/missing elements (self-canceling property: x^x=0).</div></div>
+<div class="pc"><div class="pn">Arithmetic vs Logical shift</div><div class="pw">Arithmetic (&gt;&gt;) preserves sign for negative numbers — used in normal division-like operations. Logical (&gt;&gt;&gt;) always zero-fills — used when treating the number as raw bits (e.g., hash computations).</div></div>`,
+
+`<div class="pc"><div class="pn">1. Mask and check</div><div class="trig">Mental trigger: "is bit i set?"</div><div class="pw">(num &gt;&gt; i) & 1 or num & (1&lt;&lt;i) != 0. Core building block for all masking patterns.</div></div>
+<div class="pc"><div class="pn">2. Fast multiply/divide by powers of 2</div><div class="trig">Mental trigger: "multiply/divide by 2, 4, 8..."</div><div class="pw">x &lt;&lt; k = x × 2^k. x &gt;&gt; k = x ÷ 2^k (floor, toward negative infinity for negatives in Java's arithmetic shift).</div></div>
+<div class="pc"><div class="pn">3. Self-canceling XOR</div><div class="trig">Mental trigger: "pairs cancel out, find the odd one"</div><div class="pw">a^a=0, a^0=a. XOR-ing a list where everything pairs up except one element isolates that element.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"check if a specific bit is set"</span><span class="sw">→ (num &gt;&gt; i) & 1, or num & (1&lt;&lt;i) != 0</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"multiply or divide by power of 2"</span><span class="sw">→ Use &lt;&lt; or &gt;&gt; instead of * or /</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"swap two values without temp variable"</span><span class="sw">→ XOR swap: a^=b; b^=a; a^=b;</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"everything pairs up except one element"</span><span class="sw">→ XOR all elements; pairs cancel, survivor remains</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">need raw bit pattern regardless of sign</span><span class="sw">→ Use &gt;&gt;&gt; (logical shift), not &gt;&gt; (arithmetic)</span></div>
+</div>`,
+
+`<div class="code">// Six core bit operations in Java
+int a = 12;  // 1100
+int b = 10;  // 1010
+
+int andResult = a & b;   // 1000 = 8   (both bits 1)
+int orResult  = a | b;   // 1110 = 14  (either bit 1)
+int xorResult = a ^ b;   // 0110 = 6   (bits differ)
+int notResult = ~a;      // ...11110011 = -13 (flips all bits)
+
+int leftShift  = a &lt;&lt; 2;  // 110000 = 48  (12 * 4)
+int rightShift = a &gt;&gt; 2;  // 0011 = 3     (12 / 4)
+
+// Negative number shifts — the critical distinction
+int neg = -8;             // ...11111000
+int arithRight = neg &gt;&gt; 1;   // -4  (sign-preserving, fills with 1s)
+int logicRight = neg &gt;&gt;&gt; 1;  // 2147483644 (zero-fill, sign bit becomes data)
+
+// XOR swap (no temp variable needed)
+int x = 5, y = 9;
+x ^= y;   // x = 5^9
+y ^= x;   // y = 9^(5^9) = 5
+x ^= y;   // x = (5^9)^5 = 9
+// now x=9, y=5 — swapped!</div>`,
+
+`<div class="card"><div class="lbl">LC 191 — Number of 1 Bits (intro to bit ops in action)</div><div class="card-text">Count the number of set bits (1s) in the binary representation of an integer.</div></div>
+<div class="hl"><strong>Brute force:</strong> check all 32 bits one by one using (n &gt;&gt; i) & 1, accumulate count. O(32) = O(1) but always does full 32 iterations regardless of how many bits are actually set.</div>
+<div class="code">// BRUTE FORCE — check every bit position
+int hammingWeightBrute(int n) {
+    int count = 0;
+    for (int i = 0; i &lt; 32; i++)
+        if ((n &gt;&gt; i & 1) == 1) count++;
+    return count;
+}
+// Always loops 32 times, even for n=1 (only 1 set bit)
+
+// OPTIMAL — Brian Kernighan's trick (covered next topic)
+// n & (n-1) clears the LOWEST set bit each time
+int hammingWeight(int n) {
+    int count = 0;
+    while (n != 0) {
+        n &= (n - 1);   // clear lowest set bit
+        count++;
+    }
+    return count;
+}
+// Loops only as many times as there are SET bits — much faster
+// for sparse numbers (e.g., n=8=1000 takes 1 iteration, not 32)</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 191 — Number of 1 Bits</div><div class="pmeta"><strong>Why:</strong> Introduces both naive bit-checking and the Kernighan optimization.<br><strong>Key insight:</strong> n & (n-1) clears the lowest set bit each iteration.</div></div>
+<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 461 — Hamming Distance</div><div class="pmeta"><strong>Why:</strong> XOR + count bits combo — tests both fundamental operations together.<br><strong>Key insight:</strong> Hamming distance = number of set bits in (x ^ y).</div></div>
+<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 190 — Reverse Bits</div><div class="pmeta"><strong>Why:</strong> Tests shift mastery — building a result bit by bit using shifts.<br><strong>Key insight:</strong> result = (result &lt;&lt; 1) | (n & 1); n &gt;&gt;&gt;= 1; repeat 32 times.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 371 — Sum of Two Integers</div><div class="pmeta"><strong>Why:</strong> Pure bit-operation arithmetic — no + or - allowed (deep dive later topic).<br><strong>Key insight:</strong> XOR gives sum without carry; AND+shift gives the carry; repeat until carry is 0.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 89 — Gray Code</div><div class="pmeta"><strong>Why:</strong> XOR-based sequence generation — tests creative bit-operation application.<br><strong>Key insight:</strong> nth Gray code = n ^ (n &gt;&gt; 1).</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Do you know the difference between &gt;&gt; (arithmetic) and &gt;&gt;&gt; (logical) and when each matters?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you write the XOR swap and explain why it works (self-cancellation)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you default to bit operations for power-of-2 multiply/divide when relevant?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "Since I need to check/set/toggle individual bits, I'll use AND for checking, OR for setting, and XOR for toggling. I need to be careful with right shift on negative numbers — Java's &gt;&gt; preserves the sign bit, so I'd use &gt;&gt;&gt; if I need the raw unsigned bit pattern instead."</div>`
+]},
+
+{title:"Common Tricks",sub:"Power of 2 · Brian Kernighan's algorithm · Single number (XOR)",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">A small set of bit tricks solve a disproportionate number of interview problems. Three are essential: <strong>checking if a number is a power of 2</strong> (n & (n-1) == 0), <strong>counting set bits efficiently</strong> (Brian Kernighan's n &= n-1 loop), and <strong>finding a single non-duplicate element via XOR</strong> (exploiting a^a=0 and a^0=a).</div></div>
+<div class="hl">All three tricks exploit ONE core fact: n & (n-1) clears the lowest set bit of n. This single operation underlies power-of-2 checking, Kernighan's bit count, and even isolating bits via n & -n.</div>
+<div class="card"><div class="lbl">Why n & (n-1) clears the lowest set bit</div><div class="ct">Subtracting 1 from n flips all bits from the lowest set bit downward (that bit becomes 0, everything below becomes 1). ANDing with the original n then zeroes out exactly that lowest set bit while keeping everything above it unchanged.</div></div>`,
+
+`<div class="card"><div class="lbl">Power of 2 check mechanics</div></div>
+<div class="code">// A power of 2 has EXACTLY ONE set bit: 1, 10, 100, 1000, ...
+// n & (n-1) clears that one set bit → result is 0 IFF n was a power of 2
+//
+// n=8:     1000
+// n-1=7:   0111
+// AND:     0000  → result 0 → IS a power of 2 ✓
+//
+// n=6:     0110
+// n-1=5:   0101
+// AND:     0100  → result nonzero → NOT a power of 2
+//
+// Edge case: n=0 has NO set bits. 0 & -1 = 0 → would incorrectly
+// pass the check! Must explicitly handle: n &gt; 0 && (n & (n-1)) == 0</div>
+<div class="card"><div class="lbl">Brian Kernighan's bit-counting trick</div><div class="ct">Instead of checking all 32 bit positions, repeatedly clear the lowest set bit using n &= (n-1) and count iterations. Loop runs exactly (number of set bits) times — much faster for sparse numbers.</div></div>
+<div class="card"><div class="lbl">XOR single-number trick</div><div class="ct">XOR is commutative, associative, self-canceling (a^a=0), and identity-preserving (a^0=a). If every element appears exactly twice except one, XOR-ing the entire array cancels all pairs, leaving only the singleton.</div></div>`,
+
+`<table class="ctbl"><tr><th>Trick</th><th>Time</th><th>Space</th><th>vs naive</th></tr>
+<tr><td>Power of 2 check</td><td class="og">O(1)</td><td class="og">O(1)</td><td>vs O(log n) repeated division</td></tr>
+<tr><td>Brian Kernighan bit count</td><td class="og">O(k)</td><td class="og">O(1)</td><td>k=set bits, vs O(32) checking every position</td></tr>
+<tr><td>XOR single number</td><td class="og">O(n)</td><td class="og">O(1)</td><td>vs O(n) HashSet (same time, but no extra space)</td></tr>
+<tr><td>Isolate lowest set bit (n & -n)</td><td class="og">O(1)</td><td class="og">O(1)</td><td>vs O(log n) loop checking bits one by one</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">n & (n-1) — clear lowest set bit</div><div class="pw">Core building block. Used for: power-of-2 check (result==0), Brian Kernighan bit counting (loop until n==0).</div></div>
+<div class="pc"><div class="pn">n & -n — isolate lowest set bit</div><div class="pw">Returns ONLY the lowest set bit as a standalone value (e.g., 12=1100 → 4=0100). Used in Fenwick trees (BIT) and bucket-by-lowest-bit problems like Single Number III.</div></div>
+<div class="pc"><div class="pn">XOR cancellation (a^a=0, a^0=a)</div><div class="pw">Single Number (all others appear twice). Missing Number. Finding the unique non-duplicate in an otherwise-paired array.</div></div>
+<div class="pc"><div class="pn">XOR + bit-grouping (Single Number III)</div><div class="pw">When TWO unique numbers exist (not one), XOR all gives their XOR. Use the lowest set bit of that XOR to partition the array into two groups, then XOR within each group.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Exactly one bit set</div><div class="trig">Mental trigger: "is this number a power of 2?"</div><div class="pw">n &gt; 0 && (n & (n-1)) == 0. O(1), beats any loop-based check.</div></div>
+<div class="pc"><div class="pn">2. Count set bits efficiently</div><div class="trig">Mental trigger: "how many 1-bits does this number have?"</div><div class="pw">Brian Kernighan: while(n!=0){ n&=(n-1); count++; }. Runs proportional to set bits, not total bit width.</div></div>
+<div class="pc"><div class="pn">3. Find the unpaired element</div><div class="trig">Mental trigger: "everything appears twice except one — find it"</div><div class="pw">XOR the entire array. Pairs cancel to 0, survivor remains. O(n) time, O(1) space — beats HashSet approach on space.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"is n a power of 2/4/etc"</span><span class="sw">→ n & (n-1) == 0 (and n &gt; 0). For power of 4, also check bit position parity.</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"count number of set bits / Hamming weight"</span><span class="sw">→ Brian Kernighan: n &= (n-1) in a loop, count iterations</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"every element appears twice except one — find it"</span><span class="sw">→ XOR all elements; survivor remains</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"every element appears 3 times except one"</span><span class="sw">→ Bit-counting per position mod 3 (not simple XOR — see interview problems)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"exactly two elements appear once, rest twice"</span><span class="sw">→ XOR all → split by lowest set bit of that XOR → XOR each group</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">need ONLY the lowest set bit isolated</span><span class="sw">→ n & -n (two's complement trick)</span></div>
+</div>`,
+
+`<div class="code">// Power of 2 check
+boolean isPowerOfTwo(int n) {
+    return n &gt; 0 && (n & (n - 1)) == 0;  // must handle n&lt;=0 explicitly
+}
+
+// Brian Kernighan's bit count (Hamming weight)
+int countSetBits(int n) {
+    int count = 0;
+    while (n != 0) {
+        n &= (n - 1);     // clears the lowest set bit
+        count++;
+    }
+    return count;
+}
+
+// Isolate lowest set bit
+int lowestSetBit(int n) {
+    return n & (-n);      // e.g., 12 (1100) → 4 (0100)
+}
+
+// Single Number — XOR all elements (exactly one unpaired)
+int singleNumber(int[] nums) {
+    int result = 0;
+    for (int num : nums) result ^= num;  // pairs cancel, survivor remains
+    return result;
+}
+
+// Single Number III — exactly TWO unpaired elements
+int[] singleNumberIII(int[] nums) {
+    int xorAll = 0;
+    for (int num : nums) xorAll ^= num;       // xorAll = a ^ b (the two answers)
+    int diffBit = xorAll & (-xorAll);          // lowest set bit where a,b differ
+    int a = 0, b = 0;
+    for (int num : nums) {
+        if ((num & diffBit) != 0) a ^= num;    // group 1: bit is set
+        else b ^= num;                          // group 2: bit is clear
+    }
+    return new int[]{a, b};
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 260 — Single Number III deep dive</div><div class="card-text">Array where exactly two elements appear once and all others appear exactly twice. Find both unique elements.</div></div>
+<div class="hl"><strong>Brute force:</strong> HashMap counting frequencies, then filter for count==1. O(n) time, O(n) space. Works but doesn't use the elegant bit trick.</div>
+<div class="code">// WHY SIMPLE XOR FAILS HERE:
+// XOR-ing everything gives a^b (since all pairs cancel), but we
+// need a AND b individually, not just their XOR.
+//
+// THE TRICK: a^b has at least one set bit (since a != b). That
+// set bit position is one where a and b DIFFER. We can use ANY
+// such differing bit to partition all numbers into two groups:
+// - Group 1: numbers with that bit set
+// - Group 2: numbers with that bit clear
+// Since a and b differ at that bit, they land in DIFFERENT groups.
+// All the duplicate pairs land in the SAME group as each other
+// (because duplicates are identical, so they share every bit).
+// XOR within each group cancels all pairs, leaving exactly one
+// unique value per group — a in one, b in the other.
+//
+// nums = [1,2,1,3,2,5] → expect [3,5]
+// xorAll = 1^2^1^3^2^5 = 3^5 = 6 (0110)
+// diffBit = 6 & -6 = 2 (0010) — lowest set bit
+// Group by bit 1 (value 2):
+//   has bit: 2,3,2 → wait let's check: 2=010(has bit1=1) 3=011(has bit1=1) 2=010(has bit1=1)
+//   no bit:  1,1,5 → 1=001(bit1=0) 1=001(bit1=0) 5=101(bit1=0)
+// XOR group with bit: 2^3^2 = 3
+// XOR group without bit: 1^1^5 = 5
+// Result: [3,5] ✓</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 231 — Power of Two</div><div class="pmeta"><strong>Why:</strong> Direct application of n & (n-1) == 0 trick.<br><strong>Key insight:</strong> Must exclude n &lt;= 0 explicitly — the formula alone isn't sufficient.</div></div>
+<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 136 — Single Number</div><div class="pmeta"><strong>Why:</strong> Purest XOR cancellation application.<br><strong>Key insight:</strong> XOR entire array; O(1) space beats HashSet's O(n).</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 260 — Single Number III</div><div class="pmeta"><strong>Why:</strong> Combines XOR cancellation with bit-based partitioning. The hardest XOR trick to derive cold.<br><strong>Key insight:</strong> xorAll & -xorAll finds a differing bit to split the array into two solvable groups.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 137 — Single Number II</div><div class="pmeta"><strong>Why:</strong> Every element appears 3 times except one — XOR alone doesn't work (needs mod-3 logic).<br><strong>Key insight:</strong> Count bits at each position mod 3, or use two-variable state machine (ones, twos).</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 342 — Power of Four</div><div class="pmeta"><strong>Why:</strong> Extends power-of-2 check with an extra positional constraint.<br><strong>Key insight:</strong> n & (n-1)==0 (power of 2) AND the single set bit is at an even position (n & 0xAAAAAAAA == 0).</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you explain WHY n & (n-1) clears the lowest set bit (not just recite it)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you catch the n&lt;=0 edge case in power-of-2 checks?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you extend simple XOR cancellation to the "two unique elements" case (Single Number III) under guidance?</span></div>
+</div>
+<div class="hl"><strong>Common trap:</strong> Many candidates try to apply Single Number's simple XOR to Single Number II (triples) or III (two singles) and get stuck. Recognize early: simple XOR only works when exactly ONE element is unpaired and everything else appears an EVEN number of times.</div>`
+]},
+
+{title:"Bit Masking",sub:"Generate subsets · Check/Set/Clear/Toggle bit",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">A bitmask is an integer used to represent a SET of boolean flags — each bit position corresponds to one element's inclusion/exclusion status. Bitmasking lets you encode an entire subset of up to 32 (int) or 64 (long) elements as a single number, enabling O(1) set operations and O(2ⁿ) enumeration of all subsets.</div></div>
+<div class="hl">Bitmask recognition: n ≤ 20-25 elements, need to represent "which elements are included/visited/used" as a compact, fast-to-manipulate state.</div>
+<div class="card"><div class="lbl">The four fundamental operations</div><div class="ct"><strong>Check bit i:</strong> (mask &gt;&gt; i) & 1, or mask & (1&lt;&lt;i) != 0.<br><strong>Set bit i:</strong> mask | (1&lt;&lt;i).<br><strong>Clear bit i:</strong> mask & ~(1&lt;&lt;i).<br><strong>Toggle bit i:</strong> mask ^ (1&lt;&lt;i).</div></div>`,
+
+`<div class="card"><div class="lbl">Generating all subsets via bitmask</div></div>
+<div class="code">// nums = [a, b, c] → 3 elements → 2^3 = 8 subsets
+// Iterate mask from 0 to 2^n - 1. Bit i of mask = "include nums[i]?"
+//
+// mask=000 (0) → {}
+// mask=001 (1) → {a}
+// mask=010 (2) → {b}
+// mask=011 (3) → {a,b}
+// mask=100 (4) → {c}
+// mask=101 (5) → {a,c}
+// mask=110 (6) → {b,c}
+// mask=111 (7) → {a,b,c}
+//
+// For mask=5 (101): bit 0 set → include a. bit 1 clear → skip b.
+// bit 2 set → include c. Result: {a,c} ✓</div>
+<div class="card"><div class="lbl">Iterating all submasks of a mask</div><div class="ct">Sometimes you need every subset of a GIVEN mask (not the full universe). The trick: for(int sub=mask; sub&gt;0; sub=(sub-1)&mask) visits every non-zero submask of mask in O(3ⁿ) total across all masks — a classic bitmask DP technique.</div></div>`,
+
+`<table class="ctbl"><tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Check / Set / Clear / Toggle bit</td><td class="og">O(1)</td><td class="og">O(1)</td><td>Single bitwise instruction</td></tr>
+<tr><td>Generate all subsets (bitmask)</td><td class="om">O(2ⁿ · n)</td><td class="om">O(n)</td><td>2ⁿ masks, O(n) to extract each subset's elements</td></tr>
+<tr><td>Iterate submasks of a mask</td><td class="ob">O(3ⁿ) total</td><td class="og">O(1)</td><td>Classic identity: sum over all masks of (submasks per mask) = 3ⁿ</td></tr>
+<tr><td>Population count (Integer.bitCount)</td><td class="og">O(1)</td><td class="og">O(1)</td><td>Hardware POPCNT instruction on modern CPUs</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">Full subset enumeration (0 to 2ⁿ-1)</div><div class="pw">Iterate every possible mask. Each represents one subset of the universe. Used for: power set generation, brute-force subset-sum checking, TSP-style problems.</div></div>
+<div class="pc"><div class="pn">Submask iteration (sub-subsets of a fixed mask)</div><div class="pw">for(sub=mask; sub&gt;0; sub=(sub-1)&mask). Used in bitmask DP where you split a set into two parts (e.g., assign tasks, partition into groups).</div></div>
+<div class="pc"><div class="pn">Single-bit operations (check/set/clear/toggle)</div><div class="pw">Building blocks for any bitmask manipulation. Combine these four to build/query/update any masked state incrementally.</div></div>
+<div class="pc"><div class="pn">Bitmask as visited-set in DP</div><div class="pw">dp[mask] = best value having processed/visited exactly the elements in mask. TSP, assignment problems, set cover (see Block 6 Bitmask DP).</div></div>`,
+
+`<div class="pc"><div class="pn">1. Encode inclusion/exclusion compactly</div><div class="trig">Mental trigger: "track which of n items (n≤20) are selected"</div><div class="pw">Single int/long as the entire state. O(1) check/update instead of O(n) array scan.</div></div>
+<div class="pc"><div class="pn">2. Enumerate all 2ⁿ combinations</div><div class="trig">Mental trigger: "try every possible subset"</div><div class="pw">for(mask=0; mask&lt;(1&lt;&lt;n); mask++) — replaces nested backtracking with a flat loop, often cleaner for small n.</div></div>
+<div class="pc"><div class="pn">3. Toggle state in iterative search</div><div class="trig">Mental trigger: "flip inclusion status repeatedly during search"</div><div class="pw">XOR with (1&lt;&lt;i) to toggle. Useful in BFS/DFS over mask-states without needing separate add/remove logic.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"generate all 2ⁿ subsets, n ≤ 20"</span><span class="sw">→ Bitmask loop 0 to (1&lt;&lt;n)-1, extract bits per mask</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"track included/excluded state for n items"</span><span class="sw">→ Single int as bitmask; check/set/clear/toggle via bit ops</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"need every submask of a given mask"</span><span class="sw">→ for(sub=mask;sub&gt;0;sub=(sub-1)&mask) iteration trick</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"count elements in the set" (popcount)</span><span class="sw">→ Integer.bitCount(mask), O(1) hardware instruction</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">DP state = "which elements visited so far"</span><span class="sw">→ Bitmask DP: dp[mask][...] (see Block 6)</span></div>
+</div>`,
+
+`<div class="code">// THE FOUR FUNDAMENTAL BITMASK OPERATIONS
+int checkBit(int mask, int i)  { return (mask &gt;&gt; i) & 1; }      // 0 or 1
+int setBit(int mask, int i)    { return mask | (1 &lt;&lt; i); }      // force bit i to 1
+int clearBit(int mask, int i)  { return mask & ~(1 &lt;&lt; i); }     // force bit i to 0
+int toggleBit(int mask, int i) { return mask ^ (1 &lt;&lt; i); }      // flip bit i
+
+// Generate ALL subsets using bitmask (LC 78 alternative to backtracking)
+List&lt;List&lt;Integer&gt;&gt; subsetsBitmask(int[] nums) {
+    int n = nums.length;
+    List&lt;List&lt;Integer&gt;&gt; result = new ArrayList&lt;&gt;();
+    for (int mask = 0; mask &lt; (1 &lt;&lt; n); mask++) {
+        List&lt;Integer&gt; subset = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; n; i++)
+            if ((mask & (1 &lt;&lt; i)) != 0)      // bit i set → include nums[i]
+                subset.add(nums[i]);
+        result.add(subset);
+    }
+    return result;
+}
+
+// Iterate all non-empty submasks of a given mask
+void iterateSubmasks(int mask) {
+    for (int sub = mask; sub &gt; 0; sub = (sub - 1) & mask) {
+        // process submask 'sub' (a subset of mask's set bits)
+    }
+    // Note: doesn't include the empty submask (sub=0); add separately if needed
+}
+
+// Population count (number of set bits) — built-in, O(1) hardware
+int popcount = Integer.bitCount(mask);</div>`,
+
+`<div class="card"><div class="lbl">LC 78 — Subsets, bitmask approach (vs backtracking)</div></div>
+<div class="hl"><strong>Why bitmask works here:</strong> Each of the n elements has a binary "in/out" decision. A number from 0 to 2ⁿ-1, read bit by bit, directly encodes one specific in/out assignment for all n elements simultaneously — no recursion needed.</div>
+<div class="code">// nums = [1,2,3], n=3, iterate mask 0..7
+// mask=0 (000): no bits set → {}
+// mask=1 (001): bit0 set → {1}
+// mask=2 (010): bit1 set → {2}
+// mask=3 (011): bit0,bit1 set → {1,2}
+// mask=4 (100): bit2 set → {3}
+// mask=5 (101): bit0,bit2 set → {1,3}
+// mask=6 (110): bit1,bit2 set → {2,3}
+// mask=7 (111): all set → {1,2,3}
+//
+// Backtracking vs bitmask tradeoff:
+// Backtracking: more flexible for pruning/constraints, works for any n
+// Bitmask: simpler code for n&lt;=20, no recursion overhead, but doesn't
+//          scale beyond ~25 elements (2^25 = 33M already large)</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 78 — Subsets (bitmask variant)</div><div class="pmeta"><strong>Why:</strong> Compare bitmask iteration against backtracking from Block 5.<br><strong>Key insight:</strong> Each mask 0..2ⁿ-1 directly encodes one subset — no recursion needed.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1318 — Minimum Flips to Make a OR b Equal to c</div><div class="pmeta"><strong>Why:</strong> Bit-by-bit comparison using check/set logic across three numbers.<br><strong>Key insight:</strong> For each bit position, compare a,b,c bits and count required flips.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 78 / 90 combined — Subsets with constraints via bitmask</div><div class="pmeta"><strong>Why:</strong> Use bitmask + extra filtering (e.g., sum constraint) — practice combining bit tricks with logic.<br><strong>Key insight:</strong> Generate mask, then validate subset against constraint before adding.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1494 — Parallel Courses II (bitmask DP)</div><div class="pmeta"><strong>Why:</strong> Combines submask iteration with DP transitions (see Block 6 Bitmask DP for full depth).<br><strong>Key insight:</strong> Iterate valid "available courses" submasks each semester.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1986 — Minimum Number of Work Sessions</div><div class="pmeta"><strong>Why:</strong> Bitmask state representing "tasks completed", DP over all masks.<br><strong>Key insight:</strong> Precompute valid task-subsets that fit in one session, then DP over partitions.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Do you know all four operations (check/set/clear/toggle) cold, without hesitation?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you explain the submask iteration trick (sub-1)&mask and why it terminates?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you recognize when n is small enough (≤20-25) to justify a bitmask approach?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "Since n is small, I can represent the entire subset state as a single integer bitmask — bit i tells me if element i is included. I'll check bits with AND, set with OR, clear with AND-NOT, and toggle with XOR. This gives O(1) state operations instead of scanning an array each time."</div>`
+]},
+
+{title:"Two's Complement",sub:"Negative numbers in binary",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Two's complement is the standard way computers represent negative integers in binary. Instead of a separate sign bit with magnitude, the most significant bit (MSB) carries weight -2^(n-1) instead of +2^(n-1). This makes addition/subtraction work identically for positive and negative numbers using the same circuitry — no special-casing needed.</div></div>
+<div class="hl">To negate a number in two's complement: flip all bits, then add 1. This is exactly what ~x + 1 computes — and it equals -x.</div>
+<div class="card"><div class="lbl">Why two's complement (not sign-magnitude)?</div><div class="ct">Sign-magnitude (separate sign bit + value) has two representations of zero (+0 and -0) and requires different circuitry for add/subtract depending on signs. Two's complement has exactly ONE representation of zero, and addition works uniformly — the CPU's adder doesn't need to know or care about sign.</div></div>`,
+
+`<div class="card"><div class="lbl">Two's complement construction (8-bit example)</div></div>
+<div class="code">// Positive 5:    00000101
+// Step 1 - flip all bits (one's complement):  11111010
+// Step 2 - add 1:                              11111011
+// Result: -5 in two's complement = 11111011
+//
+// Verify: 11111011 interpreted as two's complement
+// MSB=1 → negative. Value = -128 + 64+32+16+8+0+2+1 = -128+123 = -5 ✓
+//
+// Range for n-bit two's complement: -2^(n-1) to 2^(n-1)-1
+// For 32-bit int: -2,147,483,648 to 2,147,483,647
+// NOTE the asymmetry: one more negative number than positive
+// (because 0 takes up one of the "positive side" slots)</div>
+<div class="card"><div class="lbl">Why ~x = -x - 1</div><div class="ct">Flipping all bits of x (NOT) computes the one's complement, which equals -x-1 in two's complement arithmetic. This is why in Java, ~5 = -6, not -5. To get -x exactly, you need ~x + 1 (flip then add one) — which is precisely the two's complement negation formula.</div></div>`,
+
+`<table class="ctbl"><tr><th>Concept</th><th>Formula</th><th>Example (8-bit)</th></tr>
+<tr><td>Negate x</td><td>~x + 1</td><td>~5+1 = -6+1 = -5</td></tr>
+<tr><td>NOT alone</td><td>~x = -x-1</td><td>~5 = -6</td></tr>
+<tr><td>Range (n-bit)</td><td>[-2^(n-1), 2^(n-1)-1]</td><td>8-bit: [-128, 127]</td></tr>
+<tr><td>Overflow wraparound</td><td>MAX+1 → MIN</td><td>127+1 = -128 (8-bit)</td></tr>
+</table>
+<div class="hl" style="margin-top:10px">All arithmetic operations are O(1) regardless of representation — two's complement doesn't change complexity, just CORRECTNESS and uniformity of the hardware implementation.</div>`,
+
+`<div class="pc"><div class="pn">Standard two's complement (used everywhere)</div><div class="pw">Java int/long, virtually all modern hardware. MSB has negative weight. Single zero representation, uniform arithmetic circuitry.</div></div>
+<div class="pc"><div class="pn">Sign-magnitude (legacy/educational only)</div><div class="pw">Separate sign bit + magnitude bits. Two representations of zero. Rarely used in modern systems but appears in some interview "explain the alternatives" questions.</div></div>
+<div class="pc"><div class="pn">One's complement (legacy/educational only)</div><div class="pw">Just flip all bits for negation (no +1). Also has two zero representations (+0 and -0). Used historically in some early computers and in checksum algorithms.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Negation via flip-and-add-one</div><div class="trig">Mental trigger: "convert positive to negative (or vice versa) in binary"</div><div class="pw">~x + 1 = -x. Core formula for understanding any two's complement manipulation.</div></div>
+<div class="pc"><div class="pn">2. Sign-bit awareness in shifts</div><div class="trig">Mental trigger: "right-shifting a negative number"</div><div class="pw">Java's &gt;&gt; preserves sign (fills with 1s for negative). &gt;&gt;&gt; always fills with 0s, destroying the sign interpretation — critical distinction for negative number bit manipulation.</div></div>
+<div class="pc"><div class="pn">3. Overflow wraparound reasoning</div><div class="trig">Mental trigger: "adding causes the result to flip sign unexpectedly"</div><div class="pw">Integer.MAX_VALUE + 1 wraps to Integer.MIN_VALUE. This is two's complement arithmetic overflowing — important for problems explicitly avoiding overflow (e.g., sum of two integers without +).</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"negate a number using only bit operations"</span><span class="sw">→ ~x + 1 (flip bits, add one)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"explain how negative numbers are stored"</span><span class="sw">→ Two's complement: MSB has negative weight, single zero, uniform arithmetic</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">right-shifting a negative number gives unexpected huge positive result</span><span class="sw">→ You used &gt;&gt;&gt; (logical) instead of &gt;&gt; (arithmetic) — or vice versa depending on intent</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"detect/handle integer overflow"</span><span class="sw">→ Reason about two's complement wraparound (MAX+1=MIN)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"absolute value using bit tricks (no branching)"</span><span class="sw">→ mask = x &gt;&gt; 31 (all 1s if negative, all 0s if positive); (x^mask)-mask</span></div>
+</div>`,
+
+`<div class="code">// Two's complement negation
+int negate(int x) {
+    return ~x + 1;     // flip all bits, then add 1 — equals -x
+}
+
+// Verify the NOT-alone relationship: ~x = -x - 1
+// ~5 in Java:
+System.out.println(~5);   // -6  (NOT -5!)
+System.out.println(~5 + 1); // -5 (correct negation)
+
+// Branchless absolute value using two's complement properties
+int absValue(int x) {
+    int mask = x &gt;&gt; 31;       // all 1s if x&lt;0, all 0s if x&gt;=0
+    return (x ^ mask) - mask;  // if mask=0: x-0=x. if mask=-1: ~x-(-1)=~x+1=-x
+}
+
+// Detecting overflow when adding two ints (two's complement aware)
+boolean willOverflow(int a, int b) {
+    int sum = a + b;
+    // overflow happened if signs of a,b are same but sum's sign differs
+    return ((a &gt; 0 && b &gt; 0 && sum &lt; 0) || (a &lt; 0 && b &lt; 0 && sum &gt; 0));
+}
+
+// Min/Max int constants (two's complement boundaries)
+// Integer.MAX_VALUE = 2147483647   = 01111111 11111111 11111111 11111111
+// Integer.MIN_VALUE = -2147483648  = 10000000 00000000 00000000 00000000
+// MAX_VALUE + 1 wraps to MIN_VALUE (overflow, two's complement wraparound)</div>`,
+
+`<div class="card"><div class="lbl">Why Integer.MIN_VALUE has no positive counterpart</div></div>
+<div class="hl"><strong>The classic two's complement asymmetry:</strong> For 32-bit ints, the range is [-2147483648, 2147483647] — one more negative number than positive. This is because 0 occupies one slot on the "non-negative" side, leaving 2^31 negative values but only 2^31-1 positive values (plus zero).</div>
+<div class="code">// Math.abs(Integer.MIN_VALUE) — a classic gotcha!
+int x = Integer.MIN_VALUE;  // -2147483648
+int y = Math.abs(x);        // STILL -2147483648! (overflow, no positive
+                              // counterpart exists in 32-bit two's complement)
+//
+// Why: negating MIN_VALUE via ~x+1:
+// MIN_VALUE = 10000000 00000000 00000000 00000000
+// ~MIN_VALUE = 01111111 11111111 11111111 11111111  (= MAX_VALUE)
+// ~MIN_VALUE + 1 = MAX_VALUE + 1 = overflow → wraps back to MIN_VALUE
+//
+// This is why Math.abs(Integer.MIN_VALUE) returns a negative number
+// — a frequently-tested edge case in interviews about integer bounds.</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 7 — Reverse Integer</div><div class="pmeta"><strong>Why:</strong> Forces explicit reasoning about 32-bit overflow boundaries (two's complement range).<br><strong>Key insight:</strong> Check for overflow BEFORE it happens using boundary comparisons against MAX_VALUE/10.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 371 — Sum of Two Integers</div><div class="pmeta"><strong>Why:</strong> Requires understanding addition as XOR+carry, which depends on two's complement uniformity.<br><strong>Key insight:</strong> XOR computes sum without carry; (a&b)&lt;&lt;1 computes the carry; repeat until carry is 0.</div></div>
+<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 8 — String to Integer (atoi)</div><div class="pmeta"><strong>Why:</strong> Tests boundary clamping awareness (INT_MIN/INT_MAX) tied to two's complement range.<br><strong>Key insight:</strong> Clamp result to [Integer.MIN_VALUE, Integer.MAX_VALUE] before returning.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 29 — Divide Two Integers (no * or /)</div><div class="pmeta"><strong>Why:</strong> Must specifically handle the Integer.MIN_VALUE edge case (no positive counterpart).<br><strong>Key insight:</strong> Use long internally to avoid overflow, or special-case MIN_VALUE explicitly.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 478 — Generate Random Point in a Circle (bonus: floating-point bit tricks)</div><div class="pmeta"><strong>Why:</strong> Less direct, but tests comfort with low-level numeric representation thinking.<br><strong>Key insight:</strong> Not core two's complement, but builds the same "understand the representation" muscle.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you derive ~x+1 = -x from first principles (flip bits, add one)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you know why Integer.MIN_VALUE has no positive counterpart in 32-bit two's complement?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you detect overflow by comparing operand signs against result sign?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "Java integers use two's complement, so the most significant bit carries negative weight. To negate a number, I flip all bits and add 1 — that's exactly what ~x+1 computes. I need to watch for the edge case where x is Integer.MIN_VALUE, since its magnitude has no positive representation in 32 bits and negating it overflows back to itself."</div>`
+]},
+
+{title:"Interview Problems",sub:"Missing number · Single Number III · Sum of two integers without +",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">This topic curates the three most frequently asked bit-manipulation interview problems that combine multiple tricks from this block into cohesive, testable solutions: <strong>Missing Number</strong> (XOR or sum trick), <strong>Single Number III</strong> (XOR + bit partitioning, deep-dived in Common Tricks), and <strong>Sum of Two Integers</strong> (simulating addition with XOR and carry, no + or - allowed).</div></div>
+<div class="hl">These three problems are disproportionately common in FAANG interviews because each tests a DIFFERENT facet of bit fluency: XOR cancellation, bit-based partitioning, and binary addition logic.</div>
+<div class="card"><div class="lbl">Why these three specifically</div><div class="ct"><strong>Missing Number:</strong> tests whether you reach for XOR/sum instead of a HashSet — an O(n) space reduction.<br><strong>Single Number III:</strong> tests whether you can extend single-XOR insight to a harder two-unknowns case.<br><strong>Sum without +:</strong> tests deep understanding of how binary addition actually works at the hardware level.</div></div>`,
+
+`<div class="card"><div class="lbl">Missing Number — two approaches</div></div>
+<div class="code">// nums = [3,0,1] (missing 2 from range [0,n])
+// APPROACH 1: Sum formula
+// Expected sum of 0..n = n*(n+1)/2. Actual sum = sum(nums).
+// Missing = expected - actual.
+// n=3 (array length): expected = 3*4/2=6. actual=3+0+1=4. missing=6-4=2 ✓
+//
+// APPROACH 2: XOR trick (avoids overflow risk with very large sums)
+// XOR all numbers 0..n together, then XOR with all array elements.
+// Everything that's PRESENT cancels (appears once in range, once in array).
+// What remains is the MISSING number.
+// missing = (0^1^2^3) ^ (3^0^1) = 0(from pairs 0,0  1,1  3,3) ^ 2 = 2 ✓</div>
+<div class="card"><div class="lbl">Sum of Two Integers — binary addition without + or -</div><div class="ct">XOR gives the sum of two bits IGNORING carry (1^0=1, 1^1=0 — but 1+1 should produce a carry!). AND followed by left-shift gives exactly the carry bits. Repeat: new_sum = a^b, new_carry = (a&b)&lt;&lt;1, until carry becomes 0.</div></div>
+<div class="code">// a=5(101), b=3(011)
+// Step 1: sum = a^b = 110(6). carry = (a&b)&lt;&lt;1 = 001&lt;&lt;1 = 010(2)
+// Step 2: a=sum=110, b=carry=010
+//   sum = 110^010 = 100(4). carry = (110&010)&lt;&lt;1 = 010&lt;&lt;1=100(4)
+// Step 3: a=100, b=100
+//   sum = 100^100 = 000. carry = (100&100)&lt;&lt;1 = 100&lt;&lt;1 = 1000(8)
+// Step 4: a=000, b=1000
+//   sum = 1000(8). carry = 0&lt;&lt;1 = 0 → DONE
+// Result: 8 (5+3=8 ✓)</div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>Time</th><th>Space</th><th>vs naive</th></tr>
+<tr><td>Missing Number (XOR)</td><td class="og">O(n)</td><td class="og">O(1)</td><td>vs O(n) HashSet — same time, less space</td></tr>
+<tr><td>Single Number III</td><td class="og">O(n)</td><td class="og">O(1)</td><td>vs O(n) HashMap counting — same time, less space</td></tr>
+<tr><td>Sum of Two Integers</td><td class="og">O(log n) iterations</td><td class="og">O(1)</td><td>Bounded by bit-width (32); simulates hardware adder</td></tr>
+</table>
+<div class="hl" style="margin-top:10px">In every case, the bit-manipulation solution matches the TIME complexity of the naive approach but improves SPACE to O(1) — this is the recurring value proposition of bit tricks in interviews.</div>`,
+
+`<div class="pc"><div class="pn">Missing Number — XOR range trick</div><div class="pw">XOR all numbers 0..n with all array elements. Present numbers cancel in pairs; the missing one survives alone.</div></div>
+<div class="pc"><div class="pn">Missing Number — sum formula (alternative)</div><div class="pw">expected_sum - actual_sum = missing. Simpler to derive but risks overflow for very large n (use long if needed).</div></div>
+<div class="pc"><div class="pn">Single Number III — XOR + partition by differing bit</div><div class="pw">Full mechanics covered in Common Tricks topic. The two-unknowns extension of basic XOR cancellation.</div></div>
+<div class="pc"><div class="pn">Sum of Two Integers — XOR-sum + AND-carry loop</div><div class="pw">Simulates how a hardware full-adder works: XOR computes bit sum ignoring carry, AND+shift computes the carry to propagate, loop until no carry remains.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Find the missing element in a range</div><div class="trig">Mental trigger: "array contains n distinct numbers from 0 to n, one is missing"</div><div class="pw">XOR all expected values with all actual values — survivor is the missing one. Or use sum formula.</div></div>
+<div class="pc"><div class="pn">2. Simulate addition without arithmetic operators</div><div class="trig">Mental trigger: "add two numbers without using + or -"</div><div class="pw">XOR for sum-ignoring-carry, AND+shift for carry, loop until carry=0. Mimics a hardware adder circuit.</div></div>
+<div class="pc"><div class="pn">3. Isolate two unknowns from a single XOR</div><div class="trig">Mental trigger: "XOR gives me a^b, I need a and b separately"</div><div class="pw">Find a differing bit (lowest set bit of a^b), partition all elements by that bit, XOR within each partition.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"array has numbers 0..n, exactly one missing"</span><span class="sw">→ XOR all range values with all array values, or use sum formula</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"add two integers without + or -"</span><span class="sw">→ Loop: sum=a^b, carry=(a&b)&lt;&lt;1, until carry==0</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"exactly two unique elements among duplicated pairs"</span><span class="sw">→ XOR all → split by lowest differing bit → XOR each group</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">need O(1) space instead of HashSet/HashMap for a "find unique/missing" problem</span><span class="sw">→ Check if XOR cancellation applies (requires the "even occurrence except one" structure)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"subtract without using -"</span><span class="sw">→ a - b = a + (-b) = a + (~b + 1), reuse the addition-without-+ logic</span></div>
+</div>`,
+
+`<div class="code">// LC 268 — Missing Number (XOR approach)
+int missingNumber(int[] nums) {
+    int result = nums.length;          // start with n itself
+    for (int i = 0; i &lt; nums.length; i++)
+        result ^= i ^ nums[i];          // XOR in both index i and nums[i]
+    return result;
+}
+// Equivalent to XOR-ing (0^1^...^n) ^ (nums[0]^...^nums[n-1])
+// Every present number cancels with its matching index XOR pass
+
+// LC 371 — Sum of Two Integers (no + or -)
+int getSum(int a, int b) {
+    while (b != 0) {
+        int carry = (a & b) &lt;&lt; 1;   // bits where both are 1 → carry out
+        a = a ^ b;                    // sum ignoring carry
+        b = carry;                    // carry becomes the new "b" to add
+    }
+    return a;
+}
+// Loop terminates because carry eventually becomes 0
+// (each iteration shifts carry left, bounded by 32-bit width)
+
+// Subtraction reuses the same mechanism: a - b = a + (-b)
+int getDifference(int a, int b) {
+    return getSum(a, getSum(~b, 1));   // -b = ~b + 1 (two's complement negation)
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 371 — Sum of Two Integers full trace</div><div class="card-text">Add a=12, b=7 using only bitwise operations.</div></div>
+<div class="hl"><strong>Why this works:</strong> Binary addition at each bit position produces a sum bit and a carry bit, exactly like manual long addition. XOR captures "sum ignoring carry" because it's 1 exactly when bits differ (which is correct for 0+1 and 1+0, but WRONG for 1+1 — that case needs a carry, captured separately by AND).</div>
+<div class="code">// a=12 (1100), b=7 (0111)
+// Iteration 1:
+//   carry = (1100 & 0111) &lt;&lt; 1 = 0100 &lt;&lt; 1 = 1000 (8)
+//   a = 1100 ^ 0111 = 1011 (11)
+//   b = carry = 1000 (8)
+// Iteration 2:
+//   carry = (1011 & 1000) &lt;&lt; 1 = 1000 &lt;&lt; 1 = 10000 (16)
+//   a = 1011 ^ 1000 = 0011 (3)
+//   b = 10000 (16)
+// Iteration 3:
+//   carry = (0011 & 10000) &lt;&lt; 1 = 00000 &lt;&lt; 1 = 0 (0)
+//   a = 0011 ^ 10000 = 10011 (19)
+//   b = 0
+// Loop ends (b==0). Return a = 19
+// Verify: 12 + 7 = 19 ✓</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 268 — Missing Number</div><div class="pmeta"><strong>Why:</strong> Tests whether you reach for XOR/sum over HashSet for the O(1)-space win.<br><strong>Key insight:</strong> XOR all indices and values together — missing number survives.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 260 — Single Number III</div><div class="pmeta"><strong>Why:</strong> The hardest "pure XOR" problem — requires the bit-partitioning extension.<br><strong>Key insight:</strong> Already deep-dived in Common Tricks — revisit if this feels shaky.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 371 — Sum of Two Integers</div><div class="pmeta"><strong>Why:</strong> Forces genuine understanding of binary addition mechanics, not memorization.<br><strong>Key insight:</strong> XOR=sum without carry, AND+shift=carry, loop until carry=0.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 187 — Repeated DNA Sequences</div><div class="pmeta"><strong>Why:</strong> Uses bit-encoding (2 bits per nucleotide) to compress strings for fast hashing/comparison.<br><strong>Key insight:</strong> Encode 10-character DNA windows as 20-bit integers for O(1) comparison instead of string comparison.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 421 — Maximum XOR of Two Numbers in an Array</div><div class="pmeta"><strong>Why:</strong> Combines bitmask thinking with a Trie — advanced bit-manipulation application.<br><strong>Key insight:</strong> Build a bit-Trie (MSB to LSB), greedily choose the opposite bit at each level to maximize XOR.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Do you default to XOR/bit tricks for O(1) space when a HashSet/HashMap solution is the obvious first instinct?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you trace through the sum-without-+ algorithm by hand for a small example?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you connect this block's tricks to EARLIER concepts (e.g., realizing missing number is XOR cancellation, the same idea behind Single Number)?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "Since the array contains a structured set of numbers (range 0 to n, missing one), I can XOR all expected values against all actual values — anything present cancels out, leaving the missing number. This avoids the O(n) extra space a HashSet approach would need."</div>
+<div class="card"><div class="lbl">Block 8 — Complete pattern summary</div>
+<div class="sr"><span class="si">T1</span><span class="sth">Bit Ops</span><span class="sw">AND=check, OR=set, XOR=toggle/cancel, &gt;&gt;=arithmetic, &gt;&gt;&gt;=logical</span></div>
+<div class="sr"><span class="si">T2</span><span class="sth">Common Tricks</span><span class="sw">n&(n-1) clears lowest bit → power-of-2, Kernighan count, n&-n isolates it</span></div>
+<div class="sr"><span class="si">T3</span><span class="sth">Bit Masking</span><span class="sw">check/set/clear/toggle via shift+AND/OR/XOR; 2ⁿ subset enumeration</span></div>
+<div class="sr"><span class="si">T4</span><span class="sth">Two's Complement</span><span class="sw">~x+1=-x; MSB negative weight; MIN_VALUE has no positive pair</span></div>
+<div class="sr"><span class="si">T5</span><span class="sth">Interview Set</span><span class="sw">Missing Number=XOR range; Sum without +=XOR+carry loop</span></div>
+</div>`
+]}
+];
+
+let CT=0, CS=0;
+
+function renderTabs(){
+  document.getElementById('stabs').innerHTML=TABS.map((t,i)=>`<button class="stab${i===CS?' active':''}" onclick="selS(${i})">${t}</button>`).join('');
+}
+
+function renderContent(){
+  const topic=D[CT];
+  document.getElementById('cnt').innerHTML=`<div class="th">${topic.title}</div><div class="ts">${topic.sub}</div>${topic.s[CS]||'<div class="card"><div class="ct">Content coming soon.</div></div>'}`;
+}
+
+function sel(idx){
+  CT=idx; CS=0;
+  document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  renderTabs(); renderContent();
+  document.getElementById('main').scrollTop=0;
+}
+
+function selS(idx){
+  CS=idx; renderTabs(); renderContent();
+  document.getElementById('main').scrollTop=0;
+}
+
+renderTabs(); renderContent();
+</script>

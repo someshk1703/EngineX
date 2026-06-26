@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,sans-serif);background:transparent;color:var(--color-text-primary)}
+.app{max-width:700px;padding:1rem 0}
+.nav-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.nav-btn{padding:5px 10px;font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:6px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.nav-btn.active{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-primary);font-weight:500}
+.nav-btn:hover{border-color:var(--color-border-primary);color:var(--color-text-primary)}
+.topic-header{margin-bottom:1.5rem}
+.topic-title{font-size:22px;font-weight:500;margin-bottom:4px;color:var(--color-text-primary)}
+.topic-sub{font-size:14px;color:var(--color-text-secondary)}
+.section-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.25rem}
+.sec-btn{padding:4px 10px;font-size:12px;border:0.5px solid var(--color-border-tertiary);border-radius:20px;cursor:pointer;background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.sec-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.sec-btn:hover:not(.active){border-color:var(--color-border-primary);color:var(--color-text-primary)}
+.content-box{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:1.25rem}
+h2{font-size:15px;font-weight:500;margin-bottom:10px;color:var(--color-text-primary);display:flex;align-items:center;gap:8px}
+h2 .badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:400;background:#E1F5EE;color:#0F6E56}
+h3{font-size:14px;font-weight:500;margin:14px 0 6px;color:var(--color-text-primary)}
+p,li{font-size:14px;line-height:1.65;color:var(--color-text-secondary)}
+li{margin-bottom:4px}
+ul{padding-left:18px;margin-bottom:10px}
+code{font-family:var(--font-mono,monospace);font-size:12px;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px;color:var(--color-text-primary)}
+pre{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:1rem;overflow-x:auto;margin:10px 0}
+pre code{background:none;padding:0;font-size:12px;line-height:1.7}
+.table-wrap{overflow-x:auto;margin:10px 0}
+table{width:100%;font-size:13px;border-collapse:collapse}
+th{text-align:left;padding:7px 10px;font-weight:500;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+td{padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);vertical-align:top}
+td:first-child{color:var(--color-text-primary);font-weight:500;font-size:13px}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin:2px;font-weight:500}
+.pill-green{background:#E1F5EE;color:#0F6E56}
+.pill-blue{background:#E6F1FB;color:#185FA5}
+.pill-amber{background:#FAEEDA;color:#854F0B}
+.pill-coral{background:#FAECE7;color:#993C1D}
+.pill-purple{background:#EEEDFE;color:#534AB7}
+.pill-gray{background:#F1EFE8;color:#5F5E5A}
+.pattern-card{border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:12px;margin-bottom:10px}
+.pattern-title{font-size:13px;font-weight:500;margin-bottom:4px;color:var(--color-text-primary)}
+.trigger{font-size:12px;color:#0F6E56;font-style:italic;margin-top:4px}
+.smell-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.smell-if{font-size:13px;color:var(--color-text-secondary);flex:1}
+.smell-then{font-size:13px;font-weight:500;color:#185FA5;flex:1}
+.arrow{color:var(--color-text-secondary);font-size:16px;margin-top:-1px}
+.step-block{background:var(--color-background-secondary);border-left:2px solid #1D9E75;padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:8px;font-size:13px;color:var(--color-text-secondary)}
+.brute-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:#FAEEDA;color:#854F0B;margin-bottom:8px}
+.opt-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:#E1F5EE;color:#0F6E56;margin-bottom:8px}
+.practice-card{border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+.diff-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;flex-shrink:0}
+.diff-easy{background:#EAF3DE;color:#3B6D11}
+.diff-med{background:#FAEEDA;color:#854F0B}
+.diff-hard{background:#FAECE7;color:#993C1D}
+.interview-box{background:#E6F1FB;border:0.5px solid #B5D4F4;border-radius:8px;padding:12px;margin-bottom:10px}
+.interview-box p{color:#185FA5}
+.interview-q{font-size:13px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.interview-q:last-child{border-bottom:none}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:1.5rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary)}
+.nav-arr-btn{padding:6px 14px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:6px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.nav-arr-btn:hover{border-color:var(--color-border-primary);color:var(--color-text-primary)}
+.nav-arr-btn:disabled{opacity:0.35;cursor:default}
+.progress{font-size:12px;color:var(--color-text-secondary);text-align:center;align-self:center}
+.sep{height:1px;background:var(--color-border-tertiary);margin:14px 0}
+</style>
+</head>
+<body>
+<div class="app" id="root"></div>
+<script>
+const TOPICS = [
+  {
+    id:"fundamentals",title:"Graph Fundamentals",
+    sub:"Directed vs undirected · Weighted vs unweighted · Adjacency list vs matrix",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 1</span></h2>
+<p>A <strong>graph</strong> G = (V, E) is a collection of <b>vertices</b> (nodes) and <b>edges</b> (connections between nodes). Unlike trees, graphs can have cycles, multiple components, and edges pointing in any direction.</p>
+<h3>Core vocabulary</h3>
+<ul>
+<li><b>Vertex / Node:</b> An entity (city, person, task)</li>
+<li><b>Edge:</b> A connection between two vertices</li>
+<li><b>Degree:</b> Number of edges a vertex has (in-degree / out-degree for directed)</li>
+<li><b>Path:</b> A sequence of vertices where each consecutive pair is connected by an edge</li>
+<li><b>Cycle:</b> A path that starts and ends at the same vertex</li>
+<li><b>Connected graph:</b> Every vertex is reachable from every other vertex</li>
+<li><b>Component:</b> A maximal connected subgraph</li>
+<li><b>DAG:</b> Directed Acyclic Graph — directed graph with no cycles</li>
+<li><b>Tree:</b> A special graph — connected, undirected, with exactly N-1 edges for N nodes</li>
+</ul>
+<h3>Visual mental model</h3>
+<p>Think of a city map. Cities = vertices, roads = edges. Weighted = road has a distance. Directed = one-way street. Undirected = two-way street.</p>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<h3>Directed vs undirected</h3>
+<div class="table-wrap"><table>
+<tr><th>Property</th><th>Undirected</th><th>Directed (Digraph)</th></tr>
+<tr><td>Edge meaning</td><td>A—B means A↔B (both ways)</td><td>A→B means only A can reach B directly</td></tr>
+<tr><td>Adjacency matrix</td><td>Symmetric: adj[i][j]=adj[j][i]</td><td>Asymmetric possible</td></tr>
+<tr><td>Degree</td><td>Single degree count</td><td>In-degree + out-degree</td></tr>
+<tr><td>Use case</td><td>Social networks, road grids</td><td>Dependencies, web links, DAGs</td></tr>
+</table></div>
+<h3>Weighted vs unweighted</h3>
+<div class="table-wrap"><table>
+<tr><th>Property</th><th>Unweighted</th><th>Weighted</th></tr>
+<tr><td>Edge cost</td><td>All edges cost 1</td><td>Each edge has a numerical cost/distance</td></tr>
+<tr><td>Shortest path</td><td>BFS gives optimal</td><td>Need Dijkstra / Bellman-Ford</td></tr>
+<tr><td>Storage</td><td>adj[u] = list of neighbors</td><td>adj[u] = list of (neighbor, weight) pairs</td></tr>
+</table></div>
+<h3>Adjacency list vs matrix</h3>
+<div class="table-wrap"><table>
+<tr><th>Property</th><th>Adjacency List</th><th>Adjacency Matrix</th></tr>
+<tr><td>Memory</td><td>O(V + E)</td><td>O(V²)</td></tr>
+<tr><td>Check edge (u,v)</td><td>O(degree(u))</td><td>O(1)</td></tr>
+<tr><td>Iterate neighbors of u</td><td>O(degree(u))</td><td>O(V)</td></tr>
+<tr><td>Best for</td><td>Sparse graphs (E &lt;&lt; V²)</td><td>Dense graphs (E ≈ V²)</td></tr>
+<tr><td>Java structure</td><td>Map&lt;Integer,List&lt;Integer&gt;&gt;</td><td>int[V][V]</td></tr>
+</table></div>
+<p>In FAANG problems, <b>always default to adjacency list</b> — real-world graphs are sparse (a city with 1M roads doesn't have 1M² connections).</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Representation</th><th>Space</th><th>Add edge</th><th>Remove edge</th><th>Check edge</th><th>Get neighbors</th></tr>
+<tr><td>Adjacency List</td><td>O(V+E)</td><td>O(1)</td><td>O(degree)</td><td>O(degree)</td><td>O(degree)</td></tr>
+<tr><td>Adjacency Matrix</td><td>O(V²)</td><td>O(1)</td><td>O(1)</td><td>O(1)</td><td>O(V)</td></tr>
+</table></div>
+<h3>Why O(V+E) for adjacency list?</h3>
+<p>Each vertex has a list. Sum of all list sizes = number of edges (2E for undirected since each edge appears in both u's and v's list). So total space = V (for the vertex entries) + 2E (for all adjacency entries) = O(V+E).</p>
+<h3>Why O(V²) for matrix?</h3>
+<p>You allocate a V×V grid regardless of how many edges exist. For V=1000, that's 1,000,000 entries — even if you only have 100 edges.</p>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Type</th><th>Definition</th><th>When it applies</th></tr>
+<tr><td>Undirected</td><td>Edges have no direction</td><td>Social networks, physical maps</td></tr>
+<tr><td>Directed (Digraph)</td><td>Edges point one way</td><td>URLs, dependencies, state machines</td></tr>
+<tr><td>Weighted</td><td>Edges carry a cost/distance</td><td>Road maps, network routing</td></tr>
+<tr><td>DAG</td><td>Directed, no cycles</td><td>Build systems, course prerequisites, compilers</td></tr>
+<tr><td>Bipartite</td><td>Vertices split into 2 groups; edges only cross groups</td><td>Matching problems (students↔courses)</td></tr>
+<tr><td>Tree</td><td>Connected undirected acyclic graph (N nodes, N-1 edges)</td><td>Hierarchies, file systems</td></tr>
+<tr><td>Complete graph (Kₙ)</td><td>Every pair connected; E = N(N-1)/2</td><td>Combinatorics, worst-case analysis</td></tr>
+</table></div>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. Graph Traversal (BFS/DFS)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Visit every reachable node systematically. Foundation of almost all graph algorithms.</p>
+<div class="trigger">Trigger: "visit all nodes", "find if reachable", "count components"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Shortest Path</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">BFS for unweighted, Dijkstra for non-negative weights, Bellman-Ford for negative weights.</p>
+<div class="trigger">Trigger: "minimum steps", "least cost route", "shortest distance"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">3. Cycle Detection</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">DFS with coloring (WHITE/GRAY/BLACK) for directed; Union-Find or DFS for undirected.</p>
+<div class="trigger">Trigger: "detect cycle", "can tasks be completed", "deadlock detection"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">4. Connected Components</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Run BFS/DFS from each unvisited node; count how many separate traversals needed.</p>
+<div class="trigger">Trigger: "count islands", "number of provinces", "friend groups"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">5. Topological Ordering (DAGs only)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Linear ordering of vertices such that for every directed edge u→v, u comes before v.</p>
+<div class="trigger">Trigger: "task scheduling", "course prerequisites", "dependency order"</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">Grid of 0s and 1s, count groups/islands</span><span class="arrow">→</span><span class="smell-then">Graph on implicit grid, BFS/DFS</span></div>
+<div class="smell-row"><span class="smell-if">Social network connections, friend groups</span><span class="arrow">→</span><span class="smell-then">Undirected graph, Union-Find or BFS components</span></div>
+<div class="smell-row"><span class="smell-if">Prerequisites / dependencies between tasks</span><span class="arrow">→</span><span class="smell-then">Directed graph (DAG), Topological Sort</span></div>
+<div class="smell-row"><span class="smell-if">Minimum cost to connect all nodes</span><span class="arrow">→</span><span class="smell-then">MST — Prim's or Kruskal's</span></div>
+<div class="smell-row"><span class="smell-if">Shortest path, all edges same cost</span><span class="arrow">→</span><span class="smell-then">BFS (unweighted)</span></div>
+<div class="smell-row"><span class="smell-if">Shortest path, edges have positive weights</span><span class="arrow">→</span><span class="smell-then">Dijkstra's</span></div>
+<div class="smell-row"><span class="smell-if">Shortest path with negative edges</span><span class="arrow">→</span><span class="smell-then">Bellman-Ford</span></div>
+<div class="smell-row"><span class="smell-if">Shortest path between ALL pairs</span><span class="arrow">→</span><span class="smell-then">Floyd-Warshall</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>import java.util.*;
+
+public class GraphFundamentals {
+    int V;
+    // Adjacency list: vertex -> list of (neighbor, weight)
+    Map&lt;Integer, List&lt;int[]&gt;&gt; adj;
+
+    public GraphFundamentals(int v) {
+        this.V = v;
+        adj = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; v; i++) adj.put(i, new ArrayList&lt;&gt;());
+    }
+
+    // Add unweighted undirected edge
+    void addEdge(int u, int v) {
+        adj.get(u).add(new int[]{v, 1});
+        adj.get(v).add(new int[]{u, 1}); // remove for directed
+    }
+
+    // Add weighted directed edge
+    void addWeightedEdge(int u, int v, int w) {
+        adj.get(u).add(new int[]{v, w});
+        // Don't add reverse for directed graph
+    }
+
+    // Adjacency matrix alternative
+    int[][] buildMatrix(int[][] edges, int n) {
+        int[][] mat = new int[n][n];
+        for (int[] e : edges) {
+            mat[e[0]][e[1]] = e[2]; // weighted
+            mat[e[1]][e[0]] = e[2]; // undirected: remove for directed
+        }
+        return mat;
+    }
+
+    // Build from LeetCode-style edge list
+    static Map&lt;Integer, List&lt;Integer&gt;&gt; buildAdjList(int n, int[][] edges) {
+        Map&lt;Integer, List&lt;Integer&gt;&gt; graph = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; n; i++) graph.put(i, new ArrayList&lt;&gt;());
+        for (int[] e : edges) {
+            graph.get(e[0]).add(e[1]);
+            graph.get(e[1]).add(e[0]); // undirected
+        }
+        return graph;
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Number of Islands (LC 200)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">Given a 2D grid of '1's (land) and '0's (water), count the number of islands. Classic implicit graph problem — each cell is a vertex; edges connect adjacent cells.</p>
+<div class="brute-tag">Brute Force — O(V²)</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">For every land cell, check if it's already been counted by scanning all previous land cells. Impractical. O(n²m²) roughly.</p>
+<div class="opt-tag">Optimal — BFS/DFS Connected Components O(n×m)</div>
+<pre><code>public int numIslands(char[][] grid) {
+    int count = 0;
+    for (int i = 0; i &lt; grid.length; i++) {
+        for (int j = 0; j &lt; grid[0].length; j++) {
+            if (grid[i][j] == '1') {
+                count++;
+                dfs(grid, i, j); // sink the island
+            }
+        }
+    }
+    return count;
+}
+
+void dfs(char[][] grid, int r, int c) {
+    // Out of bounds or water — stop
+    if (r &lt; 0 || r &gt;= grid.length || c &lt; 0 || c &gt;= grid[0].length
+        || grid[r][c] != '1') return;
+    grid[r][c] = '0'; // mark visited by sinking
+    dfs(grid, r+1, c);
+    dfs(grid, r-1, c);
+    dfs(grid, r, c+1);
+    dfs(grid, r, c-1);
+}
+// WHY: Grid = implicit graph. Contiguous '1's = connected component.
+// Each DFS call sinks an entire island. Count = number of DFS starts.</code></pre>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-easy">Easy</span><div><div class="pattern-title">Find if Path Exists in Graph (LC 1971)</div><p style="font-size:13px;color:var(--color-text-secondary)">Build adjacency list, BFS/DFS from source. Key: basic graph construction + traversal.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-easy">Easy</span><div><div class="pattern-title">Number of Islands (LC 200)</div><p style="font-size:13px;color:var(--color-text-secondary)">Implicit grid graph. Count connected components via DFS sinking.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Number of Provinces (LC 547)</div><p style="font-size:13px;color:var(--color-text-secondary)">Adjacency matrix given. Count connected components. Practice reading a matrix.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Clone Graph (LC 133)</div><p style="font-size:13px;color:var(--color-text-secondary)">Deep copy a graph. Forces you to handle the visited map and pointer structure.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Graph Valid Tree (LC 261)</div><p style="font-size:13px;color:var(--color-text-secondary)">N nodes, N-1 edges, one component, no cycle = tree. Combines all fundamentals.</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>What interviewers test:</b> Can you build a graph from a problem description? Do you know when to use list vs matrix? Do you clarify directed/undirected before coding?</p></div>
+<h3>Always clarify upfront</h3>
+<div class="interview-q">Is the graph directed or undirected?</div>
+<div class="interview-q">Are there negative edge weights?</div>
+<div class="interview-q">Can there be cycles? Is it a DAG?</div>
+<div class="interview-q">Can there be disconnected components?</div>
+<div class="interview-q">How large can V and E be? (drives choice of representation)</div>
+<h3>Think out loud script</h3>
+<div class="step-block">"This is a graph problem. Let me model it — nodes are [X], edges are [Y]. The graph is [directed/undirected] and [weighted/unweighted]. I'll use an adjacency list since the graph is likely sparse. I'll use BFS/DFS because..."</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">What if the graph is very dense (E ≈ V²) — would you change representation?</div>
+<div class="interview-q">What's the space tradeoff between list and matrix?</div>`
+    }
+  },
+
+  {
+    id:"bfs",title:"Breadth-First Search",
+    sub:"Level-order traversal · Shortest path (unweighted) · Visited set",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 2</span></h2>
+<p>BFS explores a graph <b>level by level</b>, visiting all neighbors of a vertex before moving to their neighbors. It uses a <b>queue</b> (FIFO) to maintain the frontier of nodes to visit.</p>
+<p style="margin-top:8px">Mental model: <b>ripples on water</b>. Drop a stone at the source — the ripple expands one ring at a time. BFS visits every node at distance 1, then distance 2, then distance 3, etc.</p>
+<h3>Key guarantee</h3>
+<p>BFS always finds the <b>shortest path in terms of edge count</b> in an unweighted graph. This is its single most important property.</p>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<h3>Queue-based level expansion</h3>
+<div class="step-block">1. Add source to queue; mark it visited.</div>
+<div class="step-block">2. While queue is not empty: dequeue front node u, process u, enqueue all unvisited neighbors of u and mark them visited.</div>
+<div class="step-block">3. Nodes dequeued in order: first the source (distance 0), then its neighbors (distance 1), then their unvisited neighbors (distance 2), etc.</div>
+<h3>Why the queue guarantees shortest path</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">Nodes are enqueued in order of their distance from source. When you first reach a node, it's via the fewest edges possible — any later path to the same node would be equal or longer. A DFS might reach a node via a long winding path first.</p>
+<h3>Level tracking trick</h3>
+<pre><code>int level = 0;
+Queue&lt;Integer&gt; q = new LinkedList&lt;&gt;();
+q.offer(src);
+while (!q.isEmpty()) {
+    int size = q.size(); // snapshot: all nodes at current level
+    for (int i = 0; i &lt; size; i++) {
+        int node = q.poll();
+        // process node at 'level' distance
+        for (int nei : adj.get(node)) {
+            if (!visited.contains(nei)) { q.offer(nei); visited.add(nei); }
+        }
+    }
+    level++;
+}</code></pre>
+<p style="font-size:13px;color:var(--color-text-secondary)">Snapshotting queue size at start of each round isolates one complete level before moving to the next.</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Metric</th><th>Value</th><th>Why</th></tr>
+<tr><td>Time</td><td>O(V + E)</td><td>Each vertex enqueued/dequeued once (O(V)). Each edge examined at most twice — once from each endpoint (O(E)).</td></tr>
+<tr><td>Space (queue)</td><td>O(V)</td><td>Worst case: entire graph is one level (star graph) — all V-1 neighbors enqueued at once.</td></tr>
+<tr><td>Space (visited)</td><td>O(V)</td><td>Store each vertex at most once.</td></tr>
+</table></div>
+<h3>Important nuance</h3>
+<p>For a grid of R×C, V = R*C and E ≈ 4*R*C (4 neighbors per cell), so BFS on a grid is O(R*C). Never say O(n) for grid BFS — always clarify with grid dimensions.</p>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Variant</th><th>When to use</th><th>Key twist</th></tr>
+<tr><td>Standard BFS</td><td>Unweighted shortest path, connectivity</td><td>dist[] array tracks distances</td></tr>
+<tr><td>Multi-source BFS</td><td>Multiple starting points simultaneously</td><td>Enqueue ALL sources at level 0</td></tr>
+<tr><td>0-1 BFS</td><td>Edge weights are 0 or 1 only</td><td>Deque: 0-weight → front, 1-weight → back</td></tr>
+<tr><td>Bidirectional BFS</td><td>Shortest path when target known</td><td>BFS from both ends; meet in middle (reduces search space)</td></tr>
+<tr><td>Level-order BFS</td><td>Tree traversal by levels</td><td>Classic tree BFS, track level boundaries</td></tr>
+</table></div>
+<h3>Multi-source BFS is crucial</h3>
+<p>Problem: "Find distance from each cell to nearest source (0, gate, rotten orange...)". Instead of running BFS from each source separately (O(S*V)), enqueue ALL sources at once → single O(V+E) pass.</p>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. Shortest Path (Unweighted)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">BFS from source → target. First time you reach target = shortest path.</p>
+<div class="trigger">Trigger: "minimum number of steps/moves/jumps", "shortest path in grid", "fewest operations"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Level-Order Processing</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Process nodes level by level. Each level = one step from source.</p>
+<div class="trigger">Trigger: "spread in rounds", "infection spreads each minute", "word ladder steps"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">3. Multi-Source BFS</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Enqueue all sources simultaneously. Solves "nearest X" problems optimally.</p>
+<div class="trigger">Trigger: "distance to nearest gate/0/rotten/fresh", "01 Matrix"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">4. Connected Component Check</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">BFS from source — if all nodes visited, graph is connected.</p>
+<div class="trigger">Trigger: "is graph connected?", "can you reach all nodes?"</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">"Minimum steps/hops/moves"</span><span class="arrow">→</span><span class="smell-then">BFS (unweighted shortest path)</span></div>
+<div class="smell-row"><span class="smell-if">"In how many rounds does X spread?"</span><span class="arrow">→</span><span class="smell-then">BFS level tracking</span></div>
+<div class="smell-row"><span class="smell-if">"Distance from each cell to nearest [thing]"</span><span class="arrow">→</span><span class="smell-then">Multi-source BFS</span></div>
+<div class="smell-row"><span class="smell-if">"Transform word A to word B one letter at a time"</span><span class="arrow">→</span><span class="smell-then">BFS on word graph (Word Ladder)</span></div>
+<div class="smell-row"><span class="smell-if">"Knight reaches target in minimum moves"</span><span class="arrow">→</span><span class="smell-then">BFS on implicit chessboard graph</span></div>
+<div class="smell-row"><span class="smell-if">"Bipartite check"</span><span class="arrow">→</span><span class="smell-then">BFS with 2-coloring</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>import java.util.*;
+
+public class BFS {
+
+    // Standard BFS - returns shortest distances from src
+    int[] bfs(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int src, int V) {
+        int[] dist = new int[V];
+        Arrays.fill(dist, -1);       // -1 = unvisited
+        Queue&lt;Integer&gt; q = new LinkedList&lt;&gt;();
+        dist[src] = 0;
+        q.offer(src);
+
+        while (!q.isEmpty()) {
+            int u = q.poll();
+            for (int v : adj.get(u)) {
+                if (dist[v] == -1) { // not visited
+                    dist[v] = dist[u] + 1;
+                    q.offer(v);
+                }
+            }
+        }
+        return dist;
+    }
+
+    // Level-order BFS (returns levels as list of lists)
+    List&lt;List&lt;Integer&gt;&gt; levelOrder(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int src) {
+        List&lt;List&lt;Integer&gt;&gt; result = new ArrayList&lt;&gt;();
+        Set&lt;Integer&gt; visited = new HashSet&lt;&gt;();
+        Queue&lt;Integer&gt; q = new LinkedList&lt;&gt;();
+        q.offer(src); visited.add(src);
+
+        while (!q.isEmpty()) {
+            int size = q.size(); // CRITICAL: snapshot size
+            List&lt;Integer&gt; level = new ArrayList&lt;&gt;();
+            for (int i = 0; i &lt; size; i++) {
+                int u = q.poll();
+                level.add(u);
+                for (int v : adj.get(u)) {
+                    if (!visited.contains(v)) {
+                        visited.add(v); q.offer(v);
+                    }
+                }
+            }
+            result.add(level);
+        }
+        return result;
+    }
+
+    // Multi-source BFS (e.g., 01 Matrix)
+    int[][] multiSourceBFS(int[][] grid, int R, int C) {
+        int[][] dist = new int[R][C];
+        Queue&lt;int[]&gt; q = new LinkedList&lt;&gt;();
+        // Enqueue all sources (0-cells) at once
+        for (int i = 0; i &lt; R; i++)
+            for (int j = 0; j &lt; C; j++) {
+                if (grid[i][j] == 0) { q.offer(new int[]{i,j}); }
+                else dist[i][j] = Integer.MAX_VALUE;
+            }
+        int[][] dirs = {{0,1},{0,-1},{1,0},{-1,0}};
+        while (!q.isEmpty()) {
+            int[] cur = q.poll();
+            for (int[] d : dirs) {
+                int r = cur[0]+d[0], c = cur[1]+d[1];
+                if (r&gt;=0 &amp;&amp; r&lt;R &amp;&amp; c&gt;=0 &amp;&amp; c&lt;C
+                    &amp;&amp; dist[r][c] == Integer.MAX_VALUE) {
+                    dist[r][c] = dist[cur[0]][cur[1]] + 1;
+                    q.offer(new int[]{r,c});
+                }
+            }
+        }
+        return dist;
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Rotting Oranges (LC 994)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">Grid of 0 (empty), 1 (fresh), 2 (rotten). Rotten spreads to adjacent fresh each minute. Find minimum minutes to rot all, or -1.</p>
+<div class="brute-tag">Brute Force — O((R*C)²)</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Each minute, scan entire grid to spread rot. Repeat until no change. O(minutes × R*C). Could be O((R*C)²) worst case.</p>
+<div class="opt-tag">Optimal — Multi-Source BFS O(R*C)</div>
+<pre><code>public int orangesRotting(int[][] grid) {
+    int R = grid.length, C = grid[0].length;
+    Queue&lt;int[]&gt; q = new LinkedList&lt;&gt;();
+    int fresh = 0;
+
+    // Enqueue ALL rotten oranges as simultaneous sources
+    for (int i = 0; i &lt; R; i++)
+        for (int j = 0; j &lt; C; j++) {
+            if (grid[i][j] == 2) q.offer(new int[]{i,j});
+            if (grid[i][j] == 1) fresh++;
+        }
+
+    if (fresh == 0) return 0; // no fresh to rot
+
+    int minutes = 0;
+    int[][] dirs = {{0,1},{0,-1},{1,0},{-1,0}};
+
+    while (!q.isEmpty()) {
+        int size = q.size();
+        minutes++;
+        for (int k = 0; k &lt; size; k++) {
+            int[] cur = q.poll();
+            for (int[] d : dirs) {
+                int r = cur[0]+d[0], c = cur[1]+d[1];
+                if (r&gt;=0 &amp;&amp; r&lt;R &amp;&amp; c&gt;=0 &amp;&amp; c&lt;C &amp;&amp; grid[r][c]==1) {
+                    grid[r][c] = 2; fresh--;
+                    q.offer(new int[]{r,c});
+                }
+            }
+        }
+    }
+    return fresh == 0 ? minutes - 1 : -1;
+    // minutes-1 because we increment before processing last batch
+}
+// WHY MULTI-SOURCE: All rotten oranges spread simultaneously.
+// Simulating them one by one gives wrong "simultaneous" effect.
+// BFS levels = minutes elapsed naturally.</code></pre>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-easy">Easy</span><div><div class="pattern-title">Flood Fill (LC 733)</div><p style="font-size:13px;color:var(--color-text-secondary)">BFS/DFS from starting pixel. Classic grid traversal warm-up.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">01 Matrix (LC 542)</div><p style="font-size:13px;color:var(--color-text-secondary)">Multi-source BFS from all 0s simultaneously. Key: don't run BFS from each 1 separately.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Word Ladder (LC 127)</div><p style="font-size:13px;color:var(--color-text-secondary)">Build implicit word graph. BFS for minimum transformations. Classic pattern.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Walls and Gates (LC 286)</div><p style="font-size:13px;color:var(--color-text-secondary)">Multi-source BFS from all gates. Fill each empty room with distance to nearest gate.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Shortest Path in a Grid with Obstacles Elimination (LC 1293)</div><p style="font-size:13px;color:var(--color-text-secondary)">BFS state = (row, col, k remaining). Visited set becomes 3D. State-space BFS.</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>Top test:</b> "Why BFS over DFS for shortest path?" — Answer: BFS guarantees shortest path because it explores level-by-level. DFS might find a long path to a node before finding the short one.</p></div>
+<h3>Classic traps</h3>
+<div class="interview-q">Forgetting to mark visited BEFORE enqueuing (not after dequeuing) → duplicate enqueues → TLE/WA</div>
+<div class="interview-q">Multi-source: forgetting to handle "no sources" or "no targets" edge cases</div>
+<div class="interview-q">Level tracking: forgetting to snapshot queue size before inner loop</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">When would you use bidirectional BFS? (When target is known and graph is large)</div>
+<div class="interview-q">What if edge weights are 0 or 1? (0-1 BFS with deque)</div>
+<div class="interview-q">Can BFS handle weighted shortest paths? (No — use Dijkstra)</div>`
+    }
+  },
+
+  {
+    id:"dfs",title:"Depth-First Search",
+    sub:"Recursive & iterative · Pre/in/post order · Cycle detection",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 3</span></h2>
+<p>DFS explores a graph by going as <b>deep as possible</b> along each path before backtracking. It uses the <b>call stack</b> (recursive) or an explicit <b>stack</b> (iterative).</p>
+<p style="margin-top:8px">Mental model: <b>exploring a maze</b>. You follow one path all the way to the end (or a dead end), backtrack to the last fork, and try the next path.</p>
+<h3>Three traversal orders (trees)</h3>
+<ul>
+<li><b>Pre-order:</b> Process node BEFORE its children (root first)</li>
+<li><b>In-order:</b> Process left subtree, THEN node, THEN right (sorted for BST)</li>
+<li><b>Post-order:</b> Process children BEFORE node (bottom-up — used for tree DP)</li>
+</ul>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<h3>Recursive DFS — the call stack IS the stack</h3>
+<pre><code>void dfs(int u, Set&lt;Integer&gt; visited, Map&lt;Integer,List&lt;Integer&gt;&gt; adj) {
+    visited.add(u);       // PRE-ORDER: process u here
+    for (int v : adj.get(u)) {
+        if (!visited.contains(v)) {
+            dfs(v, visited, adj);
+        }
+    }
+    // POST-ORDER: process u here (after all descendants processed)
+}</code></pre>
+<h3>Iterative DFS — explicit stack</h3>
+<pre><code>void dfsIterative(int src, Map&lt;Integer,List&lt;Integer&gt;&gt; adj) {
+    Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
+    Set&lt;Integer&gt; visited = new HashSet&lt;&gt;();
+    stack.push(src);
+    while (!stack.isEmpty()) {
+        int u = stack.pop();
+        if (visited.contains(u)) continue; // skip if seen
+        visited.add(u);
+        // process u
+        for (int v : adj.get(u)) {
+            if (!visited.contains(v)) stack.push(v);
+        }
+    }
+}</code></pre>
+<h3>3-color cycle detection (directed graphs)</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">WHITE (0) = unvisited, GRAY (1) = in current DFS path, BLACK (2) = fully processed. If you reach a GRAY node → back edge → cycle detected.</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Metric</th><th>Value</th><th>Why</th></tr>
+<tr><td>Time</td><td>O(V + E)</td><td>Each vertex visited once. Each edge traversed at most twice (undirected) or once (directed).</td></tr>
+<tr><td>Space (recursion)</td><td>O(V)</td><td>Call stack depth = longest path in graph. Worst: linear chain → O(V) deep stack.</td></tr>
+<tr><td>Space (iterative)</td><td>O(V)</td><td>Explicit stack holds at most V nodes.</td></tr>
+</table></div>
+<h3>Stack overflow risk</h3>
+<p>For very deep graphs (V = 10^5, chain-shaped), recursive DFS causes StackOverflowError. Use iterative DFS or increase JVM stack size. In interviews: always mention this risk and offer iterative alternative.</p>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Variant</th><th>When to use</th><th>Key detail</th></tr>
+<tr><td>DFS (general graph)</td><td>Traversal, cycle detection, components</td><td>Need explicit visited set</td></tr>
+<tr><td>DFS (tree)</td><td>Pre/in/post-order, path problems</td><td>No visited needed — no cycles in tree</td></tr>
+<tr><td>DFS with backtracking</td><td>Generate all paths, combinations, permutations</td><td>Undo state after recursive call</td></tr>
+<tr><td>DFS with memoization</td><td>Overlapping subproblems on DAGs</td><td>Cache results → top-down DP</td></tr>
+<tr><td>DFS topological sort</td><td>Ordering in DAGs</td><td>Push to stack on post-order finish</td></tr>
+</table></div>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. Graph Traversal / Connected Components</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">DFS from each unvisited node. Count how many DFS calls needed.</p>
+<div class="trigger">Trigger: "count islands", "number of components", "find all reachable nodes"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Cycle Detection</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Directed: 3-color DFS. Undirected: track parent — if you reach a visited node that isn't your parent → cycle.</p>
+<div class="trigger">Trigger: "detect cycle", "can all courses be finished", "is there a circular dependency"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">3. Path Finding / All Paths</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">DFS with backtracking. Explore all paths from source to target.</p>
+<div class="trigger">Trigger: "find all paths", "enumerate all routes", "all possible orderings"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">4. Topological Sort (DFS-based)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Run DFS; push each node to a stack when fully processed (post-order). Reverse stack = topological order.</p>
+<div class="trigger">Trigger: "order tasks with dependencies", "build order"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">5. Tree DP (Post-order DFS)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Compute subtree values bottom-up. Child values feed parent computation.</p>
+<div class="trigger">Trigger: "diameter of tree", "maximum path sum", "subtree sizes"</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">"Can all courses be finished?" / "Is there a cycle?"</span><span class="arrow">→</span><span class="smell-then">DFS cycle detection (3-color)</span></div>
+<div class="smell-row"><span class="smell-if">"Find all paths from source to target"</span><span class="arrow">→</span><span class="smell-then">DFS with backtracking</span></div>
+<div class="smell-row"><span class="smell-if">"Longest/deepest path in tree"</span><span class="arrow">→</span><span class="smell-then">Post-order DFS (bottom-up)</span></div>
+<div class="smell-row"><span class="smell-if">"Serialise/deserialise tree"</span><span class="arrow">→</span><span class="smell-then">Pre-order DFS</span></div>
+<div class="smell-row"><span class="smell-if">"Inorder traversal of BST gives sorted output"</span><span class="arrow">→</span><span class="smell-then">In-order DFS</span></div>
+<div class="smell-row"><span class="smell-if">"Flood fill / paint region"</span><span class="arrow">→</span><span class="smell-then">DFS (or BFS) from starting cell</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>import java.util.*;
+
+public class DFS {
+    // --- Cycle Detection in DIRECTED graph (3-color) ---
+    // 0=WHITE, 1=GRAY (in stack), 2=BLACK (done)
+    int[] color;
+
+    boolean hasCycleDirected(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int V) {
+        color = new int[V]; // all 0 (WHITE)
+        for (int i = 0; i &lt; V; i++)
+            if (color[i] == 0 &amp;&amp; dfsHasCycle(adj, i)) return true;
+        return false;
+    }
+
+    boolean dfsHasCycle(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int u) {
+        color[u] = 1; // GRAY — in current path
+        for (int v : adj.get(u)) {
+            if (color[v] == 1) return true;  // back edge → cycle!
+            if (color[v] == 0 &amp;&amp; dfsHasCycle(adj, v)) return true;
+        }
+        color[u] = 2; // BLACK — fully processed
+        return false;
+    }
+
+    // --- Cycle Detection in UNDIRECTED graph ---
+    boolean hasCycleUndirected(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int V) {
+        boolean[] visited = new boolean[V];
+        for (int i = 0; i &lt; V; i++)
+            if (!visited[i] &amp;&amp; dfsCycleUndir(adj, i, -1, visited)) return true;
+        return false;
+    }
+
+    boolean dfsCycleUndir(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int u, int parent, boolean[] vis) {
+        vis[u] = true;
+        for (int v : adj.get(u)) {
+            if (!vis[v]) { if (dfsCycleUndir(adj, v, u, vis)) return true; }
+            else if (v != parent) return true; // visited non-parent → cycle
+        }
+        return false;
+    }
+
+    // --- DFS Topological Sort ---
+    Deque&lt;Integer&gt; topoStack = new ArrayDeque&lt;&gt;();
+
+    void dfsTopoSort(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int u, boolean[] visited) {
+        visited[u] = true;
+        for (int v : adj.get(u))
+            if (!visited[v]) dfsTopoSort(adj, v, visited);
+        topoStack.push(u); // post-order: push when done with all descendants
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Course Schedule (LC 207)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">N courses, prerequisites array [a,b] means must take b before a. Can you finish all courses? = Is the directed graph acyclic?</p>
+<div class="brute-tag">Brute Force</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Try all possible orderings (N! permutations), check if each satisfies prerequisites. Completely infeasible.</p>
+<div class="opt-tag">Optimal — DFS Cycle Detection O(V + E)</div>
+<pre><code>public boolean canFinish(int numCourses, int[][] prerequisites) {
+    // Build adjacency list
+    Map&lt;Integer,List&lt;Integer&gt;&gt; adj = new HashMap&lt;&gt;();
+    for (int i = 0; i &lt; numCourses; i++) adj.put(i, new ArrayList&lt;&gt;());
+    for (int[] pre : prerequisites) adj.get(pre[0]).add(pre[1]);
+
+    int[] state = new int[numCourses]; // 0=unvisited, 1=visiting, 2=done
+
+    for (int i = 0; i &lt; numCourses; i++)
+        if (hasCycle(adj, i, state)) return false;
+    return true;
+}
+
+boolean hasCycle(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int u, int[] state) {
+    if (state[u] == 1) return true;  // back edge → cycle
+    if (state[u] == 2) return false; // already fully explored
+
+    state[u] = 1; // mark as being visited
+    for (int v : adj.get(u))
+        if (hasCycle(adj, v, state)) return true;
+    state[u] = 2; // mark done
+    return false;
+}
+// WHY: Prerequisites form a directed graph. If there's a cycle
+// (A needs B, B needs C, C needs A), impossible to finish.
+// 3-color DFS detects cycle via back edges (GRAY→GRAY).</code></pre>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-easy">Easy</span><div><div class="pattern-title">Path Sum (LC 112)</div><p style="font-size:13px;color:var(--color-text-secondary)">Pre-order DFS on tree. Subtract node value from target each level.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Course Schedule (LC 207)</div><p style="font-size:13px;color:var(--color-text-secondary)">Directed cycle detection via 3-color DFS. The classic for this pattern.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">All Paths from Source to Target (LC 797)</div><p style="font-size:13px;color:var(--color-text-secondary)">DFS with backtracking. Build path as you go, copy when you reach target.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Diameter of Binary Tree (LC 543)</div><p style="font-size:13px;color:var(--color-text-secondary)">Post-order DFS. At each node: left depth + right depth = diameter candidate. Classic bottom-up.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Binary Tree Maximum Path Sum (LC 124)</div><p style="font-size:13px;color:var(--color-text-secondary)">Post-order DFS. At each node: max path = node + max(left,0) + max(right,0). Global max tracks answer.</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>Key question:</b> "When would you use DFS over BFS?" — DFS for: cycle detection, topological sort, all-paths enumeration, tree traversals, backtracking. BFS for: shortest path, level-order, multi-source spreading.</p></div>
+<h3>Classic traps</h3>
+<div class="interview-q">Forgetting to mark visited for graphs (infinite loop in cyclic graphs)</div>
+<div class="interview-q">Using 2-color for directed cycle detection instead of 3-color</div>
+<div class="interview-q">Recursive DFS on deep graphs → StackOverflowError (mention iterative alternative)</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">What's the space complexity of recursive DFS on a skewed tree? (O(N))</div>
+<div class="interview-q">How do pre, in, post-order differ and when does each apply?</div>
+<div class="interview-q">Can you convert recursive DFS to iterative? (Yes — use explicit stack)</div>`
+    }
+  },
+
+  {
+    id:"topo",title:"Topological Sort",
+    sub:"Kahn's algorithm (BFS) · DFS-based · When DAG is required",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 4</span></h2>
+<p>Topological sort is a <b>linear ordering of vertices</b> in a DAG such that for every directed edge u → v, vertex u appears before v in the ordering.</p>
+<p style="margin-top:8px">Mental model: <b>getting dressed</b>. You must put on socks before shoes, underwear before pants. Topological sort gives a valid "what to do first" order.</p>
+<h3>Critical requirement: DAG only</h3>
+<p>Topological sort is <b>only possible on a DAG</b> (Directed Acyclic Graph). If a cycle exists, no valid ordering exists — tasks would depend on each other circularly. If Kahn's algorithm doesn't produce all V nodes, a cycle exists.</p>
+<h3>Two algorithms</h3>
+<ul>
+<li><b>Kahn's (BFS-based):</b> In-degree approach. Start with in-degree-0 nodes.</li>
+<li><b>DFS-based:</b> Post-order DFS. Push to stack when done processing.</li>
+</ul>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<h3>Kahn's Algorithm (BFS)</h3>
+<div class="step-block">1. Compute in-degree of every vertex.</div>
+<div class="step-block">2. Add all vertices with in-degree 0 to queue (these have no prerequisites).</div>
+<div class="step-block">3. While queue not empty: dequeue u, add to result. For each neighbor v of u: decrement in-degree[v]. If in-degree[v] becomes 0 → add v to queue.</div>
+<div class="step-block">4. If result.size() ≠ V → cycle exists (some nodes never reached in-degree 0).</div>
+<h3>DFS-based Topological Sort</h3>
+<div class="step-block">1. Run DFS from each unvisited node.</div>
+<div class="step-block">2. When DFS finishes processing a node (post-order), push it onto a stack.</div>
+<div class="step-block">3. Reverse of the stack = topological order (last finished = should come first).</div>
+<h3>Why do they work?</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px"><b>Kahn's:</b> A node with in-degree 0 has no prerequisites → it can safely come first. Removing it reduces in-degrees of dependents. Process in this "safe to do now" order.<br><b>DFS:</b> A node pushed after its descendants means all dependents already in stack below it → reversing gives correct order.</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Metric</th><th>Kahn's (BFS)</th><th>DFS-based</th></tr>
+<tr><td>Time</td><td>O(V + E)</td><td>O(V + E)</td></tr>
+<tr><td>Space</td><td>O(V) for queue + in-degree array</td><td>O(V) for stack + visited array</td></tr>
+<tr><td>Cycle detection</td><td>Built-in: result.size() ≠ V</td><td>Need separate check during DFS</td></tr>
+<tr><td>Multiple valid orders</td><td>Use PriorityQueue for lexicographically smallest</td><td>Harder to control order</td></tr>
+</table></div>
+<h3>Why O(V + E)?</h3>
+<p>Each vertex enters and leaves the queue once (O(V)). Each edge is checked exactly once when processing its source (O(E)).</p>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Variant</th><th>Use case</th></tr>
+<tr><td>Kahn's (standard queue)</td><td>When you need cycle detection as a byproduct, or any valid topo order</td></tr>
+<tr><td>Kahn's (priority queue)</td><td>Lexicographically smallest valid ordering (use min-heap instead of queue)</td></tr>
+<tr><td>DFS post-order</td><td>Natural extension of DFS, easier to extend for counting paths, etc.</td></tr>
+<tr><td>Parallel task scheduling</td><td>Kahn's level-by-level gives minimum time to complete all tasks</td></tr>
+</table></div>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. Prerequisite / Dependency Ordering</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Classic topo sort. Build DAG from dependencies, output valid ordering.</p>
+<div class="trigger">Trigger: "course prerequisites", "task schedule", "build order", "compile dependencies"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Cycle Detection in Directed Graph</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Run Kahn's — if result doesn't include all V nodes, a cycle exists.</p>
+<div class="trigger">Trigger: "can all courses be completed?", "is it possible to finish all tasks?"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">3. Minimum Completion Time (Parallel Tasks)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Kahn's level-by-level. Each level = one round of parallel processing.</p>
+<div class="trigger">Trigger: "parallel execution", "minimum rounds to finish", "processors finish at same time"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">4. DP on DAGs</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Topo sort first, then DP in topological order (no need to worry about visiting nodes before their dependencies).</p>
+<div class="trigger">Trigger: "longest path in DAG", "number of paths to target", "max profit on DAG"</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">"Course prerequisites / build order"</span><span class="arrow">→</span><span class="smell-then">Kahn's topological sort</span></div>
+<div class="smell-row"><span class="smell-if">"Can all tasks be completed?"</span><span class="arrow">→</span><span class="smell-then">Topo sort + cycle check (result.size() == V)</span></div>
+<div class="smell-row"><span class="smell-if">"Find order to process nodes respecting dependencies"</span><span class="arrow">→</span><span class="smell-then">Topological sort (Kahn's or DFS)</span></div>
+<div class="smell-row"><span class="smell-if">"Minimum time to finish all tasks with parallel workers"</span><span class="arrow">→</span><span class="smell-then">Kahn's level-by-level (levels = rounds)</span></div>
+<div class="smell-row"><span class="smell-if">"Alien dictionary — infer character ordering"</span><span class="arrow">→</span><span class="smell-then">Build char DAG from word comparisons + topo sort</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>import java.util.*;
+
+public class TopologicalSort {
+
+    // ===== KAHN'S ALGORITHM (BFS) =====
+    List&lt;Integer&gt; kahnTopoSort(int V, int[][] edges) {
+        int[] inDegree = new int[V];
+        Map&lt;Integer, List&lt;Integer&gt;&gt; adj = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; V; i++) adj.put(i, new ArrayList&lt;&gt;());
+
+        for (int[] e : edges) {
+            adj.get(e[0]).add(e[1]);
+            inDegree[e[1]]++;
+        }
+
+        Queue&lt;Integer&gt; q = new LinkedList&lt;&gt;();
+        for (int i = 0; i &lt; V; i++)
+            if (inDegree[i] == 0) q.offer(i); // no prerequisites
+
+        List&lt;Integer&gt; order = new ArrayList&lt;&gt;();
+        while (!q.isEmpty()) {
+            int u = q.poll();
+            order.add(u);
+            for (int v : adj.get(u)) {
+                inDegree[v]--;
+                if (inDegree[v] == 0) q.offer(v); // all prerequisites done
+            }
+        }
+
+        // Cycle check: if not all vertices processed, cycle exists
+        return order.size() == V ? order : new ArrayList&lt;&gt;();
+    }
+
+    // ===== DFS-BASED TOPO SORT =====
+    Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
+    boolean[] visited;
+
+    List&lt;Integer&gt; dfsTopoSort(int V, Map&lt;Integer, List&lt;Integer&gt;&gt; adj) {
+        visited = new boolean[V];
+        for (int i = 0; i &lt; V; i++)
+            if (!visited[i]) dfsHelper(adj, i);
+
+        List&lt;Integer&gt; result = new ArrayList&lt;&gt;();
+        while (!stack.isEmpty()) result.add(stack.pop());
+        return result;
+    }
+
+    void dfsHelper(Map&lt;Integer,List&lt;Integer&gt;&gt; adj, int u) {
+        visited[u] = true;
+        for (int v : adj.get(u))
+            if (!visited[v]) dfsHelper(adj, v);
+        stack.push(u); // post-order: push after ALL descendants done
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Course Schedule II (LC 210)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">Return an ordering to take all courses given prerequisites. Return empty if impossible (cycle). This is the textbook Kahn's application.</p>
+<div class="brute-tag">Brute Force</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Try all N! permutations of courses, check each if prerequisites satisfied. Completely infeasible.</p>
+<div class="opt-tag">Optimal — Kahn's Algorithm O(V + E)</div>
+<pre><code>public int[] findOrder(int numCourses, int[][] prerequisites) {
+    int[] inDegree = new int[numCourses];
+    List&lt;List&lt;Integer&gt;&gt; adj = new ArrayList&lt;&gt;();
+    for (int i = 0; i &lt; numCourses; i++) adj.add(new ArrayList&lt;&gt;());
+
+    for (int[] pre : prerequisites) {
+        adj.get(pre[1]).add(pre[0]); // pre[1] → pre[0]
+        inDegree[pre[0]]++;
+    }
+
+    Queue&lt;Integer&gt; q = new LinkedList&lt;&gt;();
+    for (int i = 0; i &lt; numCourses; i++)
+        if (inDegree[i] == 0) q.offer(i);
+
+    int[] order = new int[numCourses];
+    int idx = 0;
+    while (!q.isEmpty()) {
+        int u = q.poll();
+        order[idx++] = u;
+        for (int v : adj.get(u)) {
+            inDegree[v]--;
+            if (inDegree[v] == 0) q.offer(v);
+        }
+    }
+    return idx == numCourses ? order : new int[0]; // empty if cycle
+}
+// WHY: prerequisites form directed edges (b→a means take b before a).
+// Kahn's naturally gives the "safe to take now" order.
+// Cycle = impossible to graduate.</code></pre>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Course Schedule (LC 207)</div><p style="font-size:13px;color:var(--color-text-secondary)">Detect if cycle exists. Kahn's: check result.size() == numCourses.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Course Schedule II (LC 210)</div><p style="font-size:13px;color:var(--color-text-secondary)">Return actual ordering. The textbook Kahn's problem.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Parallel Courses (LC 1136)</div><p style="font-size:13px;color:var(--color-text-secondary)">Kahn's level-by-level. Count levels = minimum semesters needed.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Alien Dictionary (LC 269)</div><p style="font-size:13px;color:var(--color-text-secondary)">Build character ordering from word list comparison. Topo sort on character DAG.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Sequence Reconstruction (LC 444)</div><p style="font-size:13px;color:var(--color-text-secondary)">Check if original sequence is the ONLY valid topo sort. Queue must always have exactly 1 element.</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>Key test:</b> "What happens if the graph has a cycle?" → "Kahn's won't process all nodes; result.size() &lt; V. I return empty/null." Interviewers love cycle detection as a follow-up.</p></div>
+<h3>Kahn's vs DFS for topo sort</h3>
+<div class="interview-q">Kahn's is easier to implement and naturally detects cycles. Prefer it in interviews.</div>
+<div class="interview-q">DFS-based is more elegant for recursive thinking; good when you need DP alongside topo sort.</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">Can there be multiple valid topological orderings? (Yes, unless graph is a simple chain)</div>
+<div class="interview-q">How to find lexicographically smallest? (Use PriorityQueue instead of regular Queue in Kahn's)</div>
+<div class="interview-q">What if you need shortest/longest path in a DAG? (Topo sort + DP in topo order)</div>`
+    }
+  },
+
+  {
+    id:"dijkstra",title:"Dijkstra's Algorithm",
+    sub:"Weighted shortest path · Min-heap · Greedy approach",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 5</span></h2>
+<p>Dijkstra's finds the <b>shortest path from a single source to all other vertices</b> in a graph with <b>non-negative edge weights</b>. It's a <b>greedy algorithm</b> — always process the currently known closest unvisited vertex next.</p>
+<p style="margin-top:8px">Mental model: <b>expanding a bubble of certainty</b>. You start at the source (distance 0), and greedily keep extending to the nearest unconfirmed node. Once a node is "confirmed", its shortest distance is final.</p>
+<h3>Critical constraint: non-negative weights only</h3>
+<p>If any edge has a negative weight, Dijkstra's may give incorrect results. The greedy assumption fails: adding more edges might decrease total distance, contradicting the "nearest first" guarantee.</p>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<div class="step-block">1. Initialize: dist[src] = 0, dist[all others] = ∞. Add (0, src) to min-heap.</div>
+<div class="step-block">2. While heap not empty: Extract (d, u) — node u with smallest known distance d.</div>
+<div class="step-block">3. If d > dist[u]: skip (stale entry — we already found a shorter path). This is the "lazy deletion" trick.</div>
+<div class="step-block">4. For each neighbor v of u with edge weight w: if dist[u] + w &lt; dist[v]: update dist[v] = dist[u] + w, push (dist[v], v) to heap.</div>
+<div class="step-block">5. Repeat until heap empty. dist[] contains shortest path to all nodes.</div>
+<h3>Why min-heap?</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">We always want to process the globally nearest unvisited node next. A min-heap gives us this in O(log V) time. Without it, we'd need to scan all nodes → O(V²) naive Dijkstra.</p>
+<h3>Lazy deletion</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">Java's PriorityQueue doesn't support decrease-key efficiently. Instead, we push a new (better_dist, v) entry when we find a shorter path, and skip stale (old_dist, v) entries when popped.</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Implementation</th><th>Time</th><th>Why</th></tr>
+<tr><td>Binary heap (Java PQ)</td><td>O((V + E) log V)</td><td>Each edge → potential heap push O(log V). Heap has up to E entries in lazy version.</td></tr>
+<tr><td>Fibonacci heap (theoretical)</td><td>O(V log V + E)</td><td>Decrease-key in O(1) amortized. Not practical in interviews.</td></tr>
+<tr><td>Naive (no heap, scan all)</td><td>O(V²)</td><td>Good for dense graphs (E ≈ V²). Simple array scan.</td></tr>
+</table></div>
+<div class="table-wrap" style="margin-top:12px"><table>
+<tr><th>Space</th><th>Value</th></tr>
+<tr><td>dist array</td><td>O(V)</td></tr>
+<tr><td>Min-heap (lazy)</td><td>O(E) — can have up to E entries</td></tr>
+</table></div>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Variant</th><th>When to use</th></tr>
+<tr><td>Standard Dijkstra (single source)</td><td>Shortest path from one source to all/target</td></tr>
+<tr><td>Dijkstra with path reconstruction</td><td>Track prev[] array to rebuild actual path</td></tr>
+<tr><td>Dijkstra on grid</td><td>Cells = nodes, movement cost = edge weight</td></tr>
+<tr><td>Modified Dijkstra (state-space)</td><td>State = (position, extra_info). Classic: (node, fuel_remaining)</td></tr>
+<tr><td>0-1 BFS</td><td>Edge weights are only 0 or 1 — use deque, O(V+E)</td></tr>
+</table></div>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. Single-Source Shortest Path (Positive Weights)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Classic Dijkstra. Find shortest distance from source to all vertices or to a specific target.</p>
+<div class="trigger">Trigger: "minimum cost/time/distance", "shortest path", edge weights given and positive</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Minimum Cost Path with State</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Extend state: (node, extra_dimension). dist becomes dist[node][extra_state].</p>
+<div class="trigger">Trigger: "cheapest flights within k stops", "minimum fuel", "path with at most k edges"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">3. Path Reconstruction</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Track prev[v] = u when dist[v] is updated. Backtrack from target to source to get path.</p>
+<div class="trigger">Trigger: "find the actual path, not just the distance"</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">"Cheapest cost between nodes with weighted edges"</span><span class="arrow">→</span><span class="smell-then">Dijkstra's</span></div>
+<div class="smell-row"><span class="smell-if">"Minimum time/cost, edges have positive weights"</span><span class="arrow">→</span><span class="smell-then">Dijkstra's</span></div>
+<div class="smell-row"><span class="smell-if">"Network delay time — when do all nodes receive signal?"</span><span class="arrow">→</span><span class="smell-then">Dijkstra's, answer = max(dist[])</span></div>
+<div class="smell-row"><span class="smell-if">"Cheapest flights with at most k stops"</span><span class="arrow">→</span><span class="smell-then">Modified Dijkstra with state (node, stops)</span></div>
+<div class="smell-row"><span class="smell-if">"Edge weights are negative"</span><span class="arrow">→</span><span class="smell-then">Bellman-Ford (not Dijkstra!)</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>import java.util.*;
+
+public class Dijkstra {
+
+    int[] dijkstra(int src, int V, Map&lt;Integer,List&lt;int[]&gt;&gt; adj) {
+        // adj[u] = list of [neighbor, weight]
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+
+        // Min-heap: [distance, node]
+        PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a, b) -&gt; a[0] - b[0]);
+        pq.offer(new int[]{0, src});
+
+        while (!pq.isEmpty()) {
+            int[] curr = pq.poll();
+            int d = curr[0], u = curr[1];
+
+            // LAZY DELETION: skip stale entries
+            if (d &gt; dist[u]) continue;
+
+            for (int[] edge : adj.get(u)) {
+                int v = edge[0], w = edge[1];
+                if (dist[u] + w &lt; dist[v]) {
+                    dist[v] = dist[u] + w;
+                    pq.offer(new int[]{dist[v], v}); // push new best
+                }
+            }
+        }
+        return dist; // dist[i] = shortest distance from src to i
+    }
+
+    // With path reconstruction
+    int[] prev;
+    int[] dijkstraWithPath(int src, int V, Map&lt;Integer,List&lt;int[]&gt;&gt; adj) {
+        int[] dist = new int[V];
+        prev = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        Arrays.fill(prev, -1);
+        dist[src] = 0;
+        PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a,b)-&gt;a[0]-b[0]);
+        pq.offer(new int[]{0, src});
+        while (!pq.isEmpty()) {
+            int[] cur = pq.poll();
+            if (cur[0] &gt; dist[cur[1]]) continue;
+            for (int[] e : adj.get(cur[1])) {
+                if (dist[cur[1]] + e[1] &lt; dist[e[0]]) {
+                    dist[e[0]] = dist[cur[1]] + e[1];
+                    prev[e[0]] = cur[1]; // track predecessor
+                    pq.offer(new int[]{dist[e[0]], e[0]});
+                }
+            }
+        }
+        return dist;
+    }
+
+    List&lt;Integer&gt; getPath(int target) {
+        List&lt;Integer&gt; path = new ArrayList&lt;&gt;();
+        for (int v = target; v != -1; v = prev[v]) path.add(0, v);
+        return path;
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Network Delay Time (LC 743)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">N nodes, directed weighted edges. Signal sent from node k. Find minimum time for all nodes to receive signal, or -1 if some can't.</p>
+<div class="brute-tag">Brute Force</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Try all paths via DFS/BFS with full path tracking. Exponential time.</p>
+<div class="opt-tag">Optimal — Dijkstra O((V + E) log V)</div>
+<pre><code>public int networkDelayTime(int[][] times, int n, int k) {
+    // Build adjacency list
+    Map&lt;Integer,List&lt;int[]&gt;&gt; adj = new HashMap&lt;&gt;();
+    for (int i = 1; i &lt;= n; i++) adj.put(i, new ArrayList&lt;&gt;());
+    for (int[] t : times) adj.get(t[0]).add(new int[]{t[1], t[2]});
+
+    int[] dist = new int[n + 1];
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    dist[k] = 0;
+
+    PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a,b) -&gt; a[0]-b[0]);
+    pq.offer(new int[]{0, k});
+
+    while (!pq.isEmpty()) {
+        int[] cur = pq.poll();
+        if (cur[0] &gt; dist[cur[1]]) continue; // stale
+        for (int[] e : adj.get(cur[1])) {
+            if (dist[cur[1]] + e[1] &lt; dist[e[0]]) {
+                dist[e[0]] = dist[cur[1]] + e[1];
+                pq.offer(new int[]{dist[e[0]], e[0]});
+            }
+        }
+    }
+
+    int maxDist = 0;
+    for (int i = 1; i &lt;= n; i++) {
+        if (dist[i] == Integer.MAX_VALUE) return -1;
+        maxDist = Math.max(maxDist, dist[i]);
+    }
+    return maxDist; // signal reaches all when the LAST node gets it
+}
+// WHY: Shortest path = minimum time for signal to reach each node.
+// Answer = max of all shortest paths (last node to receive signal).</code></pre>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Network Delay Time (LC 743)</div><p style="font-size:13px;color:var(--color-text-secondary)">Classic Dijkstra. Single source, return max(dist[]).</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Path With Minimum Effort (LC 1631)</div><p style="font-size:13px;color:var(--color-text-secondary)">Dijkstra on grid. Edge weight = abs height difference. Minimize maximum effort.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Swim in Rising Water (LC 778)</div><p style="font-size:13px;color:var(--color-text-secondary)">Dijkstra variant: find path minimizing the maximum edge weight.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Cheapest Flights Within K Stops (LC 787)</div><p style="font-size:13px;color:var(--color-text-secondary)">Modified Dijkstra with state (node, stops). Or Bellman-Ford with K relaxations.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Minimum Cost to Reach Destination in Time (LC 1928)</div><p style="font-size:13px;color:var(--color-text-secondary)">State-space Dijkstra: (node, time_remaining). 2D dist array.</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>Key test:</b> "Why can't Dijkstra handle negative weights?" — Greedy assumption breaks: once a node is "settled", we assume its distance is final. But a negative edge found later could reduce it further.</p></div>
+<h3>Common mistakes</h3>
+<div class="interview-q">Not handling lazy deletion (processing stale heap entries)</div>
+<div class="interview-q">Initializing dist to Integer.MAX_VALUE then doing dist[u] + w → overflow! Use long or check first.</div>
+<div class="interview-q">Forgetting 1-indexed vs 0-indexed nodes in LeetCode problems</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">What's the time complexity with a Fibonacci heap? O(V log V + E) — impractical</div>
+<div class="interview-q">When would you use Bellman-Ford instead? (Negative weights, cycle detection)</div>
+<div class="interview-q">How do you handle a disconnected graph? (dist[i] == MAX_VALUE after Dijkstra → unreachable)</div>`
+    }
+  },
+
+  {
+    id:"bellman",title:"Bellman-Ford",
+    sub:"Negative weights · Negative cycle detection · Dynamic programming on edges",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 6</span></h2>
+<p>Bellman-Ford finds the <b>shortest path from a single source to all vertices</b>, and uniquely handles <b>negative edge weights</b>. It can also <b>detect negative weight cycles</b>.</p>
+<p style="margin-top:8px">Mental model: <b>repeated relaxation</b>. Run V-1 rounds; in each round, try to improve every known distance using every edge. After V-1 rounds, all shortest paths are found (a path can have at most V-1 edges). One more round → if distances still decrease, a negative cycle exists.</p>
+<h3>When Dijkstra fails, Bellman-Ford saves you</h3>
+<ul>
+<li>Currency arbitrage (negative profit cycle)</li>
+<li>Game maps with negative-cost moves</li>
+<li>Problems explicitly mentioning negative weights</li>
+</ul>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<div class="step-block">1. Initialize: dist[src] = 0, dist[all others] = ∞.</div>
+<div class="step-block">2. Repeat V-1 times: For each edge (u, v, w): if dist[u] + w &lt; dist[v] → update dist[v] = dist[u] + w. This is "relaxation".</div>
+<div class="step-block">3. Run ONE MORE relaxation pass: if any dist[v] still decreases → negative cycle reachable from source.</div>
+<h3>Why V-1 rounds?</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">The shortest path between any two vertices has at most V-1 edges (it visits at most V vertices; more would mean a cycle). Each round of Bellman-Ford guarantees that we've found all shortest paths using at most k edges. After V-1 rounds → all shortest paths found.</p>
+<h3>DP interpretation</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">dp[k][v] = shortest path from src to v using at most k edges. Bellman-Ford computes this bottom-up. This DP formulation directly explains LC 787 (K stops = K edges).</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Metric</th><th>Value</th><th>Why</th></tr>
+<tr><td>Time</td><td>O(V × E)</td><td>V-1 rounds, each scanning all E edges. Relaxation is O(1) per edge.</td></tr>
+<tr><td>Space</td><td>O(V)</td><td>Only dist[] array needed.</td></tr>
+</table></div>
+<h3>Comparison with Dijkstra</h3>
+<div class="table-wrap"><table>
+<tr><th>Property</th><th>Dijkstra</th><th>Bellman-Ford</th></tr>
+<tr><td>Time</td><td>O((V+E) log V)</td><td>O(VE)</td></tr>
+<tr><td>Negative weights</td><td>No</td><td>Yes</td></tr>
+<tr><td>Negative cycle detection</td><td>No</td><td>Yes</td></tr>
+<tr><td>Practical speed</td><td>Much faster</td><td>Slower</td></tr>
+</table></div>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Variant</th><th>Use case</th></tr>
+<tr><td>Standard Bellman-Ford</td><td>Negative weights, single source</td></tr>
+<tr><td>K-relaxation Bellman-Ford</td><td>Shortest path with at most K edges (LC 787). Run exactly K rounds.</td></tr>
+<tr><td>SPFA (Bellman-Ford + Queue)</td><td>Optimized: only relax edges from nodes whose dist changed. Faster in practice, same worst-case.</td></tr>
+</table></div>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. Shortest Path with Negative Weights</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Dijkstra can't handle this — Bellman-Ford is the correct choice.</p>
+<div class="trigger">Trigger: problem mentions negative edge weights, discounts, debt, penalties</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Negative Cycle Detection</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Run V rounds total. If Vth round still relaxes → negative cycle.</p>
+<div class="trigger">Trigger: "currency arbitrage", "detect profit cycle", "negative loop"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">3. Shortest Path with K-edge Constraint</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Run exactly K rounds of Bellman-Ford. Classic: Cheapest Flights with K stops.</p>
+<div class="trigger">Trigger: "at most K hops/stops/edges", "K-step shortest path"</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">"Shortest path but edges can be negative"</span><span class="arrow">→</span><span class="smell-then">Bellman-Ford</span></div>
+<div class="smell-row"><span class="smell-if">"Detect negative cycle" / "currency arbitrage possible?"</span><span class="arrow">→</span><span class="smell-then">Bellman-Ford Vth round check</span></div>
+<div class="smell-row"><span class="smell-if">"Cheapest flights with at most K stops"</span><span class="arrow">→</span><span class="smell-then">Bellman-Ford with K rounds (or Dijkstra with state)</span></div>
+<div class="smell-row"><span class="smell-if">"Shortest path using at most K edges"</span><span class="arrow">→</span><span class="smell-then">K-round Bellman-Ford (DP on edge count)</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>import java.util.*;
+
+public class BellmanFord {
+
+    int[] bellmanFord(int src, int V, int[][] edges) {
+        // edges[i] = [u, v, weight]
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+
+        // V-1 relaxation rounds
+        for (int round = 0; round &lt; V - 1; round++) {
+            boolean updated = false;
+            for (int[] edge : edges) {
+                int u = edge[0], v = edge[1], w = edge[2];
+                if (dist[u] != Integer.MAX_VALUE
+                    &amp;&amp; dist[u] + w &lt; dist[v]) {
+                    dist[v] = dist[u] + w;
+                    updated = true;
+                }
+            }
+            if (!updated) break; // optimization: early exit if no change
+        }
+
+        // Check for negative cycles (Vth round)
+        for (int[] edge : edges) {
+            int u = edge[0], v = edge[1], w = edge[2];
+            if (dist[u] != Integer.MAX_VALUE &amp;&amp; dist[u] + w &lt; dist[v]) {
+                System.out.println("Negative cycle detected!");
+                return null;
+            }
+        }
+        return dist;
+    }
+
+    // K-stop variant (LC 787 — Cheapest Flights Within K Stops)
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+
+        // Exactly k+1 rounds (k stops = k+1 edges)
+        for (int i = 0; i &lt;= k; i++) {
+            int[] temp = Arrays.copyOf(dist, n); // CRITICAL: copy to avoid using updated dist in same round
+            for (int[] f : flights) {
+                int u = f[0], v = f[1], w = f[2];
+                if (dist[u] != Integer.MAX_VALUE &amp;&amp; dist[u] + w &lt; temp[v]) {
+                    temp[v] = dist[u] + w;
+                }
+            }
+            dist = temp;
+        }
+        return dist[dst] == Integer.MAX_VALUE ? -1 : dist[dst];
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Cheapest Flights Within K Stops (LC 787)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">N cities, directed weighted flights. Find cheapest price from src to dst using at most K stops. At most K stops = at most K+1 edges.</p>
+<div class="brute-tag">Brute Force — DFS all paths</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">DFS exploring all paths up to K+1 edges. Exponential in worst case.</p>
+<div class="opt-tag">Optimal — K-round Bellman-Ford O(K × E)</div>
+<pre><code>// See K-stop variant code in Java Implementation section above.
+// WHY BELLMAN-FORD: The "at most K edges" constraint maps DIRECTLY
+// to "run exactly K+1 relaxation rounds". After round i, dist[v]
+// holds the cheapest price using at most i edges.
+//
+// CRITICAL TRICK: Copy dist[] before each round (int[] temp = dist.clone())
+// This prevents using within-round updates — each round represents
+// exactly one more edge being allowed, not partial updates within a round.
+//
+// Example: src=0, dst=3, k=1 (at most 1 stop = at most 2 edges)
+// Round 1: relax using 1 edge from src
+// Round 2: relax using 2 edges from src → answer in dist[dst]</code></pre>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Cheapest Flights Within K Stops (LC 787)</div><p style="font-size:13px;color:var(--color-text-secondary)">K-round Bellman-Ford. The defining problem for this constraint type.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Minimum Cost to Make at Least One Valid Path in Grid (LC 1368)</div><p style="font-size:13px;color:var(--color-text-secondary)">0-1 BFS or Dijkstra variant. Negative-adjacent thinking.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Find Negative Cycle in Graph (GFG)</div><p style="font-size:13px;color:var(--color-text-secondary)">Pure Bellman-Ford. Run V rounds; Vth round reducing dist = negative cycle.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Currency Arbitrage (Classic Interview)</div><p style="font-size:13px;color:var(--color-text-secondary)">Transform to negative log weights; detect negative cycle with Bellman-Ford.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Shortest Path in a Grid with Portals (Custom)</div><p style="font-size:13px;color:var(--color-text-secondary)">Portals can give negative effective distance. Bellman-Ford over Dijkstra.</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>Key question:</b> "When do you use Bellman-Ford vs Dijkstra?" — Use Bellman-Ford when edges can be negative. Dijkstra is faster but requires non-negative weights.</p></div>
+<h3>The copy trick (LC 787)</h3>
+<div class="interview-q">In K-stop Bellman-Ford, you MUST copy dist[] before each round. Without copying, you're allowing updates within the same round — effectively using more edges than intended. This is a common bug.</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">What's the time complexity of Bellman-Ford? O(VE) — much slower than Dijkstra.</div>
+<div class="interview-q">What does SPFA optimize? Only relaxes edges from vertices whose distance improved. Average case much faster.</div>
+<div class="interview-q">Can Bellman-Ford find paths through negative cycles? No — they'd be infinitely short (-∞).</div>`
+    }
+  },
+
+  {
+    id:"floyd",title:"Floyd-Warshall",
+    sub:"All-pairs shortest path · DP on graph · O(V³)",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 7</span></h2>
+<p>Floyd-Warshall computes the <b>shortest path between EVERY pair of vertices</b> in a weighted graph. It works with negative edges (but not negative cycles) and uses dynamic programming.</p>
+<p style="margin-top:8px">Mental model: <b>intermediary relaxation</b>. For each possible "via" vertex k, check if going through k improves the path from i to j. Try all possible intermediaries.</p>
+<h3>The core insight</h3>
+<p>dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]) — can we shorten the i→j path by going through k?</p>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<div class="step-block">1. Initialize dist[i][j] = edge weight if edge exists, 0 if i==j, ∞ otherwise.</div>
+<div class="step-block">2. For k = 0 to V-1 (each potential intermediate vertex): For i = 0 to V-1: For j = 0 to V-1: dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])</div>
+<div class="step-block">3. After all rounds, dist[i][j] = shortest path from i to j through any set of intermediaries.</div>
+<h3>Detecting negative cycles</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">If dist[i][i] &lt; 0 for any i after the algorithm → a negative cycle exists reachable from i. (Going from i to i with negative cost = loop in a negative cycle.)</p>
+<h3>Order of loops matters!</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">k (intermediate) MUST be the outermost loop. Think of it as: "first consider paths using only vertex 0, then vertex 0 and 1, then 0, 1, and 2..." Building up the set of allowed intermediaries.</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Metric</th><th>Value</th><th>Why</th></tr>
+<tr><td>Time</td><td>O(V³)</td><td>Three nested loops, each running V iterations.</td></tr>
+<tr><td>Space</td><td>O(V²)</td><td>2D dist matrix of size V×V.</td></tr>
+</table></div>
+<h3>When is O(V³) acceptable?</h3>
+<p>For V ≤ 400-500, Floyd-Warshall is fine. For V = 1000, that's 10⁹ operations — too slow. In those cases, run Dijkstra from each vertex: O(V × (V+E) log V).</p>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Variant</th><th>Use case</th></tr>
+<tr><td>Floyd-Warshall (standard)</td><td>All-pairs shortest path</td></tr>
+<tr><td>Transitive closure</td><td>Same DP but track reachability (boolean matrix). dist[i][j] = dist[i][j] || (reach[i][k] && reach[k][j])</td></tr>
+<tr><td>Floyd-Warshall with path reconstruction</td><td>Track next[i][j] = first hop on shortest i→j path</td></tr>
+</table></div>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. All-Pairs Shortest Path (Dense Graphs, Small V)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Need shortest path between all pairs, V is small (≤ 300).</p>
+<div class="trigger">Trigger: "find shortest path between every pair", "build distance matrix", V is small</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Transitive Closure</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Can vertex i reach vertex j? Boolean version of Floyd-Warshall.</p>
+<div class="trigger">Trigger: "is X reachable from Y for all pairs?", "connectivity matrix"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">3. City with Fewest Reachable Cities (LC 1334)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Compute all-pairs distances, then count how many cities each city can reach within threshold.</p>
+<div class="trigger">Trigger: "count neighbors within distance threshold", "reachable cities" (small N)</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">"Shortest path between every pair of nodes"</span><span class="arrow">→</span><span class="smell-then">Floyd-Warshall</span></div>
+<div class="smell-row"><span class="smell-if">"Find city with fewest reachable cities in threshold"</span><span class="arrow">→</span><span class="smell-then">Floyd-Warshall + count</span></div>
+<div class="smell-row"><span class="smell-if">"Can node i reach node j? (for all pairs)"</span><span class="arrow">→</span><span class="smell-then">Floyd-Warshall transitive closure</span></div>
+<div class="smell-row"><span class="smell-if">Small V (≤ 300) + need all-pairs distances</span><span class="arrow">→</span><span class="smell-then">Floyd-Warshall over running V Dijkstras</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>public class FloydWarshall {
+
+    int[][] floydWarshall(int V, int[][] edges) {
+        int INF = (int) 1e9;
+        int[][] dist = new int[V][V];
+
+        // Initialize: all ∞ except diagonal
+        for (int i = 0; i &lt; V; i++) {
+            Arrays.fill(dist[i], INF);
+            dist[i][i] = 0;
+        }
+        for (int[] e : edges) dist[e[0]][e[1]] = e[2]; // directed
+        // For undirected: also dist[e[1]][e[0]] = e[2];
+
+        // Main DP: k = intermediate vertex (MUST be outermost!)
+        for (int k = 0; k &lt; V; k++) {
+            for (int i = 0; i &lt; V; i++) {
+                for (int j = 0; j &lt; V; j++) {
+                    if (dist[i][k] != INF &amp;&amp; dist[k][j] != INF)
+                        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+
+        // Negative cycle check
+        for (int i = 0; i &lt; V; i++)
+            if (dist[i][i] &lt; 0) System.out.println("Negative cycle detected!");
+
+        return dist;
+    }
+
+    // LC 1334: City With the Smallest Number of Neighbors
+    public int findTheCity(int n, int[][] edges, int distanceThreshold) {
+        int INF = (int) 1e9;
+        int[][] dist = new int[n][n];
+        for (int[] d : dist) Arrays.fill(d, INF);
+        for (int i = 0; i &lt; n; i++) dist[i][i] = 0;
+        for (int[] e : edges) {
+            dist[e[0]][e[1]] = e[2];
+            dist[e[1]][e[0]] = e[2]; // undirected
+        }
+        // Floyd-Warshall
+        for (int k = 0; k &lt; n; k++)
+            for (int i = 0; i &lt; n; i++)
+                for (int j = 0; j &lt; n; j++)
+                    if (dist[i][k] != INF &amp;&amp; dist[k][j] != INF)
+                        dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
+        // Count reachable cities for each city
+        int ans = -1, minCount = n;
+        for (int i = 0; i &lt; n; i++) {
+            int count = 0;
+            for (int j = 0; j &lt; n; j++)
+                if (i != j &amp;&amp; dist[i][j] &lt;= distanceThreshold) count++;
+            if (count &lt;= minCount) { minCount = count; ans = i; }
+        }
+        return ans;
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Find the City With Fewest Neighbors (LC 1334)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">N cities, weighted undirected edges. Find the city that can reach the fewest cities within a distance threshold. Ties: return city with largest index.</p>
+<div class="brute-tag">Brute Force — Dijkstra from each city</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">O(V × (V+E) log V). Works but verbose. For small N, overkill complexity.</p>
+<div class="opt-tag">Optimal — Floyd-Warshall O(V³) — elegant for small N</div>
+<p style="font-size:13px;color:var(--color-text-secondary)">N ≤ 100, so O(V³) = 10⁶ operations. Perfectly acceptable. Code shown above in Java section.</p>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px"><b>WHY FLOYD-WARSHALL:</b> We need the shortest distance between EVERY pair of cities. Floyd-Warshall gives the full distance matrix in 3 nested loops. Then one more pass counts reachable cities per node.</p>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Find the City With Smallest Neighbors at Threshold (LC 1334)</div><p style="font-size:13px;color:var(--color-text-secondary)">Floyd-Warshall + counting. Textbook application.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Network Delay Time with All-Pairs (variant)</div><p style="font-size:13px;color:var(--color-text-secondary)">Compare Floyd-Warshall vs Dijkstra solutions for practice.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Transitive Closure (GFG)</div><p style="font-size:13px;color:var(--color-text-secondary)">Boolean variant. reach[i][j] |= reach[i][k] && reach[k][j].</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>Key question:</b> "When would you choose Floyd-Warshall over running Dijkstra from each vertex?" — Floyd-Warshall: simpler code, handles negative edges, better for dense graphs with small V. Dijkstra per vertex: better for sparse graphs with large V.</p></div>
+<h3>Critical loop order question</h3>
+<div class="interview-q">Why must k (intermediate) be the outermost loop? Because when processing (i,j) via k, we need dist[i][k] and dist[k][j] to already include all shorter subpaths. If k were inner, those values wouldn't be fully computed yet.</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">What's the space optimization for Floyd-Warshall? It already runs in-place on the 2D matrix — O(V²) is the minimum.</div>
+<div class="interview-q">Can Floyd-Warshall detect negative cycles? Yes — if dist[i][i] &lt; 0 after the algorithm.</div>`
+    }
+  },
+
+  {
+    id:"prim",title:"Prim's Algorithm",
+    sub:"Minimum Spanning Tree · Greedy · Priority Queue",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 8</span></h2>
+<p>Prim's finds a <b>Minimum Spanning Tree (MST)</b> — a subset of edges that connects all vertices with the minimum total weight, with no cycles. It grows the MST <b>one vertex at a time</b>, always adding the cheapest edge connecting a vertex in the MST to one outside it.</p>
+<p style="margin-top:8px">Mental model: <b>growing a tree from a seed</b>. Start at any node. At each step, grab the cheapest edge that extends your current tree to an unvisited vertex. Like Dijkstra but for MST.</p>
+<h3>MST key properties</h3>
+<ul>
+<li>V vertices → MST has exactly V-1 edges</li>
+<li>MST is unique if all edge weights are distinct</li>
+<li>MST minimizes total edge weight to connect all vertices</li>
+<li>MST is NOT the same as shortest path tree</li>
+</ul>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<div class="step-block">1. Start at any vertex (say vertex 0). Add all its edges to a min-heap keyed by weight.</div>
+<div class="step-block">2. While heap not empty: Extract minimum weight edge (w, u, v). If v already in MST → skip. Otherwise: add v to MST, add edge (u,v,w) to result, add all edges from v to heap.</div>
+<div class="step-block">3. Stop when MST has V-1 edges (or heap is empty).</div>
+<h3>Why greedy works</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">Cut property: For any cut (partition of V into two sets), the minimum weight edge crossing the cut must be in EVERY MST. Prim's repeatedly applies this — at each step, the MST forms one set and all unvisited nodes form another.</p>
+<h3>Similarity to Dijkstra</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">Dijkstra: heap stores (dist_from_source, node). Prim's: heap stores (edge_weight, node). Key difference: Dijkstra minimizes total path distance; Prim's minimizes individual edge weight picked.</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Metric</th><th>Value</th><th>Why</th></tr>
+<tr><td>Time (binary heap)</td><td>O(E log V)</td><td>Each edge pushed/popped from heap once. Heap ops are O(log V) (at most V entries at any time in non-lazy version, E in lazy).</td></tr>
+<tr><td>Space</td><td>O(V + E)</td><td>Adjacency list + heap</td></tr>
+</table></div>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Variant</th><th>Detail</th></tr>
+<tr><td>Prim's with adj list + PQ</td><td>Standard — O(E log V). Best for sparse graphs.</td></tr>
+<tr><td>Prim's with adj matrix</td><td>O(V²). Best for dense graphs (E ≈ V²).</td></tr>
+<tr><td>Kruskal's (alternative MST)</td><td>Sort edges, Union-Find. Better when edges already sorted or graph very sparse.</td></tr>
+</table></div>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. Minimum Spanning Tree (Connected Graph)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Classic Prim's. Connect all N nodes with minimum total cost.</p>
+<div class="trigger">Trigger: "minimum cost to connect all nodes", "connect all cities with minimum cable", "minimum total weight"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Min Cost to Connect All Points (Euclidean)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Points in 2D space. Edge weight = Manhattan/Euclidean distance. Build implicit complete graph, run Prim's.</p>
+<div class="trigger">Trigger: "points on a plane", "connect with minimum total distance", "coordinate pairs given"</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">"Minimum cost to connect all N nodes/cities"</span><span class="arrow">→</span><span class="smell-then">MST — Prim's or Kruskal's</span></div>
+<div class="smell-row"><span class="smell-if">"Minimum total edge weight to span the graph"</span><span class="arrow">→</span><span class="smell-then">MST</span></div>
+<div class="smell-row"><span class="smell-if">"Connect all points with minimum total Manhattan distance"</span><span class="arrow">→</span><span class="smell-then">Prim's on complete graph with Manhattan distance as weight</span></div>
+<div class="smell-row"><span class="smell-if">"Remove maximum weight edges to create a spanning tree"</span><span class="arrow">→</span><span class="smell-then">MST (minimum total weight = maximum removal)</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>import java.util.*;
+
+public class Prims {
+
+    // Standard Prim's: adj[u] = list of [v, weight]
+    int primMST(int V, Map&lt;Integer, List&lt;int[]&gt;&gt; adj) {
+        boolean[] inMST = new boolean[V];
+        // [weight, vertex, from_vertex]
+        PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a,b) -&gt; a[0]-b[0]);
+        pq.offer(new int[]{0, 0, -1}); // start from vertex 0
+
+        int totalWeight = 0;
+        List&lt;int[]&gt; mstEdges = new ArrayList&lt;&gt;();
+
+        while (!pq.isEmpty()) {
+            int[] cur = pq.poll();
+            int w = cur[0], u = cur[1], from = cur[2];
+
+            if (inMST[u]) continue; // already in MST
+            inMST[u] = true;
+            totalWeight += w;
+            if (from != -1) mstEdges.add(new int[]{from, u, w});
+
+            for (int[] edge : adj.get(u)) {
+                int v = edge[0], ew = edge[1];
+                if (!inMST[v]) pq.offer(new int[]{ew, v, u});
+            }
+        }
+        return totalWeight; // sum of MST edge weights
+    }
+
+    // LC 1584: Min Cost to Connect All Points
+    public int minCostConnectPoints(int[][] points) {
+        int n = points.length;
+        boolean[] inMST = new boolean[n];
+        PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a,b) -&gt; a[0]-b[0]);
+        pq.offer(new int[]{0, 0}); // [cost, point_index]
+        int total = 0, edgesUsed = 0;
+
+        while (!pq.isEmpty() &amp;&amp; edgesUsed &lt; n) {
+            int[] cur = pq.poll();
+            int cost = cur[0], u = cur[1];
+            if (inMST[u]) continue;
+            inMST[u] = true;
+            total += cost;
+            edgesUsed++;
+            // Push edges to all other unvisited points
+            for (int v = 0; v &lt; n; v++) {
+                if (!inMST[v]) {
+                    int dist = Math.abs(points[u][0]-points[v][0])
+                             + Math.abs(points[u][1]-points[v][1]);
+                    pq.offer(new int[]{dist, v});
+                }
+            }
+        }
+        return total;
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Min Cost to Connect All Points (LC 1584)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">Given N points on a 2D plane, return the minimum cost to connect all points. Cost = Manhattan distance. Each point must be connected (directly or indirectly).</p>
+<div class="brute-tag">Brute Force — Try all spanning trees</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Cayley's formula: N^(N-2) spanning trees for N nodes. Completely infeasible for N > 10.</p>
+<div class="opt-tag">Optimal — Prim's on complete graph O(N² log N)</div>
+<p style="font-size:13px;color:var(--color-text-secondary)">See full implementation in Java section above.</p>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px"><b>WHY PRIM'S:</b> "Connect all points" = MST problem. Points on a plane = complete graph (every pair connected). Manhattan distance = edge weight. We want minimum total weight spanning tree. Prim's naturally handles this without building the full edge list explicitly — we compute edge weights on-the-fly when expanding from each node.</p>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Min Cost to Connect All Points (LC 1584)</div><p style="font-size:13px;color:var(--color-text-secondary)">Prim's on implicit complete graph. Textbook MST with coordinate points.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Connecting Cities with Minimum Cost (LC 1135)</div><p style="font-size:13px;color:var(--color-text-secondary)">Explicit edge list. Compare Prim's vs Kruskal's.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Optimize Water Distribution (LC 1168)</div><p style="font-size:13px;color:var(--color-text-secondary)">Add virtual well node; MST gives optimal water pipes + wells.</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>Key question:</b> "Prim's or Kruskal's?" — Prim's: better for dense graphs (E close to V²) or when starting from a specific node. Kruskal's: better for sparse graphs, when edges are pre-sorted, or when Union-Find is familiar.</p></div>
+<h3>MST vs Shortest Path Tree</h3>
+<div class="interview-q">MST minimizes TOTAL edge weight across the tree. Shortest path tree minimizes distance FROM a specific source. They're different trees and neither is a subset of the other in general.</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">Is MST unique? Yes, if all edge weights are distinct.</div>
+<div class="interview-q">What if the graph is disconnected? (MST doesn't exist — you'd get a minimum spanning FOREST)</div>
+<div class="interview-q">Can MST be used for clustering? Yes — cut the K-1 heaviest MST edges to get K clusters.</div>`
+    }
+  },
+
+  {
+    id:"kruskal",title:"Kruskal's Algorithm",
+    sub:"MST · Union-Find · Sort edges by weight",
+    sections:{
+      definition:`<h2>Definition <span class="badge">Block 3 · Topic 9</span></h2>
+<p>Kruskal's finds the <b>Minimum Spanning Tree</b> by taking a completely different approach from Prim's: <b>sort all edges by weight</b> and greedily add edges that don't create a cycle, using <b>Union-Find</b> to check for cycles efficiently.</p>
+<p style="margin-top:8px">Mental model: <b>sorting roads by price, building cheapest first</b>. Sort all roads by cost. Add each road to your map unless it connects two cities already connected (which would create a loop). Stop when all cities are connected.</p>
+<h3>Two algorithms, one result</h3>
+<p>Prim's and Kruskal's always produce an MST with the same total weight (though edge sets may differ when weights aren't all distinct).</p>`,
+
+      mechanics:`<h2>Internal Mechanics</h2>
+<div class="step-block">1. Sort all E edges by weight in ascending order.</div>
+<div class="step-block">2. Initialize Union-Find: each vertex in its own component.</div>
+<div class="step-block">3. For each edge (u, v, w) in sorted order: If find(u) ≠ find(v) → u and v are in different components → safe to add this edge → union(u, v), add edge to MST. Else → adding this edge would create a cycle → skip.</div>
+<div class="step-block">4. Stop when MST has V-1 edges (or all edges processed).</div>
+<h3>Union-Find with path compression + rank</h3>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">Find with path compression: O(α(N)) ≈ O(1). Union by rank prevents tall trees. This makes cycle checking nearly O(1) per edge.</p>`,
+
+      complexity:`<h2>Time & Space Complexity</h2>
+<div class="table-wrap"><table>
+<tr><th>Step</th><th>Time</th><th>Why</th></tr>
+<tr><td>Sort edges</td><td>O(E log E)</td><td>Standard sort of E edges</td></tr>
+<tr><td>Process all edges</td><td>O(E × α(V)) ≈ O(E)</td><td>Each edge → one union-find operation. α(V) is near-constant.</td></tr>
+<tr><td>Total</td><td>O(E log E)</td><td>Dominated by sorting</td></tr>
+<tr><td>Space</td><td>O(V)</td><td>Union-Find parent + rank arrays</td></tr>
+</table></div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">Note: O(E log E) = O(E log V) since E ≤ V² so log E ≤ 2 log V.</p>`,
+
+      subtypes:`<h2>Subtypes & Variants</h2>
+<div class="table-wrap"><table>
+<tr><th>Variant</th><th>Use case</th></tr>
+<tr><td>Standard Kruskal's</td><td>MST on general weighted undirected graph</td></tr>
+<tr><td>Reverse Kruskal's (Maximum ST)</td><td>Sort edges in DESCENDING order. Pick edges that don't form a cycle. → Maximum Spanning Tree</td></tr>
+<tr><td>Kruskal's for forest</td><td>Disconnected graph → minimum spanning forest</td></tr>
+</table></div>`,
+
+      patterns:`<h2>Core Patterns</h2>
+<div class="pattern-card">
+<div class="pattern-title">1. Minimum Spanning Tree (Sparse Graph / Pre-sorted Edges)</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Sort edges, Union-Find for cycle check. Especially clean when edge list is the input.</p>
+<div class="trigger">Trigger: "minimum cost to connect all nodes", edges given as list (not adjacency list)</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">2. Maximum Spanning Tree</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Same algorithm, reverse sort. Find spanning tree with maximum total weight.</p>
+<div class="trigger">Trigger: "maximum bandwidth path", "maximum bottleneck spanning tree"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-title">3. Union-Find Connectivity Check</div>
+<p style="font-size:13px;margin-top:4px;color:var(--color-text-secondary)">Kruskal's naturally models incremental connectivity — add edges one by one, check when fully connected.</p>
+<div class="trigger">Trigger: "at what point are all nodes connected?" (process edges in order of weight)</div>
+</div>`,
+
+      smells:`<h2>Problem Smell → Pattern Map</h2>
+<div class="smell-row"><span class="smell-if">"Minimum cost to connect all nodes" + edge list given</span><span class="arrow">→</span><span class="smell-then">Kruskal's (sort + Union-Find)</span></div>
+<div class="smell-row"><span class="smell-if">"Minimum spanning tree in sparse graph"</span><span class="arrow">→</span><span class="smell-then">Kruskal's (faster than Prim's for sparse)</span></div>
+<div class="smell-row"><span class="smell-if">"When does the graph become fully connected as we add edges?"</span><span class="arrow">→</span><span class="smell-then">Kruskal's order simulation with Union-Find</span></div>
+<div class="smell-row"><span class="smell-if">"Add edges; detect when cycle first forms"</span><span class="arrow">→</span><span class="smell-then">Union-Find: cycle forms when union returns false</span></div>`,
+
+      java:`<h2>Java Implementation</h2>
+<pre><code>import java.util.*;
+
+public class Kruskals {
+
+    // ===== UNION-FIND (with path compression + rank) =====
+    int[] parent, rank;
+
+    void init(int n) {
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i &lt; n; i++) parent[i] = i; // each node is its own parent
+    }
+
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]); // path compression
+        return parent[x];
+    }
+
+    boolean union(int x, int y) {
+        int px = find(x), py = find(y);
+        if (px == py) return false; // already connected — adding edge = cycle!
+        // Union by rank
+        if (rank[px] &lt; rank[py]) parent[px] = py;
+        else if (rank[px] &gt; rank[py]) parent[py] = px;
+        else { parent[py] = px; rank[px]++; }
+        return true; // successfully merged two components
+    }
+
+    // ===== KRUSKAL'S ALGORITHM =====
+    int kruskalMST(int V, int[][] edges) {
+        // edges[i] = [u, v, weight]
+        Arrays.sort(edges, (a, b) -&gt; a[2] - b[2]); // sort by weight ASC
+        init(V);
+
+        int totalWeight = 0, edgesAdded = 0;
+        for (int[] edge : edges) {
+            if (union(edge[0], edge[1])) { // no cycle — add to MST
+                totalWeight += edge[2];
+                edgesAdded++;
+                if (edgesAdded == V - 1) break; // MST complete!
+            }
+        }
+        return edgesAdded == V - 1 ? totalWeight : -1; // -1 if graph disconnected
+    }
+
+    // ===== DETECT REDUNDANT CONNECTION (LC 684) =====
+    public int[] findRedundantConnection(int[][] edges) {
+        int n = edges.length;
+        init(n + 1);
+        for (int[] e : edges) {
+            if (!union(e[0], e[1])) return e; // union failed → this edge creates cycle
+        }
+        return new int[]{};
+    }
+}</code></pre>`,
+
+      worked:`<h2>Worked Example — Connecting Cities with Minimum Cost (LC 1135)</h2>
+<p style="font-size:13px;margin-bottom:12px;color:var(--color-text-secondary)">N cities, cost to connect pairs given. Return minimum total cost to connect all cities, or -1 if impossible. Classic MST.</p>
+<div class="brute-tag">Brute Force</div>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Try all 2^E subsets of edges; check if each connects all N nodes with minimum weight. Exponential.</p>
+<div class="opt-tag">Optimal — Kruskal's O(E log E)</div>
+<pre><code>public int minimumCost(int N, int[][] connections) {
+    // connections[i] = [city1, city2, cost]
+    Arrays.sort(connections, (a, b) -&gt; a[2] - b[2]); // cheapest first
+    init(N + 1); // 1-indexed cities
+
+    int total = 0, edgesAdded = 0;
+    for (int[] c : connections) {
+        if (union(c[0], c[1])) {
+            total += c[2];
+            edgesAdded++;
+            if (edgesAdded == N - 1) return total; // N-1 edges = MST complete
+        }
+    }
+    return -1; // couldn't connect all cities (disconnected graph)
+}
+// WHY KRUSKAL'S: Input is an edge list → perfect for Kruskal's.
+// Sort cheapest first, greedily take non-cycle edges.
+// Union-Find detects cycle in O(α(N)) ≈ O(1).
+// N-1 edges in MST → we're done.</code></pre>`,
+
+      practice:`<h2>Practice Problems</h2>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Redundant Connection (LC 684)</div><p style="font-size:13px;color:var(--color-text-secondary)">Process edges in order. First edge where union() returns false = redundant (creates cycle).</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Min Cost to Connect All Points (LC 1584)</div><p style="font-size:13px;color:var(--color-text-secondary)">Can use Kruskal's (build all O(N²) edges, sort, apply). Compare with Prim's approach.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-med">Medium</span><div><div class="pattern-title">Number of Operations to Make Network Connected (LC 1319)</div><p style="font-size:13px;color:var(--color-text-secondary)">Count components with Union-Find. Need C-1 cables to connect C components.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Optimize Water Distribution in a Village (LC 1168)</div><p style="font-size:13px;color:var(--color-text-secondary)">Add virtual well node (node 0), MST gives the optimal solution.</p></div></div>
+<div class="practice-card"><span class="diff-badge diff-hard">Hard</span><div><div class="pattern-title">Minimum Spanning Tree (GFG)</div><p style="font-size:13px;color:var(--color-text-secondary)">Raw Kruskal's implementation with path compression. Build and test from scratch.</p></div></div>`,
+
+      interview:`<h2>Interview Perspective</h2>
+<div class="interview-box"><p><b>Critical insight:</b> Union-Find is the backbone of Kruskal's. Interviewers will ask you to implement Union-Find from scratch. Know: parent array, find with path compression, union by rank — cold.</p></div>
+<h3>Kruskal's vs Prim's decision</h3>
+<div class="interview-q">Sparse graph (E ≈ V): Kruskal's O(E log E) vs Prim's O(E log V) — similar, Kruskal's cleaner code</div>
+<div class="interview-q">Dense graph (E ≈ V²): Prim's with matrix O(V²) vs Kruskal's O(E log E = V² log V) — Prim's wins</div>
+<div class="interview-q">Edge list given as input: Kruskal's natural fit</div>
+<h3>Follow-up questions</h3>
+<div class="interview-q">What's the time complexity of Union-Find with path compression + rank? O(α(N)) per operation — effectively O(1).</div>
+<div class="interview-q">How do you find the maximum spanning tree? Sort edges in descending order, same Kruskal's logic.</div>
+<div class="interview-q">What if edges have equal weights? MST may not be unique, but total weight is still minimum.</div>`
+    }
+  }
+];
+
+const SECTIONS = [
+  {key:"definition",label:"Definition"},
+  {key:"mechanics",label:"Mechanics"},
+  {key:"complexity",label:"Complexity"},
+  {key:"subtypes",label:"Subtypes"},
+  {key:"patterns",label:"Patterns"},
+  {key:"smells",label:"Smell → Pattern"},
+  {key:"java",label:"Java Code"},
+  {key:"worked",label:"Worked Example"},
+  {key:"practice",label:"Practice"},
+  {key:"interview",label:"Interview"},
+];
+
+let currentTopic = 0;
+let currentSection = 0;
+
+function render() {
+  const topic = TOPICS[currentTopic];
+  const secKey = SECTIONS[currentSection].key;
+  const content = topic.sections[secKey] || "<p>Content coming soon.</p>";
+
+  document.getElementById("root").innerHTML = `
+    <h2 class="sr-only">Graph DSA Coach — Block 3: ${topic.title}</h2>
+    <div class="nav-bar">
+      ${TOPICS.map((t,i) => `<button class="nav-btn ${i===currentTopic?'active':''}" onclick="goTopic(${i})">${i+1}. ${t.id==='fundamentals'?'Fundamentals':t.id==='bfs'?'BFS':t.id==='dfs'?'DFS':t.id==='topo'?'Topo Sort':t.id==='dijkstra'?"Dijkstra's":t.id==='bellman'?'Bellman-Ford':t.id==='floyd'?'Floyd-Warshall':t.id==='prim'?"Prim's":"Kruskal's"}</button>`).join('')}
+    </div>
+    <div class="topic-header">
+      <div class="topic-title">${topic.title}</div>
+      <div class="topic-sub">${topic.sub}</div>
+    </div>
+    <div class="section-tabs">
+      ${SECTIONS.map((s,i) => `<button class="sec-btn ${i===currentSection?'active':''}" onclick="goSection(${i})">${s.label}</button>`).join('')}
+    </div>
+    <div class="content-box">${content}</div>
+    <div class="nav-arrows">
+      <button class="nav-arr-btn" onclick="prevSec()" ${currentTopic===0&&currentSection===0?'disabled':''}>← Prev</button>
+      <span class="progress">Topic ${currentTopic+1}/${TOPICS.length} · Section ${currentSection+1}/${SECTIONS.length}</span>
+      <button class="nav-arr-btn" onclick="nextSec()" ${currentTopic===TOPICS.length-1&&currentSection===SECTIONS.length-1?'disabled':''}>Next →</button>
+    </div>
+  `;
+}
+
+function goTopic(i) { currentTopic=i; currentSection=0; render(); }
+function goSection(i) { currentSection=i; render(); }
+function nextSec() {
+  if (currentSection < SECTIONS.length-1) currentSection++;
+  else if (currentTopic < TOPICS.length-1) { currentTopic++; currentSection=0; }
+  render();
+}
+function prevSec() {
+  if (currentSection > 0) currentSection--;
+  else if (currentTopic > 0) { currentTopic--; currentSection=SECTIONS.length-1; }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

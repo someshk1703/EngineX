@@ -1,0 +1,891 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:760px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:224px;min-width:224px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary);display:flex;flex-direction:column}
+.sidebar-header{padding:14px 16px 10px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.nav-item{padding:10px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;line-height:1.35}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.nav-item .num{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:2px}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic{display:none}.topic.active{display:block}
+.topic-title{font-size:20px;font-weight:500;margin-bottom:4px}
+.topic-sub{font-size:13px;color:var(--color-text-tertiary);margin-bottom:24px}
+.sec{margin-bottom:24px}
+.sec-label{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:14px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px}
+.kv-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px;font-weight:500}
+.kv-val{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.tradeoff-item{display:flex;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tradeoff-item:last-child{border-bottom:none}
+.tradeoff-side{font-size:12px;flex:1}
+.tradeoff-side .lbl{font-weight:500;margin-bottom:3px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.gain .lbl{color:#3B6D11}.lose .lbl{color:#A32D2D}
+.tradeoff-side p{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.failure-item{padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px;line-height:1.6;color:var(--color-text-secondary)}
+.failure-item:last-child{border-bottom:none}
+.failure-item strong{color:var(--color-text-primary);font-weight:500}
+.interview-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:16px}
+.interview-box ol{padding-left:18px;font-size:13px;line-height:2;color:var(--color-text-secondary)}
+.interview-box li strong{color:var(--color-text-primary);font-weight:500}
+.connects{display:flex;flex-wrap:wrap;gap:8px}
+.connects a{font-size:12px;padding:4px 12px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.connects a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.arch-block{font-family:var(--font-mono);font-size:12px;line-height:1.65;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:16px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.scale-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.scale-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px}
+.scale-num{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.scale-desc{font-size:12px;color:var(--color-text-tertiary);line-height:1.4}
+.tab-row{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:16px}
+.tab{font-size:12px;padding:8px 14px;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:all .15s}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.next-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:8px 16px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:24px}
+.next-btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.sim-wrap{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:16px;margin-top:12px}
+.sim-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px}
+.sim-row label{color:var(--color-text-secondary);min-width:80px}
+.sim-row input[type=range]{flex:1}
+.sim-row span{min-width:48px;text-align:right;color:var(--color-text-primary);font-weight:500}
+.sim-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.sim-stat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;text-align:center}
+.sim-stat .val{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.sim-stat .lbl{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+.evict-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.evict-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px}
+.evict-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-bottom:6px;font-weight:500}
+.badge-teal{background:#E1F5EE;color:#0F6E56}
+.badge-amber{background:#FAEEDA;color:#854F0B}
+.badge-coral{background:#FAECE7;color:#993C1D}
+.badge-gray{background:#F1EFE8;color:#5F5E5A}
+.lru-sim{margin-top:12px}
+.lru-cells{display:flex;gap:4px;margin:8px 0}
+.lru-cell{flex:1;height:36px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--color-text-secondary);background:var(--color-background-secondary);transition:all .3s}
+.lru-cell.hit{background:#E1F5EE;border-color:#5DCAA5;color:#0F6E56}
+.lru-cell.evict{background:#FAECE7;border-color:#F0997B;color:#993C1D}
+.lru-cell.new{background:#E6F1FB;border-color:#85B7EB;color:#185FA5}
+.lru-log{font-size:12px;color:var(--color-text-tertiary);min-height:18px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.pill-btn{font-size:12px;padding:5px 12px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:transparent;color:var(--color-text-secondary);cursor:pointer;transition:all .15s}
+.pill-btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.comp-row{display:grid;grid-template-columns:140px 1fr 1fr;gap:0;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;font-size:13px}
+.comp-row div{padding:9px 12px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.comp-row div:last-child,.comp-row div:nth-last-child(2),.comp-row div:nth-last-child(3){border-bottom:none}
+.comp-hdr{background:var(--color-background-secondary);font-weight:500;color:var(--color-text-primary);font-size:12px}
+.comp-feat{background:var(--color-background-secondary);color:var(--color-text-tertiary);font-size:12px}
+.comp-r{background:var(--color-background-primary);color:var(--color-text-secondary)}
+.comp-m{background:var(--color-background-primary);color:var(--color-text-secondary)}
+.yes{color:#3B6D11;font-weight:500}.no{color:#A32D2D;font-weight:500}
+</style>
+
+<h2 class="sr-only">System Design Caching — Block 2 interactive reference covering fundamentals, strategies, eviction policies, Redis vs Memcached, cache invalidation, CDN, and distributed caching.</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sidebar-header">Block 2 — Caching</div>
+  <div class="nav-item active" onclick="show(0)"><span class="num">01</span>Cache Fundamentals</div>
+  <div class="nav-item" onclick="show(1)"><span class="num">02</span>Cache Strategies</div>
+  <div class="nav-item" onclick="show(2)"><span class="num">03</span>Eviction Policies</div>
+  <div class="nav-item" onclick="show(3)"><span class="num">04</span>Redis vs Memcached</div>
+  <div class="nav-item" onclick="show(4)"><span class="num">05</span>Cache Invalidation</div>
+  <div class="nav-item" onclick="show(5)"><span class="num">06</span>CDN</div>
+  <div class="nav-item" onclick="show(6)"><span class="num">07</span>Distributed Cache</div>
+</nav>
+
+<main class="content">
+
+<!-- ══════════════ TOPIC 0: Fundamentals ══════════════ -->
+<div class="topic active" id="t0">
+  <div class="topic-title">Cache fundamentals</div>
+  <div class="topic-sub">Hit/miss · hit rate · cold start · TTL</div>
+
+  <div class="sec">
+    <div class="sec-label">Definition &amp; core purpose</div>
+    <div class="prose">
+      A cache is a fast, temporary storage layer placed in front of a slower data source. Its entire purpose: <strong>serve frequently requested data faster than the origin can.</strong> Every cache exploits temporal locality — the observation that data accessed once is likely to be accessed again soon.<br><br>
+      The performance improvement is multiplicative. A Redis GET takes ~0.1ms. A Postgres query on a cold page takes ~5–50ms. A cache hit is 50–500× faster. At 1M RPS, a 90% hit rate means only 100K requests reach the DB — 10× less load.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Core metrics — know these precisely</div>
+    <div class="kv-grid">
+      <div class="kv-card"><div class="kv-label">Cache hit</div><div class="kv-val">Requested key exists in cache and is not expired. Returns immediately. No DB call.</div></div>
+      <div class="kv-card"><div class="kv-label">Cache miss</div><div class="kv-val">Key not in cache (never set, expired, or evicted). Must fetch from origin, then optionally populate cache.</div></div>
+      <div class="kv-card"><div class="kv-label">Hit rate</div><div class="kv-val">hits / (hits + misses). Target: 90%+ for production caches. Below 80% = cache is too small or TTL too short. Each % point matters at scale.</div></div>
+      <div class="kv-card"><div class="kv-label">Cold start</div><div class="kv-val">Cache is empty (new deployment, restart, flush). All requests are misses → DB gets hammered. First 5–10 minutes can saturate origin. Warm with pre-population or accept the spike.</div></div>
+      <div class="kv-card"><div class="kv-label">TTL (Time to Live)</div><div class="kv-val">Expiry duration. After TTL, key is automatically deleted. Controls staleness vs freshness. Tuning TTL is the primary knob for the consistency/performance tradeoff.</div></div>
+      <div class="kv-card"><div class="kv-label">Stale data</div><div class="kv-val">Cache holds an old version after the DB was updated. Acceptable for feeds, profiles. Catastrophic for balances, inventory counts.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Hit rate simulator</div>
+    <div class="sim-wrap">
+      <div class="sim-row"><label>RPS</label><input type="range" min="100" max="100000" step="100" value="10000" id="s-rps" oninput="calcSim()"><span id="o-rps">10,000</span></div>
+      <div class="sim-row"><label>Hit rate</label><input type="range" min="50" max="99" step="1" value="90" id="s-hr" oninput="calcSim()"><span id="o-hr">90%</span></div>
+      <div class="sim-row"><label>DB latency</label><input type="range" min="5" max="200" step="5" value="20" id="s-dbl" oninput="calcSim()"><span id="o-dbl">20ms</span></div>
+      <div class="sim-row"><label>Cache latency</label><input type="range" min="1" max="10" step="1" value="1" id="s-cl" oninput="calcSim()"><span id="o-cl">1ms</span></div>
+      <div class="sim-stats">
+        <div class="sim-stat"><div class="val" id="r-db">1,000</div><div class="lbl">DB requests/s</div></div>
+        <div class="sim-stat"><div class="val" id="r-avgms">2.9</div><div class="lbl">Avg latency (ms)</div></div>
+        <div class="sim-stat"><div class="val" id="r-saved">90%</div><div class="lbl">DB load saved</div></div>
+        <div class="sim-stat"><div class="val" id="r-ratio">20×</div><div class="lbl">Latency speedup</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">TTL strategy</div>
+    <div class="prose">
+      <strong>Short TTL (seconds):</strong> Fresh data, high cache miss rate, DB still gets load. Good for: inventory counts, stock prices, seat availability.<br><br>
+      <strong>Long TTL (hours/days):</strong> High hit rate, stale risk. Good for: product catalog, user profile, static content. Pair with explicit invalidation on write.<br><br>
+      <strong>TTL jitter:</strong> If 1M keys all expire at the same second (e.g., set at midnight + 24h TTL), you get a thundering herd at midnight. Add random jitter: <code>TTL = base + random(0, jitter_range)</code>. Spreads expiry across a window.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Failure modes</div>
+    <div class="failure-item"><strong>Cache stampede (cold start):</strong> All keys expire simultaneously → 10K concurrent requests all miss → 10K DB queries. Mitigation: staggered TTLs, mutex/lock on first miss (only one request fetches, rest wait), background refresh before expiry.</div>
+    <div class="failure-item"><strong>Cache as source of truth:</strong> Team starts reading from cache assuming it's always fresh. Cache restarts → data appears lost. Mitigation: cache is always a read-through layer, never the system of record.</div>
+    <div class="failure-item"><strong>Memory leak via no TTL:</strong> Keys set without TTL grow forever. Cache fills, evictions kick in erratically. Always set a TTL or an explicit eviction policy.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Interview perspective</div>
+    <div class="interview-box">
+      <ol>
+        <li><strong>Quantify immediately.</strong> "At 100K RPS with a 95% hit rate, only 5K requests hit the DB — our DB needs to handle 5K QPS, not 100K."</li>
+        <li><strong>TTL is a design decision, not an afterthought.</strong> Interviewers probe: "how fresh does this data need to be?" — answer with a concrete TTL and justify it.</li>
+        <li><strong>Cold start = deployment risk.</strong> Mention cache warm-up strategy (pre-populate top-N keys on deploy, use a read replica to seed cache).</li>
+        <li><strong>Always ask: what's the cost of a stale read vs a cache miss?</strong> This frames every subsequent caching decision.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Connects to</div>
+    <div class="connects">
+      <a onclick="show(1)">Cache strategies →</a>
+      <a onclick="show(2)">Eviction policies →</a>
+      <a onclick="show(6)">Distributed cache →</a>
+      <a onclick="sendPrompt('Explain database read replicas and caching together in system design')">DB read replicas</a>
+    </div>
+  </div>
+  <button class="next-btn" onclick="show(1)">Next: Cache strategies <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══════════════ TOPIC 1: Strategies ══════════════ -->
+<div class="topic" id="t1">
+  <div class="topic-title">Cache strategies</div>
+  <div class="topic-sub">Cache-aside · write-through · write-behind · read-through</div>
+
+  <div class="sec">
+    <div class="sec-label">The four patterns</div>
+    <div class="tab-row">
+      <div class="tab active" onclick="switchTab(this,'strat','s0')">Cache-aside</div>
+      <div class="tab" onclick="switchTab(this,'strat','s1')">Write-through</div>
+      <div class="tab" onclick="switchTab(this,'strat','s2')">Write-behind</div>
+      <div class="tab" onclick="switchTab(this,'strat','s3')">Read-through</div>
+    </div>
+    <div id="strat">
+      <div class="tab-panel active" id="s0">
+        <div class="prose">
+          <strong>Cache-aside (lazy loading)</strong> — the most common pattern. Application code is in charge of the cache.<br><br>
+          Read: check cache → hit → return. Miss → fetch from DB → write to cache → return.<br>
+          Write: write to DB → <em>invalidate or update cache entry</em>.<br><br>
+          The application manages both the cache and the DB. The cache is populated on demand (lazy). Keys that are never requested are never cached — good for large datasets where only a hot subset matters.<br><br>
+          <strong>Risk:</strong> Cache and DB can diverge on concurrent writes (race condition). Thread 1 writes DB, Thread 2 reads stale cache before Thread 1 can invalidate. Mitigation: short TTL, or use CAS (compare-and-set) on invalidation.
+        </div>
+      </div>
+      <div class="tab-panel" id="s1">
+        <div class="prose">
+          <strong>Write-through</strong> — every write goes to both cache and DB synchronously before acknowledging to the client.<br><br>
+          Write: write to cache → write to DB → return.<br>
+          Read: always from cache (it's always up to date with DB).<br><br>
+          <strong>Benefit:</strong> Cache is always consistent with DB. No stale reads.<br>
+          <strong>Cost:</strong> Write latency doubles (cache write + DB write in series). Cold-start problem: keys written before a cache restart are lost until re-written. Unpopular items pollute cache with data that's never read (write amplification).
+        </div>
+      </div>
+      <div class="tab-panel" id="s2">
+        <div class="prose">
+          <strong>Write-behind (write-back)</strong> — write to cache immediately, acknowledge to client, then asynchronously persist to DB.<br><br>
+          Write: write to cache → ack client → async job writes to DB later.<br><br>
+          <strong>Benefit:</strong> Lowest write latency (cache write only on critical path). Can batch multiple writes to DB (efficiency). Cache absorbs write bursts.<br><br>
+          <strong>Risk:</strong> If cache crashes before async write, data is lost. Durability is sacrificed. Not suitable for financial data. Use only when: write volume is very high, some data loss is acceptable (analytics events, counters), or writes to the same key happen rapidly (coalesce 100 counter increments into 1 DB write).<br><br>
+          <strong>Real use:</strong> Memcached + MySQL at early Facebook for like counts. Redis as a write buffer for Cassandra with Kafka async flush.
+        </div>
+      </div>
+      <div class="tab-panel" id="s3">
+        <div class="prose">
+          <strong>Read-through</strong> — cache sits in front of DB and handles its own population. Application only ever reads from the cache.<br><br>
+          On miss: cache itself fetches from DB and stores the result, then returns it. Application never talks to DB directly.<br><br>
+          <strong>Benefit:</strong> Clean application code — no cache logic in the application layer. Cache is always the data layer. Works well with provider libraries (Ehcache, Spring Cache, NCache).<br><br>
+          <strong>Difference from cache-aside:</strong> In cache-aside, the application fetches from DB and populates cache. In read-through, the cache does both — application is decoupled from DB entirely.<br><br>
+          <strong>Limitation:</strong> First request for any key is always slow (cold miss, cache-fetches from DB). Cold-start is visible to users.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Architecture — cache-aside (most common)</div>
+    <div class="arch-block">READ PATH (cache-aside):
+  App Server
+    │
+    ├─ GET user:42 ──────────────→ Redis
+    │                               │
+    │          HIT ←── user JSON ───┘
+    │          │
+    │          └─ return to client  ✓ fast
+    │
+    │          MISS ──────────────→ Postgres
+    │                               │
+    │          ← row data ──────────┘
+    │          │
+    ├─ SET user:42 TTL=300s → Redis   (populate cache)
+    └─ return to client               ✓ slower (first load)
+
+WRITE PATH (cache-aside, invalidate-on-write):
+  App Server
+    ├─ UPDATE users SET ... WHERE id=42 → Postgres  ✓
+    └─ DEL user:42 ──────────────────────→ Redis    ✓
+       (next read will repopulate from DB)
+
+WRITE PATH (cache-aside, update-on-write):
+  App Server
+    ├─ UPDATE users ... → Postgres
+    └─ SET user:42 {new data} TTL=300 → Redis
+       RISK: race condition if concurrent write happens between
+       the DB write and the cache SET</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Trade-offs by strategy</div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Cache-aside</div><p>Only hot keys are cached. Resilient — cache can restart without data loss (repopulates). Simple to reason about.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Cache-aside</div><p>Stale window between write and invalidation. Application code must manage cache. Cold start exposes DB.</p></div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Write-through</div><p>Always consistent cache. No stale reads after writes. Simple read path.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Write-through</div><p>Write latency up. Cache polluted with never-read keys. Miss on cold start still possible.</p></div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Write-behind</div><p>Lowest write latency. DB protected from write bursts. Efficient batching.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Write-behind</div><p>Data loss risk on cache crash. Complex async pipeline. Hard to debug.</p></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Interview perspective</div>
+    <div class="interview-box">
+      <ol>
+        <li><strong>Default answer: cache-aside</strong> for reads, invalidate on write. State this confidently and explain the race condition risk and how TTL mitigates it.</li>
+        <li><strong>Write-through</strong> if asked for strong consistency. "I'd use write-through for the user settings service — stale settings are confusing to users."</li>
+        <li><strong>Write-behind</strong> if probed on high-throughput counters. "For like counts or view counts where near-real-time is fine and some loss is acceptable, write-behind with periodic DB flush is the right call."</li>
+        <li><strong>Common trap:</strong> "Update cache on write" (write-through read path) — mention the race condition between concurrent writes. Deleting the key on write (cache-aside) is safer than updating it.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Connects to</div>
+    <div class="connects">
+      <a onclick="show(4)">Cache invalidation →</a>
+      <a onclick="show(0)">← Fundamentals</a>
+      <a onclick="sendPrompt('Explain CQRS and event sourcing in system design')">CQRS</a>
+      <a onclick="sendPrompt('Explain Kafka as a write buffer in system design')">Kafka write buffer</a>
+    </div>
+  </div>
+  <button class="next-btn" onclick="show(2)">Next: Eviction policies <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══════════════ TOPIC 2: Eviction ══════════════ -->
+<div class="topic" id="t2">
+  <div class="topic-title">Eviction policies</div>
+  <div class="topic-sub">LRU · LFU · FIFO · random — when each applies</div>
+
+  <div class="sec">
+    <div class="sec-label">The four policies</div>
+    <div class="evict-grid">
+      <div class="evict-card">
+        <span class="evict-badge badge-teal">LRU</span>
+        <div class="kv-label">Least Recently Used</div>
+        <div class="kv-val" style="font-size:13px;line-height:1.6">Evicts the key that hasn't been accessed for the longest time. Implemented as a doubly-linked list + hashmap: O(1) get and set. Every access moves the key to the front. Tail = eviction candidate.<br><br><strong>Use when:</strong> working set fits in memory, access patterns have temporal locality (recently accessed = likely to be accessed again). Most common default.<br><br><strong>Weakness:</strong> One-time large scan evicts the entire hot working set. A single batch job that reads 10M keys thrashes the LRU list, evicting data that was actually hot.</div>
+      </div>
+      <div class="evict-card">
+        <span class="evict-badge badge-amber">LFU</span>
+        <div class="kv-label">Least Frequently Used</div>
+        <div class="kv-val" style="font-size:13px;line-height:1.6">Evicts the key with the lowest access count. Tracks frequency of access, not recency. Keys that are accessed rarely are evicted first regardless of when.<br><br><strong>Use when:</strong> some keys are permanently hot (product homepage, top-10 SKUs), others are accessed once and forgotten. LFU keeps those hot keys forever.<br><br><strong>Weakness:</strong> Frequency counts decay slowly. A key that was hot 6 months ago but is now cold has a high count and resists eviction. Fix: LFU with decay (Redis uses a logarithmic counter with time-based decay — allkeys-lfu).</div>
+      </div>
+      <div class="evict-card">
+        <span class="evict-badge badge-coral">FIFO</span>
+        <div class="kv-label">First In First Out</div>
+        <div class="kv-val" style="font-size:13px;line-height:1.6">Evicts the oldest key regardless of access pattern. Simple queue. No tracking of recency or frequency.<br><br><strong>Use when:</strong> all data has equal value (e.g., rate-limiting windows, session tokens), or data expires naturally anyway and eviction just needs to clear space predictably.<br><br><strong>Weakness:</strong> No intelligence about hot vs cold data. A key inserted 30 days ago may still be very hot (homepage config), but FIFO evicts it anyway. Not suitable for general-purpose caching.</div>
+      </div>
+      <div class="evict-card">
+        <span class="evict-badge badge-gray">Random</span>
+        <div class="kv-label">Random eviction</div>
+        <div class="kv-val" style="font-size:13px;line-height:1.6">Evicts a random key. Zero overhead — no bookkeeping. Surprisingly effective when all keys have similar access patterns (uniform distribution).<br><br><strong>Use when:</strong> access is uniform (e.g., DNS cache where any domain is equally likely to be queried next), or when LRU/LFU overhead matters (very high throughput, tiny cache entries).<br><br><strong>Redis:</strong> Uses approximated LRU (random sample of N keys, evict the least recently used among the sample). Avoids true LRU's O(N) overhead while approximating it well enough.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Interactive LRU simulator (capacity = 4)</div>
+    <div class="lru-sim">
+      <div class="btn-row" id="lru-btns"></div>
+      <div class="lru-cells" id="lru-cells">
+        <div class="lru-cell" id="lc0">—</div>
+        <div class="lru-cell" id="lc1">—</div>
+        <div class="lru-cell" id="lc2">—</div>
+        <div class="lru-cell" id="lc3">—</div>
+      </div>
+      <div class="lru-log" id="lru-log">Click a key to access it. MRU is leftmost, LRU is rightmost.</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="pill-btn" onclick="lruReset()">Reset</button>
+        <button class="pill-btn" onclick="sendPrompt('Explain how LRU cache is implemented with O(1) get and set using a doubly linked list and hashmap')">How is LRU implemented? ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Redis eviction policies (maxmemory-policy)</div>
+    <div class="kv-grid">
+      <div class="kv-card"><div class="kv-label">noeviction</div><div class="kv-val">Return error on write when memory full. Use for: critical data you never want evicted.</div></div>
+      <div class="kv-card"><div class="kv-label">allkeys-lru</div><div class="kv-val">Evict any key using LRU. Most common. Assumes all keys are cache-able.</div></div>
+      <div class="kv-card"><div class="kv-label">volatile-lru</div><div class="kv-val">Evict only keys with TTL set. Keys without TTL are never evicted. Good for mixed persistent + cache data.</div></div>
+      <div class="kv-card"><div class="kv-label">allkeys-lfu</div><div class="kv-val">Evict any key using LFU. Best for skewed access where a small hot set dominates.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Interview perspective</div>
+    <div class="interview-box">
+      <ol>
+        <li><strong>Default: LRU.</strong> It's the right answer for 90% of caching problems. Know its O(1) implementation (doubly linked list + hashmap).</li>
+        <li><strong>Upgrade to LFU</strong> when the interviewer says "some items are permanently hot." Then mention Redis's approximated LFU with time-decay.</li>
+        <li><strong>Probe: "What happens when a batch job scans the cache?"</strong> → LRU thrashing. Solutions: scan-resistant LRU (2Q or ARC algorithm), or run batch jobs against a separate read replica, not the cache.</li>
+        <li><strong>LRU implementation:</strong> "I'd implement it with a HashMap for O(1) lookup and a doubly linked list for O(1) move-to-front and tail eviction." Be ready to code this — it's a top 10 LeetCode problem (LRU Cache, #146).</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Connects to</div>
+    <div class="connects">
+      <a onclick="show(3)">Redis internals →</a>
+      <a onclick="sendPrompt('Implement LRU cache in Java with O(1) operations')">LRU in Java</a>
+      <a onclick="show(6)">Distributed cache →</a>
+    </div>
+  </div>
+  <button class="next-btn" onclick="show(3)">Next: Redis vs Memcached <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══════════════ TOPIC 3: Redis vs Memcached ══════════════ -->
+<div class="topic" id="t3">
+  <div class="topic-title">Redis vs Memcached</div>
+  <div class="topic-sub">Persistence · data types · pub/sub · clustering</div>
+
+  <div class="sec">
+    <div class="sec-label">Head-to-head comparison</div>
+    <div class="comp-row">
+      <div class="comp-hdr"></div><div class="comp-hdr">Redis</div><div class="comp-hdr">Memcached</div>
+      <div class="comp-feat">Data types</div><div class="comp-r">String, Hash, List, Set, Sorted Set, Bitmap, HyperLogLog, Stream, JSON (via module)</div><div class="comp-m">String only (binary-safe)</div>
+      <div class="comp-feat">Persistence</div><div class="comp-r"><span class="yes">Yes</span> — RDB snapshots + AOF (append-only file). Durable on restart.</div><div class="comp-m"><span class="no">No</span> — pure RAM. Restart = total data loss.</div>
+      <div class="comp-feat">Replication</div><div class="comp-r"><span class="yes">Yes</span> — primary/replica, async or semi-sync. Redis Sentinel for HA.</div><div class="comp-m"><span class="no">No</span> built-in. Use client-side sharding.</div>
+      <div class="comp-feat">Clustering</div><div class="comp-r">Redis Cluster — 16,384 hash slots, automatic sharding and failover.</div><div class="comp-m">Client-side consistent hashing only. No server-side cluster management.</div>
+      <div class="comp-feat">Pub/Sub</div><div class="comp-r"><span class="yes">Yes</span> — channels, patterns. Also Redis Streams for persistent pub/sub.</div><div class="comp-m"><span class="no">No</span></div>
+      <div class="comp-feat">Lua scripting</div><div class="comp-r"><span class="yes">Yes</span> — atomic server-side scripts</div><div class="comp-m"><span class="no">No</span></div>
+      <div class="comp-feat">Transactions</div><div class="comp-r"><span class="yes">Yes</span> — MULTI/EXEC, optimistic locking via WATCH</div><div class="comp-m"><span class="no">No</span></div>
+      <div class="comp-feat">Multi-thread</div><div class="comp-r">Single-threaded command processing (I/O multi-threaded since 6.0)</div><div class="comp-m">Multi-threaded. Better raw throughput on multi-core for simple get/set.</div>
+      <div class="comp-feat">Memory efficiency</div><div class="comp-r">Higher overhead per key (metadata, encoding). More features = more memory.</div><div class="comp-m">Lower overhead per key. Better for billions of small string values.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">How it works — Redis internals</div>
+    <div class="prose">
+      <strong>Single-threaded event loop (command processing):</strong> Redis processes one command at a time — no locks, no race conditions inside. This is why Redis is safe to use for distributed locking (Redlock). Since Redis 6.0, I/O is multi-threaded but command execution remains single-threaded.<br><br>
+      <strong>Persistence — RDB vs AOF:</strong><br>
+      RDB (snapshotting): fork() creates a child process, child writes a point-in-time snapshot to disk. Parent continues serving requests. Used for backups. Fast restart, but can lose last N minutes of writes.<br><br>
+      AOF (Append-Only File): every write command is appended to a log file. On restart, Redis replays the log. Slower than RDB but near-zero data loss (can configure fsync every 1s or every write). File grows forever → periodic rewrite via BGREWRITEAOF.<br><br>
+      Production: use both — RDB for fast restart + AOF for durability.<br><br>
+      <strong>Redis data structure internals:</strong><br>
+      String: up to 512MB, SDS (Simple Dynamic String), O(1) GET/SET.<br>
+      Sorted Set: skip list + hash map. O(log N) insert/remove. O(log N + M) range queries. Used for leaderboards, rate limiting.<br>
+      HyperLogLog: probabilistic cardinality counter. Counts unique items with ~0.81% error using only 12KB of memory. Used for: DAU counting, unique URL visitors.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Redis use cases by data type</div>
+    <div class="kv-grid">
+      <div class="kv-card"><div class="kv-label">String</div><div class="kv-val">Session tokens, cached JSON blobs, counters (INCR for atomic increment), distributed locks (SET key value NX EX 30).</div></div>
+      <div class="kv-card"><div class="kv-label">Hash</div><div class="kv-val">User profiles (field-level updates without deserializing whole object), product attributes. HSET/HGET/HGETALL.</div></div>
+      <div class="kv-card"><div class="kv-label">Sorted Set</div><div class="kv-val">Leaderboards (score = points, ZREVRANGEBYSCORE), rate limiting (score = timestamp), feed ranking. ZADD/ZRANGEBYSCORE.</div></div>
+      <div class="kv-card"><div class="kv-label">List</div><div class="kv-val">Message queues (LPUSH + BRPOP for blocking pop), activity feeds (bounded list of last N events), job queues.</div></div>
+      <div class="kv-card"><div class="kv-label">Set</div><div class="kv-val">Unique visitors, tags, friend lists. SADD/SMEMBERS/SINTER for intersection (mutual friends).</div></div>
+      <div class="kv-card"><div class="kv-label">Stream</div><div class="kv-val">Durable append-only log. Consumer groups. Like a lightweight Kafka inside Redis. Used for audit logs, event sourcing at smaller scale.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">When to choose each</div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">Choose Redis when</div><p>You need rich data types, persistence, replication, pub/sub, Lua scripts, or distributed locks. This is 95% of use cases.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">Choose Memcached when</div><p>Pure simple string cache, extremely high throughput on multi-core (Memcached's multithreading wins here), or you need linear horizontal scaling without coordination overhead.</p></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Interview perspective</div>
+    <div class="interview-box">
+      <ol>
+        <li><strong>Default to Redis</strong> for every caching question. Memcached is the niche answer for specific multi-core throughput requirements.</li>
+        <li><strong>Know Redis data types by use case:</strong> Leaderboard = Sorted Set. Rate limiting = Sorted Set or INCR+EXPIRE. Session = String. User profile = Hash. Feed = List. Unique counters = HyperLogLog.</li>
+        <li><strong>Probe: "How do you implement a distributed lock with Redis?"</strong> → <code>SET key uuid NX EX 30</code>. NX = only set if not exists. EX = expire in 30s. Unlock: Lua script to check UUID matches before DEL (prevents another thread's lock from being deleted).</li>
+        <li><strong>Probe: "What's Redis Sentinel vs Redis Cluster?"</strong> → Sentinel = HA for single-primary setup (monitors, auto-promotes). Cluster = horizontal sharding across multiple primaries (16,384 hash slots, each node owns a range).</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Connects to</div>
+    <div class="connects">
+      <a onclick="show(6)">Distributed cache →</a>
+      <a onclick="sendPrompt('Explain Redis Sentinel vs Redis Cluster in depth')">Sentinel vs Cluster</a>
+      <a onclick="sendPrompt('Implement rate limiting using Redis sorted sets')">Rate limiting with Redis</a>
+      <a onclick="sendPrompt('Explain distributed locking with Redis Redlock')">Redlock</a>
+    </div>
+  </div>
+  <button class="next-btn" onclick="show(4)">Next: Cache invalidation <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══════════════ TOPIC 4: Invalidation ══════════════ -->
+<div class="topic" id="t4">
+  <div class="topic-title">Cache invalidation</div>
+  <div class="topic-sub">The hard problem — event-driven · TTL · version tags</div>
+
+  <div class="sec">
+    <div class="sec-label">Definition &amp; why it's hard</div>
+    <div class="prose">
+      Phil Karlton: <em>"There are only two hard things in computer science: cache invalidation and naming things."</em><br><br>
+      Cache invalidation is the problem of ensuring that when data in the source of truth changes, the cached copy is updated or removed in a timely and correct way — without either serving stale data or creating race conditions.<br><br>
+      The difficulty: a cache is a copy. The moment a copy exists, it can diverge from the original. The question is: how quickly, and what are the consequences?
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Three invalidation approaches</div>
+    <div class="tab-row">
+      <div class="tab active" onclick="switchTab(this,'inv','i0')">TTL-based</div>
+      <div class="tab" onclick="switchTab(this,'inv','i1')">Event-driven</div>
+      <div class="tab" onclick="switchTab(this,'inv','i2')">Version tags</div>
+    </div>
+    <div id="inv">
+      <div class="tab-panel active" id="i0">
+        <div class="prose">
+          <strong>TTL-based (passive expiry):</strong> Set a TTL on every cache entry. When it expires, the next read is a miss and repopulates from the source.<br><br>
+          <strong>Simplest approach.</strong> No coordination needed. Works even if you can't reliably detect writes.<br><br>
+          <strong>Staleness window = TTL.</strong> If TTL = 5 minutes, data can be up to 5 minutes stale. For product descriptions, that's fine. For inventory count, probably not.<br><br>
+          <strong>Tuning TTL:</strong> Start with the longest TTL where staleness is acceptable. Shorter TTLs = fresher data but higher DB load. Find the business tolerance — "how stale is acceptable?" is a product decision, not just a technical one.<br><br>
+          <strong>Jitter:</strong> Add ±10–30% random jitter to TTL to prevent simultaneous mass expiry (thundering herd).
+        </div>
+      </div>
+      <div class="tab-panel" id="i1">
+        <div class="prose">
+          <strong>Event-driven invalidation:</strong> When a write occurs, immediately invalidate or update the cache entry. No staleness window.<br><br>
+          <strong>Approach 1 — Synchronous (in application code):</strong> After writing to DB, call <code>cache.delete(key)</code>. Fast. Risk: if the app crashes after the DB write but before the cache delete, the cache has stale data until TTL. Also: race condition with concurrent reads.<br><br>
+          <strong>Approach 2 — CDC (Change Data Capture):</strong> A separate service reads the DB's WAL (Write-Ahead Log) and publishes change events. A cache invalidation consumer subscribes and invalidates affected keys. Debezium + Kafka is the standard stack.<br><br>
+          This decouples invalidation from the write path. No app code change needed. Works even for writes from legacy systems, batch jobs, or direct DB mutations.<br><br>
+          <strong>Approach 3 — Message queue:</strong> On write, publish an event to a queue ("user:42 updated"). Cache invalidation workers consume and delete the key. Works well for fan-out invalidation (one write → many cache keys need invalidating).
+        </div>
+      </div>
+      <div class="tab-panel" id="i2">
+        <div class="prose">
+          <strong>Version tags / surrogate keys:</strong> Cache keys include a version identifier that changes when the underlying data changes. Stale entries are simply never accessed again — they expire via TTL naturally.<br><br>
+          <strong>Example:</strong> Cache key = <code>user:{id}:v{version}</code>. User record has a version counter. When updated, version increments. New reads fetch <code>user:42:v7</code> — old <code>user:42:v6</code> is now orphaned and expires.<br><br>
+          <strong>Tag-based invalidation (advanced):</strong> Tag cache entries with semantic labels ("product-catalog", "user-42"). On a product update, invalidate all entries tagged "product-catalog". Used in CDNs (Fastly, Cloudflare cache tags), and by Varnish.<br><br>
+          <strong>Benefit:</strong> No coordination needed at write time. The version IS the invalidation mechanism. No DEL calls.<br><br>
+          <strong>Cost:</strong> Cache fills with orphaned old versions until TTL. Requires version tracking in DB or application.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Architecture — CDC-based invalidation</div>
+    <div class="arch-block">CDC Invalidation Pipeline (Debezium + Kafka + Redis)
+
+  Application
+    │ writes
+    ▼
+  Postgres (primary)
+    │ WAL (Write-Ahead Log) — every change logged
+    ▼
+  Debezium connector (reads WAL)
+    │ publishes change events
+    ▼
+  Kafka topic: "db.public.users"
+    │ {"op":"u","id":42,"table":"users"}
+    ▼
+  Cache Invalidation Service (consumer group)
+    │ DEL user:42 in Redis
+    ▼
+  Redis (stale entry removed)
+
+  Next read: cache miss → fetch from DB → repopulate cache
+  Latency from write to invalidation: ~50–200ms (Debezium lag)
+
+  PRO: Works for all write sources (app, batch jobs, admin tools)
+  CON: Eventual invalidation — ~100ms staleness window remains</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Failure modes</div>
+    <div class="failure-item"><strong>Race condition (cache-aside write pattern):</strong> Thread A reads miss, fetches from DB (old value). Thread B writes new value, deletes cache key. Thread A then sets cache key with old value. Cache is now stale indefinitely (until TTL). Mitigation: use short TTL, or version the cache key, or use CAS (WATCH in Redis).</div>
+    <div class="failure-item"><strong>Invalidation fan-out explosion:</strong> One write invalidates thousands of cache keys (e.g., a category name change invalidates every product in that category). Mitigation: tag-based invalidation with lazy repopulation, or accept eventual consistency for large fan-outs.</div>
+    <div class="failure-item"><strong>Missed invalidation:</strong> App code has multiple write paths (API, admin panel, batch job). Developers forget to add cache invalidation to the batch job. Stale data persists. Fix: centralize writes through a single service, or use CDC which catches all DB writes regardless of source.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Interview perspective</div>
+    <div class="interview-box">
+      <ol>
+        <li><strong>Start with TTL</strong> as the baseline. It handles 80% of cases. Then upgrade to event-driven for data where staleness matters.</li>
+        <li><strong>CDC is the senior-level answer.</strong> Mention Debezium reading Postgres WAL to trigger invalidation. This shows distributed systems maturity.</li>
+        <li><strong>The race condition question is almost guaranteed.</strong> "There's a race between the DB write and the cache invalidation. I handle this by always deleting (not updating) the cache on write, using short TTLs, and accepting a brief staleness window."</li>
+        <li><strong>Tag-based invalidation</strong> impresses when the problem involves many-to-many invalidation (e.g., "if a user changes their username, which cached pages need to refresh?").</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Connects to</div>
+    <div class="connects">
+      <a onclick="show(1)">← Cache strategies</a>
+      <a onclick="sendPrompt('Explain Debezium and CDC change data capture in system design')">CDC / Debezium</a>
+      <a onclick="sendPrompt('Explain Kafka in system design')">Kafka</a>
+      <a onclick="show(5)">CDN invalidation →</a>
+    </div>
+  </div>
+  <button class="next-btn" onclick="show(5)">Next: CDN <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══════════════ TOPIC 5: CDN ══════════════ -->
+<div class="topic" id="t5">
+  <div class="topic-title">CDN</div>
+  <div class="topic-sub">Edge caching · cache-control headers · origin shield · invalidation</div>
+
+  <div class="sec">
+    <div class="sec-label">Definition &amp; core purpose</div>
+    <div class="prose">
+      A CDN (Content Delivery Network) is a geographically distributed network of edge servers that cache content close to end users. The goal: serve content from a server that's physically near the user (low latency) without hitting your origin server (reduced load).<br><br>
+      Without CDN: a user in Mumbai requesting an image from a server in us-east-1 → ~200ms round-trip. With CDN PoP in Mumbai: ~5ms. For a page with 50 assets, this saves 10 seconds of asset loading.<br><br>
+      CDNs cache: static assets (JS, CSS, images, fonts), API responses (with correct headers), HTML pages (for SSR sites), video segments, and even dynamic personalized content at the edge (Cloudflare Workers, Lambda@Edge).
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">How it works — mechanics</div>
+    <div class="prose">
+      <strong>1. Cache-Control headers drive everything.</strong> Your origin server sets these headers on responses. The CDN reads them and decides how long to cache.<br><br>
+      <strong>2. Cache key = URL (+ optional Vary headers).</strong> By default, two requests with the same URL hit the same cache entry. If you add <code>Vary: Accept-Language</code>, the CDN caches separate versions per language.<br><br>
+      <strong>3. Cache HIT:</strong> CDN serves from edge. No request to origin.<br>
+      <strong>Cache MISS (first request to this PoP):</strong> CDN fetches from origin (or origin shield), caches the response, serves to user.<br><br>
+      <strong>4. Stale-while-revalidate:</strong> Serve the stale cached version immediately while asynchronously fetching a fresh version from origin. User gets fast response, cache refreshes in background.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Cache-control header anatomy</div>
+    <div class="arch-block">Cache-Control: public, max-age=86400, stale-while-revalidate=3600, s-maxage=604800
+
+  public          — cacheable by CDN and browser (not private/sensitive)
+  max-age=86400   — browser caches for 24 hours
+  s-maxage=604800 — CDN caches for 7 days (overrides max-age for shared caches)
+  stale-while-revalidate=3600 — serve stale for 1hr while refreshing
+
+Other key directives:
+  no-cache        — must revalidate with origin on every request (not "no caching")
+  no-store        — truly no caching anywhere (PII, auth pages)
+  private         — browser can cache, CDN must not
+  immutable       — content never changes (hashed filenames like app.a3f2e1.js)
+
+Strategy by asset type:
+  CSS/JS with content hash:  Cache-Control: public, max-age=31536000, immutable
+  HTML page:                 Cache-Control: public, s-maxage=300, stale-while-revalidate=60
+  API response:              Cache-Control: public, s-maxage=60
+  User data / auth:          Cache-Control: private, no-store</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Origin shield</div>
+    <div class="prose">
+      Without origin shield: each CDN PoP (say, 200 globally) independently fetches from origin on a miss. For a low-traffic object, your origin gets 200 requests instead of 1.<br><br>
+      <strong>Origin shield (shield PoP):</strong> A single designated "mid-tier" CDN node that acts as a cache in front of your origin. All other PoPs check the shield first. Miss at shield → one request to origin. Other PoPs get the response from shield.<br><br>
+      Reduces origin load dramatically. Shield is typically located near your origin datacenter for low shield→origin latency. Used by Cloudflare (Tiered Cache), Fastly (shielding), AWS CloudFront (Origin Shield).
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">CDN cache invalidation</div>
+    <div class="prose">
+      Invalidating cached content is the hardest CDN problem. Options:<br><br>
+      <strong>URL-based purge:</strong> Send a purge request for a specific URL. Fast (~1–5 seconds to propagate globally). Works for targeted invalidations (update one product image).<br><br>
+      <strong>Tag-based purge (surrogate keys):</strong> Tag cache entries with labels at response time (<code>Surrogate-Key: product-42 category-shoes</code>). Purge by tag: one API call removes all entries tagged "product-42" across all PoPs. Fastly and Cloudflare support this. Ideal for invalidating a product page + all its images + its listing page appearance simultaneously.<br><br>
+      <strong>Versioned URLs (best practice):</strong> Never invalidate — instead, change the URL when content changes. CSS file: <code>app.css?v=2</code> or <code>app.a3f2e1.js</code> (content-hashed). Old URL expires naturally. New URL is automatically fetched. Zero invalidation cost. This is what webpack/Vite does for asset fingerprinting.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Trade-offs</div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Long CDN TTL</div><p>High hit rate. Low origin load. Users get fast responses globally.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Long CDN TTL</div><p>Bug fixes / content updates take hours to propagate (unless you purge or use versioned URLs).</p></div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Short CDN TTL</div><p>Fresh content. Rapid iteration. Easy to push fixes.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Short CDN TTL</div><p>More origin requests. Lower hit rate. Higher origin cost and latency.</p></div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Versioned URLs + immutable</div><p>Best of both worlds. Long cache, instant update via new URL. Zero stale risk.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Versioned URLs</div><p>Requires build pipeline to generate content hashes. HTML must reference new URLs. More complex deployment.</p></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Interview perspective</div>
+    <div class="interview-box">
+      <ol>
+        <li><strong>Always mention CDN for static assets</strong> in any system design. "Static assets (JS, CSS, images) go behind CloudFront with max-age=1 year, immutable, using content-hashed filenames."</li>
+        <li><strong>Probe: "How do you update cached content?"</strong> → Versioned URLs for static assets (no invalidation needed). Tag-based purge for dynamic content. URL-based purge for emergency hotfixes.</li>
+        <li><strong>Origin shield</strong> is a senior-level detail. "I'd place an origin shield in us-east-1 near our origin to prevent cache-miss thundering herd from 200 global PoPs hitting origin simultaneously."</li>
+        <li><strong>stale-while-revalidate</strong> is an underrated answer for API caching. "The user gets the cached version immediately, and the CDN refreshes in the background. No user-visible latency on refresh."</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Connects to</div>
+    <div class="connects">
+      <a onclick="show(4)">← Cache invalidation</a>
+      <a onclick="sendPrompt('Explain DNS and anycast routing for CDN in system design')">DNS + Anycast</a>
+      <a onclick="sendPrompt('Explain edge computing with Cloudflare Workers and Lambda@Edge')">Edge compute</a>
+      <a onclick="show(6)">Distributed cache →</a>
+    </div>
+  </div>
+  <button class="next-btn" onclick="show(6)">Next: Distributed cache <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══════════════ TOPIC 6: Distributed Cache ══════════════ -->
+<div class="topic" id="t6">
+  <div class="topic-title">Distributed cache</div>
+  <div class="topic-sub">Consistent hashing · cache stampede · thundering herd</div>
+
+  <div class="sec">
+    <div class="sec-label">Why distribute the cache?</div>
+    <div class="prose">
+      A single Redis node handles ~100K–1M ops/sec and is limited by one machine's RAM. At scale (Zepto, Razorpay, Netflix), you need:<br><br>
+      1. More memory than one machine can hold<br>
+      2. Higher throughput than one machine can serve<br>
+      3. HA — one node failure shouldn't take down the entire cache<br><br>
+      Distributing the cache means partitioning keys across multiple cache nodes. The hard problem: when you add or remove a node, how do you decide which node holds which key — without remapping everything?
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Consistent hashing — the foundation</div>
+    <div class="prose">
+      <strong>Naive approach (mod N):</strong> <code>node = hash(key) % N</code>. Adding/removing one node changes the mapping for (N-1)/N keys → massive cache invalidation.<br><br>
+      <strong>Consistent hashing:</strong> Hash space is a ring (0 to 2³²). Nodes are placed on the ring by hashing their identifier (IP:port). Keys are also placed on the ring by hash. Each key routes to the first node clockwise from its position.<br><br>
+      Adding a node: only the keys between the new node and its counter-clockwise neighbor move. ~1/N keys remapped. Removing a node: that node's keys shift to the next clockwise node. ~1/N keys remapped.<br><br>
+      <strong>Virtual nodes (vnodes):</strong> Each physical node is represented by K virtual positions on the ring (e.g., K=150). This distributes keys evenly even with heterogeneous hardware and avoids hotspots when nodes join/leave. Redis Cluster uses 16,384 hash slots — a form of consistent hashing with fixed slot count.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Cache stampede — deep dive</div>
+    <div class="prose">
+      <strong>What it is:</strong> A popular cache key expires. Multiple concurrent requests all see a miss simultaneously. All of them independently query the DB. DB is suddenly hit with N requests instead of 1.<br><br>
+      <strong>Why it's dangerous:</strong> At 100K RPS with 90% hit rate, ~10K req/s hit the DB normally. If the top-10 hot keys expire simultaneously and each has 5K concurrent requests → 50K sudden DB queries. DB falls over. Cache now can't repopulate. System collapses.<br><br>
+      <strong>Solution 1 — Mutex/lock:</strong> First thread to detect miss acquires a Redis lock (<code>SET stampede-lock:key uuid NX EX 5</code>). Only that thread fetches from DB and repopulates. Other threads wait (or return stale data). Lock expires → next miss triggers repopulation.<br><br>
+      <strong>Solution 2 — Probabilistic early expiry (PER):</strong> Each request has a small probability of treating the entry as expired before its actual TTL. Earlier expiry → DB fetch happens before the crowd arrives. No locking needed. Used by Nginx.<br><br>
+      <strong>Solution 3 — Background refresh:</strong> A background job (or Redis keyspace notification) detects keys approaching expiry and proactively refreshes them. Cache is always warm. No miss-driven DB hit.<br><br>
+      <strong>Solution 4 — Serve stale on miss:</strong> When key expires, return the stale value immediately while triggering async refresh. Users see slightly stale data once; no DB stampede. Combine with background refresh.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Architecture — Redis Cluster</div>
+    <div class="arch-block">Redis Cluster — 3 primary, 3 replica
+
+  Client (with cluster-aware driver)
+    │
+    │  hash("user:42") → slot 7638 → node 2
+    │
+  ┌──────────────┬──────────────┬──────────────┐
+  │   Node 1     │   Node 2     │   Node 3     │
+  │  slots 0-5460│ slots 5461-  │ slots 10923- │
+  │              │   10922      │   16383      │
+  │  Replica A   │  Replica B   │  Replica C   │
+  └──────────────┴──────────────┴──────────────┘
+
+  Node failure: Replica B promoted → node 2 slot range survives
+  Adding node 4: move subset of slots from nodes 1/2/3 to node 4
+
+Cache stampede protection:
+  ┌──────────────────────────────────┐
+  │ Thread 1: GET user:42 → MISS     │
+  │ SET lock:user:42 uuid NX EX 5    │ ← acquired lock
+  │ → fetch DB → SET user:42 data    │
+  │ DEL lock:user:42                 │
+  └──────────────────────────────────┘
+  ┌──────────────────────────────────┐
+  │ Thread 2-N: GET user:42 → MISS   │
+  │ SET lock:user:42 ... → FAIL      │ ← lock held
+  │ → sleep 50ms → GET user:42 → HIT │ ← served from cache
+  └──────────────────────────────────┘</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Trade-offs</div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Consistent hashing</div><p>Only 1/N keys remapped on node change. Smooth scaling. Minimizes cache invalidation on topology changes.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Consistent hashing</div><p>Hot spots still possible (one key gets all traffic). Requires virtual nodes to distribute evenly. Client must be cluster-aware.</p></div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Mutex on stampede</div><p>Exactly one DB request per miss. Clean and correct.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Mutex on stampede</div><p>Other threads block, adding latency. Lock itself can fail. Complex to implement correctly (lock expiry vs DB query duration).</p></div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-side gain"><div class="lbl">✓ Background refresh</div><p>Zero miss-driven DB hits. Always-warm cache. Best user experience.</p></div>
+      <div class="tradeoff-side lose"><div class="lbl">✗ Background refresh</div><p>Complex infrastructure. Keys may refresh unnecessarily (low-traffic key refreshed 1000× before being accessed again). Harder to debug.</p></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Interview perspective</div>
+    <div class="interview-box">
+      <ol>
+        <li><strong>Consistent hashing is mandatory knowledge.</strong> Draw the ring, place nodes and keys. Explain virtual nodes. Know Redis Cluster's 16,384 hash slot implementation.</li>
+        <li><strong>Cache stampede is a high-value question.</strong> Most candidates say "use mutex." Senior candidates layer: mutex + background refresh + serve-stale-on-miss. Pick the right one for the data freshness requirement.</li>
+        <li><strong>Thundering herd ≠ cache stampede.</strong> Thundering herd = many clients reconnect simultaneously after a failure (e.g., after Redis restart). Fix: exponential backoff with jitter on reconnect. Cache stampede = many requests for the same expired key. Different problem, different fix.</li>
+        <li><strong>"What happens when a Redis Cluster node fails?"</strong> → The replica for that node's slot range is promoted (takes ~1–2 seconds). During promotion, requests to that slot range fail. Mitigation: clients should retry with backoff. For writes, the window of data loss = replication lag at time of failure (usually &lt;1s).</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Connects to</div>
+    <div class="connects">
+      <a onclick="sendPrompt('Explain consistent hashing in depth with virtual nodes')">Consistent hashing deep dive</a>
+      <a onclick="show(3)">← Redis internals</a>
+      <a onclick="sendPrompt('Explain rate limiting using Redis in system design')">Rate limiting</a>
+      <a onclick="sendPrompt('Continue with Block 3: Databases — SQL vs NoSQL, indexing, ACID, isolation levels, replication, sharding, WAL, MVCC')">Continue to Block 3: Databases ↗</a>
+    </div>
+  </div>
+  <button class="next-btn" onclick="sendPrompt('Continue with Block 3: Databases — SQL vs NoSQL, indexing, ACID, isolation levels, replication, sharding, WAL, MVCC')">Continue to Block 3: Databases ↗</button>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(idx){
+  document.querySelectorAll('.topic').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.nav-item').forEach((n,i)=>n.classList.toggle('active',i===idx));
+  document.querySelector('.content').scrollTop=0;
+}
+function switchTab(el,groupId,panelId){
+  const g=document.getElementById(groupId);
+  g.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  g.querySelector('#'+panelId).classList.add('active');
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function calcSim(){
+  const rps=+document.getElementById('s-rps').value;
+  const hr=+document.getElementById('s-hr').value/100;
+  const dbl=+document.getElementById('s-dbl').value;
+  const cl=+document.getElementById('s-cl').value;
+  const dbReq=Math.round(rps*(1-hr));
+  const avgMs=((hr*cl+(1-hr)*dbl)).toFixed(1);
+  const saved=Math.round(hr*100);
+  const ratio=Math.round(dbl/cl);
+  document.getElementById('o-rps').textContent=rps.toLocaleString();
+  document.getElementById('o-hr').textContent=Math.round(hr*100)+'%';
+  document.getElementById('o-dbl').textContent=dbl+'ms';
+  document.getElementById('o-cl').textContent=cl+'ms';
+  document.getElementById('r-db').textContent=dbReq.toLocaleString();
+  document.getElementById('r-avgms').textContent=avgMs;
+  document.getElementById('r-saved').textContent=saved+'%';
+  document.getElementById('r-ratio').textContent=ratio+'×';
+}
+calcSim();
+
+const LRU_CAP=4;
+let lruList=[];
+const KEYS=['A','B','C','D','E','F','G'];
+
+function renderLRU(highlight,type){
+  for(let i=0;i<LRU_CAP;i++){
+    const c=document.getElementById('lc'+i);
+    c.textContent=lruList[i]||'—';
+    c.className='lru-cell'+(lruList[i]?' ':'');
+    if(highlight&&lruList[i]===highlight) c.classList.add(type||'hit');
+  }
+}
+
+function lruAccess(k){
+  const idx=lruList.indexOf(k);
+  let log='';
+  let evicted='';
+  if(idx!==-1){
+    lruList.splice(idx,1);
+    lruList.unshift(k);
+    log=`HIT: "${k}" moved to front`;
+    renderLRU(k,'hit');
+  } else {
+    if(lruList.length>=LRU_CAP){
+      evicted=lruList[lruList.length-1];
+      lruList.pop();
+    }
+    lruList.unshift(k);
+    log=evicted?`MISS: "${k}" inserted, "${evicted}" evicted`:`MISS: "${k}" inserted`;
+    for(let i=0;i<LRU_CAP;i++){
+      const c=document.getElementById('lc'+i);
+      c.textContent=lruList[i]||'—';
+      c.className='lru-cell'+(lruList[i]?'':' ');
+    }
+    document.getElementById('lc0').classList.add('new');
+    if(evicted){
+      const allCells=document.querySelectorAll('.lru-cell');
+    }
+  }
+  document.getElementById('lru-log').textContent=log;
+}
+
+function lruReset(){
+  lruList=[];
+  for(let i=0;i<LRU_CAP;i++){const c=document.getElementById('lc'+i);c.textContent='—';c.className='lru-cell';}
+  document.getElementById('lru-log').textContent='Click a key to access it. MRU is leftmost, LRU is rightmost.';
+}
+
+const btnRow=document.getElementById('lru-btns');
+KEYS.forEach(k=>{
+  const b=document.createElement('button');
+  b.className='pill-btn';
+  b.textContent='Access "'+k+'"';
+  b.onclick=()=>lruAccess(k);
+  btnRow.appendChild(b);
+});
+</script>

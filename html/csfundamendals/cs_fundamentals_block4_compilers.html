@@ -1,0 +1,657 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+.shell{display:flex;height:700px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:224px;min-width:224px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 8px;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 10px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin-bottom:2px;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-secondary)}
+.nav-num{font-size:11px;color:var(--color-text-tertiary);min-width:16px}
+.nav-item.active .nav-num{color:var(--color-text-secondary)}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic-tag{display:inline-block;font-size:11px;font-weight:500;color:var(--color-text-info);background:var(--color-background-info);padding:3px 10px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.topic-title{font-size:22px;font-weight:500;margin-bottom:8px}
+.topic-oneliner{font-size:15px;color:var(--color-text-secondary);line-height:1.6;border-left:2px solid var(--color-border-secondary);padding-left:12px;margin-bottom:24px}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.sec{margin-bottom:28px}
+.body{font-size:14px;line-height:1.75}
+.body p{margin-bottom:10px}
+.body p:last-child{margin-bottom:0}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.steps li::before{content:counter(s);min-width:22px;height:22px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-top:2px;flex-shrink:0}
+.card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px;background:var(--color-background-primary)}
+.card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.card-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;margin-top:6px;white-space:pre}
+.analogy{background:var(--color-background-secondary);border-left:2px solid var(--color-border-info);border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:12px 16px;font-size:14px;color:var(--color-text-secondary);line-height:1.7;font-style:italic}
+.iq{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:6px}
+.iq .q{font-size:13px;font-weight:500;margin-bottom:4px}
+.iq .a{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.bad{display:flex;gap:10px;margin-bottom:8px;font-size:13px;line-height:1.6}
+.bad .ic{color:var(--color-text-danger);font-size:15px;margin-top:1px;flex-shrink:0}
+.connects{display:flex;flex-wrap:wrap;gap:6px}
+.cp{font-size:12px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+table.ct{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.ct th{text-align:left;font-weight:500;padding:6px 10px;border-bottom:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+table.ct td{padding:6px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5}
+table.ct tr:last-child td{border-bottom:none}
+</style>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sidebar-title">Block 4 — Compilers</div>
+  <div class="nav-item active" onclick="show(0,this)"><span class="nav-num">01</span>Compilation Pipeline</div>
+  <div class="nav-item" onclick="show(1,this)"><span class="nav-num">02</span>Lexing & Tokenisation</div>
+  <div class="nav-item" onclick="show(2,this)"><span class="nav-num">03</span>Parsing & CFGs</div>
+  <div class="nav-item" onclick="show(3,this)"><span class="nav-num">04</span>Abstract Syntax Tree</div>
+  <div class="nav-item" onclick="show(4,this)"><span class="nav-num">05</span>Interpreted vs Compiled vs JIT</div>
+  <div class="nav-item" onclick="show(5,this)"><span class="nav-num">06</span>JVM Internals</div>
+  <div class="nav-item" onclick="show(6,this)"><span class="nav-num">07</span>Garbage Collection</div>
+  <div class="nav-item" onclick="show(7,this)"><span class="nav-num">08</span>Memory Model</div>
+  <div class="nav-item" onclick="show(8,this)"><span class="nav-num">09</span>Type Systems</div>
+</nav>
+<main class="content" id="content"></main>
+</div>
+
+<script>
+const T=[
+
+// 01
+{tag:"Compiler Theory",title:"Compilation Pipeline",
+oneliner:"A compiler translates source code through a series of structured transformations — source text → tokens → tree → typed tree → intermediate representation → optimised machine code — each phase narrowing the gap between human intent and hardware instruction.",
+secs:[
+{l:"Why a pipeline, not one big step",b:`<p>Each phase has a well-defined input/output contract. This separation means: you can swap out the backend (LLVM front-end for C, Rust, Swift all produce the same LLVM IR), you can stop after parsing to build a linter, you can stop after type-checking to build an IDE, and you can share optimisation passes across languages. Modularity is the point.</p>`},
+{l:"The full pipeline",b:`<div class="code">Source code (text)
+    │
+    ▼  LEXER (scanner)
+Tokens: [IF][IDENT:x][GT][NUM:5][LBRACE]...
+    │
+    ▼  PARSER
+AST (Abstract Syntax Tree) — structural representation
+    │
+    ▼  SEMANTIC ANALYSIS
+  - Symbol table construction (variable declarations, scopes)
+  - Type checking (operand types compatible?)
+  - Name resolution (which 'x' does this identifier refer to?)
+  - Control flow checks (all paths return a value?)
+    │
+    ▼  IR GENERATION (Intermediate Representation)
+  Three-address code / SSA form / LLVM IR / JVM bytecode
+  Machine-independent — enables cross-platform compilation
+    │
+    ▼  OPTIMISATION PASSES (on IR)
+  - Dead code elimination
+  - Constant folding: 3+4 → 7 at compile time
+  - Inlining: replace function call with function body
+  - Loop unrolling, vectorisation, register allocation
+    │
+    ▼  CODE GENERATION
+  Target machine instructions (x86-64, ARM, WASM, JVM bytecode)
+    │
+    ▼  LINKER (separate tool)
+  Combines object files, resolves external symbols → executable</div>`},
+{l:"Front-end, middle, back-end",b:`<div class="card"><div class="card-name">Front-end (language-specific)</div><div class="card-desc">Lexer + Parser + Semantic Analysis. Understands the language's grammar and rules. Output: typed AST or IR. Language-specific: one per language (clang front-end, javac front-end, rustc front-end).</div></div>
+<div class="card"><div class="card-name">Middle-end / IR + Optimiser (shared)</div><div class="card-desc">LLVM IR, GCC GIMPLE, JVM bytecode. Language-independent optimisations. Shared across all languages that target the same IR. LLVM enables Clang, Rust, Swift, Julia, Kotlin/Native all to share the same optimiser.</div></div>
+<div class="card"><div class="card-name">Back-end (target-specific)</div><div class="card-desc">Instruction selection, register allocation, machine code emission. One per target architecture: x86-64, ARM64, WASM, RISC-V. Also language-independent — any IR can target any back-end.</div></div>`},
+{l:"Real-world pipeline examples",b:`<div class="code">GCC:    C source → preprocessor → cc1 (compile) → as (assemble) → ld (link)
+Clang:  C/C++/ObjC → clang frontend → LLVM IR → opt → llc → machine code
+javac:  Java source → lexer/parser → type check → bytecode (.class) → JVM
+Kotlin: .kt → K2 compiler frontend → K2 IR → JVM bytecode or JS or native
+TypeScript: .ts → tsc → type check → AST transform → JavaScript (no machine code)
+Babel:  JS → parse → AST transform → generate (transpiler, no type check)</div>`},
+{l:"Mental model",b:`<div class="analogy">Compiling is like translating a novel from Japanese to English via French, with editing at each step. First, a tokenizer splits the Japanese into words and punctuation (lexing). A grammarian identifies sentences and their structure (parsing). A literary editor checks that all references make sense (semantic analysis). A translator produces a draft in French (IR — language-neutral). An editor polishes it (optimisation). Finally, an English typesetter formats it for print (code generation). Each specialist only needs to understand their step's inputs and outputs.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why do Rust and Swift share optimisations with C even though they're different languages?</div><div class="a">All three use LLVM as their back-end. Each language's front-end compiles to LLVM IR — a common, typed, machine-independent representation. LLVM's optimisation passes (inlining, vectorisation, dead-code elimination) operate on IR, not the source language. One optimiser, many languages. This is why Rust can achieve C-comparable performance without implementing its own optimiser.</div></div>
+<div class="iq"><div class="q">What is the difference between a compiler and a transpiler?</div><div class="a">Both parse and transform code. A compiler targets a lower-level representation (machine code, bytecode). A transpiler targets another high-level language — TypeScript → JavaScript, CoffeeScript → JavaScript, Kotlin → JavaScript. Transpilers usually skip IR optimisation passes and focus on AST-to-AST transformation. Babel, tsc, and the Sass CSS compiler are transpilers.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Lexing (first pipeline stage)</span><span class="cp">Parsing / AST (middle stages)</span><span class="cp">JVM Internals (JIT compilation)</span><span class="cp">Type Systems (semantic analysis)</span><span class="cp">Interpreted vs Compiled vs JIT</span></div>`}
+]},
+
+// 02
+{tag:"Compiler Theory",title:"Lexing & Tokenisation",
+oneliner:"The lexer (scanner) reads raw source text character-by-character and groups characters into a flat stream of tokens — the smallest meaningful units of the language — discarding whitespace and comments.",
+secs:[
+{l:"Why lexing is a separate phase",b:`<p>Parsers work on tokens, not characters. Without lexing, a grammar rule for an integer literal would need to express "any sequence of digit characters" — making every grammar rule unboundedly complex. Lexing separates two different kinds of pattern: character-level patterns (what is a number? an identifier? a keyword?) from structural patterns (how are tokens nested and combined?).</p>`},
+{l:"What a lexer produces",b:`<div class="code">Source: int x = a + 42;
+
+Tokens:
+  [KEYWORD:int]   [IDENT:x]    [ASSIGN:=]
+  [IDENT:a]       [PLUS:+]     [NUMBER:42]
+  [SEMICOLON:;]
+
+Each token has:
+  type   — the category (KEYWORD, IDENT, NUMBER, OPERATOR, ...)
+  lexeme — the raw matched text ("int", "x", "42")
+  position — line:column (for error messages)
+
+Discarded: whitespace, newlines, comments
+Preserved: string literals (content), number literals (value)</div>`},
+{l:"Regular expressions and finite automata",b:`<p>Token patterns are described by regular expressions. Each regex defines which character sequences belong to a token type. The lexer generator (flex, ANTLR, JFlex) converts these regexes into a <strong>Deterministic Finite Automaton (DFA)</strong> — a state machine that processes input in O(n) time (one character at a time, no backtracking).</p>
+<div class="code">Token patterns as regexes:
+  INTEGER:    [0-9]+
+  FLOAT:      [0-9]+\.[0-9]+
+  IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*
+  KEYWORD:    if|else|while|for|return|int|void
+  (Keywords matched before identifiers — priority order matters)
+
+DFA for INTEGER [0-9]+:
+  State 0 (start) --digit--> State 1 (accepting)
+  State 1         --digit--> State 1
+  State 1         --other--> emit INTEGER token, return char to stream
+
+NFA → DFA conversion: subset construction (Thompson's algorithm)
+  NFA: nondeterministic (ε-transitions allowed), easy to construct from regex
+  DFA: deterministic, one state per input char, O(n) matching, more states</div>`},
+{l:"Longest match rule and priority",b:`<p>When multiple patterns could match: the lexer uses <strong>maximal munch</strong> — always take the longest possible match. This is why <code>++</code> is one INCREMENT token, not two PLUS tokens. When two patterns match the same length: priority order (defined in the lexer spec) decides — keywords before identifiers is why <code>if</code> is KEYWORD, not IDENTIFIER.</p>`},
+{l:"Lexer errors",b:`<p>The lexer rejects characters that don't begin any valid token. In most languages: <code>@</code> outside a Java annotation context, <code>#</code> in C (outside preprocessor), or unterminated string literals cause lexer errors. Lexer errors are simpler than parser errors — they're just "I don't know what this character starts." Good lexers report them with line/column and attempt to recover by skipping to the next recognisable start.</p>`},
+{l:"Mental model",b:`<div class="analogy">Lexing is like reading a recipe and circling each meaningful unit: "2 cups flour" becomes [NUMBER:2][UNIT:cups][INGREDIENT:flour]. You ignore the formatting (whitespace, line breaks), throw away comments ("// this is the secret"), and label every unit. You don't understand what "2 cups" means yet — that's the parser's job. You just identify and label.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why can't you parse a context-free grammar with just a regular expression?</div><div class="a">Regular languages (recognised by finite automata / regex) cannot count or match balanced pairs. Nested structures like parentheses require memory that grows with nesting depth — formally requiring a pushdown automaton (stack). CFGs capture this. Regex can tokenise "(" and ")" individually, but can't ensure they're balanced — that requires parsing. The pumping lemma for regular languages formally proves no DFA can recognise {aⁿbⁿ | n≥1}.</div></div>
+<div class="iq"><div class="q">How does a lexer handle overlapping patterns like '>' vs '>>'?</div><div class="a">Maximal munch: always match the longest sequence. ">>" is consumed as a single RSHIFT token, not two GT tokens. This is a deliberate design choice — most languages want ">>" to mean right-shift. Java's generics caused a historical problem here: List&lt;List&lt;Integer&gt;&gt; required the parser to recognise ">>" as two ">" in that context — handled by the parser, not the lexer.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Compilation Pipeline (stage 1)</span><span class="cp">Parsing (consumes tokens)</span><span class="cp">Type Systems (keyword recognition)</span></div>`}
+]},
+
+// 03
+{tag:"Compiler Theory",title:"Parsing & Context-Free Grammars",
+oneliner:"The parser takes the flat token stream from the lexer and builds a hierarchical tree structure that represents the grammatical relationships in the code — enforcing the language's syntax rules defined by a context-free grammar.",
+secs:[
+{l:"Context-free grammars (CFG)",b:`<p>A CFG defines a language's syntax as a set of production rules: non-terminals (syntactic categories like Expression, Statement) can be replaced by sequences of terminals (tokens like +, NUMBER) and other non-terminals. CFGs can describe nested structures — the key power that regular expressions lack.</p>
+<div class="code">Grammar for arithmetic expressions (simplified BNF):
+  expr   → expr '+' term   |  expr '-' term  |  term
+  term   → term '*' factor |  term '/' factor |  factor
+  factor → '(' expr ')'   |  NUMBER  |  IDENTIFIER
+
+Derivation of "x + 3 * 2":
+  expr
+  → expr '+' term              (rule 1)
+  → term '+' term              (rule 3)
+  → IDENT '+' term             (factor → IDENTIFIER)
+  → IDENT '+' term '*' factor  (rule for term)
+  → IDENT '+' NUM '*' NUM      (factor → NUMBER twice)
+  = x + 3 * 2  ✓
+
+The grammar encodes precedence:
+  term handles * before + because expr is defined in terms of term
+  Parentheses override via factor → '(' expr ')'</div>`},
+{l:"Parsing algorithms",b:`<div class="card"><div class="card-name">Recursive Descent (top-down)</div><div class="card-desc">One function per non-terminal. Each function peeks at the next token, decides which production to apply, and recursively calls other functions. Hand-writeable, clear, used by GCC, Clang, Go, Rust compilers. Works on LL(k) grammars — predict which production using k tokens of lookahead. Limitation: can't handle left-recursive grammars directly (expr → expr '+' term loops infinitely).</div></div>
+<div class="card"><div class="card-name">LR parsing (bottom-up)</div><div class="card-desc">Shift-reduce: push tokens onto a stack, reduce when a right-hand side is complete. Handles a broader class of grammars than LL. YACC, Bison use LALR(1) — a compact LR variant. Not hand-writeable; generated from grammar tables. Used historically for many language parsers.</div></div>
+<div class="card"><div class="card-name">Pratt parser (top-down + precedence)</div><div class="card-desc">Extends recursive descent with precedence climbing. Each token type has a binding power (precedence). Elegantly handles operator precedence without grammar left-recursion issues. Used by: V8 (JavaScript), Rust, many modern compilers. Robert Nystrom's "Crafting Interpreters" popularised this.</div></div>`},
+{l:"Recursive descent — code",b:`<div class="code">// Recursive descent for: expr → term ('+' term)*
+class Parser {
+    Token current = tokens.next();
+
+    Expr parseExpr() {
+        Expr left = parseTerm();           // handle higher-precedence first
+        while (current.type == PLUS) {
+            consume(PLUS);
+            Expr right = parseTerm();
+            left = new BinaryExpr(left, PLUS, right);  // build AST node
+        }
+        return left;
+    }
+
+    Expr parseTerm() {
+        Expr left = parseFactor();
+        while (current.type == STAR) {
+            consume(STAR);
+            Expr right = parseFactor();
+            left = new BinaryExpr(left, STAR, right);
+        }
+        return left;
+    }
+
+    Expr parseFactor() {
+        if (current.type == NUMBER) { return new NumberLiteral(consume(NUMBER)); }
+        if (current.type == LPAREN) {
+            consume(LPAREN); Expr e = parseExpr(); consume(RPAREN); return e;
+        }
+        throw new ParseError("unexpected token: " + current);
+    }
+}</div>`},
+{l:"Parse errors and recovery",b:`<p>Good parsers don't stop at the first error — they report it and recover to parse the rest, collecting all errors in one pass. Strategies: <strong>panic mode</strong> (skip tokens until a synchronisation point like a semicolon or closing brace), <strong>error productions</strong> (grammar rules for common mistakes — outputs a helpful message), <strong>error tokens</strong> (ANTLR inserts error tokens and continues). This is why your IDE shows multiple errors per file rather than stopping at the first one.</p>`},
+{l:"Mental model",b:`<div class="analogy">The grammar is a recipe book defining what valid dishes look like. The parser is a chef reading your order (tokens) and checking whether it's a valid dish from the recipe book. If you order "flour eggs milk", the parser identifies it as "a batter recipe." If you order "flour eggs milk milk eggs," the parser says "that's not a valid recipe, error at position 4." The result isn't the food — it's a structured order form (AST) the kitchen can work from.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is ambiguity in a grammar, and why does it matter?</div><div class="a">An ambiguous grammar has an input string with more than one valid parse tree — it can be interpreted in multiple ways. "a - b - c" in an ambiguous grammar could be (a-b)-c or a-(b-c). Languages eliminate ambiguity via explicit associativity rules (left-associative subtraction) and precedence tiers in the grammar. An ambiguous grammar makes the compiler's behaviour unpredictable — the parser's tree depends on which derivation it happened to find.</div></div>
+<div class="iq"><div class="q">Why do modern compilers write recursive descent parsers by hand rather than using parser generators?</div><div class="a">Error messages. Generated parsers (Bison/ANTLR) produce generic "syntax error at token X" messages. Hand-written recursive descent can contextually identify "missing closing parenthesis for function argument list opened at line 42" because the parser code knows what it was trying to parse. GCC, Clang, Rust, Go all moved to hand-written recursive descent precisely for error quality.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Lexing (token input)</span><span class="cp">AST (parser output)</span><span class="cp">Compilation Pipeline</span><span class="cp">Type Systems (semantic analysis uses parse tree)</span></div>`}
+]},
+
+// 04
+{tag:"Compiler Theory",title:"Abstract Syntax Tree (AST)",
+oneliner:"An AST is the compiler's canonical in-memory tree representation of source code, preserving semantic structure while discarding syntactic noise like parentheses and semicolons — the universal substrate for linters, transpilers, formatters, and IDEs.",
+secs:[
+{l:"Concrete Syntax Tree vs AST",b:`<div class="code">Source: (x + 3) * 2
+
+Concrete Syntax Tree (parse tree — every grammar rule):
+    expr
+    └── term
+        ├── factor
+        │   ├── '('
+        │   ├── expr
+        │   │   ├── term → factor → IDENT:x
+        │   │   ├── '+'
+        │   │   └── term → factor → NUM:3
+        │   └── ')'
+        ├── '*'
+        └── factor → NUM:2
+
+AST (semantic structure only — noise removed):
+    BinaryOp(*)
+    ├── BinaryOp(+)
+    │   ├── Identifier(x)
+    │   └── IntLiteral(3)
+    └── IntLiteral(2)
+
+The parentheses, semicolons, grammar-rule nodes are GONE.
+Operator precedence is encoded in the TREE STRUCTURE, not symbols.</div>`},
+{l:"AST node types",b:`<div class="code">// Typical AST node hierarchy (Java-style)
+sealed interface Node {}
+
+// Expressions
+record BinaryExpr(Node left, Token op, Node right) implements Node {}
+record UnaryExpr(Token op, Node operand)          implements Node {}
+record CallExpr(Node callee, List<Node> args)      implements Node {}
+record Identifier(String name, Type resolvedType)  implements Node {}
+record IntLiteral(int value)                       implements Node {}
+
+// Statements
+record IfStmt(Node condition, Node then, Node else_) implements Node {}
+record BlockStmt(List<Node> stmts)                  implements Node {}
+record ReturnStmt(Node value)                       implements Node {}
+record VarDecl(String name, Type type, Node init)   implements Node {}
+
+// After semantic analysis, nodes are annotated with:
+//   resolvedType — the inferred/declared type
+//   symbol — pointer to symbol table entry
+//   scope — which scope this identifier belongs to</div>`},
+{l:"The Visitor pattern on ASTs",b:`<p>AST processing is the canonical use case for the Visitor design pattern. You want to add many operations (type-checking, code generation, pretty printing, dead code detection) to a fixed set of node types without modifying the nodes. Each operation is a visitor that knows what to do for each node type.</p>
+<div class="code">// Visitor: evaluate the AST as an interpreter
+class Evaluator implements NodeVisitor<Integer> {
+    @Override
+    public Integer visit(BinaryExpr e) {
+        int left  = e.left().accept(this);   // recursive tree walk
+        int right = e.right().accept(this);
+        return switch (e.op().type()) {
+            case PLUS  -> left + right;
+            case STAR  -> left * right;
+            case MINUS -> left - right;
+            default    -> throw new Error("unknown op");
+        };
+    }
+    public Integer visit(IntLiteral n) { return n.value(); }
+    public Integer visit(Identifier n) { return env.get(n.name()); }
+}</div>`},
+{l:"Real-world uses of the AST",b:`<div class="card"><div class="card-name">Linters (ESLint, Checkstyle, SpotBugs)</div><div class="card-desc">Parse source to AST, walk the tree with rules as visitors. Rule: "no unused variables" → walk all Identifiers, compare with VarDecl nodes. No compilation needed — AST is enough for all static analysis.</div></div>
+<div class="card"><div class="card-name">Transpilers (Babel, TypeScript tsc)</div><div class="card-desc">Parse TypeScript → AST with type annotations → transform AST (remove type nodes, convert arrow functions for older targets) → generate JavaScript from the transformed AST. The same source AST is printed to different targets by swapping the code-generator visitor.</div></div>
+<div class="card"><div class="card-name">IDEs (IntelliJ, VS Code Language Server)</div><div class="card-desc">Keep a live AST of every open file, updated incrementally as you type. Autocomplete: look up the type of the expression before the dot → list the type's members. Go-to-definition: find the Identifier node → look up its resolved symbol → jump to the VarDecl node's source location. Error highlighting: report type checker errors on specific AST nodes.</div></div>
+<div class="card"><div class="card-name">Code formatters (Prettier, gofmt, rustfmt)</div><div class="card-desc">Parse to AST, discard all whitespace and formatting information, then pretty-print the AST according to fixed style rules. Result: deterministic formatting regardless of input style.</div></div>`},
+{l:"Mental model",b:`<div class="analogy">The AST is the architectural blueprint of your code. The source code is the building — it includes paint colour, door knobs, and noise from the construction crew (syntax, whitespace, comments). The blueprint strips all of that to just the structural relationships: walls, load-bearing columns, plumbing routes. Once you have the blueprint, you can build the same house in Tokyo, London, or Paris (different code generators) — or inspect it for building code violations (linters) — without caring what colour the walls were in the original.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How does ESLint know that a variable is unused without running the code?</div><div class="a">It parses the source to an AST, builds a scope tree (which declarations are in scope at each point), then walks all Identifier reference nodes and checks whether each VarDecl node's name was ever referenced in a read context within its scope. Pure static analysis on the AST — no execution. This is also how IDEs provide "find all references" and "rename symbol" — same AST walk, different visitor logic.</div></div>
+<div class="iq"><div class="q">What is the difference between an AST and a parse tree?</div><div class="a">A parse tree (concrete syntax tree) mirrors every grammar rule application, including all syntactic noise: parentheses nodes, semicolon nodes, grammar rule intermediate nodes. An AST collapses this to only semantically meaningful nodes. Example: (x+3) produces three nodes in AST (BinaryOp, Identifier, Literal) but a parse tree with 7+ nodes including the paren nodes and grammar-rule wrappers. Compilers use ASTs — parse trees are too verbose for downstream processing.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Parsing (produces AST)</span><span class="cp">Compilation Pipeline (semantic analysis operates on AST)</span><span class="cp">Type Systems (annotated AST nodes)</span><span class="cp">Visitor pattern (GoF design patterns — Java topic)</span></div>`}
+]},
+
+// 05
+{tag:"Language Runtimes",title:"Interpreted vs Compiled vs JIT",
+oneliner:"Interpreted code runs statement-by-statement via a runtime, compiled code runs as native machine instructions after a pre-run translation step, and JIT compilation profiles running code and compiles hot paths to machine code on-the-fly.",
+secs:[
+{l:"The spectrum",b:`<div class="code">Pure interpretation:           Python (CPython), Ruby (MRI), early JavaScript
+    Source → bytecode (optional) → VM interprets each instruction
+    Pros: fast startup, portable, easy debugging
+    Cons: ~10-100x slower than native for CPU-bound work
+
+Ahead-of-time compilation (AOT): C, C++, Rust, Go
+    Source → machine code → run directly on CPU
+    Pros: maximum performance, no startup cost, no runtime overhead
+    Cons: target-specific binary, longer build times, no runtime info for optimisation
+
+JIT compilation:               Java (HotSpot), JavaScript (V8), .NET (CLR), Julia
+    Source → portable bytecode → interpret → profile → compile hot code → native
+    Pros: portable bytecode + near-native performance for hot code
+    Cons: warm-up time, memory overhead, JIT compilation pauses (mitigated in modern JITs)
+
+Transpilation (not execution): TypeScript, CoffeeScript, Sass
+    Source → another source language → then compiled/interpreted separately</div>`},
+{l:"Why Python is slow for CPU-bound work",b:`<div class="code">CPython executes one bytecode instruction at a time:
+  x = a + b  →  LOAD_FAST a
+                 LOAD_FAST b
+                 BINARY_OP +      ← calls PyObject_add()
+                 STORE_FAST x
+
+PyObject_add() must:
+  1. Check both operands' types (int? str? float? custom object with __add__?)
+  2. Call the appropriate C function
+  3. Allocate a new PyObject for the result
+  4. Manage reference counts for all three objects
+
+Same operation in compiled C:
+  ADD EAX, EBX  ← 1 CPU instruction, typed, no dispatch, no allocation
+
+Overhead multiplier: ~50-100x for CPU-bound numeric loops
+GIL (Global Interpreter Lock): only one thread runs Python bytecode at a time
+  → Python threads can't use multiple cores for CPU-bound work
+Fix for CPU-bound: NumPy (C extensions), multiprocessing, PyPy (JIT)</div>`},
+{l:"Why Java catches up to C after warm-up",b:`<p>The JVM starts interpreting bytecode (slow). As the program runs, the HotSpot JIT profiles execution: which methods are called frequently, which branches are always taken, what types flow through polymorphic call sites. With this runtime information, the JIT generates highly optimised native code:</p>
+<div class="code">Runtime profile reveals: shape.draw() is ALWAYS called on a Circle
+JIT can de-virtualise: instead of a virtual dispatch (check vtable, indirect call),
+emit a direct call to Circle.draw() with a guard check.
+
+Profile reveals: loop runs 10M times with x always positive
+JIT can eliminate the negative-number check inside the loop.
+
+This is information AOT compilers (C, Rust) don't have:
+  C must compile conservatively — it doesn't know which subtype will appear at runtime
+  JIT compiles speculatively based on observed behaviour, adds guard, deoptimises if wrong</div>`},
+{l:"Deoptimisation",b:`<p>When a JIT's speculation proves wrong (a method that was always called with Circle suddenly gets called with Square), the JVM deoptimises: discards the compiled code, falls back to interpreter, and profiles again. This on-stack replacement (OSR) mechanism makes JIT compilation adaptive. The deoptimisation overhead is why long-running server JVMs significantly outperform freshly-started ones.</p>`},
+{l:"Speed comparison",b:`<table class="ct"><tr><th>Language</th><th>Execution</th><th>Peak speed</th><th>Startup</th><th>Warm-up</th></tr>
+<tr><td>C / Rust</td><td>AOT native</td><td>Fastest</td><td>~ms</td><td>None</td></tr>
+<tr><td>Java / C#</td><td>JIT (bytecode)</td><td>Near-C for hot code</td><td>~100ms</td><td>Seconds</td></tr>
+<tr><td>JavaScript (V8)</td><td>JIT (AST/bytecode)</td><td>Near-Java</td><td>~50ms</td><td>Sub-second</td></tr>
+<tr><td>Python (CPython)</td><td>Bytecode interpret</td><td>50-100x slower than C</td><td>~50ms</td><td>N/A</td></tr>
+<tr><td>Python (PyPy)</td><td>Tracing JIT</td><td>~5-10x slower than C</td><td>~200ms</td><td>Seconds</td></tr></table>`},
+{l:"Mental model",b:`<div class="analogy">AOT compilation is like translating an entire novel into English before any reader touches it — the readers (CPU) get a native English book and read at full speed. Interpretation is a live translator who reads Japanese and speaks English simultaneously to an audience — slower, but you can start immediately. JIT is a smart translator who starts speaking live (slow), but records the most-repeated passages and pre-translates those for instant delivery — eventually approaching the speed of the pre-translated book, using performance data only available during the live session.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How does the JVM achieve near-C performance if it runs on a virtual machine?</div><div class="a">HotSpot JIT. After 10,000 calls (C1) and 10,000 more (C2), methods are compiled to native machine code with aggressive optimisations: inlining, de-virtualisation of polymorphic calls, loop unrolling, escape analysis (allocate on stack instead of heap). These use runtime profiling data unavailable to C compilers. The "virtual machine" overhead is in startup and cold code — hot code runs as native instructions.</div></div>
+<div class="iq"><div class="q">If Java is JIT-compiled, why does it still have warm-up time while C doesn't?</div><div class="a">Java distributes bytecode — platform-independent instructions interpreted by the JVM. The JIT compiles bytecode to native code on the deployment machine during execution, using profiling. C distributes pre-compiled machine code — the translation already happened at build time on the developer's machine. JVM warm-up is the time spent profiling and JIT-compiling. GraalVM native-image does AOT compilation of Java to eliminate this.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">JVM Internals (JIT mechanism)</span><span class="cp">Compilation Pipeline (full AOT pipeline)</span><span class="cp">GC (managed runtimes)</span><span class="cp">I/O Models (Node.js event loop + V8 JIT)</span></div>`}
+]},
+
+// 06
+{tag:"JVM",title:"JVM Internals",
+oneliner:"The JVM loads Java bytecode, verifies it, interprets it, profiles execution, and JIT-compiles hot methods to native machine code — providing a portable, managed runtime with automatic memory management.",
+secs:[
+{l:"Bytecode and the class file",b:`<div class="code">javac compiles MyClass.java → MyClass.class (bytecode)
+
+.class file structure (JVM spec):
+  magic number: 0xCAFEBABE
+  minor/major version (Java version compatibility)
+  constant pool (string literals, class names, method signatures)
+  access flags (public, final, abstract...)
+  this_class, super_class references
+  interfaces[]
+  fields[]
+  methods[] → each has:
+    name, descriptor (e.g., "(ILjava/lang/String;)V" = int, String → void)
+    Code attribute: max_stack, max_locals, bytecode[]
+
+Bytecode: stack-based (not register-based like JVM's IR or x86)
+  int sum(int a, int b) { return a + b; }
+
+  Bytecode:
+    iload_1   // push local[1] (a) onto operand stack
+    iload_2   // push local[2] (b)
+    iadd      // pop 2 ints, push sum
+    ireturn   // return top of stack</div>`},
+{l:"Class loading",b:`<ol class="steps">
+<li><strong>Loading</strong> — ClassLoader reads .class file bytes (from JAR, filesystem, network). Creates a Class object in the Method Area.</li>
+<li><strong>Verification</strong> — Bytecode verifier checks: valid bytecode structure, type safety (no int used where object expected), no stack over/underflow, no illegal memory access. This is why the JVM can safely run untrusted bytecode — verification enforces safety.</li>
+<li><strong>Preparation</strong> — Allocate static fields, set to default values (0, null, false).</li>
+<li><strong>Resolution</strong> — Resolve symbolic references (class names, method signatures in constant pool) to direct memory references.</li>
+<li><strong>Initialisation</strong> — Execute static initialisers and static blocks. This is when static fields get their programmed values.</li>
+</ol>
+<p>Class loaders are hierarchical: Bootstrap (JDK core classes) → Extension → Application (your classpath) → Custom. This delegation model is why your code can't shadow java.lang.String — the bootstrap loader handles it first.</p>`},
+{l:"JIT compilation — tiered",b:`<div class="code">HotSpot tiered compilation (Java 8+):
+
+Tier 0: Interpreter
+  All code starts here. Slow (~10-50x native).
+  Collects invocation/back-edge counters.
+
+Tier 1: C1 (client compiler) — kicks in at ~2000 invocations
+  Fast compilation, minimal optimisation.
+  Output: lightly optimised native code + profiling instrumentation.
+
+Tier 2-3: C1 with profiling
+  Instruments the native code to collect type profiles, branch probabilities.
+
+Tier 4: C2 (server compiler) — kicks in at ~10000-15000 invocations
+  Aggressive optimisation using the profiling data:
+    - Method inlining (most impactful: eliminates call overhead + enables further opts)
+    - De-virtualisation (virtual call → direct call when type is monomorphic)
+    - Escape analysis → stack allocation, lock elision
+    - Loop unrolling, vectorisation (SIMD)
+    - Dead code elimination, constant propagation
+  Output: highly optimised native code (compiled methods cached in Code Cache)</div>`},
+{l:"JVM Memory areas",b:`<div class="code">JVM Memory layout:
+  ┌────────────────────────────────────────────┐
+  │  Heap  (GC-managed)                       │
+  │    Young Gen:  Eden + Survivor S0 + S1    │
+  │    Old Gen:    long-lived objects          │
+  ├────────────────────────────────────────────┤
+  │  Metaspace  (class metadata, since Java 8) │
+  │    Class structures, method bytecode       │
+  │    Not on heap — grows in native memory    │
+  ├────────────────────────────────────────────┤
+  │  Code Cache  (JIT-compiled native code)    │
+  ├────────────────────────────────────────────┤
+  │  Thread stacks  (one per thread)           │
+  │    Stack frames, local variables           │
+  ├────────────────────────────────────────────┤
+  │  Direct / off-heap memory  (NIO, ByteBuffer)│
+  └────────────────────────────────────────────┘
+
+-Xms: initial heap   -Xmx: max heap
+-Xss: stack size per thread (default 512KB-1MB)
+-XX:MaxMetaspaceSize: cap on class metadata</div>`},
+{l:"Mental model",b:`<div class="analogy">The JVM is a smart universal book reader. You write in any dialect (Kotlin, Groovy, Scala, Java) — all dialects become the same standardised script (bytecode). The reader first checks the script is safe (verification). It starts reading aloud slowly (interpreter). It keeps a tally of paragraphs read most often (profiling). For frequently-read paragraphs, it memorises them (C1) and then internalises deeply with full expression (C2). After warm-up, the reader knows the most important passages by heart and delivers them at native speed.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is escape analysis and what does the JVM do with it?</div><div class="a">Escape analysis determines whether an object "escapes" a method — i.e., is it accessible after the method returns (stored in a field, passed to another thread, returned). If an object does NOT escape: the JVM can allocate it on the stack instead of the heap (no GC pressure), and can elide synchronisation (if an object isn't shared, locking it is unnecessary). This is why small, short-lived objects in tight loops don't always cause GC pressure in well-tuned JVMs.</div></div>
+<div class="iq"><div class="q">Why does a JVM application need warm-up time before reaching peak performance?</div><div class="a">The JIT needs to profile code before optimising it. C2 kicks in after ~10K-15K method invocations. Before that, code runs at interpreter or C1 speed. Additionally: class loading is lazy (classes loaded on first use), JIT-compiled code is cached after compilation, and the JVM's GC itself gets more efficient as it learns the object allocation patterns. Containers and serverless functions that restart frequently never reach peak JVM performance — this is why GraalVM native-image (AOT Java) exists.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Interpreted vs Compiled vs JIT</span><span class="cp">GC Theory (heap management)</span><span class="cp">Memory Model (stack frames, heap)</span><span class="cp">Java Concurrency (JMM)</span><span class="cp">System Design (warm-up, container sizing)</span></div>`}
+]},
+
+// 07
+{tag:"Memory Management",title:"Garbage Collection Theory",
+oneliner:"Garbage collection automatically reclaims heap memory no longer reachable by the program — relieving developers from manual memory management at the cost of pause times and throughput overhead.",
+secs:[
+{l:"Why it exists",b:`<p>Manual memory management (C's malloc/free, C++'s new/delete) puts the burden on developers. Bugs: use-after-free (dereference freed memory), double-free (corruption), memory leaks (never freed). GC eliminates these classes of bugs by tracking object reachability automatically — if no live reference points to an object, it's garbage.</p>`},
+{l:"Reference counting",b:`<div class="card"><div class="card-name">Reference Counting (Swift ARC, Python, Rust Rc&lt;T&gt;)</div><div class="card-desc">Every object stores a counter of how many references point to it. On reference creation: increment. On reference drop: decrement. When count reaches 0: immediately free the object. Pros: instant reclamation, no stop-the-world pauses, deterministic. Cons: cyclic references leak (A → B → A, both counts stay at 1 forever). Fix: weak references for back-pointers. Cost: every pointer assignment modifies a counter — cache thrashing for pointer-heavy workloads.</div></div>
+<div class="code">Python:
+  a = MyObj()    # refcount = 1
+  b = a          # refcount = 2
+  del a          # refcount = 1
+  del b          # refcount = 0 → __del__() called → memory freed immediately
+  
+  # Cycle:
+  x = {}; y = {}
+  x['y'] = y; y['x'] = x  # both refcount = 2
+  del x; del y             # refcount drops to 1, NOT 0 → leak!
+  # Python's cyclic GC (separate module) detects and clears these</div>`},
+{l:"Tracing GC — mark and sweep",b:`<ol class="steps">
+<li><strong>Stop the world</strong> — pause all application threads (or use concurrent marking with write barriers)</li>
+<li><strong>Mark phase</strong> — starting from GC roots (local variables on stacks, static fields, JNI references), traverse the object graph, marking every reachable object</li>
+<li><strong>Sweep phase</strong> — scan the entire heap; any object not marked is garbage; reclaim its space</li>
+<li><strong>Resume</strong> — application threads continue</li>
+</ol>
+<p>Problem: naive mark-and-sweep doesn't compact the heap — leads to fragmentation. <strong>Mark-compact</strong>: after marking, move all live objects to one end of the heap, update all references. No fragmentation, but all references must be updated — requires pausing application threads.</p>`},
+{l:"Generational hypothesis — why modern GCs are fast",b:`<p><strong>The generational hypothesis</strong>: most objects die young. Profiling across languages and applications consistently shows: >90% of objects become unreachable within milliseconds of creation (temporaries, loop variables, short-lived allocations).</p>
+<div class="code">Generational GC design (Java G1GC, ZGC, Shenandoah, Python, .NET):
+  
+  Young generation (small, collected frequently):
+    New objects allocated here (Eden space) — bump pointer allocation, ~1 instruction
+    Minor GC: collect only young gen, extremely fast (seconds of live objects)
+    Surviving objects promoted to Old gen (if survive N collections)
+  
+  Old generation (large, collected rarely):
+    Long-lived objects (caches, singletons, connection pools)
+    Major GC / Full GC: slower, must scan entire old gen
+  
+  Why this is fast:
+    Minor GC only scans young gen (~few MB) not entire heap (~GB)
+    Pause proportional to LIVE objects, not heap size
+    90%+ of objects collected in the first minor GC they're eligible for</div>`},
+{l:"Modern JVM GCs",b:`<div class="card"><div class="card-name">G1GC (default Java 9+)</div><div class="card-desc">Heap divided into equal-sized regions (not monolithic young/old). Concurrent marking, incremental collection. Targets configurable pause goals (-XX:MaxGCPauseMillis=200). Good for heaps 4GB-16GB.</div></div>
+<div class="card"><div class="card-name">ZGC (Java 15+ production-ready)</div><div class="card-desc">Concurrent compaction using coloured pointers and load barriers. Pauses measured in sub-millisecond (< 1ms) regardless of heap size (even 1TB heaps). Slightly lower throughput than G1. Best for: latency-sensitive, large heap applications.</div></div>
+<div class="card"><div class="card-name">Shenandoah (Red Hat)</div><div class="card-desc">Similar to ZGC — concurrent compaction, sub-millisecond pauses. Available in OpenJDK. Good alternative to ZGC.</div></div>`},
+{l:"GC tuning signals",b:`<div class="code">// Warning signs in GC logs (-Xlog:gc*):
+[GC Pause Young (G1 Evacuation Pause) 450ms]  → pause too long → tune -XX:MaxGCPauseMillis
+[GC Pause Full (G1 Humongous Allocation)]      → large object (> 50% region size) → increase region size
+[GC Pause Full 3500ms every 30 seconds]        → old gen filling up → heap too small or memory leak
+
+Key metrics:
+  GC throughput = time NOT in GC / total time (want > 95%)
+  GC pause      = stop-the-world duration (want < MaxGCPauseMillis)
+  Promotion rate = how fast objects move from young to old (high = memory pressure)</div>`},
+{l:"Mental model",b:`<div class="analogy">Reference counting is a restaurant where every table has a counter of occupied seats — the moment a table empties, it's immediately cleared. But if two parties refuse to leave until the other leaves first (cycle), the restaurant is stuck. Tracing GC is a nightly cleanup crew that walks through the restaurant, marks every occupied seat, then clears everything unmarked. Generational GC is the crew focusing on the fast-turnover counter seats (young gen) every 15 minutes, and deep-cleaning the reservation tables (old gen) once a week.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why does reference counting fail with cyclic data structures?</div><div class="a">Two objects pointing to each other each have refcount ≥ 1, even if nothing outside the cycle references them. Refcount never reaches 0 → never freed. Fix: one direction uses a weak reference (doesn't increment refcount). Python's gc module and Rust's Weak&lt;T&gt; handle this. Java's GC is tracing-based so cycles are not an issue — reachability from GC roots, not refcount, determines liveness.</div></div>
+<div class="iq"><div class="q">What is stop-the-world pause and how do modern GCs reduce it?</div><div class="a">STW: all application threads paused while GC scans/moves objects. Modern GCs do most work concurrently (while app runs), using write barriers to track mutations during concurrent marking. ZGC achieves sub-1ms pauses by doing even compaction concurrently via coloured load barriers — the GC moves objects while the mutator (app) is running, updating references on first access via barriers.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Memory Model (heap, stack)</span><span class="cp">JVM Internals (GC is JVM's memory manager)</span><span class="cp">Virtual Memory (pages backing heap)</span><span class="cp">System Design (GC tuning for latency)</span></div>`}
+]},
+
+// 08
+{tag:"Memory",title:"Memory Model — Stack, Heap, Escape Analysis",
+oneliner:"The memory model defines how local variables, function call state, and heap objects are laid out in memory — the stack is fast but limited and tied to function scope; the heap is large but managed (GC or manually).",
+secs:[
+{l:"Stack frames",b:`<div class="code">Stack: contiguous memory region, LIFO structure.
+Each function call pushes a STACK FRAME (activation record) containing:
+  Return address  — where to continue after this function returns
+  Saved registers — caller's register values to restore
+  Local variables — primitives and object REFERENCES (not objects themselves)
+  Parameters      — arguments passed to this function
+  Metadata        — frame pointer, exception handler tables
+
+stack (grows downward on x86):
+    high address
+    ┌──────────────┐
+    │ main() frame │  ← oldest frame (bottom of logical stack)
+    ├──────────────┤
+    │  foo() frame │
+    ├──────────────┤
+    │  bar() frame │  ← currently executing (top of stack)
+    └──────────────┘
+    low address   ← stack pointer (SP) points here
+
+Each frame: allocated when function called, FREED when function returns.
+Size must be known at compile time (for languages with fixed-size locals).</div>`},
+{l:"Stack overflow",b:`<p>Each thread has a fixed stack size (JVM: -Xss, default 512KB-1MB; Linux threads: 8MB). Infinite recursion (no base case) keeps pushing frames until the stack exhausts its allocated memory → StackOverflowError (Java) / stack overflow (C/OS). Deep recursion with large local variables (e.g. 1MB array local) can also blow the stack. Tail call optimisation (TCO): if the last operation is the recursive call, the compiler reuses the current frame instead of allocating a new one — eliminating stack growth. Java does NOT do TCO (JVM limitation). Scala added trampolining as a workaround.</p>`},
+{l:"Heap allocation",b:`<div class="code">Heap: large memory region for objects with dynamic size or lifetime.
+In Java:
+  new MyObject()    → allocate on Eden (young gen heap)
+                      bump-pointer allocation: advance pointer by object size
+                      ~1-2 instructions (vs malloc's free-list search)
+  Local variable:   MyObject ref = ... → ref is on STACK (8 bytes, a pointer)
+                                          the OBJECT is on the HEAP
+
+Object layout in JVM (HotSpot):
+  [mark word (8 bytes)]  — GC age, hash code, lock state, GC marking
+  [klass pointer (4-8 bytes)] — pointer to Class object (what type is this?)
+  [instance fields...]   — in declaration order, padded to alignment
+
+Object header overhead:
+  Every Java object: minimum 16 bytes header
+  new Integer(5): 16 bytes header + 4 bytes value = 20 bytes (vs C's 4 bytes)
+  This is why primitive arrays (int[]) are more efficient than Integer[]</div>`},
+{l:"Escape analysis",b:`<div class="code">JVM escape analysis determines whether an object's reference
+escapes the scope where it was created.
+
+Cases:
+  1. No escape (method-local): object created and used only within one method
+     JIT can: allocate on stack (scalar replacement), elide synchronisation
+
+  2. Thread-local escape: object passed to methods of same thread only
+     JIT can: elide synchronisation (no concurrent access possible)
+
+  3. Global escape: object stored in static field or returned / passed cross-thread
+     Must: allocate on heap, full GC management, full synchronisation
+
+Example — scalar replacement:
+  // JIT sees Point never escapes foo():
+  void foo() {
+      Point p = new Point(3, 4);   // normally: heap allocation
+      double d = Math.sqrt(p.x*p.x + p.y*p.y);
+      // p is dead here
+  }
+  // JIT replaces with: two local variables (x=3, y=4) → no heap allocation, no GC</div>`},
+{l:"Stack vs heap comparison",b:`<table class="ct"><tr><th></th><th>Stack</th><th>Heap</th></tr>
+<tr><td>Allocation speed</td><td>~1 instruction (SP decrement)</td><td>~2 instructions (bump ptr) to µs (malloc)</td></tr>
+<tr><td>Size</td><td>Small (512KB–8MB per thread)</td><td>Large (GBs, limited by RAM)</td></tr>
+<tr><td>Lifetime</td><td>Tied to function scope</td><td>Until GC collects / free() called</td></tr>
+<tr><td>Thread safety</td><td>Private per thread</td><td>Shared (requires synchronisation)</td></tr>
+<tr><td>Management</td><td>Automatic (LIFO)</td><td>GC (managed) or manual (C/C++)</td></tr>
+<tr><td>Fragmentation</td><td>None</td><td>Possible (managed by allocator)</td></tr></table>`},
+{l:"Mental model",b:`<div class="analogy">The stack is your desk workspace — cleared completely every time you finish a task (function returns). Fast to use (everything is right there), but limited in size. The heap is a warehouse — objects live there until explicitly removed (manual) or a warehouse inspector decides nothing refers to them (GC). Your desk only holds tickets (references/pointers) telling you where the warehouse items are. Stack overflow is cramming so many items onto your desk that it collapses. Escape analysis is the smart clerk who realises you need this item for 5 minutes only — no need to warehouse it, just put it on your desk temporarily.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Where are Java primitives and objects stored?</div><div class="a">Primitives declared as local variables live on the stack (the actual value). Object references declared as local variables live on the stack (the pointer — 4 or 8 bytes). The actual object always lives on the heap (unless escape analysis proves it doesn't escape, in which case JIT may stack-allocate it). Static fields are in the Metaspace/Method Area. Instance fields are in the object on the heap.</div></div>
+<div class="iq"><div class="q">How does escape analysis reduce GC pressure?</div><div class="a">If the JIT determines an object never escapes its allocating method (not stored in fields, not passed to other threads, not returned), it can perform scalar replacement — decompose the object into its primitive fields and allocate them as local variables on the stack. No heap allocation means no GC involvement. This is critical for allocation-heavy code like tight loops creating temporary Point, Range, or Builder objects.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">GC Theory (heap management)</span><span class="cp">JVM Internals (stack frames per thread)</span><span class="cp">Virtual Memory (stack + heap are virtual memory regions)</span><span class="cp">OS Memory (stack size → thread cost)</span><span class="cp">Java Concurrency (heap shared, stack private)</span></div>`}
+]},
+
+// 09
+{tag:"Type Theory",title:"Type Systems",
+oneliner:"A type system classifies values, restricts what operations are valid on them, and — in static systems — proves at compile time that a whole class of runtime errors cannot occur.",
+secs:[
+{l:"Why type systems exist",b:`<p>Without types, any operation on any value is syntactically valid — adding a string to a function pointer compiles. Runtime: crash or silent wrong answer. Type systems convert these into compile-time errors (static) or immediate runtime errors (dynamic), making bugs earlier and cheaper. Stronger type systems can eliminate entire bug categories; more flexible type systems enable more expressive code.</p>`},
+{l:"Static vs dynamic typing",b:`<div class="card"><div class="card-name">Static typing (Java, C, Rust, Kotlin, TypeScript)</div><div class="card-desc">Types checked at compile time. Every variable has a declared or inferred type known before running. Type errors are compile errors — you can never ship code that adds an int to a boolean (in a strongly-typed static language). Performance benefit: the compiler knows types → generates direct instructions, no type dispatch at runtime.</div></div>
+<div class="card"><div class="card-name">Dynamic typing (Python, JavaScript, Ruby)</div><div class="card-desc">Types checked at runtime. Variables have no declared type — the value itself carries its type. Flexibility: a list can hold integers, strings, objects, functions simultaneously. Cost: every operation must check value types at runtime; no compile-time proof of correctness; type errors only appear when that code path executes.</div></div>
+<div class="code">// Static (Java): caught at compile time
+String s = "hello";
+int x = s + 5;  // ERROR: incompatible types
+
+// Dynamic (Python): caught at runtime
+s = "hello"
+x = s + 5    # TypeError only when this line executes
+x = s + "!"  # Fine — string concatenation</div>`},
+{l:"Strong vs weak typing",b:`<div class="card"><div class="card-name">Strong typing (Python, Java, Haskell)</div><div class="card-desc">No implicit coercions between incompatible types. "1" + 1 → TypeError in Python. The runtime refuses to silently change types.</div></div>
+<div class="card"><div class="card-name">Weak typing (JavaScript, C, PHP)</div><div class="card-desc">Implicit coercions between types — the runtime tries to make operations work by converting types. "1" + 1 → "11" in JavaScript. 1 + true → 2 in JavaScript. A pointer to int can be cast to a pointer to float in C. Flexible but a source of subtle bugs.</div></div>
+<div class="code">JavaScript (weakly typed + dynamic):
+"5" - 3    → 2      (string coerced to number for subtraction)
+"5" + 3    → "53"   (number coerced to string for addition — different!)
+null + 1   → 1      (null coerced to 0)
+[] + {}    → "[object Object]"
+{} + []    → 0      (context-dependent parsing!)
+
+Java (strongly typed + static):
+"5" - 3    → compile error  (operator - not defined for String)
+"5" + 3    → "53"           (exception: + is overloaded for String concatenation)</div>`},
+{l:"Nominal vs structural typing",b:`<div class="card"><div class="card-name">Nominal typing (Java, C++, C#)</div><div class="card-desc">Two types are compatible only if they have an explicit inheritance/implementation relationship. class Dog implements Animal → Dog is an Animal. Two classes with identical methods but no declared relationship are NOT compatible. Explicit: you say "Dog IS-A Animal." Safe but verbose — requires planning the type hierarchy upfront.</div></div>
+<div class="card"><div class="card-name">Structural typing / duck typing (TypeScript, Go interfaces, Haskell typeclasses)</div><div class="card-desc">Two types are compatible if they have the same structure (same methods/fields). If it walks like a duck and quacks like a duck, it's a duck. TypeScript: any object with a {name: string, age: number} shape satisfies that interface — no explicit declaration needed. Go: if a type implements all methods of an interface, it implicitly satisfies that interface.</div></div>
+<div class="code">// TypeScript — structural (duck typing)
+interface Drawable { draw(): void; }
+
+class Circle { draw() { console.log("circle"); } }
+class Square { draw() { console.log("square"); } }
+
+function render(shape: Drawable) { shape.draw(); }
+
+render(new Circle());  // OK — Circle has draw() — no "implements Drawable" needed
+render(new Square());  // OK — Square has draw()
+render({ draw: () => console.log("custom") });  // OK — anonymous object with draw()
+
+// Java — nominal
+// Square must explicitly implement Drawable or this is a compile error</div>`},
+{l:"Type inference",b:`<p>Modern statically-typed languages infer types from context, eliminating most explicit annotations. The Hindley-Milner type inference algorithm (Haskell, ML, Rust, Swift) can infer the types of entire programs from minimal annotations. Java has limited inference (var keyword, diamond operator). Kotlin infers return types from expressions. TypeScript infers from initial assignment. Type inference gives the safety of static typing with the ergonomics of dynamic typing.</p>
+<div class="code">// Kotlin — full inference
+val x = 42           // inferred: Int
+val name = "Somesh"  // inferred: String
+val nums = listOf(1, 2, 3)  // inferred: List<Int>
+fun double(x: Int) = x * 2  // inferred return: Int
+
+// Rust — Hindley-Milner, bidirectional inference
+let mut v: Vec<_> = vec![];  // type inferred from usage below
+v.push(42);                   // compiler deduces Vec<i32></div>`},
+{l:"Gradual typing",b:`<p>Systems that allow mixing static and dynamic typing in the same codebase. TypeScript is JavaScript + optional static types — you can annotate any subset of your code, and any: the escape hatch to dynamic. Python's type hints (mypy) are gradual — runtime ignores them, mypy checks them statically. This allows incremental adoption: add types to critical paths first, leave experimental code dynamic.</p>`},
+{l:"Mental model",b:`<div class="analogy">Type systems are quality control stamps on a factory line. Static typing: every part is stamped and inspected before leaving the machine (compile time). Nothing incorrectly typed makes it to assembly. Dynamic typing: parts are stamped only when they're about to be used — if a wrong part arrives at the wrong station, the line halts at runtime. Strong typing: the factory refuses to file down a bolt to fit a hole it shouldn't go in. Weak typing: the factory files it down anyway — usually works, occasionally causes structural failure later.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is the difference between static and dynamic typing? What are the trade-offs?</div><div class="a">Static: types checked at compile time — entire class of runtime type errors eliminated, better IDE support, performance (no type dispatch). Cost: more upfront annotation, harder to write flexible/generic code. Dynamic: types checked at runtime — faster prototyping, more flexible data structures, less boilerplate. Cost: type errors discovered only at runtime, harder to refactor large codebases safely. TypeScript exists to give JS the benefits of static typing with gradual adoption.</div></div>
+<div class="iq"><div class="q">How does Go's interface system differ from Java's?</div><div class="a">Structural vs nominal. In Go, any type that implements all methods of an interface implicitly satisfies it — no "implements" declaration. This allows: define an interface after the implementing type (even in another package), and any type with those methods works. In Java: you must explicitly declare "implements Serializable" — you can't retrofit an interface onto a class you don't own without modifying it (or wrapping it). Go's approach enables looser coupling; Java's approach enables explicit documentation of intent.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Semantic Analysis (type checking in pipeline)</span><span class="cp">AST (annotated with types)</span><span class="cp">Java Generics (parametric polymorphism)</span><span class="cp">Interpreted vs Compiled (type dispatch cost)</span><span class="cp">JVM Internals (bytecode verifier uses types)</span></div>`}
+]},
+];
+
+function show(idx,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');render(idx);
+}
+function render(idx){
+  const t=T[idx];
+  let h=`<span class="topic-tag">${t.tag}</span><div class="topic-title">${t.title}</div><div class="topic-oneliner">${t.oneliner}</div>`;
+  for(const s of t.secs)h+=`<div class="sec"><div class="sec-label">${s.l}</div><div class="body">${s.b}</div></div>`;
+  const c=document.getElementById('content');
+  c.innerHTML=h;c.scrollTop=0;
+}
+render(0);
+</script>

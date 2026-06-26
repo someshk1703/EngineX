@@ -1,0 +1,911 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.shell{display:flex;height:100vh;min-height:640px;overflow:hidden}
+.nav{width:230px;min-width:230px;border-right:0.5px solid var(--color-border-tertiary);padding:12px 0;overflow-y:auto;background:var(--color-background-secondary)}
+.nav-title{font-size:10px;font-weight:500;color:var(--color-text-tertiary);padding:6px 16px 4px;letter-spacing:.07em;text-transform:uppercase}
+.ni{display:block;padding:7px 16px;font-size:12.5px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent;line-height:1.4;transition:all .12s}
+.ni:hover{color:var(--color-text-primary);background:var(--color-background-primary)}
+.ni.active{color:var(--color-text-primary);border-left-color:#1D9E75;background:var(--color-background-primary);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:26px 30px}
+.topic{display:none}.topic.visible{display:block}
+h1.ttl{font-size:20px;font-weight:500;margin-bottom:4px}
+.tnum{font-size:11px;color:var(--color-text-tertiary);margin-bottom:12px}
+.tags{margin-bottom:12px}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin:0 3px 3px 0}
+.tg{background:#E1F5EE;color:#085041}.tp{background:#EEEDFE;color:#3C3489}.tw{background:#FAEEDA;color:#633806}.td{background:#FCEBEB;color:#791F1F}.ti{background:#E6F1FB;color:#0C447C}
+.sl{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin:18px 0 6px;display:flex;align-items:center;gap:6px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{font-weight:500;color:var(--color-text-primary)}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+.g3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:7px}
+.sb{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.sb h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.sb p{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.cb{background:#1a1b26;border-radius:var(--border-radius-md);padding:13px 15px;margin:8px 0;overflow-x:auto}
+.cb pre{font-family:var(--font-mono);font-size:11.5px;line-height:1.75;color:#c0caf5;white-space:pre}
+.kw{color:#bb9af7}.fn{color:#7aa2f7}.cm{color:#565f89;font-style:italic}.str{color:#9ece6a}.num{color:#ff9e64}.vr{color:#f7768e}.cl{color:#e0af68}
+.mst{border-left:2px solid #E24B4A;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.tof{border-left:2px solid #EF9F27;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.iq{font-size:12.5px;padding:8px 11px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin:5px 0;border:0.5px solid var(--color-border-tertiary)}
+.iq .q{font-weight:500;margin-bottom:2px}
+.iq .d{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.55}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pill{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
+.pq{background:var(--color-background-info);color:var(--color-text-info)}
+.pc{background:#E1F5EE;color:#085041}
+.divline{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:26px 0}
+.divlabel{text-align:center;font-size:11px;color:var(--color-text-tertiary);margin:-10px 0 18px}
+.arch{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 13px;margin:5px 0}
+.arch h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.arch p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.65}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0}
+.fbox{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 10px;font-size:12px;font-weight:500}
+.farr{font-size:14px;color:var(--color-text-tertiary)}
+.fbox.g{border-color:#1D9E75;background:#E1F5EE;color:#085041}
+.fbox.p{border-color:#534AB7;background:#EEEDFE;color:#3C3489}
+.fbox.a{border-color:#BA7517;background:#FAEEDA;color:#633806}
+.fbox.r{border-color:#A32D2D;background:#FCEBEB;color:#791F1F}
+</style>
+
+<div class="shell">
+<nav class="nav">
+  <div class="nav-title">Block 3 — React Internals</div>
+  <div class="ni active" onclick="show(0,this)">1. Reconciliation &amp; diffing</div>
+  <div class="ni" onclick="show(1,this)">2. Fiber architecture</div>
+  <div class="ni" onclick="show(2,this)">3. Render vs commit phase</div>
+  <div class="ni" onclick="show(3,this)">4. useState &amp; useReducer internals</div>
+  <div class="ni" onclick="show(4,this)">5. useEffect internals</div>
+  <div class="ni" onclick="show(5,this)">6. useMemo &amp; useCallback</div>
+  <div class="ni" onclick="show(6,this)">7. React 18 features</div>
+  <div class="ni" onclick="show(7,this)">8. Context API performance</div>
+  <div class="ni" onclick="show(8,this)">9. Server vs client components</div>
+  <div class="ni" onclick="show(9,this)">10. CSR / SSR / SSG / ISR</div>
+</nav>
+
+<main class="content">
+
+<div class="topic visible" id="t0">
+  <div class="tnum">Topic 1 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">Reconciliation &amp; diffing</h1>
+  <div class="tags"><span class="tag tg">Virtual DOM</span><span class="tag tp">Diffing heuristics</span><span class="tag tw">Keys</span><span class="tag td">index-as-key</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Reconciliation is React's algorithm for determining what changed between two renders and computing the minimal set of DOM mutations needed. React maintains a <strong>virtual DOM</strong> — a lightweight in-memory tree of React element descriptors (<code>{type, props, children}</code>). On each render, React calls component functions to produce a new element tree, then <strong>diffs</strong> it against the previous tree. The diff produces a change-set that is applied to the real DOM in the commit phase. Without reconciliation, every re-render would destroy and recreate the entire DOM — catastrophically slow. React's diffing is O(n) (not the theoretical O(n³) for general tree diffing) through two heuristics: (1) elements of different types produce different trees entirely, (2) <code>key</code> props let React track element identity across renders.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">React diffs trees level-by-level (breadth). At each position it compares the old fiber node's <code>type</code> against the new React element's <code>type</code>. <strong>Same type:</strong> React keeps the DOM node and updates only changed props. Children are reconciled recursively. <strong>Different type:</strong> React unmounts the entire old subtree (running all cleanup effects, removing DOM nodes) and mounts a fresh subtree from scratch. This is why wrapping a component in a different parent element causes full remount. For <strong>lists</strong>, React uses <code>key</code> to match old and new elements by identity across positions. Without keys (or with index keys), React matches by position — meaning a deleted first element causes every subsequent element to appear "changed", updating N-1 elements unnecessarily. With stable keys, React correctly identifies the deletion and only removes that one node.</p>
+
+  <div class="flow">
+    <div class="fbox g">New render tree</div><div class="farr">→</div>
+    <div class="fbox">Compare types</div><div class="farr">→</div>
+    <div class="fbox p">Same type: update props</div><div class="farr">|</div>
+    <div class="fbox r">Diff type: full remount</div><div class="farr">→</div>
+    <div class="fbox g">Commit mutations</div>
+  </div>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Element type comparison</h4><p>React compares <code>element.type</code> (string for DOM elements, function/class reference for components). Two renders of the same component function = same type. A new function defined inline = different reference = React sees a different type each render.</p></div>
+    <div class="sb"><h4>Key reconciliation</h4><p>Keys let React match elements by identity rather than position. Keys must be stable (same value across renders), unique among siblings, and ideally from the data itself (database ID, slug). Keys are not passed as props — they're consumed by the reconciler.</p></div>
+    <div class="sb"><h4>Index as key — the bug</h4><p>When items are reordered, inserted, or deleted, index keys cause: wrong component state association (React thinks element at index 0 is still the same), unnecessary re-renders of all elements after the change, broken animations and form inputs.</p></div>
+    <div class="sb"><h4>Component identity</h4><p>If you define a component inside another component's render, a new function reference is created each render. React sees a new type, unmounts the old subtree, mounts fresh — losing all internal state. Move component definitions outside render functions.</p></div>
+    <div class="sb"><h4>Bailout optimization</h4><p>React.memo wraps a component to skip re-render if props haven't changed (shallow equality). PureComponent is the class equivalent. The reconciler checks memo status before even calling the component function.</p></div>
+    <div class="sb"><h4>Fragment keys</h4><p>React.Fragment can receive a key: <code>&lt;Fragment key={id}&gt;</code>. Used when you need to key a group of elements that map from data without introducing a wrapper DOM node.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ❌ Index as key — breaks on insert/delete/reorder</span>
+<span class="kw">const</span> <span class="fn">BadList</span> = ({ items }) => (
+  &lt;ul&gt;
+    {items.<span class="fn">map</span>((item, <span class="vr">index</span>) => (
+      &lt;li <span class="kw">key</span>={<span class="vr">index</span>}&gt;          <span class="cm">// React uses position as identity</span>
+        &lt;input defaultValue={item.name} /&gt; <span class="cm">// State tied to position</span>
+      &lt;/li&gt;                               <span class="cm">// Delete item[0] → all inputs shift wrong</span>
+    ))}
+  &lt;/ul&gt;
+);
+
+<span class="cm">// ✅ Stable ID as key</span>
+<span class="kw">const</span> <span class="fn">GoodList</span> = ({ items }) => (
+  &lt;ul&gt;
+    {items.<span class="fn">map</span>((item) => (
+      &lt;li <span class="kw">key</span>={item.id}&gt;            <span class="cm">// React tracks by identity across renders</span>
+        &lt;input defaultValue={item.name} /&gt;
+      &lt;/li&gt;
+    ))}
+  &lt;/ul&gt;
+);
+
+<span class="cm">// ❌ Component defined inside render — new reference every render</span>
+<span class="kw">function</span> <span class="fn">Parent</span>() {
+  <span class="kw">const</span> <span class="fn">Child</span> = () =&gt; &lt;div&gt;child&lt;/div&gt;; <span class="cm">// New function ref each render</span>
+  <span class="kw">return</span> &lt;<span class="cl">Child</span> /&gt;;                      <span class="cm">// React: different type! Full remount.</span>
+}
+
+<span class="cm">// ✅ Define outside</span>
+<span class="kw">const</span> <span class="fn">Child</span> = () =&gt; &lt;div&gt;child&lt;/div&gt;;   <span class="cm">// Stable reference</span>
+<span class="kw">function</span> <span class="fn">Parent</span>() { <span class="kw">return</span> &lt;<span class="cl">Child</span> /&gt;; }
+
+<span class="cm">// Forcing remount with key — useful for resetting state</span>
+&lt;<span class="cl">UserProfile</span> key={userId} userId={userId} /&gt;
+<span class="cm">// When userId changes → key changes → React unmounts old, mounts fresh</span>
+<span class="cm">// All internal state of UserProfile is reset. Controlled remount.</span></pre></div>
+
+  <div class="sl">Performance implications</div>
+  <p class="prose">Incorrect keys cause O(n) DOM mutations for what should be O(1). A list of 1000 items where one is deleted from the front with index keys triggers 999 prop-update patches plus a delete. With stable ID keys: 1 delete, 0 patches. This is measurable at 50+ items and catastrophic at thousands. Key-related reconciliation bugs also cause React to unmount and remount components unnecessarily, running teardown effects and losing component state — a source of flickering, lost scroll positions, and refetched data.</p>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using array index as key whenever you have a static, never-reordered list — this is technically safe but builds a false habit. The moment the list becomes sortable or filterable, you have a bug. Default to IDs.</div>
+  <div class="mst">Using <code>Math.random()</code> as a key — generates a new key every render, forcing React to unmount and remount every list item on every render. Worse than index keys.</div>
+  <div class="mst">Thinking the virtual DOM eliminates DOM operations — it minimizes them. A component at the root of a deep subtree re-rendering still calls every descendant's render function (unless memoized). The vDOM diff is CPU cost, DOM mutation is GPU/layout cost.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Why is using index as a key dangerous?"</div><div class="d">React uses keys for identity, not position. With index keys, deleting item[0] makes React think item[0] is still the same element but with item[1]'s props — it updates in-place instead of unmounting. Form inputs, animations, and component state tied to the element are now associated with the wrong data item. Stable IDs fix this by letting React identify which specific item was removed.</div></div>
+  <div class="iq"><div class="q">"How does React's diffing algorithm work and what are its heuristics?"</div><div class="d">O(n) via two heuristics: (1) different element.type → full subtree remount, (2) key prop establishes identity across renders for list diffing. Level-by-level traversal. Emphasize what triggers full remount (type change, key change, conditional wrapping in different elements).</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Fiber (next topic — reconciler output)</span>
+    <span class="pill pc">DOM mutations (layout/paint cost)</span>
+    <span class="pill pq">React.memo (bailout from reconciliation)</span>
+    <span class="pill pc">List virtualization (avoids reconciling 10k items)</span>
+  </div>
+</div>
+
+<div class="topic" id="t1">
+  <div class="tnum">Topic 2 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">Fiber architecture</h1>
+  <div class="tags"><span class="tag tg">Work loop</span><span class="tag tp">Lanes</span><span class="tag tw">Concurrent mode</span><span class="tag ti">Time slicing</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Fiber is React's reimplementation of its core algorithm (introduced in React 16), replacing the recursive stack-based reconciler with a linked-list-based, interruptible work scheduler. The old reconciler walked the component tree recursively — once started, it couldn't be paused. Fiber makes reconciliation <strong>incremental and preemptible</strong>: work is split into units called <strong>fiber nodes</strong>, and React can pause between units to check if higher-priority work (like a user input) has arrived. This enables <strong>Concurrent Mode</strong>: multiple renders can be in-flight simultaneously at different priorities, lower-priority renders can be interrupted and resumed, and React can discard stale work entirely if the underlying state changes before it's committed.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">Every React element in the tree has a corresponding <strong>fiber node</strong> — a plain JS object with fields: <code>type</code>, <code>stateNode</code> (DOM node or class instance), <code>child</code>, <code>sibling</code>, <code>return</code> (parent), <code>pendingProps</code>, <code>memoizedProps</code>, <code>memoizedState</code>, <code>updateQueue</code>, <code>flags</code> (effect bitmask), and <code>lanes</code>. React maintains two trees: the <strong>current tree</strong> (what's on screen) and the <strong>work-in-progress (WIP) tree</strong> (being built). Fibers in these trees are linked — each WIP fiber has an <code>alternate</code> pointer to its current counterpart. The <strong>work loop</strong> (<code>workLoopSync</code> or <code>workLoopConcurrent</code>) iterates the fiber tree using a depth-first traversal: <code>performUnitOfWork</code> on each fiber, which calls <code>beginWork</code> (process fiber, return child or null) and <code>completeWork</code> (bottom-up, collect effects). In concurrent mode, the loop checks <code>shouldYield()</code> after each fiber — if the deadline is exceeded (5ms slices), it yields to the event loop via scheduler. <strong>Lanes</strong> are a priority bitmask system (31 lanes) — each update is assigned a lane (SyncLane, InputContinuousLane, DefaultLane, TransitionLane, IdleLane). The scheduler only processes fibers whose lanes match the current render priority.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Fiber node structure</h4><p>Linked list: child → first child, sibling → next sibling, return → parent. This replaces the call stack — fiber nodes live on the heap, traversal is iterative (loop), not recursive. Stack can be "rewound" by abandoning WIP.</p></div>
+    <div class="sb"><h4>Double buffering</h4><p>Current tree (on screen) and WIP tree (being built) exist simultaneously. On commit, the WIP tree becomes current (pointer swap). Fibers are recycled via alternate pointers — no GC pressure per render.</p></div>
+    <div class="sb"><h4>Lanes system</h4><p>31 priority lanes via bitmask. React batches updates at the same lane. Higher-priority lanes interrupt lower-priority renders. Transition updates (startTransition) use TransitionLane — interruptible. Sync updates use SyncLane — must complete.</p></div>
+    <div class="sb"><h4>Work loop &amp; scheduler</h4><p>React Scheduler (separate package) uses MessageChannel macrotasks for 5ms work slices. shouldYield() checks elapsed time. If exceeded, React yields, pending work is saved in the WIP tree, resumes on next scheduler message.</p></div>
+    <div class="sb"><h4>beginWork / completeWork</h4><p>beginWork: determine what changed for this fiber (bailout if no updates in lane). Call component function/render method. Return child fiber or null. completeWork: propagate flags up, attach DOM node references, build effect list.</p></div>
+    <div class="sb"><h4>Concurrent features</h4><p>Enabled by Concurrent Mode (React 18 default). startTransition marks low-priority. useDeferredValue defers a value to lower-priority render. Suspense boundaries catch Promise throws and render fallback while awaiting resolution.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Conceptual fiber node structure (simplified)</span>
+<span class="kw">const</span> fiberNode = {
+  tag: <span class="num">0</span>,                  <span class="cm">// FunctionComponent, ClassComponent, HostComponent...</span>
+  type: <span class="cl">MyComponent</span>,       <span class="cm">// The function/class/string</span>
+  stateNode: domElement,    <span class="cm">// Actual DOM node (for host fibers)</span>
+  child: childFiber,        <span class="cm">// First child</span>
+  sibling: siblingFiber,    <span class="cm">// Next sibling</span>
+  return: parentFiber,      <span class="cm">// Parent fiber</span>
+  alternate: currentFiber,  <span class="cm">// Current tree counterpart</span>
+  pendingProps: {},
+  memoizedProps: {},
+  memoizedState: hookList,  <span class="cm">// Head of hooks linked list</span>
+  updateQueue: updates,     <span class="cm">// Pending state updates</span>
+  flags: <span class="num">0b00000100</span>,        <span class="cm">// Effect bitmask (Update, Placement, Deletion...)</span>
+  lanes: <span class="num">0b0001</span>,            <span class="cm">// Which priority lanes this fiber has work in</span>
+};
+
+<span class="cm">// Simplified work loop (concurrent mode)</span>
+<span class="kw">function</span> <span class="fn">workLoopConcurrent</span>() {
+  <span class="kw">while</span> (workInProgress !== <span class="kw">null</span> && !<span class="fn">shouldYield</span>()) {
+    <span class="fn">performUnitOfWork</span>(workInProgress); <span class="cm">// beginWork → completeWork</span>
+  }
+  <span class="cm">// If shouldYield() fired: WIP tree partially built, saved in memory</span>
+  <span class="cm">// Scheduler resumes via MessageChannel macrotask</span>
+}
+
+<span class="cm">// Lane priority check — why startTransition works</span>
+<span class="cm">// SyncLane   = 0b0000001 — synchronous, cannot be interrupted</span>
+<span class="cm">// InputLane  = 0b0000100 — user input, high priority</span>
+<span class="cm">// TransLane  = 0b0100000 — transition, low priority, interruptible</span>
+<span class="cm">// If user types (InputLane) while transition render is in-flight:</span>
+<span class="cm">// → React abandons WIP transition tree</span>
+<span class="cm">// → Processes input update synchronously</span>
+<span class="cm">// → Restarts transition render from scratch with new state</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Conflating "Fiber" (the data structure) with "Concurrent Mode" (the feature). Fiber has existed since React 16. Concurrent Mode (interruptible rendering) shipped in React 18. Fiber made concurrent mode possible but didn't enable it immediately.</div>
+  <div class="mst">Thinking <code>React.StrictMode</code> invokes renders twice due to a bug — it's intentional. StrictMode double-invokes render functions and effect setup/teardown in development to surface side effects in what should be pure functions. This is a direct consequence of the Fiber architecture needing render to be re-playable.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is React Fiber and why was it introduced?"</div><div class="d">Fiber replaced the recursive stack reconciler with an iterative, heap-allocated linked list traversal, making reconciliation interruptible. Enabled concurrent features: prioritized updates, time slicing, startTransition, Suspense. Explain the old stack reconciler's problem: started = committed, no way to pause.</div></div>
+  <div class="iq"><div class="q">"How does React's lanes system work?"</div><div class="d">31-bit priority bitmask. Each update tagged with a lane. Scheduler processes lanes from highest to lowest priority. Multiple lanes can batch. TransitionLane = interruptible. SyncLane = must flush synchronously. This is what allows input events to interrupt transition renders.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">startTransition / useDeferredValue (React 18 topic)</span>
+    <span class="pill pc">Event loop (scheduler uses MessageChannel macrotasks)</span>
+    <span class="pill pq">Suspense (built on Fiber's "throw a Promise" protocol)</span>
+    <span class="pill pc">OS cooperative scheduling (same concept, user-space)</span>
+  </div>
+</div>
+
+<div class="topic" id="t2">
+  <div class="tnum">Topic 3 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">Render phase vs commit phase</h1>
+  <div class="tags"><span class="tag tg">Pure render</span><span class="tag tp">Side effects</span><span class="tag td">DOM ops in render</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">React separates a re-render into two distinct, strictly ordered phases with different rules. The <strong>render phase</strong> (also called reconciliation) calls component functions and computes what changed — it must be <strong>pure and side-effect-free</strong> because React may call it multiple times (StrictMode double-invoke, concurrent interruption and restart). The <strong>commit phase</strong> applies the computed changes to the real DOM and runs effects — it runs synchronously to completion, cannot be interrupted, and is the only place where DOM mutations, refs, and side effects are safe.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">React splits the commit phase into three sub-phases to respect the order of effect execution. <strong>Before mutation</strong> (<code>commitBeforeMutationEffects</code>): reads the DOM before any mutations, runs <code>getSnapshotBeforeUpdate</code> in class components. This is where React captures scroll positions before DOM changes. <strong>Mutation</strong> (<code>commitMutationEffects</code>): applies all DOM mutations — insertions, updates, deletions. Runs <code>useLayoutEffect</code> cleanup from the previous render. Refs are detached (set to null). <strong>Layout</strong> (<code>commitLayoutEffects</code>): runs <code>useLayoutEffect</code> setup synchronously (DOM is updated, but browser hasn't painted yet). Attaches refs. After the commit phase finishes and the browser paints, React schedules <code>useEffect</code> setup via the Scheduler — asynchronous, after paint. This ordering is critical: <code>useLayoutEffect</code> runs before paint (safe for DOM measurements and synchronous mutations), <code>useEffect</code> runs after paint (safe for async operations, subscriptions).</p>
+
+  <div class="flow">
+    <div class="fbox p">Render phase</div><div class="farr">→</div>
+    <div class="fbox">Before mutation</div><div class="farr">→</div>
+    <div class="fbox r">Mutation (DOM)</div><div class="farr">→</div>
+    <div class="fbox g">Layout effects</div><div class="farr">→</div>
+    <div class="fbox a">Browser paint</div><div class="farr">→</div>
+    <div class="fbox g">useEffect</div>
+  </div>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Render phase purity requirement</h4><p>Component functions must be pure: same props/state → same output, no side effects. React 18 + StrictMode double-invokes them in dev to catch violations. In concurrent mode, React may discard and re-run render multiple times before committing.</p></div>
+    <div class="sb"><h4>useLayoutEffect</h4><p>Runs synchronously after DOM mutations but before browser paint. Use for: reading layout (getBoundingClientRect), synchronous DOM mutations (tooltip positioning), synchronizing third-party DOM libraries. Blocks paint if slow.</p></div>
+    <div class="sb"><h4>useEffect</h4><p>Runs after paint. Use for: data fetching, subscriptions, event listeners, analytics. Never blocks paint. Runs in the order effects appear, matching their cleanup from previous render first.</p></div>
+    <div class="sb"><h4>Why no DOM ops in render</h4><p>Render phase may be called multiple times (concurrent interruption). DOM mutations in render would be applied multiple times incorrectly. React doesn't know which render "wins" until commit. DOM is a side effect — belongs in commit.</p></div>
+    <div class="sb"><h4>ref attachment timing</h4><p>Refs are set to null during mutation phase (before DOM is updated), then set to the new DOM node during layout phase. This means in useLayoutEffect, ref.current is the up-to-date DOM node. In useEffect, it's also up-to-date, but the DOM has already been painted.</p></div>
+    <div class="sb"><h4>Passive effects queue</h4><p>useEffect callbacks are collected into a "passive effects" queue, flushed by the Scheduler after the browser has had a chance to paint. This is what makes useEffect non-blocking — it's a macrotask, not a synchronous call.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ❌ Side effect in render phase — breaks in concurrent mode</span>
+<span class="kw">function</span> <span class="fn">BadComponent</span>({ id }) {
+  analytics.<span class="fn">track</span>(<span class="str">'view'</span>, id); <span class="cm">// Fires on every render, may fire 2x in StrictMode</span>
+  <span class="kw">return</span> &lt;div&gt;{id}&lt;/div&gt;;
+}
+
+<span class="cm">// ✅ Side effect in useEffect — fires once after commit</span>
+<span class="kw">function</span> <span class="fn">GoodComponent</span>({ id }) {
+  <span class="fn">useEffect</span>(() => {
+    analytics.<span class="fn">track</span>(<span class="str">'view'</span>, id); <span class="cm">// After paint, once per committed render</span>
+  }, [id]);
+  <span class="kw">return</span> &lt;div&gt;{id}&lt;/div&gt;;
+}
+
+<span class="cm">// useLayoutEffect — measure before paint (tooltip positioning)</span>
+<span class="kw">function</span> <span class="fn">Tooltip</span>({ target }) {
+  <span class="kw">const</span> ref = <span class="fn">useRef</span>();
+  <span class="fn">useLayoutEffect</span>(() => {
+    <span class="cm">// DOM is mutated, but browser hasn't painted yet</span>
+    <span class="cm">// Safe to read layout and synchronously reposition</span>
+    <span class="kw">const</span> rect = target.<span class="fn">getBoundingClientRect</span>();
+    ref.current.style.top = rect.bottom + <span class="str">'px'</span>; <span class="cm">// No visual flash</span>
+  });
+  <span class="kw">return</span> &lt;div ref={ref} className=<span class="str">"tooltip"</span> /&gt;;
+}
+
+<span class="cm">// useEffect would cause visible flash: paint happens → layout → reposition</span>
+<span class="cm">// User sees element jump. useLayoutEffect prevents the flash.</span>
+
+<span class="cm">// StrictMode double-invoke — effect setup+cleanup runs twice in dev</span>
+<span class="fn">useEffect</span>(() => {
+  <span class="kw">const</span> sub = <span class="fn">subscribe</span>(channel); <span class="cm">// Runs in dev: setup → cleanup → setup</span>
+  <span class="kw">return</span> () => sub.<span class="fn">unsubscribe</span>(); <span class="cm">// Must be idempotent</span>
+}, [channel]);</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using <code>useLayoutEffect</code> for data fetching — it blocks paint while awaiting. Only use it for synchronous DOM reads/writes. Network calls belong in <code>useEffect</code> or in a data-fetching library (SWR, React Query, RSC).</div>
+  <div class="mst">Not providing cleanup in <code>useEffect</code> for subscriptions/listeners — in StrictMode, React runs setup→cleanup→setup to verify cleanup is correct. Without cleanup, you'll accumulate duplicate listeners. In production, navigation away without cleanup leaks the subscription.</div>
+  <div class="mst">Thinking StrictMode double-invoke is a bug — it's intentional. It surfaces non-idempotent effects. If your effect breaks on double-invoke, your cleanup is incorrect.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between useEffect and useLayoutEffect?"</div><div class="d">useLayoutEffect: synchronous, after DOM mutation, before paint. useEffect: async, after paint. Use useLayoutEffect for DOM measurements and synchronous mutations to avoid visual flash. Use useEffect for everything else. useLayoutEffect blocks paint — must be fast.</div></div>
+  <div class="iq"><div class="q">"Why can't you perform side effects in the render phase?"</div><div class="d">Render may execute multiple times — React can discard and re-execute in concurrent mode (StrictMode deliberately does this). Side effects (DOM mutations, network calls, subscriptions) applied multiple times or to discarded renders would be incorrect. Only committed renders are real — commit phase is the safe zone.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Fiber work loop (render phase = beginWork/completeWork)</span>
+    <span class="pill pc">reflow/repaint timing (useLayoutEffect fires before paint)</span>
+    <span class="pill pq">React Query / SWR (data fetching abstraction over useEffect)</span>
+    <span class="pill pc">StrictMode double-invoke detection</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 1–3 complete ───</div>
+
+<div class="topic" id="t3">
+  <div class="tnum">Topic 4 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">useState &amp; useReducer internals</h1>
+  <div class="tags"><span class="tag tg">Hook linked list</span><span class="tag tp">Dispatcher</span><span class="tag td">Conditional hooks</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose"><code>useState</code> and <code>useReducer</code> are the primary state primitives in React function components. Internally they are nearly identical — <code>useState(initialValue)</code> is <code>useReducer(basicStateReducer, initialValue)</code> where <code>basicStateReducer</code> is <code>(state, action) => typeof action === 'function' ? action(state) : action</code>. Both store state in the fiber's <code>memoizedState</code> field as a <strong>linked list of hook objects</strong>. This linked list is the reason hooks cannot be called conditionally, inside loops, or after early returns — React identifies each hook by its <strong>call order position</strong> in the list, not by name.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">During the first render (<strong>mount</strong>), each hook call creates a new hook object <code>{ memoizedState, queue, next }</code> and appends it to the fiber's hook list. During subsequent renders (<strong>update</strong>), React reads hook objects from the existing list in order — hook call 1 reads hook node 1, hook call 2 reads hook node 2, etc. The <strong>dispatcher</strong> is the object that React swaps between mount and update phases to differentiate behavior: during mount, <code>ReactCurrentDispatcher.current = HooksDispatcherOnMount</code>; during update, it's <code>HooksDispatcherOnUpdate</code>. This is what makes hooks stateful across renders without explicit identifiers. When you call <code>setState(newValue)</code>, React creates an <strong>update object</strong> (<code>{ action, next, lane }</code>) and enqueues it in the hook's <code>queue</code> (a circular linked list of updates). React then schedules a re-render at the appropriate lane priority. During the re-render, React processes the update queue to compute the new state value via the reducer.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Hook linked list</h4><p>Each hook call during render appends to / reads from a singly linked list stored in <code>fiber.memoizedState</code>. The list is ordered by call sequence. This is the concrete mechanism behind "hooks must be called in the same order every render".</p></div>
+    <div class="sb"><h4>Dispatcher swap</h4><p>React uses a global dispatcher object that switches between mount/update/re-render implementations. In dev, there's also a special dispatcher that throws "cannot call hooks conditionally" errors by checking the expected vs actual hook call count.</p></div>
+    <div class="sb"><h4>Update queue (circular)</h4><p>setState calls enqueue update objects in a circular singly linked list on the hook's queue. During render, React applies all pending updates in order by running them through the reducer, yielding the new state value.</p></div>
+    <div class="sb"><h4>Batching</h4><p>Multiple setState calls within one event handler create multiple update objects in the queue but trigger only one re-render. React 18 automatic batching extends this to all async contexts (setTimeout, Promise callbacks, etc.).</p></div>
+    <div class="sb"><h4>useState vs useReducer</h4><p>useState: reducer is built-in (identity or function call). useReducer: explicit reducer function, explicit action objects. Prefer useReducer when next state depends on previous in complex ways, or when multiple sub-values need atomic updates.</p></div>
+    <div class="sb"><h4>Lazy initialization</h4><p>useState(fn) and useReducer(reducer, arg, initFn) — if a function is passed as initial state, it's called once on mount and its return value used. Avoids re-running expensive initial computation on every render.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Hook linked list visualization</span>
+<span class="kw">function</span> <span class="fn">Component</span>() {
+  <span class="kw">const</span> [count, setCount] = <span class="fn">useState</span>(<span class="num">0</span>);   <span class="cm">// Hook node 0: {state:0, next:→}</span>
+  <span class="kw">const</span> [name, setName]   = <span class="fn">useState</span>(<span class="str">''</span>);    <span class="cm">// Hook node 1: {state:'', next:→}</span>
+  <span class="fn">useEffect</span>(() => {}, []);                   <span class="cm">// Hook node 2: {deps:[], next:null}</span>
+}
+<span class="cm">// fiber.memoizedState → hookNode0 → hookNode1 → hookNode2 → null</span>
+
+<span class="cm">// ❌ Conditional hook — breaks the linked list order</span>
+<span class="kw">function</span> <span class="fn">Bad</span>({ show }) {
+  <span class="kw">if</span> (show) <span class="fn">useState</span>(<span class="num">0</span>); <span class="cm">// Sometimes hook 0 exists, sometimes not</span>
+  <span class="fn">useState</span>(<span class="str">''</span>);         <span class="cm">// React reads hook 0 here when show=false → wrong state!</span>
+}
+
+<span class="cm">// useState is useReducer with a built-in reducer</span>
+<span class="kw">function</span> <span class="fn">basicStateReducer</span>(state, action) {
+  <span class="kw">return</span> <span class="kw">typeof</span> action === <span class="str">'function'</span> ? <span class="fn">action</span>(state) : action;
+}
+<span class="cm">// setState(5)       → action = 5          → state = 5</span>
+<span class="cm">// setState(n => n+1)→ action = fn         → state = fn(currentState)</span>
+
+<span class="cm">// useReducer — when to prefer over useState</span>
+<span class="kw">const</span> formReducer = (state, action) => {
+  <span class="kw">switch</span> (action.type) {
+    <span class="kw">case</span> <span class="str">'SET_FIELD'</span>: <span class="kw">return</span> { ...state, [action.field]: action.value };
+    <span class="kw">case</span> <span class="str">'RESET'</span>:     <span class="kw">return</span> initialFormState;
+    <span class="kw">case</span> <span class="str">'SUBMIT'</span>:    <span class="kw">return</span> { ...state, submitting: <span class="kw">true</span> };
+  }
+};
+<span class="cm">// Multiple related fields updated atomically in one dispatch</span>
+<span class="cm">// Logic is extractable, testable, and replayable</span>
+
+<span class="cm">// Lazy initializer — runs once, not every render</span>
+<span class="kw">const</span> [data, setData] = <span class="fn">useState</span>(() => <span class="fn">expensiveParse</span>(rawInput));</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using object spread for all state updates in <code>useState</code> — <code>setState({...state, field: value})</code> stales when multiple state updates batch. Prefer functional update <code>setState(prev => ({...prev, field: value}))</code> or useReducer for multi-field state.</div>
+  <div class="mst">Calling hooks inside callbacks, conditions, or loops. The React rule "hooks must be called at the top level" exists because the linked list must have the same node count and order every render. Any conditional call shifts all subsequent hook nodes to wrong positions.</div>
+  <div class="mst">Passing an initial value to <code>useState</code> that involves computation: <code>useState(computeExpensive())</code> runs the computation on every render. Use lazy initializer: <code>useState(() => computeExpensive())</code>.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Why can't hooks be called conditionally?"</div><div class="d">Hooks are identified by position in a linked list stored on the fiber, not by name. React reads hook N from list position N on every render. If a hook is conditionally skipped, all subsequent hooks shift by one position — React reads the wrong state for every hook after the skipped one. The rule enforces stable list order.</div></div>
+  <div class="iq"><div class="q">"What is the internal relationship between useState and useReducer?"</div><div class="d">useState is useReducer with a built-in reducer: identity for values, function call for functional updates. The implementation is literally the same code path. This means everything you can do with useState, you can do with useReducer — the difference is ergonomics for complex state transitions.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Fiber memoizedState (hooks live on the fiber node)</span>
+    <span class="pill pq">React 18 automatic batching</span>
+    <span class="pill pc">Flux/Redux pattern (useReducer is mini-Redux)</span>
+    <span class="pill pq">Zustand (uses useState-like external store subscription)</span>
+  </div>
+</div>
+
+<div class="topic" id="t4">
+  <div class="tnum">Topic 5 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">useEffect internals</h1>
+  <div class="tags"><span class="tag tg">Dependency array</span><span class="tag tp">Cleanup timing</span><span class="tag td">StrictMode</span><span class="tag ti">Passive effects</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose"><code>useEffect</code> is React's mechanism for synchronizing a component with external systems after render. It schedules a <strong>passive effect</strong> — a callback that runs asynchronously after the browser has painted. The dependency array controls when the effect re-runs: it's compared using <code>Object.is</code> (reference equality for objects/functions) between the previous and current render's deps array. React stores the effect as a hook node on the fiber's hook list, with the previous deps cached in the hook node's <code>memoizedState</code>. The cleanup function (returned from the effect) is called before re-running the effect and on unmount — this is not optional, it's the mechanism React uses to prevent resource accumulation.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">During the render phase, <code>useEffect</code> creates an <strong>effect object</strong> and attaches it to the fiber's <code>updateQueue</code>. It does NOT run during render. After commit, React collects all passive effects from the committed fiber tree and schedules them via the Scheduler as a single <code>flushPassiveEffects</code> task. This task runs cleanup for effects whose deps changed (calling the previous render's cleanup), then runs new setup callbacks. The ordering: all cleanups first (across the component tree), then all setups. In <strong>StrictMode</strong> (development only), React intentionally runs setup→cleanup→setup to verify that cleanup correctly reverses setup — simulating what happens during fast refresh or concurrent mode interruption.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>No dependency array</h4><p>Effect runs after every render. Equivalent to componentDidMount + componentDidUpdate. Rarely the correct choice — causes excessive effect runs including on renders where nothing relevant changed.</p></div>
+    <div class="sb"><h4>Empty dependency array</h4><p>Effect runs once on mount, cleanup on unmount. Equivalent to componentDidMount + componentWillUnmount. Common for subscriptions, event listeners with stable references.</p></div>
+    <div class="sb"><h4>Dependency comparison</h4><p>React uses Object.is for each dep. Primitives compare by value. Objects/arrays/functions compare by reference. A new object literal <code>{a:1}</code> in props causes useEffect to re-run every render even if content is identical — referential instability.</p></div>
+    <div class="sb"><h4>Stale closure in effects</h4><p>If an effect captures a value but that value is not in the deps array, it reads the stale value from the closure at the time the effect was created. The ESLint exhaustive-deps rule catches this — treat it as an error, not a warning.</p></div>
+    <div class="sb"><h4>Cleanup function</h4><p>Returned function runs before the next effect invocation and on unmount. Must reverse all setup: remove listeners, cancel subscriptions, abort fetches, clear timers. Without cleanup, effects accumulate on each render cycle.</p></div>
+    <div class="sb"><h4>AbortController pattern</h4><p>Standard pattern for cancellable fetch in useEffect: create AbortController in setup, pass signal to fetch, abort in cleanup. Prevents race conditions where a slow response from an old render overwrites a fast response from a newer render.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Effect hook node in fiber (conceptual)</span>
+<span class="kw">const</span> effectHookNode = {
+  memoizedState: {
+    create: setupFn,        <span class="cm">// The effect callback</span>
+    destroy: cleanupFn,     <span class="cm">// Returned cleanup fn (from previous run)</span>
+    deps: [userId],         <span class="cm">// Previous render's deps (Object.is compared)</span>
+    next: nextEffectNode,
+    tag: HookPassive,       <span class="cm">// vs HookLayout for useLayoutEffect</span>
+  }
+};
+
+<span class="cm">// Race condition without AbortController</span>
+<span class="fn">useEffect</span>(() => {
+  <span class="cm">// ❌ User changes userId quickly: two fetches in flight</span>
+  <span class="cm">// Slower old fetch may resolve AFTER newer fetch</span>
+  <span class="cm">// Overwrites correct data with stale data</span>
+  <span class="fn">fetchUser</span>(userId).<span class="fn">then</span>(setUser);
+}, [userId]);
+
+<span class="cm">// ✅ AbortController pattern — cancels stale requests</span>
+<span class="fn">useEffect</span>(() => {
+  <span class="kw">const</span> controller = <span class="kw">new</span> <span class="cl">AbortController</span>();
+  <span class="fn">fetch</span>(<span class="str">`/api/users/${userId}`</span>, { signal: controller.signal })
+    .<span class="fn">then</span>(r => r.<span class="fn">json</span>())
+    .<span class="fn">then</span>(setUser)
+    .<span class="fn">catch</span>(err => {
+      <span class="kw">if</span> (err.name !== <span class="str">'AbortError'</span>) <span class="fn">setError</span>(err);
+    });
+  <span class="kw">return</span> () => controller.<span class="fn">abort</span>(); <span class="cm">// Cleanup: abort previous fetch on re-run</span>
+}, [userId]);
+
+<span class="cm">// Stale closure bug — missing dep</span>
+<span class="fn">useEffect</span>(() => {
+  <span class="kw">const</span> id = <span class="fn">setInterval</span>(() => {
+    console.<span class="fn">log</span>(count); <span class="cm">// ❌ Always prints initial count — stale closure</span>
+  }, <span class="num">1000</span>);
+  <span class="kw">return</span> () => <span class="fn">clearInterval</span>(id);
+}, []); <span class="cm">// ← Missing [count] in deps</span>
+
+<span class="cm">// StrictMode lifecycle in dev:</span>
+<span class="cm">// 1. Mount: setup() runs</span>
+<span class="cm">// 2. React unmounts (simulated): cleanup() runs</span>
+<span class="cm">// 3. React remounts: setup() runs again</span>
+<span class="cm">// If your app breaks at step 2, cleanup is wrong</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Suppressing the <code>react-hooks/exhaustive-deps</code> eslint rule with a comment instead of fixing the actual stale closure. The rule exists to prevent the most common class of React bugs. Every suppression is technical debt.</div>
+  <div class="mst">Putting async functions directly as the effect callback: <code>useEffect(async () => {...})</code> — the async function returns a Promise, but React expects the cleanup function (or undefined). The cleanup is never called correctly. Wrap with an immediately-invoked async inside the effect.</div>
+  <div class="mst">Not handling the race condition in data-fetching effects — this is so common that React's docs now recommend using a data-fetching library (React Query, SWR) instead of raw useEffect for fetching. The AbortController pattern is the manual solution.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Explain the race condition that can occur in useEffect data fetching and how to fix it."</div><div class="d">If userId changes quickly, two fetches are in-flight. The slower response from the first (stale) fetch may resolve after the second (current) fetch, overwriting correct data. Fix: AbortController in setup, abort in cleanup. Or ignore stale responses via a boolean flag. Libraries like React Query handle this automatically.</div></div>
+  <div class="iq"><div class="q">"Why does StrictMode invoke effects twice in development?"</div><div class="d">To simulate component unmount/remount (fast refresh, concurrent mode interruptions). Verifies that cleanup correctly reverses setup. If double-invocation breaks your app, it means your effect is not idempotent — you have a bug that will also manifest in production during navigation and HMR.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">React Query / SWR (proper data fetching)</span>
+    <span class="pill pc">Closures (stale closure is a closure bug)</span>
+    <span class="pill pc">AbortController / fetch cancellation</span>
+    <span class="pill pq">useEffectEvent (React 19 proposal for stable callbacks)</span>
+  </div>
+</div>
+
+<div class="topic" id="t5">
+  <div class="tnum">Topic 6 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">useMemo &amp; useCallback</h1>
+  <div class="tags"><span class="tag tg">Referential equality</span><span class="tag tp">Memoization</span><span class="tag tw">Premature optimisation</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose"><code>useMemo(fn, deps)</code> memoizes the <em>return value</em> of a function — it returns a cached value from the previous render unless a dep changed. <code>useCallback(fn, deps)</code> memoizes the <em>function itself</em> — it's literally <code>useMemo(() => fn, deps)</code>. Both exist to stabilize values across renders for two specific purposes: (1) avoiding expensive recomputations, and (2) maintaining <strong>referential equality</strong> so that downstream consumers (React.memo, useEffect deps, child components) don't see a "new" value every render. The critical insight most developers miss: memoization has a cost — it's only beneficial when the cost of recomputing exceeds the cost of memoization overhead plus the benefit of skipping downstream re-renders.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">Both hooks store their value in a hook node on the fiber's hook list. On each render, React compares the new deps array against the cached deps using <code>Object.is</code> for each element. If all deps pass (unchanged), the cached value is returned without calling the function. If any dep changed, the function is called, the new value stored, and new deps cached. The comparison happens every render regardless — you always pay the comparison cost. For <code>useCallback</code>, the function passed to it is created fresh every render (JS creates a new closure object on each render call), but React discards it and returns the previous function reference if deps haven't changed.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>When useMemo helps</h4><p>Expensive pure computations (sorting/filtering large arrays, complex derived data) that would run on every render but whose inputs (deps) change infrequently. Benchmark first — function call overhead is ~μs, useMemo comparison is also ~μs.</p></div>
+    <div class="sb"><h4>When useCallback helps</h4><p>Stabilizing function references passed to: (1) memoized child components (React.memo), (2) useEffect/useCallback/useMemo dependency arrays. Without stable reference, the consumer sees a "new" function every render and bypasses memoization.</p></div>
+    <div class="sb"><h4>When they're premature optimization</h4><p>Wrapping every value and function "just in case". Components that don't receive the value as a dep or that aren't wrapped in React.memo. Cheap computations (object property access, simple arithmetic). Creates cognitive overhead without measurable benefit.</p></div>
+    <div class="sb"><h4>Referential equality trap</h4><p>Object literals and arrow functions in JSX create new references every render: <code>&lt;Child style={{color:'red'}} onClick={() => doThing()} /&gt;</code>. Even if Child is memoized, new object/function references cause re-render. useMemo/useCallback stabilize these.</p></div>
+    <div class="sb"><h4>React Compiler (React 19)</h4><p>Auto-inserts useMemo/useCallback at the right places via static analysis. Eliminates most manual memoization needs. Rules: pure components, no mutation of props/state. The compiler tracks "reactive values" and generates optimal memo wrapping.</p></div>
+    <div class="sb"><h4>Memoization cache invalidation</h4><p>React may evict memoized values from cache (future feature for low-memory conditions). Don't use useMemo for values with side effects or that must persist — it's a performance hint, not a guarantee.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// useMemo — expensive computation</span>
+<span class="kw">function</span> <span class="fn">ProductList</span>({ products, searchTerm, sortBy }) {
+  <span class="cm">// ❌ Runs on EVERY render, including unrelated state changes</span>
+  <span class="kw">const</span> filtered = products
+    .<span class="fn">filter</span>(p => p.name.<span class="fn">includes</span>(searchTerm))
+    .<span class="fn">sort</span>((a, b) => a[sortBy] > b[sortBy] ? <span class="num">1</span> : <span class="num">-1</span>);
+
+  <span class="cm">// ✅ Only recomputes when products/searchTerm/sortBy change</span>
+  <span class="kw">const</span> filtered = <span class="fn">useMemo</span>(() =>
+    products
+      .<span class="fn">filter</span>(p => p.name.<span class="fn">includes</span>(searchTerm))
+      .<span class="fn">sort</span>((a, b) => a[sortBy] > b[sortBy] ? <span class="num">1</span> : <span class="num">-1</span>),
+    [products, searchTerm, sortBy]
+  );
+}
+
+<span class="cm">// useCallback — stabilizing for memoized child</span>
+<span class="kw">const</span> <span class="fn">ExpensiveChild</span> = <span class="cl">React</span>.<span class="fn">memo</span>(({ onSubmit }) => {
+  console.<span class="fn">log</span>(<span class="str">'child rendered'</span>); <span class="cm">// Should not run on parent re-render</span>
+  <span class="kw">return</span> &lt;button onClick={onSubmit}&gt;Submit&lt;/button&gt;;
+});
+
+<span class="kw">function</span> <span class="fn">Parent</span>({ userId }) {
+  <span class="kw">const</span> [unrelated, setUnrelated] = <span class="fn">useState</span>(<span class="num">0</span>);
+
+  <span class="cm">// ❌ New function reference every render → React.memo bypassed</span>
+  <span class="kw">const</span> handleSubmit = () => <span class="fn">submitForm</span>(userId);
+
+  <span class="cm">// ✅ Stable reference when userId doesn't change</span>
+  <span class="kw">const</span> handleSubmit = <span class="fn">useCallback</span>(
+    () => <span class="fn">submitForm</span>(userId),
+    [userId]
+  );
+
+  <span class="kw">return</span> &lt;&gt;
+    &lt;button onClick={() => <span class="fn">setUnrelated</span>(n => n+<span class="num">1</span>)}&gt;Unrelated&lt;/button&gt;
+    &lt;<span class="cl">ExpensiveChild</span> onSubmit={handleSubmit} /&gt; <span class="cm">// Only re-renders when userId changes</span>
+  &lt;/&gt;;
+}
+
+<span class="cm">// useCallback is useMemo returning a function:</span>
+<span class="fn">useCallback</span>(fn, deps) === <span class="fn">useMemo</span>(() => fn, deps)</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Memoizing a child component with React.memo but forgetting to stabilize prop functions with useCallback — React.memo does a shallow props comparison. A new function reference fails the comparison, re-rendering the child every time, negating the memo entirely.</div>
+  <div class="mst">Wrapping every function in useCallback "for safety" — adds cognitive load, increases bundle size marginally, and provides no benefit if the function is used in JSX without memo'd children or effect deps.</div>
+  <div class="mst">Using useMemo for primitive values — <code>useMemo(() => count * 2, [count])</code> is pure overhead. useMemo is for object/function references and expensive computations. Primitive math is never the bottleneck.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"When would you NOT use useMemo or useCallback?"</div><div class="d">When the computation is cheap (primitives, simple operations). When the child isn't wrapped in React.memo. When the value isn't used in effect deps. The cost of memoization (comparison on every render, cognitive overhead, closure allocation) must be justified by measurable improvement. Profile first.</div></div>
+  <div class="iq"><div class="q">"What is referential equality and why does it matter for React optimization?"</div><div class="d">JS objects/functions created in render have new references each time, even if content is identical. React.memo, useEffect, and downstream hooks compare by reference (Object.is). Without stable references from useMemo/useCallback, every render looks like a change to these consumers, bypassing all optimization.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">React Compiler (auto-memoization in React 19)</span>
+    <span class="pill pc">Object.is vs deep equality</span>
+    <span class="pill pq">React.memo (the reason useCallback exists)</span>
+    <span class="pill pc">V8 closure allocation cost</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 4–6 complete ───</div>
+
+<div class="topic" id="t6">
+  <div class="tnum">Topic 7 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">React 18 features</h1>
+  <div class="tags"><span class="tag tg">Auto batching</span><span class="tag tp">startTransition</span><span class="tag tw">useDeferredValue</span><span class="tag ti">Suspense</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">React 18 shipped three major categories of improvements: (1) <strong>Automatic batching</strong> — extending state update batching from synchronous event handlers to all async contexts; (2) <strong>Concurrent features</strong> — <code>startTransition</code> and <code>useDeferredValue</code> for marking updates as interruptible low-priority work; (3) <strong>Suspense improvements</strong> — Suspense for data fetching (not just code splitting) and server-side streaming SSR support. All concurrent features required the Fiber architecture (React 16+) to be possible, and are enabled by default in React 18 via the new <code>createRoot</code> API.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g3">
+    <div class="sb"><h4>Automatic batching</h4><p>Pre-18: multiple setStates in async callbacks (setTimeout, Promises) triggered separate renders. React 18: all setState calls are batched into one render regardless of context. Reduces renders for async event handlers from N to 1.</p></div>
+    <div class="sb"><h4>startTransition</h4><p>Marks an update as non-urgent (TransitionLane). React can interrupt the transition render when higher-priority work (user input) arrives. The transition is discarded and restarted with the new state. UI stays responsive during expensive renders.</p></div>
+    <div class="sb"><h4>useDeferredValue</h4><p>Defers a value to a lower-priority render. Like startTransition but for values rather than state updates — useful when you don't control the state setter (e.g., prop from parent). React renders with the old value first, then deferred value when idle.</p></div>
+    <div class="sb"><h4>useId</h4><p>Generates a stable unique ID that matches between server and client renders (avoiding hydration mismatches from incrementing counters). Solves the SSR accessibility ID problem for form inputs and ARIA attributes.</p></div>
+    <div class="sb"><h4>Suspense for data</h4><p>Components can throw a Promise; Suspense catches it and shows fallback until the Promise resolves. Previously only usable with React.lazy (code splitting). React 18 enables data-fetching frameworks (Next.js, Relay) to integrate with Suspense boundaries.</p></div>
+    <div class="sb"><h4>Streaming SSR</h4><p>renderToPipeableStream allows the server to stream HTML progressively. Suspense boundaries that aren't ready are sent as fallbacks; when data resolves, the resolved HTML is streamed and replaces the fallback via a script tag. True streaming, not just blocking HTML generation.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Automatic batching — React 18</span>
+<span class="kw">async function</span> <span class="fn">handleSubmit</span>() {
+  <span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">submitForm</span>(data);
+  <span class="cm">// React 17: two separate re-renders below</span>
+  <span class="cm">// React 18: batched into ONE re-render ✓</span>
+  <span class="fn">setSubmitting</span>(<span class="kw">false</span>);
+  <span class="fn">setResult</span>(result);
+}
+
+<span class="cm">// startTransition — keep input responsive during slow render</span>
+<span class="kw">function</span> <span class="fn">SearchInput</span>() {
+  <span class="kw">const</span> [query, setQuery] = <span class="fn">useState</span>(<span class="str">''</span>);
+  <span class="kw">const</span> [results, setResults] = <span class="fn">useState</span>([]);
+
+  <span class="kw">function</span> <span class="fn">handleChange</span>(e) {
+    setQuery(e.target.value);               <span class="cm">// Urgent: update input immediately</span>
+    <span class="fn">startTransition</span>(() => {
+      <span class="fn">setResults</span>(<span class="fn">filterResults</span>(e.target.value)); <span class="cm">// Non-urgent: can be interrupted</span>
+    });
+  }
+  <span class="cm">// If user types fast: input update runs, transition renders discard + restart</span>
+  <span class="cm">// Input field stays responsive; results may lag but never block typing</span>
+}
+
+<span class="cm">// useDeferredValue — defer a prop you don't control</span>
+<span class="kw">function</span> <span class="fn">ResultList</span>({ query }) {
+  <span class="kw">const</span> deferredQuery = <span class="fn">useDeferredValue</span>(query);
+  <span class="cm">// React renders ResultList twice:</span>
+  <span class="cm">// 1st: synchronous render with old deferredQuery (fast, no flicker)</span>
+  <span class="cm">// 2nd: deferred render with new query when idle</span>
+  <span class="kw">const</span> items = <span class="fn">useMemo</span>(() => <span class="fn">expensiveFilter</span>(deferredQuery), [deferredQuery]);
+  <span class="cm">// Show stale=dimmed while deferred render is in progress</span>
+  <span class="kw">const</span> isStale = query !== deferredQuery;
+  <span class="kw">return</span> &lt;div style={{ opacity: isStale ? <span class="num">0.5</span> : <span class="num">1</span> }&gt;{items}&lt;/div&gt;;
+}
+
+<span class="cm">// Suspense for data (framework integration)</span>
+<span class="kw">function</span> <span class="fn">UserProfile</span>({ userId }) {
+  <span class="cm">// use() (React 19) or Relay/Next.js data integrations throw Promises</span>
+  <span class="kw">const</span> user = <span class="fn">use</span>(<span class="fn">fetchUser</span>(userId)); <span class="cm">// Suspends until resolved</span>
+  <span class="kw">return</span> &lt;h1&gt;{user.name}&lt;/h1&gt;;
+}
+<span class="cm">// Parent wraps with Suspense boundary:</span>
+<span class="cm">&lt;Suspense fallback={&lt;Skeleton /&gt;}&gt;&lt;UserProfile userId={id} /&gt;&lt;/Suspense&gt;</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using <code>startTransition</code> for urgent updates — only wrap updates that produce a heavy, interruptible render. Navigation, form submissions, and input changes should remain urgent (SyncLane). Only filter/sort/search result rendering is a good transition candidate.</div>
+  <div class="mst">Not migrating to <code>createRoot</code> from <code>ReactDOM.render</code> — concurrent features are entirely disabled in legacy render mode. The migration is one line change but is a prerequisite for React 18 features.</div>
+  <div class="mst">Using <code>useDeferredValue</code> without <code>useMemo</code> — <code>useDeferredValue</code> gives you a stale value, but if the component re-renders with the deferred value and the computation isn't memoized, you lose the performance benefit. Always pair <code>useDeferredValue</code> with <code>useMemo</code>.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between startTransition and useDeferredValue?"</div><div class="d">startTransition wraps a state setter call — use when you control the state. useDeferredValue wraps a value — use when you receive a prop you don't control. Both mark work as low-priority and interruptible. useDeferredValue also gives you the stale value for use during the pending render, allowing you to show the old result dimmed.</div></div>
+  <div class="iq"><div class="q">"How does automatic batching work in React 18 and what changed from 17?"</div><div class="d">React 17: batching only in synchronous event handlers. Inside setTimeout, Promises, async handlers — each setState triggered a separate render. React 18: all setState calls are batched regardless of where they occur. Achieved by React 18 tracking "execution context" more broadly via the Scheduler. Use flushSync() to opt out of batching when needed.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Fiber lanes (mechanism behind startTransition)</span>
+    <span class="pill pq">Streaming SSR (renderToPipeableStream)</span>
+    <span class="pill pc">Cooperative scheduling (OS analogy)</span>
+    <span class="pill pq">Next.js App Router (built on React 18 streaming)</span>
+  </div>
+</div>
+
+<div class="topic" id="t7">
+  <div class="tnum">Topic 8 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">Context API performance</h1>
+  <div class="tags"><span class="tag tg">Consumer re-renders</span><span class="tag td">Context splitting</span><span class="tag tp">Zustand tradeoff</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">React Context provides a way to pass values through the component tree without prop drilling. However, Context has a critical performance characteristic: when a context value changes, <strong>every consumer of that context re-renders</strong>, regardless of whether the part of the value they use actually changed. This is not a bug — it's a consequence of how Context compares values (single <code>Object.is</code> on the context value object). A single context containing both frequently-changing and rarely-changing data will cause unnecessary re-renders of all consumers on every change.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">React propagates context changes by walking the fiber tree from the Provider downward. When it finds a fiber that consumes the context (has <code>useContext</code> or <code>Context.Consumer</code>), it marks that fiber as having pending work and schedules a re-render. The comparison is <code>Object.is(prevContextValue, newContextValue)</code> — a single reference comparison on the whole context value. This means if you do <code>value={{ user, settings }}</code> in JSX, a new object is created every render — all consumers re-render every time the Provider's parent renders, even if <code>user</code> and <code>settings</code> haven't changed. React does skip subtrees that are between the Provider and consumer if they're bailed out via memo — but the consumer itself always re-renders when the context value reference changes.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>The re-render problem</h4><p>All consumers of a context re-render when the context value changes. There's no selector mechanism built into React Context (unlike Redux useSelector). Every consumer gets the full value and must re-render to "see" it, even if the specific field it reads hasn't changed.</p></div>
+    <div class="sb"><h4>Context splitting</h4><p>Separate frequently-changing values (e.g. current user's notification count) from rarely-changing values (e.g. theme, locale) into different contexts. Consumers subscribe only to the context they need — theme consumers don't re-render when notification count updates.</p></div>
+    <div class="sb"><h4>Stable value reference</h4><p>Memoize the context value with useMemo to avoid re-creating the object on every parent render. Memoize setter functions with useCallback. Without this, every render of the Provider's parent creates a new context value object, triggering all consumers.</p></div>
+    <div class="sb"><h4>State/dispatch split pattern</h4><p>Put mutable state in one context, dispatch (setter) in another. Components that only dispatch never subscribe to state changes — they always have the stable dispatch context value. Pattern popularized by Kent C. Dodds.</p></div>
+    <div class="sb"><h4>Zustand vs Context</h4><p>Zustand uses an external store with selector-based subscriptions. Components subscribe to slices of state; they only re-render when their specific slice changes. No Provider needed. Better for frequently-changing global state. Context better for static/near-static config (theme, locale, auth user).</p></div>
+    <div class="sb"><h4>use(Context) in React 19</h4><p>The new use() API allows reading Context inside conditional logic (unlike useContext). Doesn't change the re-render behavior — all consumers still re-render on value change. Adds ergonomic flexibility, not performance improvement.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ❌ One large context — all consumers re-render on ANY change</span>
+<span class="kw">const</span> <span class="cl">AppContext</span> = <span class="fn">createContext</span>();
+<span class="kw">function</span> <span class="fn">AppProvider</span>({ children }) {
+  <span class="kw">const</span> [user, setUser] = <span class="fn">useState</span>(null);
+  <span class="kw">const</span> [theme, setTheme] = <span class="fn">useState</span>(<span class="str">'light'</span>);
+  <span class="kw">const</span> [notifications, setNotifications] = <span class="fn">useState</span>([]);
+  <span class="cm">// New object every render → ALL consumers re-render when notifications update</span>
+  <span class="kw">return</span> &lt;<span class="cl">AppContext</span>.Provider value={{ user, theme, notifications, setUser }}&gt;
+    {children}
+  &lt;/<span class="cl">AppContext</span>.Provider&gt;;
+}
+
+<span class="cm">// ✅ Context splitting + stable refs</span>
+<span class="kw">const</span> <span class="cl">ThemeContext</span> = <span class="fn">createContext</span>();    <span class="cm">// Changes rarely</span>
+<span class="kw">const</span> <span class="cl">UserContext</span> = <span class="fn">createContext</span>();     <span class="cm">// Changes on login/logout</span>
+<span class="kw">const</span> <span class="cl">NotifContext</span> = <span class="fn">createContext</span>();    <span class="cm">// Changes frequently</span>
+
+<span class="kw">function</span> <span class="fn">NotifProvider</span>({ children }) {
+  <span class="kw">const</span> [notifs, setNotifs] = <span class="fn">useState</span>([]);
+  <span class="cm">// useMemo prevents new value object on unrelated parent re-renders</span>
+  <span class="kw">const</span> value = <span class="fn">useMemo</span>(() => ({ notifs, setNotifs }), [notifs]);
+  <span class="kw">return</span> &lt;<span class="cl">NotifContext</span>.Provider value={value}&gt;{children}&lt;/<span class="cl">NotifContext</span>.Provider&gt;;
+}
+<span class="cm">// Theme consumers never re-render when notifs change — different contexts</span>
+
+<span class="cm">// Zustand — selector-based subscriptions</span>
+<span class="kw">const</span> useStore = <span class="fn">create</span>((set) => ({
+  user: null, count: <span class="num">0</span>,
+  increment: () => <span class="fn">set</span>(s => ({ count: s.count + <span class="num">1</span> })),
+}));
+<span class="cm">// Only re-renders when `count` changes, not when `user` changes</span>
+<span class="kw">const</span> count = <span class="fn">useStore</span>(state => state.count);
+<span class="cm">// Shallow selector: only re-renders when selected slice changes by Object.is</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Passing an inline object as context value: <code>value={{ user, setUser }}</code> — creates a new object reference on every Provider render, causing all consumers to re-render. Always memoize the context value object.</div>
+  <div class="mst">Using Context as a replacement for all state management. Context is a propagation mechanism, not a state management system. It has no batching, no selectors, no devtools, no derived state. Use for genuinely global, infrequently-changing values.</div>
+  <div class="mst">Wrapping the entire app in a single Provider that holds all state — the "God context" anti-pattern. Every state change re-renders every consumer in the entire app.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Why does React Context cause performance issues and how do you fix them?"</div><div class="d">Context uses a single Object.is comparison on the value — any reference change triggers all consumers to re-render. Fix: (1) split into multiple contexts by change frequency, (2) memoize the value object, (3) split state and dispatch into separate contexts, (4) consider Zustand for frequently-changing shared state that needs subscriptions.</div></div>
+  <div class="iq"><div class="q">"When would you choose Zustand over React Context?"</div><div class="d">When state changes frequently (counters, real-time data, filters), when you need selector subscriptions (only re-render when specific slice changes), when you want devtools integration, or when Context re-render propagation is causing measurable performance issues. Context remains appropriate for theme, locale, auth user, and feature flags.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pc">React.memo (stops context propagation at memoized boundaries)</span>
+    <span class="pill pq">useMemo for stable value objects</span>
+    <span class="pill pq">Zustand / Jotai / Recoil (external store patterns)</span>
+    <span class="pill pq">Redux useSelector (inspiration for Zustand slices)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 7–9 complete ───</div>
+
+<div class="topic" id="t8">
+  <div class="tnum">Topic 9 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">Server components vs client components</h1>
+  <div class="tags"><span class="tag tg">RSC</span><span class="tag tp">Serialization boundary</span><span class="tag tw">Zero bundle</span><span class="tag ti">Composition</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">React Server Components (RSC) is an architecture where components are divided by where they execute: <strong>server components</strong> run only on the server (or at build time), have direct access to databases, file systems, and secrets, and their output is serialized as a special RSC payload — not HTML, not JSON, but a React-specific format that includes rendered subtrees and references to client component placeholders. <strong>Client components</strong> are traditional React components that run in the browser, can use hooks, event handlers, and browser APIs. The boundary between them is explicit: a <code>"use client"</code> directive at the top of a file marks it as a client component. The architectural shift is from "component as a JavaScript unit" to "component as a rendering location" — some components live exclusively on the server and ship zero JavaScript to the client.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">The RSC protocol defines a serialized wire format (the "RSC payload") that the server sends to the client. This is not HTML — it's a streaming JSON-like format that describes the React tree, distinguishing server-rendered subtrees (sent as pre-rendered markup) from client component boundaries (sent as references to client component modules + their props). The client React runtime receives this payload and hydrates only the client components — server component subtrees are never re-executed on the client. Props passed across the server-client boundary must be <strong>serializable</strong>: JSON-compatible values, Promises, and special objects like Blobs. Functions (closures) and class instances cannot cross the boundary — they're not serializable. The <code>"use client"</code> directive triggers the bundler (webpack/turbopack) to mark that module as a client boundary: the bundler ships the module to the client bundle and replaces the import in the server bundle with a reference placeholder.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Server component capabilities</h4><p>Direct database/ORM queries, file system access, environment secrets, async/await at the component level, access to server-only modules. No hooks, no event handlers, no browser APIs, no component state.</p></div>
+    <div class="sb"><h4>Client component capabilities</h4><p>useState, useEffect, event handlers (onClick, onChange), browser APIs (window, localStorage, geolocation), real-time data (WebSocket, EventSource). Cannot directly access database or secrets. Marked with "use client".</p></div>
+    <div class="sb"><h4>Serialization boundary</h4><p>Props crossing server→client boundary must be serializable: strings, numbers, arrays, plain objects, Dates, Promises. Functions (including event handlers) cannot be serialized. Server actions ("use server") are the mechanism for server-side mutations triggered by client events.</p></div>
+    <div class="sb"><h4>Server actions</h4><p>Functions marked "use server" can be called from client components — they're serialized as a POST request to a server endpoint. Enables form actions, mutations, and RPC-style calls without manually writing API routes.</p></div>
+    <div class="sb"><h4>Composition pattern</h4><p>Server components can pass client components as children (via props.children). This allows interleaving: &lt;ServerWrapper&gt;&lt;ClientInteractive /&gt;&lt;/ServerWrapper&gt;. The server component renders the wrapper; the client component handles interactivity. Critical pattern for performance.</p></div>
+    <div class="sb"><h4>Zero JS for server components</h4><p>Server components ship no JavaScript to the client browser. A complex data-fetching component that renders a table from a DB query contributes 0 bytes to the client bundle. Only "use client" modules are bundled and shipped.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Server component — no "use client", runs only on server</span>
+<span class="cm">// app/dashboard/page.tsx (Next.js App Router)</span>
+<span class="kw">async function</span> <span class="fn">DashboardPage</span>() {
+  <span class="cm">// Direct DB access — no API route needed, no exposed secret</span>
+  <span class="kw">const</span> metrics = <span class="kw">await</span> db.query(<span class="str">`SELECT * FROM metrics WHERE date > NOW() - INTERVAL '7d'`</span>);
+  <span class="cm">// Ships ZERO JS to client — this component doesn't exist in the browser bundle</span>
+  <span class="kw">return</span> (
+    &lt;main&gt;
+      &lt;<span class="cl">MetricsTable</span> data={metrics} /&gt;   {<span class="cm">/* Also a server component */</span>}
+      &lt;<span class="cl">FilterControls</span> /&gt;               {<span class="cm">/* "use client" — client component */</span>}
+    &lt;/main&gt;
+  );
+}
+
+<span class="cm">// Client component — marked explicitly</span>
+<span class="str">"use client"</span>;
+<span class="kw">function</span> <span class="fn">FilterControls</span>() {
+  <span class="kw">const</span> [filter, setFilter] = <span class="fn">useState</span>(<span class="str">'all'</span>); <span class="cm">// ✓ Hooks allowed</span>
+  <span class="kw">return</span> &lt;select onChange={e => <span class="fn">setFilter</span>(e.target.value)}&gt;...&lt;/select&gt;;
+}
+
+<span class="cm">// ❌ Cannot pass function across boundary</span>
+<span class="cm">// Server component trying to pass callback to client:</span>
+<span class="cm">// &lt;ClientButton onClick={() => doServerThing()} /&gt; — TypeError, not serializable</span>
+
+<span class="cm">// ✅ Server action instead</span>
+<span class="str">"use server"</span>;
+<span class="kw">async function</span> <span class="fn">deleteItem</span>(id: <span class="cl">string</span>) {
+  <span class="kw">await</span> db.<span class="fn">delete</span>(<span class="str">'items'</span>, id);
+}
+<span class="cm">// Client component:</span>
+<span class="str">"use client"</span>;
+<span class="kw">import</span> { deleteItem } <span class="kw">from</span> <span class="str">'./actions'</span>; <span class="cm">// Becomes a POST request</span>
+&lt;button onClick={() => <span class="fn">deleteItem</span>(id)}&gt;Delete&lt;/button&gt;
+
+<span class="cm">// Composition: server component wrapping client component</span>
+<span class="kw">async function</span> <span class="fn">ServerCard</span>({ userId }) {
+  <span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">fetchUser</span>(userId);  <span class="cm">// Server-side</span>
+  <span class="kw">return</span> &lt;<span class="cl">InteractiveCard</span> name={user.name}&gt; <span class="cm">// Props must serialize</span>
+    &lt;<span class="cl">ClientActions</span> userId={userId} /&gt;      <span class="cm">// Client component as child ✓</span>
+  &lt;/<span class="cl">InteractiveCard</span>&gt;;
+}</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Trying to pass non-serializable props across the server/client boundary — functions, class instances, Map/Set objects, React component references. The bundler and runtime will throw. Design the boundary around serializable data shapes.</div>
+  <div class="mst">Marking too many components as "use client" — entire component trees become client-side, losing the benefits of RSC. The "use client" directive marks a boundary; everything imported from that file is also a client component. Push client boundaries as far down the tree as possible.</div>
+  <div class="mst">Confusing RSC with SSR — SSR renders HTML on the server for the initial load, then hydrates to make it interactive. RSC is a persistent server-rendered component model where components <em>never</em> ship JS to the client. Both can be used together (and are in Next.js App Router).</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between a React Server Component and SSR?"</div><div class="d">SSR renders components to HTML on the server for every request, then ships the same component's JS to the client for hydration. RSC components run only on the server, ship no JS to the client, and output a special RSC payload rather than HTML. They can be composed with client components. RSC reduces client bundle size; SSR improves initial HTML delivery. Next.js App Router uses both.</div></div>
+  <div class="iq"><div class="q">"What can and cannot cross the server/client boundary?"</div><div class="d">Can cross: strings, numbers, arrays, plain objects, Dates, Promises (for Suspense), JSX (children prop). Cannot cross: functions, class instances, Map/Set, non-serializable objects, React hooks. Server actions (use server) are the escape hatch for calling server logic from client events.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Next.js App Router (primary RSC implementation)</span>
+    <span class="pill pq">Suspense streaming (RSC + Suspense = progressive loading)</span>
+    <span class="pill pc">Serialization (structured clone, JSON)</span>
+    <span class="pill pc">HTTP/2 server push analogy</span>
+    <span class="pill pq">Server actions (RPC-style mutations)</span>
+  </div>
+</div>
+
+<div class="topic" id="t9">
+  <div class="tnum">Topic 10 of 10 — Block 3: React Internals</div>
+  <h1 class="ttl">React rendering patterns</h1>
+  <div class="tags"><span class="tag tg">CSR</span><span class="tag tp">SSR</span><span class="tag tw">SSG</span><span class="tag ti">ISR</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Rendering pattern describes where and when a React application's HTML is generated. This fundamentally determines performance characteristics (TTFB, LCP, TTI), data freshness, infrastructure requirements, and SEO behavior. The four canonical patterns form a spectrum from fully dynamic to fully static: <strong>CSR</strong> (client-side rendering — browser builds HTML from JS), <strong>SSR</strong> (server-side rendering — server generates HTML per request), <strong>SSG</strong> (static site generation — HTML generated at build time), and <strong>ISR</strong> (incremental static regeneration — SSG with background revalidation). In Next.js App Router, these are no longer page-level choices — they're per-fetch decisions, enabling individual components to use different data strategies.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>CSR (Client-Side Rendering)</h4><p>Server sends empty HTML + JS bundle. Browser downloads, parses, executes JS, fetches data, renders HTML. <strong>TTFB is fast</strong> (tiny HTML), but LCP is slow (waits for JS + data). No SEO for crawlers that don't execute JS. Suits SPAs, dashboards, auth-gated pages where SEO doesn't matter.</p></div>
+    <div class="sb"><h4>SSR (Server-Side Rendering)</h4><p>Server generates full HTML per request, sends to browser. Fast FCP and LCP. TTFB depends on server render time. JS hydration still needed for interactivity (TTI may lag behind LCP = "uncanny valley"). Suits highly dynamic, user-personalized pages.</p></div>
+    <div class="sb"><h4>SSG (Static Site Generation)</h4><p>HTML generated at build time, served from CDN. Near-zero TTFB (CDN edge). Best possible LCP. Zero server compute per request. Data can be stale (as old as last build). Suits content that changes infrequently: blogs, docs, marketing pages.</p></div>
+    <div class="sb"><h4>ISR (Incremental Static Regeneration)</h4><p>SSG pages are revalidated in the background after a TTL expires. First request after TTL: serves stale HTML, triggers background regeneration. Next request: gets fresh HTML. stale-while-revalidate at the page level. Suits e-commerce product pages, news articles, prices.</p></div>
+    <div class="sb"><h4>Partial prerendering (PPR)</h4><p>Next.js 14+ experimental. A page renders a static shell at build time (fast, cacheable) with Suspense boundaries as dynamic holes. Dynamic holes are streamed in per-request. Best of SSG + SSR in one page.</p></div>
+    <div class="sb"><h4>Hydration &amp; TTI gap</h4><p>SSR/SSG send pre-rendered HTML (good FCP/LCP) but the page is not interactive until hydration completes (JS downloaded, parsed, React tree reconciled). During this gap the page looks ready but doesn't respond to clicks. Large JS bundles worsen this gap.</p></div>
+  </div>
+
+  <div class="sl">Performance implications per pattern</div>
+  <div class="g2">
+    <div class="sb"><h4>TTFB</h4><p>SSG/ISR: ~10ms (CDN edge). CSR: ~50ms (tiny HTML, fast network). SSR: 200ms–2s (server render time + network). PPR: ~10ms (static shell from CDN).</p></div>
+    <div class="sb"><h4>LCP</h4><p>SSG best (pre-rendered, CDN). SSR good (full HTML on arrival). CSR worst (JS must load and run first). ISR = SSG after first revalidation cycle.</p></div>
+    <div class="sb"><h4>TTI</h4><p>CSR: worst (all JS upfront). SSR/SSG with small bundles: best. Code splitting + streaming SSR reduces the hydration cost. RSC reduces bundle size (zero JS for server components).</p></div>
+    <div class="sb"><h4>Data freshness</h4><p>SSR: always fresh (per-request). ISR: stale up to TTL. SSG: stale until rebuild. CSR: fresh on each client-side fetch. ISR + manual revalidation (on-demand ISR) = fresh on content change.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Next.js App Router — per-fetch rendering strategy</span>
+
+<span class="cm">// SSG: no-store = never cache, cache: 'force-cache' = build-time cache</span>
+<span class="kw">const</span> staticData = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/static'</span>, {
+  cache: <span class="str">'force-cache'</span>     <span class="cm">// SSG — cached at build time, served from CDN</span>
+});
+
+<span class="cm">// ISR: revalidate after N seconds (stale-while-revalidate)</span>
+<span class="kw">const</span> isrData = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/products'</span>, {
+  next: { revalidate: <span class="num">60</span> }  <span class="cm">// Revalidate every 60s in background</span>
+});
+
+<span class="cm">// SSR: no-store = always fresh, bypass all caches</span>
+<span class="kw">const</span> dynamicData = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/user-cart'</span>, {
+  cache: <span class="str">'no-store'</span>         <span class="cm">// SSR — fresh on every request</span>
+});
+
+<span class="cm">// On-demand ISR revalidation — trigger rebuild from webhook</span>
+<span class="cm">// app/api/revalidate/route.ts</span>
+<span class="kw">import</span> { revalidatePath, revalidateTag } <span class="kw">from</span> <span class="str">'next/cache'</span>;
+<span class="kw">export async function</span> <span class="fn">POST</span>(req) {
+  <span class="fn">revalidateTag</span>(<span class="str">'products'</span>); <span class="cm">// Invalidate all fetches tagged 'products'</span>
+  <span class="kw">return</span> <span class="cl">Response</span>.<span class="fn">json</span>({ revalidated: <span class="kw">true</span> });
+}
+<span class="cm">// CMS webhook calls this on content publish → pages rebuild on next request</span>
+
+<span class="cm">// CSR — still valid in App Router with "use client" + useEffect</span>
+<span class="str">"use client"</span>;
+<span class="kw">function</span> <span class="fn">Dashboard</span>() {
+  <span class="kw">const</span> { data } = <span class="fn">useSWR</span>(<span class="str">'/api/realtime-metrics'</span>, <span class="fn">fetcher</span>, {
+    refreshInterval: <span class="num">5000</span>  <span class="cm">// Client-side polling for real-time data</span>
+  });
+}</pre></div>
+
+  <div class="sl">Trade-offs decision matrix</div>
+  <div class="g2">
+    <div class="sb"><h4>Use SSG/ISR when</h4><p>Content is the same for all users. Can tolerate some staleness. Need maximum performance and low cost. Examples: product catalog, documentation, marketing pages, blog posts.</p></div>
+    <div class="sb"><h4>Use SSR when</h4><p>Page is personalized per user (session data, cart, permissions). Data must be real-time fresh. SEO matters. Examples: user dashboards, checkout, search results with personalization.</p></div>
+    <div class="sb"><h4>Use CSR when</h4><p>Auth-gated content (no SEO needed). Highly interactive UIs where data changes in real-time (trading apps, live collaboration). Content that's meaningless without JS anyway.</p></div>
+    <div class="sb"><h4>Use PPR when</h4><p>Page has a cacheable shell (header, layout, non-personalized sections) with dynamic holes (cart count, user name, personalized content). Best of both worlds — static speed with dynamic content.</p></div>
+  </div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using SSR for content that's the same for all users — wastes server compute on every request. Static generation + CDN is always faster and cheaper for shared content.</div>
+  <div class="mst">Using SSG for user-personalized content — SSG can't vary per user at CDN level (without edge functions). Using SSG for cart pages or dashboards causes incorrect/empty content at CDN edges.</div>
+  <div class="mst">Ignoring the hydration TTI gap with SSR — SSR gives fast FCP but if the JS bundle is large, the page looks interactive but isn't for several seconds. This is worse UX than a slow-loading CSR app that only shows content when it's actually interactive.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"When would you choose SSR over SSG for a Next.js page?"</div><div class="d">SSR when content is user-specific (session-dependent), requires real-time data, or when the page changes faster than builds can keep up. SSG when content is shared across users and can tolerate some staleness. ISR bridges the gap: static speed + periodic freshness. In App Router, the decision is per-fetch, not per-page.</div></div>
+  <div class="iq"><div class="q">"What is the hydration gap and how does it affect UX?"</div><div class="d">SSR/SSG delivers pre-rendered HTML quickly (fast FCP/LCP), but the page is not interactive until React hydrates it (JS bundle downloaded, parsed, component tree reconciled). During this gap, the page appears ready but ignores clicks/inputs. Reduce it with: smaller JS bundles, streaming SSR, selective hydration (Suspense), and RSC (removes server component JS from bundle).</div></div>
+  <div class="iq"><div class="q">"Design the rendering strategy for an e-commerce product page."</div><div class="d">Product details (shared across users): ISR with 60s revalidation + on-demand revalidation from CMS webhook. Product images: CDN-cached SSG. Personalized section (cart count, recommended): client-side hydrated or PPR dynamic hole. Inventory/pricing: could be ISR or SSR depending on how quickly it changes. Reviews: ISR. Checkout flow: SSR (session data required).</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Critical rendering path (LCP, TTFB, TTI)</span>
+    <span class="pill pq">CDN edge caching (stale-while-revalidate)</span>
+    <span class="pill pq">Partial Prerendering (Next.js 14+)</span>
+    <span class="pill pq">React Server Components (zero-JS static layer)</span>
+    <span class="pill pc">HTTP cache headers (s-maxage, stale-while-revalidate)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── All 10 topics complete · Block 3 done ───</div>
+
+</main>
+</div>
+
+<script>
+function show(idx,el){
+  document.querySelectorAll('.topic').forEach(t=>t.classList.remove('visible'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('t'+idx).classList.add('visible');
+  el.classList.add('active');
+  document.querySelector('.content').scrollTop=0;
+}
+</script>

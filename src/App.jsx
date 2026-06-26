@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { CATEGORIES, ALL_CHAPTERS as CHAPTERS } from './data/topics'
 import { getDocsUrl } from './data/docsMap'
+import { HTML_SECTIONS, hasTheory } from './data/htmlContent'
+import { DSA_QUESTIONS, JAVA_QUESTIONS } from './data/questions'
+import FlashcardManager from './components/FlashcardManager'
+import StaticContentViewer from './components/StaticContentViewer'
+import InterviewWhiteboard from './components/InterviewWhiteboard'
 import { supabase, signInWithGoogle, signInWithGitHub, signOut } from './services/supabaseClient'
 import {
   generateChapterContent,
@@ -34,6 +39,9 @@ const PROGRESS_KEY = 'enginex_progress'
 const NOTES_KEY    = 'enginex_notes'
 const STREAK_KEY   = 'enginex_streak'
 const THEME_KEY    = 'enginex_theme'
+
+// Questions per category
+const QUESTIONS_MAP = { DSA: DSA_QUESTIONS, Java: JAVA_QUESTIONS }
 
 function loadNotes() {
   try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '{}') } catch { return {} }
@@ -604,8 +612,349 @@ function ChapterCard({ chapter, progress, onClick }) {
   )
 }
 
+// HtmlViewer removed — StaticContentViewer handles theory content inline
+
+// ─── Difficulty badge ─────────────────────────────────────────────────────────
+function DiffBadge({ difficulty }) {
+  const colors = { Easy: 'var(--accent-green)', Medium: 'var(--accent-yellow)', Hard: 'var(--accent-red)' }
+  return (
+    <span style={{
+      fontFamily: 'var(--font-mono)', fontSize: '0.68rem', letterSpacing: 1,
+      padding: '2px 8px', borderRadius: 4,
+      color: colors[difficulty] || 'var(--text-muted)',
+      border: `1px solid ${colors[difficulty] || 'var(--border-color)'}33`,
+      background: `${colors[difficulty] || 'var(--border-color)'}10`,
+    }}>
+      {difficulty}
+    </span>
+  )
+}
+
+// ─── Questions Panel (DSA coding problems + Java conceptual Q&A) ──────────────
+function QuestionsPanel({ questions = [], type = 'dsa' }) {
+  const [filter, setFilter]   = useState('ALL')
+  const [selected, setSelected] = useState(null)
+  const [showHint, setShowHint]  = useState(false)
+  const [showSol, setShowSol]    = useState(false)
+  const [showWb, setShowWb]      = useState(false)
+
+  const filtered = filter === 'ALL' ? questions : questions.filter(q => q.difficulty === filter)
+
+  const openQ = (q) => { setSelected(q); setShowHint(false); setShowSol(false); setShowWb(false) }
+
+  if (selected) {
+    return (
+      <div style={{ maxWidth: 820, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+          <button className="btn-console" onClick={() => setSelected(null)} style={{ padding: '5px 12px', fontSize: '0.78rem' }}>
+            ← QUESTIONS
+          </button>
+          <DiffBadge difficulty={selected.difficulty} />
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--accent-cyan)', border: '1px solid rgba(0,212,255,0.2)', padding: '2px 8px', borderRadius: 4 }}>
+            {selected.topic}
+          </span>
+          <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', flex: 1 }}>
+            {selected.title}
+          </h2>
+        </div>
+
+        {/* DSA problem layout */}
+        {type === 'dsa' && (
+          <>
+            <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '20px 24px', marginBottom: 16 }}>
+              <p style={{ color: 'var(--text-primary)', lineHeight: 1.7, marginBottom: 16 }}>{selected.description}</p>
+              {selected.examples.map((ex, i) => (
+                <div key={i} style={{ marginBottom: 12 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 4 }}>Example {i + 1}</div>
+                  <div style={{ background: 'var(--bg-primary)', borderRadius: 4, padding: '10px 14px', fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>
+                    <div><span style={{ color: 'var(--accent-cyan)' }}>Input: </span><span style={{ color: 'var(--text-secondary)' }}>{ex.input}</span></div>
+                    <div><span style={{ color: 'var(--accent-green)' }}>Output: </span><span style={{ color: 'var(--text-secondary)' }}>{ex.output}</span></div>
+                    {ex.explanation && <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{ex.explanation}</div>}
+                  </div>
+                </div>
+              ))}
+              {selected.constraints?.length > 0 && (
+                <div style={{ marginTop: 12 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 6, letterSpacing: 1 }}>CONSTRAINTS</div>
+                  <ul style={{ paddingLeft: 20, color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.8 }}>
+                    {selected.constraints.map((c, i) => <li key={i}>{c}</li>)}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Hints */}
+            <div style={{ marginBottom: 12 }}>
+              <button
+                className="btn-console"
+                onClick={() => setShowHint(h => !h)}
+                style={{ padding: '6px 14px', fontSize: '0.78rem', borderColor: 'var(--accent-yellow)', color: 'var(--accent-yellow)' }}
+              >
+                {showHint ? '▼ HIDE HINTS' : '▶ SHOW HINTS'}
+              </button>
+              {showHint && (
+                <div style={{ marginTop: 10, background: 'rgba(255,204,0,0.05)', border: '1px solid rgba(255,204,0,0.2)', borderRadius: 6, padding: '14px 18px' }}>
+                  {selected.hints.map((h, i) => (
+                    <div key={i} style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.7, marginBottom: i < selected.hints.length - 1 ? 8 : 0 }}>
+                      <span style={{ color: 'var(--accent-yellow)', fontFamily: 'var(--font-mono)' }}>#{i + 1}</span> {h}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Solution */}
+            <div>
+              <button
+                className="btn-console btn-console-success"
+                onClick={() => setShowSol(s => !s)}
+                style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+              >
+                {showSol ? '▼ HIDE SOLUTION' : '▶ REVEAL SOLUTION'}
+              </button>
+              {showSol && (
+                <div style={{ marginTop: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '20px 24px' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: 1, marginBottom: 8 }}>APPROACH</div>
+                  <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 16 }}>{selected.solution.approach}</p>
+                  <div style={{ background: 'var(--bg-primary)', borderRadius: 6, padding: '14px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-primary)', whiteSpace: 'pre', overflowX: 'auto', marginBottom: 14, lineHeight: 1.6, border: '1px solid var(--border-color)' }}>
+                    {selected.solution.code}
+                  </div>
+                  <div style={{ display: 'flex', gap: 16, fontFamily: 'var(--font-mono)', fontSize: '0.78rem' }}>
+                    <span><span style={{ color: 'var(--text-muted)' }}>Time: </span><span style={{ color: 'var(--accent-cyan)' }}>{selected.solution.complexity.time}</span></span>
+                    <span><span style={{ color: 'var(--text-muted)' }}>Space: </span><span style={{ color: 'var(--accent-cyan)' }}>{selected.solution.complexity.space}</span></span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Java Q&A layout */}
+        {type === 'java' && (
+          <>
+            <div style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 8, padding: '20px 24px', marginBottom: 16 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--accent-cyan)', letterSpacing: 1, marginBottom: 10 }}>QUESTION</div>
+              <p style={{ color: 'var(--text-primary)', fontSize: '1rem', fontWeight: 500, lineHeight: 1.6 }}>{selected.question}</p>
+            </div>
+
+            <button
+              className="btn-console btn-console-success"
+              onClick={() => setShowSol(s => !s)}
+              style={{ padding: '6px 14px', fontSize: '0.78rem', marginBottom: 12 }}
+            >
+              {showSol ? '▼ HIDE ANSWER' : '▶ REVEAL ANSWER'}
+            </button>
+
+            {showSol && (
+              <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '20px 24px' }}>
+                {selected.answer.split('\n\n').map((para, i) => (
+                  <p key={i} style={{ color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: 12, whiteSpace: 'pre-wrap' }}>
+                    {para}
+                  </p>
+                ))}
+                {selected.keyPoints?.length > 0 && (
+                  <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(0,255,102,0.05)', border: '1px solid rgba(0,255,102,0.2)', borderRadius: 6 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--accent-green)', letterSpacing: 1, marginBottom: 8 }}>KEY POINTS</div>
+                    <ul style={{ paddingLeft: 18, color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.8 }}>
+                      {selected.keyPoints.map((p, i) => <li key={i}>{p}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {selected.codeExample && (
+                  <div style={{ marginTop: 14, background: 'var(--bg-primary)', borderRadius: 6, padding: '14px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-primary)', whiteSpace: 'pre', overflowX: 'auto', border: '1px solid var(--border-color)', lineHeight: 1.6 }}>
+                    {selected.codeExample}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ── Interview Whiteboard ── */}
+        <div style={{ marginTop: 28 }}>
+          <button
+            className="btn-console"
+            onClick={() => setShowWb(w => !w)}
+            style={{ padding: '6px 14px', fontSize: '0.78rem', borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' }}
+          >
+            {showWb ? '▼ CLOSE WHITEBOARD' : '▶ OPEN WHITEBOARD'}
+          </button>
+          {showWb && (
+            <div style={{ marginTop: 14 }}>
+              <InterviewWhiteboard
+                questionId={selected.id}
+                question={type === 'dsa' ? selected.description : selected.question}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {/* Difficulty filter */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+        {['ALL', 'Easy', 'Medium', 'Hard'].map(d => (
+          <button
+            key={d}
+            onClick={() => setFilter(d)}
+            style={{
+              background: filter === d ? 'var(--accent-cyan)' : 'var(--bg-secondary)',
+              color: filter === d ? 'var(--bg-primary)' : 'var(--text-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 4, padding: '5px 14px', cursor: 'pointer',
+              fontFamily: 'var(--font-mono)', fontSize: '0.78rem', letterSpacing: 0.5,
+              transition: 'all 0.15s',
+            }}
+          >
+            {d}
+            <span style={{ marginLeft: 6, color: filter === d ? 'var(--bg-primary)' : 'var(--text-muted)', fontSize: '0.7rem' }}>
+              {d === 'ALL' ? questions.length : questions.filter(q => q.difficulty === d).length}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Question list */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {filtered.map((q, idx) => (
+          <button
+            key={q.id}
+            onClick={() => openQ(q)}
+            style={{
+              background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+              borderRadius: 8, padding: '14px 18px', cursor: 'pointer', textAlign: 'left',
+              display: 'flex', alignItems: 'center', gap: 14, transition: 'border-color 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-cyan)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
+          >
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', width: 24, flexShrink: 0 }}>
+              {String(idx + 1).padStart(2, '0')}
+            </span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4, fontSize: '0.95rem' }}>{q.title}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>{q.topic}</div>
+            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              {q.tags.slice(0, 2).map(t => <span key={t} className="tech-tag">{t}</span>)}
+              <DiffBadge difficulty={q.difficulty} />
+            </div>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginLeft: 4 }}>›</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// TheoryPanel removed — replaced by StaticContentViewer component
+
+// ─── Category View (Theory | Questions | Flashcards) ─────────────────────────
+function CategoryView({ category, progress, onOpenChapter, onBack }) {
+  const theoryItems  = HTML_SECTIONS[category.id] || []
+  const questions    = QUESTIONS_MAP[category.id] || []
+  const chaptersInCat = CHAPTERS.filter(c => c.category === category.id)
+  const hasQuestions = questions.length > 0
+  const hasChapters  = chaptersInCat.length > 0
+  const qType        = category.id === 'Java' ? 'java' : 'dsa'
+
+  // Default tab priority: theory → questions → flashcards → chapters
+  const defaultTab = theoryItems.length ? 'theory' : hasQuestions ? 'questions' : 'flashcards'
+  const [activeTab, setActiveTab] = useState(defaultTab)
+
+  const tabs = [
+    theoryItems.length  && { key: 'theory',    label: '📚 Theory',    count: theoryItems.length },
+    hasQuestions        && { key: 'questions',  label: '💡 Questions', count: questions.length },
+    true                && { key: 'flashcards', label: '📌 Flashcards' },
+    hasChapters         && { key: 'chapters',   label: '◈ AI Chapters', count: chaptersInCat.length },
+  ].filter(Boolean)
+
+  const readCount = chaptersInCat.filter(c => progress[c.id]?.read).length
+
+  return (
+    <div>
+      {/* Category Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, flexWrap: 'wrap' }}>
+        <button className="btn-console" onClick={onBack} style={{ padding: '5px 12px', fontSize: '0.78rem' }}>
+          ← LIBRARY
+        </button>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: '1.4rem' }}>{category.icon}</span>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{category.name}</h1>
+          </div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
+            {theoryItems.length > 0 && `${theoryItems.length} guides · `}
+            {questions.length > 0 && `${questions.length} questions · `}
+            {hasChapters && `${readCount}/${chaptersInCat.length} chapters read`}
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 28 }}>
+        {tabs.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: '10px 18px',
+              fontFamily: 'var(--font-mono)', fontSize: '0.82rem', letterSpacing: 0.5,
+              color: activeTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+              borderBottom: `2px solid ${activeTab === tab.key ? 'var(--accent-cyan)' : 'transparent'}`,
+              transition: 'all 0.15s',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            {tab.label}
+            {tab.count !== undefined && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: activeTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)' }}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {activeTab === 'theory' && (
+        <StaticContentViewer categoryId={category.id} />
+      )}
+
+      {activeTab === 'questions' && (
+        <QuestionsPanel questions={questions} type={qType} />
+      )}
+
+      {activeTab === 'flashcards' && (
+        <FlashcardManager section={category.id.toLowerCase().replace(/\s+/g, '-')} />
+      )}
+
+      {activeTab === 'chapters' && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: 20,
+        }}>
+          {chaptersInCat.map(chapter => (
+            <ChapterCard
+              key={chapter.id}
+              chapter={chapter}
+              progress={progress}
+              onClick={() => onOpenChapter(chapter)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Library View ─────────────────────────────────────────────────────────────
-function LibraryView({ progress, onOpenChapter }) {
+function LibraryView({ progress, onOpenChapter, onOpenCategory }) {
   const [activeCategory, setActiveCategory] = useState('ALL')
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('default') // 'default' | 'quiz-asc' | 'quiz-desc' | 'recent'
@@ -634,91 +983,168 @@ function LibraryView({ progress, onOpenChapter }) {
     return 0 // default order
   })
 
+  // When searching, show the chapter grid. Otherwise show the category cards landing page.
+  const showGrid = search.trim().length > 0 || activeCategory !== 'ALL'
+
   return (
-    <div style={{ display: 'flex', gap: 28, minHeight: 'calc(100vh - 120px)' }}>
-      {/* Sidebar */}
-      <div style={{ width: 240, flexShrink: 0 }}>
-        <div style={{ position: 'sticky', top: 24 }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: 2, marginBottom: 12 }}>
-            CATEGORIES
+    <div>
+      {/* Search bar always visible */}
+      <div style={{ marginBottom: 20 }}>
+        <input
+          className="search-bar"
+          type="text"
+          placeholder="🔍  Search chapters, tags, topics..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
+
+      {!showGrid ? (
+        /* ── Category Cards Landing ── */
+        <div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: 2, marginBottom: 16 }}>
+            CHOOSE A TOPIC TO EXPLORE
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <button
-              className={`category-btn ${activeCategory === 'ALL' ? 'active' : ''}`}
-              onClick={() => setActiveCategory('ALL')}
-            >
-              <span>◈</span>
-              <span>All Topics</span>
-              <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                {CHAPTERS.length}
-              </span>
-            </button>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
             {CATEGORIES.map(cat => {
-              const count = CHAPTERS.filter(c => c.category === cat.id).length
-              const completed = CHAPTERS.filter(c => c.category === cat.id && progress[c.id]?.read).length
+              const catChaps  = CHAPTERS.filter(c => c.category === cat.id)
+              const readCount = catChaps.filter(c => progress[c.id]?.read).length
+              const pct       = catChaps.length ? Math.round((readCount / catChaps.length) * 100) : 0
+              const theory    = hasTheory(cat.id)
+              const qCount    = (QUESTIONS_MAP[cat.id] || []).length
+
               return (
                 <button
                   key={cat.id}
-                  className={`category-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                  onClick={() => setActiveCategory(cat.id)}
+                  onClick={() => onOpenCategory(cat)}
+                  style={{
+                    background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+                    borderRadius: 10, padding: '20px', cursor: 'pointer', textAlign: 'left',
+                    display: 'flex', flexDirection: 'column', gap: 12, transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-cyan)'; e.currentTarget.style.boxShadow = '0 0 16px var(--accent-cyan-glow)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.boxShadow = 'none' }}
                 >
-                  <span>{cat.icon}</span>
-                  <span style={{ flex: 1, fontSize: '0.88rem' }}>{cat.name}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: completed === count ? 'var(--accent-green)' : 'var(--text-muted)' }}>
-                    {completed}/{count}
-                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: '1.5rem' }}>{cat.icon}</span>
+                    <div style={{ display: 'flex', gap: 5 }}>
+                      {theory   && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', padding: '2px 6px', borderRadius: 3, background: 'rgba(0,212,255,0.1)', color: 'var(--accent-cyan)', border: '1px solid rgba(0,212,255,0.25)' }}>📚 Theory</span>}
+                      {qCount>0 && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', padding: '2px 6px', borderRadius: 3, background: 'rgba(0,255,102,0.1)', color: 'var(--accent-green)', border: '1px solid rgba(0,255,102,0.25)' }}>💡 Q&A</span>}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem', marginBottom: 4 }}>{cat.name}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      {catChaps.length > 0 ? `${readCount}/${catChaps.length} chapters` : 'Theory & Practice'}
+                      {qCount > 0 && ` · ${qCount} questions`}
+                    </div>
+                  </div>
+                  {catChaps.length > 0 && (
+                    <div className="progress-bar-container" style={{ height: 3 }}>
+                      <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
+                    </div>
+                  )}
                 </button>
               )
             })}
           </div>
-        </div>
-      </div>
 
-      {/* Chapter Grid */}
-      <div style={{ flex: 1 }}>
-        <div style={{ marginBottom: 16 }}>
-          <input
-            className="search-bar"
-            type="text"
-            placeholder="🔍  Search chapters, tags, topics..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+          {/* Quick-access: All chapters */}
+          <div style={{ marginTop: 32, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: 2 }}>
+              OR BROWSE ALL AI CHAPTERS
+            </div>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '4px 10px', cursor: 'pointer', outline: 'none' }}
+            >
+              <option value="default">Default order</option>
+              <option value="recent">Recently viewed</option>
+              <option value="quiz-asc">Score: Low → High</option>
+              <option value="quiz-desc">Score: High → Low</option>
+            </select>
+          </div>
+          {/* Category filter pills */}
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                style={{
+                  background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 20,
+                  padding: '4px 12px', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '0.73rem',
+                  color: 'var(--text-secondary)', transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-cyan)'; e.currentTarget.style.color = 'var(--accent-cyan)' }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+            {CHAPTERS.slice(0, 12).map(chapter => (
+              <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
+            ))}
+          </div>
         </div>
-        <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            {filtered.length} chapter{filtered.length !== 1 ? 's' : ''}
-          </span>
-          <select
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-            style={{
-              background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 6,
-              color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem',
-              padding: '5px 10px', cursor: 'pointer', outline: 'none',
-            }}
-          >
-            <option value="default">Default order</option>
-            <option value="recent">Recently viewed</option>
-            <option value="quiz-asc">Score: Low → High</option>
-            <option value="quiz-desc">Score: High → Low</option>
-          </select>
+      ) : (
+        /* ── Filtered Chapter Grid ── */
+        <div style={{ display: 'flex', gap: 28, minHeight: 'calc(100vh - 200px)' }}>
+          {/* Sidebar */}
+          <div style={{ width: 220, flexShrink: 0 }}>
+            <div style={{ position: 'sticky', top: 24 }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: 2, marginBottom: 10 }}>
+                CATEGORIES
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <button
+                  className={`category-btn ${activeCategory === 'ALL' ? 'active' : ''}`}
+                  onClick={() => setActiveCategory('ALL')}
+                >
+                  <span>◈</span><span>All Topics</span>
+                  <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>{CHAPTERS.length}</span>
+                </button>
+                {CATEGORIES.map(cat => {
+                  const count     = CHAPTERS.filter(c => c.category === cat.id).length
+                  const completed = CHAPTERS.filter(c => c.category === cat.id && progress[c.id]?.read).length
+                  return (
+                    <button
+                      key={cat.id}
+                      className={`category-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                      onClick={() => setActiveCategory(cat.id)}
+                    >
+                      <span>{cat.icon}</span>
+                      <span style={{ flex: 1, fontSize: '0.86rem' }}>{cat.name}</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: completed === count ? 'var(--accent-green)' : 'var(--text-muted)' }}>
+                        {completed}/{count}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Chapter grid */}
+          <div style={{ flex: 1 }}>
+            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                {filtered.length} chapter{filtered.length !== 1 ? 's' : ''}
+              </span>
+              <button className="btn-console" onClick={() => { setSearch(''); setActiveCategory('ALL') }} style={{ padding: '4px 12px', fontSize: '0.75rem' }}>
+                ✕ Clear
+              </button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+              {filtered.map(chapter => (
+                <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
+              ))}
+            </div>
+          </div>
         </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: 20,
-        }}>
-          {filtered.map(chapter => (
-            <ChapterCard
-              key={chapter.id}
-              chapter={chapter}
-              progress={progress}
-              onClick={() => onOpenChapter(chapter)}
-            />
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   )
 }
@@ -1375,10 +1801,10 @@ function QuizView({ chapter, onBack, onComplete }) {
         }}>
           <div style={{
             fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: 1,
-            color: results[results.length - 1].correct ? 'var(--accent-green)' : 'var(--accent-red)',
+            color: results[results.length-1]?.correct ? 'var(--accent-green)' : 'var(--accent-red)',
             marginBottom: 8, fontWeight: 700,
           }}>
-            {results[results.length - 1].correct ? '✓ CORRECT' : '✗ INCORRECT'}
+            {results[results.length-1]?.correct ? '✓ CORRECT' : '✗ INCORRECT'}
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, margin: 0 }}>
             {q.explanation}
@@ -1792,29 +2218,42 @@ function LoginScreen() {
 }
 
 export default function App() {
-  const [view, setView] = useState('library')   // 'library' | 'chapter' | 'quiz' | 'dashboard'
+  const [view, setView] = useState('library')   // 'library' | 'category' | 'chapter' | 'quiz' | 'dashboard'
   const [selectedChapter, setSelectedChapter] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  // selectedHtmlItem removed — theory is now inline via StaticContentViewer
   const [progress, setProgress] = useState(loadProgress)
   const [showSettings, setShowSettings] = useState(false)
   const [apiConfigured, setApiConfigured] = useState(hasApiKey)
   const [providerLabel, setProviderLabel] = useState(() => getProvider().toUpperCase())
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem(THEME_KEY) !== 'light')
-  const [user, setUser] = useState(undefined) // undefined = loading, null = logged out, object = logged in
+  const [user, setUser] = useState(undefined)
   const [authLoading, setAuthLoading] = useState(true)
 
   // ── Supabase auth ─────────────────────────────────────────────────────────
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setAuthLoading(false)
-    })
+    // Failsafe: never leave app stuck on INITIALIZING for >4s
+    const timeout = setTimeout(() => setAuthLoading(false), 4000)
+
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setUser(session?.user ?? null)
+        setAuthLoading(false)
+        clearTimeout(timeout)
+      })
+      .catch(() => {
+        setUser(null)
+        setAuthLoading(false)
+        clearTimeout(timeout)
+      })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       setAuthLoading(false)
+      clearTimeout(timeout)
     })
 
-    return () => subscription.unsubscribe()
+    return () => { subscription.unsubscribe(); clearTimeout(timeout) }
   }, [])
 
   useEffect(() => {
@@ -1839,6 +2278,13 @@ export default function App() {
     setView('chapter')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+
+  const handleOpenCategory = (cat) => {
+    setSelectedCategory(cat)
+    setView('category')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
 
   const handleMarkRead = (chapterId) => {
     updateProgress(prev => ({
@@ -1913,8 +2359,8 @@ export default function App() {
                   background: 'none', border: 'none', cursor: 'pointer',
                   padding: '6px 14px', borderRadius: 4,
                   fontFamily: 'var(--font-mono)', fontSize: '0.85rem', letterSpacing: 0.5,
-                  color: view === val ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                  borderBottom: view === val ? '2px solid var(--accent-cyan)' : '2px solid transparent',
+                  color: (view === val || (val === 'library' && ['category','html','chapter','quiz'].includes(view))) ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                  borderBottom: (view === val || (val === 'library' && ['category','html','chapter','quiz'].includes(view))) ? '2px solid var(--accent-cyan)' : '2px solid transparent',
                   transition: 'all 0.2s',
                 }}
               >
@@ -2002,8 +2448,17 @@ export default function App() {
       {/* Main */}
       <main style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: '32px 28px' }}>
         {view === 'library' && (
-          <LibraryView progress={progress} onOpenChapter={handleOpenChapter} />
+          <LibraryView progress={progress} onOpenChapter={handleOpenChapter} onOpenCategory={handleOpenCategory} />
         )}
+        {view === 'category' && selectedCategory && (
+          <CategoryView
+            category={selectedCategory}
+            progress={progress}
+            onOpenChapter={handleOpenChapter}
+            onBack={() => setView('library')}
+          />
+        )}
+
         {view === 'chapter' && selectedChapter && (
           <ChapterView
             chapter={selectedChapter}

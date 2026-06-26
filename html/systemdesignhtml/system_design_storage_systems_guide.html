@@ -1,0 +1,642 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:800px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:210px;min-width:210px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary)}
+.sh{padding:14px 16px 10px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ni{padding:9px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;line-height:1.3}
+.ni:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ni.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.ni .num{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:1px}
+.content{flex:1;overflow-y:auto;padding:24px 28px}
+.topic{display:none}.topic.active{display:block}
+.tt{font-size:19px;font-weight:500;margin-bottom:3px;color:var(--color-text-primary)}
+.ts2{font-size:13px;color:var(--color-text-tertiary);margin-bottom:20px}
+.sec{margin-bottom:20px}
+.sl{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kvc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.kvl{font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px;font-weight:500}
+.kvv{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.to{display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.to:last-child{border-bottom:none}
+.tos{font-size:12px;flex:1}
+.tos .lb{font-weight:500;margin-bottom:2px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.gain .lb{color:#3B6D11}.lose .lb{color:#A32D2D}
+.tos p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.fi{padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12.5px;line-height:1.6;color:var(--color-text-secondary)}
+.fi:last-child{border-bottom:none}
+.fi strong{color:var(--color-text-primary);font-weight:500}
+.ib{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px}
+.ib ol{padding-left:16px;font-size:12.5px;line-height:1.9;color:var(--color-text-secondary)}
+.ib li strong{color:var(--color-text-primary);font-weight:500}
+.cx{display:flex;flex-wrap:wrap;gap:6px}
+.cx a{font-size:11.5px;padding:3px 10px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.cx a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ab{font-family:var(--font-mono);font-size:11.5px;line-height:1.6;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px}
+.sn{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.sd{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.4}
+.tr{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:14px;flex-wrap:wrap}
+.tab{font-size:12px;padding:7px 12px;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tp{display:none}.tp.active{display:block}
+.nb{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:7px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:20px}
+.nb:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-right:4px;vertical-align:middle}
+.b-blue{background:#E6F1FB;color:#0C447C}
+.b-teal{background:#E1F5EE;color:#085041}
+.b-amber{background:#FAEEDA;color:#633806}
+.b-coral{background:#FAECE7;color:#712B13}
+.b-purple{background:#EEEDFE;color:#3C3489}
+.b-green{background:#EAF3DE;color:#27500A}
+.b-gray{background:#F1EFE8;color:#5F5E5A}
+.storage-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:8px;background:var(--color-background-secondary)}
+.storage-card .ct{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.storage-card .cd{font-size:12.5px;color:var(--color-text-secondary);line-height:1.6}
+.inv-demo{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px}
+.posting-list{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.doc-pill{font-size:11px;padding:2px 8px;border-radius:10px;background:#E6F1FB;color:#0C447C;border:0.5px solid #85B7EB;font-weight:500}
+.ts-bar-wrap{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:3px;height:40px;overflow:hidden;display:flex;align-items:flex-end;gap:1px;padding:2px}
+.ts-bar{border-radius:2px 2px 0 0;transition:height .3s}
+.upload-step{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.upload-step:last-child{border-bottom:none}
+.upload-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;margin-top:1px;background:#E6F1FB;color:#0C447C;border:0.5px solid #85B7EB}
+.upload-body{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.upload-body strong{color:var(--color-text-primary);font-weight:500}
+.progress-wrap{height:8px;background:var(--color-background-primary);border-radius:4px;border:0.5px solid var(--color-border-tertiary);overflow:hidden;margin:4px 0}
+.progress-bar{height:100%;border-radius:4px;background:#378ADD;transition:width .4s}
+</style>
+
+<h2 class="sr-only">System Design Storage Systems — Block 8 covering object vs block vs file storage, data lake vs data warehouse, Elasticsearch internals, time-series databases, and blob storage with multipart upload.</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sh">Block 8 — Storage</div>
+  <div class="ni active" onclick="show(0)"><span class="num">01</span>Object / block / file storage</div>
+  <div class="ni" onclick="show(1)"><span class="num">02</span>Data lake vs warehouse</div>
+  <div class="ni" onclick="show(2)"><span class="num">03</span>Search engines</div>
+  <div class="ni" onclick="show(3)"><span class="num">04</span>Time-series databases</div>
+  <div class="ni" onclick="show(4)"><span class="num">05</span>Blob storage</div>
+</nav>
+
+<main class="content">
+
+<!-- ══ T0: Object / Block / File ══ -->
+<div class="topic active" id="t0">
+  <div class="tt">Object vs block vs file storage</div>
+  <div class="ts2">S3 · EBS · EFS — precise use cases and why each exists</div>
+
+  <div class="sec">
+    <div class="sl">The fundamental distinction</div>
+    <div class="prose">These are not three competing solutions to the same problem — they are three different abstractions built for three entirely different access patterns. Choosing the wrong one creates either correctness problems (file-locking semantics that don't exist) or performance problems (treating an API call like a filesystem read).</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Block storage — raw addressable blocks</div>
+    <div class="storage-card">
+      <div class="ct"><span class="badge b-amber">Block (AWS EBS)</span> What it is</div>
+      <div class="cd">Exposes raw storage as a sequence of fixed-size blocks (typically 512B or 4KB). The OS mounts it as a device and formats it with a filesystem (ext4, XFS, NTFS). The storage layer sees only block reads and writes — no filenames, no directories, no metadata. The filesystem is entirely in the OS layer above.<br><br>Think of it as a very fast, durable SSD attached over a network. Your EC2 instance treats it exactly like a local disk.</div>
+    </div>
+    <div class="kv" style="margin-top:8px">
+      <div class="kvc"><div class="kvl">Use when</div><div class="kvv">Running databases (Postgres, MySQL) that need low-latency random I/O. Boot volumes. Any application that needs a mounted filesystem with POSIX semantics. EBS gp3: 16,000 IOPS, 1,000 MB/s throughput.</div></div>
+      <div class="kvc"><div class="kvl">Do not use when</div><div class="kvv">Sharing across multiple EC2 instances simultaneously — EBS is single-attachment (except EBS Multi-Attach, which is limited). Not for large unstructured data at rest. Not for global access.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Object storage — flat namespace of immutable objects</div>
+    <div class="storage-card">
+      <div class="ct"><span class="badge b-blue">Object (AWS S3)</span> What it is</div>
+      <div class="cd">Stores data as objects in a flat namespace (bucket + key). Each object is identified by a unique key and carries its data + arbitrary metadata. Objects are immutable — you don't append to them or seek within them at the byte level. To "update" a file, you PUT the entire new version. Access is via HTTP API (GET, PUT, DELETE), not a filesystem mount.<br><br>S3 is effectively infinite in capacity, globally durable (11 nines), replicated across 3+ AZs, with a pay-per-byte model. It is not a filesystem.</div>
+    </div>
+    <div class="kv" style="margin-top:8px">
+      <div class="kvc"><div class="kvl">Use when</div><div class="kvv">User uploads (images, videos, PDFs). Static web assets (CSS, JS, fonts). Backups and archives. Data lake raw storage. ML training datasets. Anything large, immutable, and globally accessed. ML model weights, Docker layer cache.</div></div>
+      <div class="kvc"><div class="kvl">Do not use when</div><div class="kvv">You need random byte-range writes (databases). Sub-10ms latency (S3 GET latency is ~20–100ms). POSIX filesystem semantics (rename is not atomic in S3). High-frequency tiny object operations (cost per API call adds up).</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">File storage — shared POSIX filesystem</div>
+    <div class="storage-card">
+      <div class="ct"><span class="badge b-teal">File (AWS EFS / Azure Files)</span> What it is</div>
+      <div class="cd">A network filesystem (NFS-based for EFS) that multiple instances can mount simultaneously and access with full POSIX semantics — directories, symlinks, file locking, atomic rename. Unlike EBS (single instance) or S3 (API, not filesystem), EFS mounts like a real shared folder across an entire fleet.<br><br>Throughput scales with storage consumed. EFS Throughput Mode: Elastic (recommended — auto-scales), Provisioned (predictable throughput), Bursting (default, credits model).</div>
+    </div>
+    <div class="kv" style="margin-top:8px">
+      <div class="kvc"><div class="kvl">Use when</div><div class="kvv">Multiple EC2 instances or ECS tasks need shared filesystem access simultaneously. CMS media libraries, shared config files, ML model serving (same checkpoint read by many inference workers). Kubernetes PersistentVolumes shared across pods (ReadWriteMany).</div></div>
+      <div class="kvc"><div class="kvl">Do not use when</div><div class="kvv">Latency-critical DB workloads (NFS overhead vs EBS). High-throughput sequential I/O (S3 is cheaper per GB and scales better for bulk). You only need single-instance access (EBS is faster and cheaper for that).</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Decision cheat sheet</div>
+    <div class="ab">Question to ask                    →   Answer               →   Use
+─────────────────────────────────────────────────────────────────────
+Need to run a database?            →   Single fast disk     →   EBS (gp3/io2)
+User uploaded a photo/video?       →   Store immutably      →   S3
+Multiple pods reading same files?  →   Shared filesystem    →   EFS
+Static website assets?             →   Global HTTP access   →   S3 + CloudFront
+Boot volume for EC2?               →   OS filesystem        →   EBS
+Data lake raw files (Parquet, CSV) →   Cheap, infinite      →   S3
+ML model checkpoint (100 pods)     →   Shared read          →   EFS or S3
+Postgres WAL volume                →   Low-latency I/O      →   EBS io2
+
+Cost (rough, us-east-1, 2024):
+  EBS gp3: $0.08/GB-month
+  EFS:     $0.30/GB-month (elastic)
+  S3:      $0.023/GB-month (standard)
+  S3 Glacier: $0.004/GB-month (archival)</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>S3 is not a filesystem — say this early.</strong> "S3 is an object store accessed via HTTP PUT/GET. It has no concept of directories, no byte-range writes, and no atomic rename. It's not suitable for running a database on."</li>
+      <li><strong>The YouTube upload pipeline answer:</strong> "Video files go to S3 (multipart upload for large files). Metadata (title, description, owner) goes to Postgres on EBS. Transcoded versions go back to S3. Static thumbnails served from S3 via CloudFront."</li>
+      <li><strong>EFS is the answer for shared filesystem across pods.</strong> "For EngineX's resume parser that runs on 10 ECS tasks and needs to read the same NLP model file — EFS with ReadWriteMany semantics. The model is loaded once to EFS, all tasks read it concurrently."</li>
+      <li><strong>Probe: "Your Postgres instance is slow. What storage would you upgrade to?"</strong> → EBS io2 Block Express — up to 256,000 IOPS, sub-millisecond latency. Never S3 or EFS for this. The bottleneck in Postgres is random 4KB page I/O — that's exactly what block storage is optimised for.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(4)">Blob storage (S3 internals) →</a><a onclick="show(1)">Data lake (S3 as foundation) →</a><a onclick="sendPrompt('Explain S3 storage classes and lifecycle policies')">S3 storage classes</a></div></div>
+  <button class="nb" onclick="show(1)">Next: Data lake vs warehouse <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T1: Data Lake vs Warehouse ══ -->
+<div class="topic" id="t1">
+  <div class="tt">Data lake vs data warehouse</div>
+  <div class="ts2">OLAP vs OLTP · columnar storage · when each applies</div>
+
+  <div class="sec">
+    <div class="sl">The core distinction</div>
+    <div class="prose">Both store large amounts of data for analysis. The difference is what you store, in what format, and what questions you ask of it.<br><br><strong>Data warehouse:</strong> Structured, schema-on-write. Data is transformed and loaded in a defined schema before storage. Optimised for predefined business queries (dashboards, reports). SQL-native. High cost per GB but very fast for the queries it's built for.<br><br><strong>Data lake:</strong> Raw, schema-on-read. Store everything in its original format (JSON logs, CSV exports, Parquet files, images, audio). Apply schema only when reading. Cheap per GB (S3). Flexible — the same data can be queried in many different ways by different teams.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">OLTP vs OLAP — the critical split</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">OLTP — Online Transaction Processing</div><div class="kvv">Powers your application. Short, frequent, transactional queries. SELECT one user, INSERT one order, UPDATE one balance. Optimised for low latency per query and high concurrency. Row-oriented storage (reads full row). Examples: Postgres, MySQL, DynamoDB.</div></div>
+      <div class="kvc"><div class="kvl">OLAP — Online Analytical Processing</div><div class="kvv">Powers business intelligence. Long-running, analytical queries. "Total revenue by region for the past 12 months across 1 billion rows." Optimised for high throughput scans. Column-oriented storage (reads only the columns needed). Examples: Redshift, BigQuery, ClickHouse, Snowflake.</div></div>
+      <div class="kvc"><div class="kvl">Row storage (OLTP)</div><div class="kvv">Data for one row is stored contiguously: <code>[id=1, name="Alice", age=28, ...][id=2, name="Bob", ...]</code>. Full-row INSERT/UPDATE is one sequential write. Reading all columns of row 1 is one seek.</div></div>
+      <div class="kvc"><div class="kvl">Columnar storage (OLAP)</div><div class="kvv">Data for one column is stored contiguously: <code>[id: 1,2,3,...][name: Alice,Bob,...][age: 28,31,...]</code>. Query "average age" reads only the age column — skips name, email, etc. Massive I/O reduction for wide tables. Compresses beautifully (same-type values compress 10–50×).</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Columnar storage — why it's so fast for analytics</div>
+    <div class="prose">A table with 1 billion rows and 100 columns. Query: <code>SELECT AVG(revenue) WHERE country='IN'</code>. Only needs two columns (revenue, country).<br><br><strong>Row store reads:</strong> Must scan all 100 columns × 1B rows = 100B values transferred from disk just to get 2B values we actually need. I/O wasted: 98%.<br><br><strong>Column store reads:</strong> Read only revenue column (1B values) + country column (1B values). Skips all other 98 columns entirely. I/O reduction: ~98%.<br><br><strong>Compression bonus:</strong> A column of country codes ("IN", "US", "GB") compresses with run-length encoding from 3 bytes/row to ~0.1 bytes/row on a sorted dataset — 30× compression. Row stores can't compress this efficiently because the column values are interleaved with other column types.<br><br><strong>Vectorised execution:</strong> Modern OLAP engines (ClickHouse, DuckDB) process columns in SIMD-friendly batches of 1024 values at a time using CPU vector instructions. Processing 1024 integers in one CPU instruction vs one at a time = 1000× throughput.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — the modern lakehouse</div>
+    <div class="ab">Modern data architecture (lakehouse pattern):
+
+  Operational systems (OLTP)
+    Postgres, MySQL, DynamoDB
+        │ CDC (Debezium) or batch export
+        ▼
+  Data Lake — S3 (raw zone)
+    s3://data-lake/raw/orders/2024/01/15/orders_14h.json
+    s3://data-lake/raw/events/2024/01/15/clickstream.parquet
+    ↓ ETL / ELT (Spark, dbt)
+  Data Lake — S3 (curated zone, Parquet + partitioned)
+    s3://data-lake/curated/orders/year=2024/month=01/
+        │
+        ├── Query with Athena (serverless SQL on S3 Parquet)
+        │   → Pay per query. No servers. Presto/Trino underneath.
+        │
+        ├── Load into Redshift / Snowflake (data warehouse)
+        │   → Fast BI queries. Pre-aggregated. Dashboard-ready.
+        │
+        └── ML training (SageMaker reads directly from S3 Parquet)
+
+Delta Lake / Apache Iceberg on top of S3:
+  Adds ACID transactions to S3 object storage.
+  UPDATE/DELETE/MERGE semantics on Parquet files.
+  Time travel (query data as it was 7 days ago).
+  This is the "lakehouse" — lake's cost + warehouse's ACID.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Trade-offs</div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ Data lake</div><p>Store everything cheaply (S3 = $0.023/GB vs Redshift $0.25/GB). Schema flexibility — add new fields without migration. Multiple query engines can read the same data. Raw data preserved for future use cases not yet known.</p></div><div class="tos lose"><div class="lb">✗ Data lake</div><p>Queries slower without materialised views. Schema-on-read means data quality issues only discovered at query time. "Data swamp" risk — raw data without governance becomes unusable.</p></div></div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ Data warehouse</div><p>Blazing fast for the queries it's designed for. Enforced schemas = data quality guarantees. Business users can use SQL without understanding Spark or Parquet.</p></div><div class="tos lose"><div class="lb">✗ Data warehouse</div><p>Expensive per GB. Schema changes require migrations. Can't store unstructured data (images, audio, free text). Vendor lock-in (Snowflake, Redshift have proprietary features).</p></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Always separate OLTP from OLAP.</strong> "I'd never run analytics directly on the production Postgres — it would kill OLTP performance. Analytics goes to a separate columnar store fed by CDC or batch export."</li>
+      <li><strong>Columnar = column-skip + compression.</strong> Know both benefits cold. "Reading 2 of 100 columns from a billion-row table is 50× faster in a column store because the other 98 columns are never touched."</li>
+      <li><strong>ClickHouse is the FAANG answer for high-throughput OLAP.</strong> "For real-time analytics at Razorpay (transaction volume dashboards, fraud rate by merchant), I'd use ClickHouse — sub-second queries on billions of rows, 10–100× faster than Redshift for high-cardinality GROUP BY."</li>
+      <li><strong>Probe: "How does Uber generate surge pricing based on real-time demand?"</strong> → OLTP path: driver/rider events written to Kafka. Stream processing (Flink): sliding-window aggregation of supply/demand per geohash. Output feeds the surge pricing service directly. Analytics: same events land in S3/ClickHouse for historical analysis and model training. Never touch the Postgres for this.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(0)">← S3 as lake foundation</a><a onclick="sendPrompt('Explain Apache Iceberg and Delta Lake for lakehouse architecture')">Iceberg / Delta Lake</a><a onclick="sendPrompt('Explain ClickHouse architecture and why it is so fast for OLAP')">ClickHouse internals</a></div></div>
+  <button class="nb" onclick="show(2)">Next: Search engines <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T2: Search ══ -->
+<div class="topic" id="t2">
+  <div class="tt">Search engines</div>
+  <div class="ts2">Elasticsearch internals · inverted index · TF-IDF · BM25</div>
+
+  <div class="sec">
+    <div class="sl">The core data structure — inverted index</div>
+    <div class="prose">A regular database index maps row → columns. An inverted index maps term → list of documents containing that term. It "inverts" the document-to-word relationship into a word-to-document relationship. This is what makes full-text search fast — instead of scanning every document for your search term, you look up the term in the index and get the exact list of matching documents in microseconds.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interactive inverted index demo</div>
+    <div class="inv-demo">
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:6px">Sample documents</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.8">
+          <span style="font-weight:500;color:var(--color-text-primary)">Doc 1:</span> "Razorpay payment gateway India"<br>
+          <span style="font-weight:500;color:var(--color-text-primary)">Doc 2:</span> "India startup payment processing"<br>
+          <span style="font-weight:500;color:var(--color-text-primary)">Doc 3:</span> "Zepto fast delivery India"
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:6px">Inverted index (after tokenisation + lowercasing)</div>
+        <div id="inv-index"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <input type="text" id="search-q" placeholder='Try: "payment india" or "delivery"' style="flex:1;font-size:12.5px;padding:7px 10px" oninput="searchDocs()">
+      </div>
+      <div id="search-results" style="font-size:12.5px;color:var(--color-text-secondary);min-height:24px"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">How Elasticsearch indexes a document</div>
+    <div class="prose"><strong>1. Analysis pipeline:</strong> Raw text → Tokeniser (split on whitespace/punctuation) → Token filters (lowercase, remove stop words, stem). "Payment Gateway" → ["payment", "gateway"]. "Payments" → "payment" (stemming). This is why "payments" matches "payment".<br><br><strong>2. Posting list:</strong> For each term, store: list of document IDs, position within each document (for phrase matching), term frequency per document (for relevance scoring).<br><br><strong>3. Segments:</strong> Elasticsearch (built on Lucene) writes to in-memory buffers that are periodically flushed to immutable segment files. A search queries all segments and merges results. Background segment merging reduces the number of files over time. Near real-time (NRT) search: new documents visible in ~1 second (after the refresh interval).</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Relevance scoring — TF-IDF and BM25</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'sc','s0')">TF-IDF</div>
+      <div class="tab" onclick="stab(this,'sc','s1')">BM25</div>
+    </div>
+    <div id="sc">
+      <div class="tp active" id="s0">
+        <div class="prose"><strong>TF-IDF (Term Frequency — Inverse Document Frequency):</strong><br><br><strong>TF (Term Frequency):</strong> How often does the search term appear in this document? More occurrences = more relevant. But raw count is not enough — a 1000-word document with 5 occurrences should not beat a 10-word document with 3.<br><br><strong>IDF (Inverse Document Frequency):</strong> How rare is this term across all documents? "the" appears in every document — it's meaningless. "BM25" appears in few documents — it's highly discriminative. Terms that appear in fewer documents get higher IDF scores.<br><br><strong>Score = TF × IDF:</strong> High score when the term appears often in this document but rarely across all documents. This is the exact signal you want for relevance.<br><br><strong>Weakness:</strong> TF grows unboundedly. A document with 100 occurrences of a term scores 10× a document with 10 occurrences — but is it really 10× more relevant? In practice, relevance saturates. BM25 fixes this.</div>
+      </div>
+      <div class="tp" id="s1">
+        <div class="prose"><strong>BM25 (Best Match 25) — Elasticsearch's default since version 5:</strong><br><br>BM25 improves TF-IDF in two ways:<br><br><strong>1. TF saturation:</strong> <code>TF_bm25 = TF / (TF + k1)</code>. As TF grows, the score saturates. Default k1=1.2. A document with 10 occurrences doesn't score 10× a document with 1 — it scores about 2×. Reflects diminishing returns of repetition.<br><br><strong>2. Field length normalisation:</strong> <code>norm = (1 - b) + b × (field_length / avg_field_length)</code>. Default b=0.75. A term in a short document is more significant than the same term buried in a 10,000-word document. BM25 penalises longer documents relative to the corpus average.<br><br><strong>Result:</strong> BM25 consistently outperforms TF-IDF in real search benchmarks (TREC, MS MARCO). It's the practical default for all modern search engines including Lucene, Elasticsearch, Solr, and Postgres's full-text search.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Elasticsearch in system design</div>
+    <div class="ab">Elasticsearch is NOT a primary database — it is a search index.
+
+  Source of truth: Postgres (orders, products, users)
+      │ sync via CDC (Debezium) or dual-write
+      ▼
+  Elasticsearch index (search read model)
+      │ query with full-text, fuzzy, aggregations
+      ▼
+  Search results returned to user
+
+Index design for e-commerce product search:
+  PUT /products/_mapping
+  {
+    "name":        { "type": "text", "analyzer": "english" },
+    "description": { "type": "text", "analyzer": "english" },
+    "brand":       { "type": "keyword" },  ← exact match, filter
+    "price":       { "type": "float" },    ← range queries
+    "category_id": { "type": "keyword" },  ← faceted filter
+    "stock":       { "type": "integer" }
+  }
+
+Query: "blue nike running shoes" under ₹5000 in "footwear"
+  GET /products/_search
+  {
+    "query": {
+      "bool": {
+        "must": { "multi_match": {
+          "query": "blue nike running shoes",
+          "fields": ["name^3", "description"]  ← name is 3× boosted
+        }},
+        "filter": [
+          { "term": { "category_id": "footwear" } },
+          { "range": { "price": { "lte": 5000 } } },
+          { "range": { "stock": { "gt": 0 } } }
+        ]
+      }
+    }
+  }</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Elasticsearch is always a secondary index.</strong> "I'd never use Elasticsearch as the source of truth. It syncs from Postgres via CDC. If Elasticsearch goes down, data is safe in Postgres and the index can be rebuilt."</li>
+      <li><strong>Know the inverted index by heart.</strong> "An inverted index maps term → posting list of (docId, positions, TF). A search looks up each query term in the index — O(1) per term lookup — then intersects the posting lists. That's why full-text search over a billion documents completes in under 100ms."</li>
+      <li><strong>BM25 over TF-IDF.</strong> "BM25 adds TF saturation and field length normalisation. A term appearing 100 times scores only marginally better than 10 times — relevance has diminishing returns, which BM25 models correctly."</li>
+      <li><strong>Probe: "How would you add search to Zepto's product catalog?"</strong> → Sync products from Postgres to Elasticsearch via Debezium CDC. Index name (text, English analyzer), brand (keyword for exact filter), price (float for range), category (keyword for facets). Query: BM25 on name and description, filters on category + price + in-stock. Rank by BM25 score × in-stock boost × seller rating.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="sendPrompt('Explain Elasticsearch sharding and replication for production clusters')">ES sharding</a><a onclick="sendPrompt('Explain vector search and dense retrieval vs BM25 for semantic search')">Vector search</a><a onclick="sendPrompt('Explain the ELK stack for log aggregation and search')">ELK stack</a></div></div>
+  <button class="nb" onclick="show(3)">Next: Time-series databases <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T3: Time-series ══ -->
+<div class="topic" id="t3">
+  <div class="tt">Time-series databases</div>
+  <div class="ts2">InfluxDB · Prometheus · downsampling · retention policies</div>
+
+  <div class="sec">
+    <div class="sl">Why time-series DBs exist</div>
+    <div class="prose">A time-series is a sequence of (timestamp, value) pairs, usually from a sensor, metric, or event stream. In a general-purpose relational DB, storing 1M metrics/second would mean 86 billion rows/day — inserts are the bottleneck, range queries are expensive (even with indexes), and disk consumption explodes.<br><br>Time-series databases are purpose-built to exploit temporal patterns: data arrives in timestamp order, old data is queried far less than recent data, queries are always time ranges, and precision requirements decrease with age (you care about the last minute at 1-second granularity but only care about last year at 1-hour granularity).</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Prometheus vs InfluxDB</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Prometheus</div><div class="kvv">Pull-based — Prometheus scrapes /metrics endpoints every 15s. Stores metrics locally in a custom TSDB format optimised for recent data. Query language: PromQL. Designed for monitoring infrastructure and services. Integrates with Grafana for dashboards. AlertManager for alerting. Short retention (15 days default) — use Thanos or Cortex for long-term storage.</div></div>
+      <div class="kvc"><div class="kvl">InfluxDB</div><div class="kvv">Push-based — applications write metrics to InfluxDB via HTTP API. Time-series stored in "measurements" (like tables) with tags (indexed metadata) and fields (values). Query language: Flux (functional) or InfluxQL (SQL-like). Better for IoT sensor data, application metrics, business events. Built-in downsampling and retention policies.</div></div>
+      <div class="kvc"><div class="kvl">TimescaleDB</div><div class="kvv">Postgres extension. Converts Postgres into a time-series DB with automatic time-based partitioning (hypertables), compression, and continuous aggregates. Best when you already run Postgres and want time-series without a separate DB. Full SQL compatibility.</div></div>
+      <div class="kvc"><div class="kvl">ClickHouse for time-series</div><div class="kvv">Not a dedicated TSDB but handles time-series at extreme scale due to columnar storage + vectorised execution. Used by Cloudflare (1M metrics/sec), Uber (analytics). When you need OLAP-style aggregations over time-series data at massive scale.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Downsampling — the key technique</div>
+    <div class="prose"><strong>Problem:</strong> Raw data at 1-second resolution for 1 year = 31M data points per metric. Querying a year's worth of a metric for a dashboard takes forever and returns way more points than any graph can display.<br><br><strong>Downsampling:</strong> Aggregate raw data into lower-resolution summaries as it ages.<br>Raw (last 7 days): 1-second resolution → keep every point.<br>Medium (last 30 days): 1-minute resolution → one point per 60 raw points (take avg/max/min).<br>Long (last 1 year): 1-hour resolution → one point per 3600 raw points.<br>Archive (beyond 1 year): 1-day resolution or discard.<br><br>A year of a metric at 1-day resolution = 365 points. Trivial to query and display.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Downsampling visualiser</div>
+    <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary);min-width:80px">Resolution</label>
+        <input type="range" min="1" max="4" step="1" value="1" id="res" oninput="drawTs()" style="flex:1">
+        <span id="res-out" style="font-weight:500;color:var(--color-text-primary);min-width:80px">Raw (1s)</span>
+      </div>
+      <div class="ts-bar-wrap" id="ts-bars"></div>
+      <div style="font-size:11.5px;color:var(--color-text-tertiary);margin-top:6px" id="ts-caption">Showing raw 1-second data points.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Retention policies</div>
+    <div class="prose"><strong>Retention policy:</strong> Automatic deletion of data older than a configured age. In InfluxDB: define multiple RPs with different durations and shard group durations. New data goes to the default RP. A continuous query downsamples from the raw RP to longer-duration RPs automatically.<br><br><code>CREATE RETENTION POLICY "raw" ON "metrics" DURATION 7d SHARD DURATION 1d DEFAULT</code><br><code>CREATE RETENTION POLICY "monthly" ON "metrics" DURATION 30d SHARD DURATION 7d</code><br><code>CREATE RETENTION POLICY "yearly" ON "metrics" DURATION 365d SHARD DURATION 30d</code><br><br>Prometheus equivalent: <code>--storage.tsdb.retention.time=15d</code>. For longer retention, Thanos writes to S3 with downsampling at 5m and 1h resolution automatically.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Name the pattern: collect → downsample → retain.</strong> "I'd collect raw metrics at 10s intervals in Prometheus. After 7 days, downsample to 1-minute resolution. After 30 days, 1-hour. Store long-term in Thanos/S3. This reduces storage 99%+ while preserving analytical fidelity."</li>
+      <li><strong>Prometheus for infra, InfluxDB for business metrics.</strong> "Prometheus scrapes service health metrics. InfluxDB receives payment events and business KPIs where I need to push from the application."</li>
+      <li><strong>Probe: "Monitor 10,000 IoT devices sending 1 reading/second."</strong> → 10K readings/sec. Push to InfluxDB (push-based). Tag with device_id and location (indexed). Field: temperature/pressure. Retention: raw 7 days → 1-min downsample 30 days → 1-hour 1 year. Alert on PromQL-style rules for anomalies. Dashboard in Grafana.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="sendPrompt('Explain Prometheus remote write and Thanos for long-term storage')">Thanos long-term storage</a><a onclick="sendPrompt('Explain PromQL query language with examples')">PromQL examples</a><a onclick="show(1)">← Columnar storage</a></div></div>
+  <button class="nb" onclick="show(4)">Next: Blob storage <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T4: Blob Storage ══ -->
+<div class="topic" id="t4">
+  <div class="tt">Blob storage</div>
+  <div class="ts2">Chunked upload · multipart upload · presigned URLs</div>
+
+  <div class="sec">
+    <div class="sl">The problem with large file uploads</div>
+    <div class="prose">Uploading a 5GB video file as a single HTTP request is fragile. One network hiccup at minute 45 of a 50-minute upload means starting from zero. The connection holds open for the entire duration, tying up server resources. If the server crashes mid-upload, the partial file is useless. And your API server shouldn't be handling large file data at all — it should focus on business logic.<br><br>Multipart upload solves all of this by splitting the file into chunks that upload independently and in parallel.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">S3 multipart upload — step by step</div>
+    <div class="upload-step"><div class="upload-num">1</div><div class="upload-body"><strong>Initiate.</strong> Client calls <code>POST /bucket/key?uploads</code>. S3 returns an <code>UploadId</code>. This is the session identifier for all subsequent parts.</div></div>
+    <div class="upload-step"><div class="upload-num">2</div><div class="upload-body"><strong>Split and upload parts.</strong> Client splits file into N chunks (minimum 5MB each, except last part). Uploads each part: <code>PUT /bucket/key?partNumber=N&amp;uploadId=X</code>. Parts can upload in parallel (8–16 concurrent uploads typical). S3 returns an ETag for each part.</div></div>
+    <div class="upload-step"><div class="upload-num">3</div><div class="upload-body"><strong>Complete.</strong> Client sends all part ETags in order: <code>POST /bucket/key?uploadId=X</code> with body listing ETag of each part. S3 assembles the parts into a single object. The assembled object appears atomically — it's either fully present or absent.</div></div>
+    <div class="upload-step"><div class="upload-num">4</div><div class="upload-body"><strong>Abort on failure.</strong> If the upload is abandoned, call <code>DELETE /bucket/key?uploadId=X</code> to clean up partial parts. Unaborted multipart uploads accumulate storage charges for the parts — set an S3 lifecycle rule to auto-abort incomplete multipart uploads after 7 days.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Upload progress simulator</div>
+    <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary);min-width:70px">File size</label>
+        <input type="range" min="1" max="10" step="1" value="4" id="fsize" oninput="updateUpload()" style="flex:1">
+        <span id="fsize-out" style="font-weight:500;min-width:36px;color:var(--color-text-primary)">4 GB</span>
+        <label style="color:var(--color-text-secondary);min-width:80px;margin-left:8px">Chunk size</label>
+        <input type="range" min="5" max="100" step="5" value="20" id="csize" oninput="updateUpload()" style="flex:1">
+        <span id="csize-out" style="font-weight:500;min-width:36px;color:var(--color-text-primary)">20 MB</span>
+      </div>
+      <div id="chunk-grid" style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="nb" style="margin-top:0;font-size:12px" id="upload-btn" onclick="simulateUpload()">Simulate upload</button>
+        <button class="nb" style="margin-top:0;font-size:12px" onclick="resetUpload()">Reset</button>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" id="prog-bar" style="width:0%"></div></div>
+      <div style="font-size:11.5px;color:var(--color-text-tertiary);margin-top:4px" id="upload-msg">Ready. Press simulate to start parallel chunk upload.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Presigned URLs — the right way to handle uploads</div>
+    <div class="prose"><strong>The wrong way:</strong> Client → API server → S3. The file goes through your API server. This ties up threads, wastes bandwidth (the file travels twice — client to server, server to S3), and makes your API server a bottleneck for large files.<br><br><strong>The right way — presigned URLs:</strong> Client asks your API server for a presigned URL. Server generates a time-limited URL (signed with your S3 credentials) and returns it. Client uploads directly to S3 using that URL — no data passes through your server. S3 enforces the time limit and size constraints.<br><br>Presigned GET URL: Client can download an object from S3 without it being publicly accessible. URL expires in N seconds. Signed with your credentials to prove authorisation.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — presigned multipart upload</div>
+    <div class="ab">Presigned multipart upload flow:
+
+  Client (browser / mobile)
+    │ 1. POST /api/uploads/init  {filename, size, parts: 5}
+    ▼
+  API Server
+    │ 2. s3.createMultipartUpload() → UploadId
+    │ 3. generate 5 presigned URLs (one per part, expiry 1hr)
+    │ 4. return { uploadId, presignedUrls: [url1...url5] }
+    ▼
+  Client
+    │ 5. Split file into 5 chunks
+    │ 6. PUT chunk1 → presignedUrl1 (directly to S3)
+    │    PUT chunk2 → presignedUrl2 (in parallel)
+    │    ...up to 8 parallel uploads...
+    │    each returns an ETag
+    ▼
+  Client
+    │ 7. POST /api/uploads/complete
+    │    { uploadId, parts: [{partNumber:1, eTag:...}...] }
+    ▼
+  API Server
+    │ 8. s3.completeMultipartUpload() → final object URL
+    │ 9. Save metadata to DB (filename, s3Key, userId, size)
+    │ 10. Trigger async job: transcode video, extract thumbnails
+    ▼
+  Client ← 200 OK { fileUrl: "https://cdn.example.com/videos/abc123" }
+
+No video bytes ever touch the API server.
+Parallel 5-part upload of a 1GB file at 100MB/s → ~2 seconds.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Resumable uploads</div>
+    <div class="prose"><strong>The problem:</strong> User is halfway through a 5GB upload. Connection drops. Restart from zero? Unacceptable.<br><br><strong>Resumability with S3 multipart:</strong> Track which parts have been uploaded (store ETag list in your DB or client-side). On resume, query which parts are missing and upload only those. S3 keeps incomplete multipart uploads for up to 7 days — plenty of time to resume.<br><br><strong>TUS protocol:</strong> An open protocol for resumable uploads. The client stores the upload offset. On resume, it sends a PATCH request with the current offset. The server continues from where it left off. Used by Vimeo, Cloudflare, and uploadcare. Worth mentioning for a YouTube-like system design.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Presigned URLs are mandatory for any file upload system.</strong> "Files never go through my API server. Client requests a presigned URL, uploads directly to S3. This keeps my API servers stateless and removes them from the data path entirely."</li>
+      <li><strong>Multipart upload minimum part size is 5MB.</strong> "S3 requires parts ≥ 5MB (except the last). I'd use 20–100MB chunks for large files, uploading 8 in parallel. For a 10GB video at 100MB/s with 8-parallel 100MB chunks, upload completes in ~12 seconds vs 100s sequential."</li>
+      <li><strong>Always set a lifecycle rule to abort incomplete uploads.</strong> "Abandoned multipart uploads accumulate storage charges. I'd add an S3 lifecycle rule: abort any incomplete multipart upload older than 7 days."</li>
+      <li><strong>EngineX resume upload for PDFs:</strong> "For EngineX, users upload resumes (typically small — < 5MB). For those I'd use a simple presigned PUT to S3, no multipart needed. For a video-based system like Zombie Hunt game replays, multipart upload with resumability would be essential."</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(0)">← S3 object storage</a><a onclick="sendPrompt('Explain YouTube upload and transcoding pipeline system design')">YouTube pipeline</a><a onclick="sendPrompt('Continue with Block 9: Full system design walkthroughs — URL shortener, Twitter feed, WhatsApp, Uber, payment system, notification system')">Continue to Block 9 ↗</a></div></div>
+  <button class="nb" onclick="sendPrompt('Continue with Block 9: Full end-to-end system design problems — URL shortener, Twitter/X feed, WhatsApp messaging, YouTube video platform, Uber ride matching, payment processing system, notification system — with complete architecture diagrams, component choices with justifications, and 45-minute interview structure')">Continue to Block 9 ↗</button>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(i){
+  document.querySelectorAll('.topic').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.querySelectorAll('.ni').forEach((n,j)=>n.classList.toggle('active',j===i));
+  document.querySelector('.content').scrollTop=0;
+}
+function stab(el,gid,pid){
+  document.getElementById(gid).querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pid).classList.add('active');
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const DOCS=[
+  {id:1,text:"razorpay payment gateway india"},
+  {id:2,text:"india startup payment processing"},
+  {id:3,text:"zepto fast delivery india"}
+];
+const STOPWORDS=new Set(["a","the","and","or","in","of","to","for","is","it","on","at","by"]);
+function buildIndex(){
+  const idx={};
+  DOCS.forEach(d=>{
+    d.text.split(/\s+/).forEach(w=>{
+      if(STOPWORDS.has(w))return;
+      if(!idx[w])idx[w]=[];
+      if(!idx[w].includes(d.id))idx[w].push(d.id);
+    });
+  });
+  return idx;
+}
+const IDX=buildIndex();
+function renderIndex(){
+  let h='';
+  Object.entries(IDX).sort().forEach(([term,docs])=>{
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <span style="font-size:12px;font-weight:500;color:var(--color-text-primary);min-width:110px;font-family:var(--font-mono)">${term}</span>
+      <div class="posting-list">${docs.map(d=>`<span class="doc-pill">doc${d}</span>`).join('')}</div>
+    </div>`;
+  });
+  document.getElementById('inv-index').innerHTML=h;
+}
+renderIndex();
+function searchDocs(){
+  const q=document.getElementById('search-q').value.trim().toLowerCase();
+  if(!q){document.getElementById('search-results').textContent='';return;}
+  const terms=q.split(/\s+/).filter(w=>!STOPWORDS.has(w)&&w.length>0);
+  const scores={};
+  terms.forEach(t=>{
+    (IDX[t]||[]).forEach(id=>{scores[id]=(scores[id]||0)+1;});
+  });
+  const hits=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  if(!hits.length){document.getElementById('search-results').innerHTML='<span style="color:var(--color-text-tertiary)">No results</span>';return;}
+  const html=hits.map(([id,sc])=>`<span style="font-size:12px;color:var(--color-text-secondary)">Doc ${id}: <strong style="color:var(--color-text-primary)">${DOCS[id-1].text}</strong> (score: ${sc})</span>`).join('<br>');
+  document.getElementById('search-results').innerHTML=html;
+}
+
+const RES_LABELS=['Raw (1s)','1-min avg','1-hour avg','1-day avg'];
+const RES_BARS=[60,12,6,4];
+function drawTs(){
+  const r=+document.getElementById('res').value;
+  document.getElementById('res-out').textContent=RES_LABELS[r-1];
+  const n=RES_BARS[r-1];
+  const seed=r*17;
+  let h='';
+  for(let i=0;i<n;i++){
+    const v=30+Math.abs(Math.sin((i+seed)*0.7)*60)|0;
+    const col=r===1?'#378ADD':r===2?'#1D9E75':r===3?'#EF9F27':'#993C1D';
+    h+=`<div class="ts-bar" style="height:${v}%;flex:1;background:${col};opacity:0.7"></div>`;
+  }
+  document.getElementById('ts-bars').innerHTML=h;
+  const pts=[n*60,n*60,n*60,n][r-1];
+  document.getElementById('ts-caption').textContent=`${n} bars shown. ${RES_LABELS[r-1]} resolution — ${n} data points represent the same window. Raw would be ${60} points.`;
+}
+drawTs();
+
+let uploadInterval=null;
+function updateUpload(){
+  const fs=+document.getElementById('fsize').value;
+  const cs=+document.getElementById('csize').value;
+  document.getElementById('fsize-out').textContent=fs+' GB';
+  document.getElementById('csize-out').textContent=cs+' MB';
+  const chunks=Math.ceil((fs*1024)/cs);
+  let h='';
+  for(let i=0;i<Math.min(chunks,80);i++){
+    h+=`<div id="chunk-${i}" style="width:16px;height:16px;border-radius:3px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary)"></div>`;
+  }
+  if(chunks>80)h+=`<div style="font-size:11px;color:var(--color-text-tertiary);align-self:center">+${chunks-80} more</div>`;
+  document.getElementById('chunk-grid').innerHTML=h;
+  document.getElementById('upload-msg').textContent=`${chunks} chunks × ${cs}MB. ${Math.min(8,chunks)} parallel uploads.`;
+  document.getElementById('prog-bar').style.width='0%';
+}
+updateUpload();
+function simulateUpload(){
+  if(uploadInterval)clearInterval(uploadInterval);
+  const fs=+document.getElementById('fsize').value;
+  const cs=+document.getElementById('csize').value;
+  const chunks=Math.ceil((fs*1024)/cs);
+  const visible=Math.min(chunks,80);
+  let done=0;
+  const parallelism=Math.min(8,visible);
+  let inFlight=new Set();
+  const queue=[...Array(visible).keys()];
+  document.getElementById('upload-btn').disabled=true;
+  function tick(){
+    while(inFlight.size<parallelism&&queue.length>0){
+      const idx=queue.shift();
+      inFlight.add(idx);
+      const delay=600+Math.random()*800;
+      setTimeout(()=>{
+        const el=document.getElementById('chunk-'+idx);
+        if(el)el.style.background='#5DCAA5';
+        inFlight.delete(idx);
+        done++;
+        const pct=Math.round((done/chunks)*100);
+        document.getElementById('prog-bar').style.width=pct+'%';
+        document.getElementById('upload-msg').textContent=`Uploading… ${done}/${chunks} chunks done (${pct}%)`;
+        if(done===chunks){
+          document.getElementById('upload-msg').textContent=`Upload complete. S3 assembled ${chunks} parts into one object.`;
+          document.getElementById('upload-btn').disabled=false;
+          return;
+        }
+        tick();
+      },delay);
+    }
+  }
+  tick();
+}
+function resetUpload(){
+  if(uploadInterval)clearInterval(uploadInterval);
+  document.getElementById('upload-btn').disabled=false;
+  updateUpload();
+}
+</script>

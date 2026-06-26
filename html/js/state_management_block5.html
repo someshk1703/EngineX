@@ -1,0 +1,709 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.shell{display:flex;height:100vh;min-height:640px;overflow:hidden}
+.nav{width:232px;min-width:232px;border-right:0.5px solid var(--color-border-tertiary);padding:12px 0;overflow-y:auto;background:var(--color-background-secondary)}
+.nav-title{font-size:10px;font-weight:500;color:var(--color-text-tertiary);padding:6px 16px 4px;letter-spacing:.07em;text-transform:uppercase}
+.ni{display:block;padding:7px 16px;font-size:12.5px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent;line-height:1.4;transition:all .12s}
+.ni:hover{color:var(--color-text-primary);background:var(--color-background-primary)}
+.ni.active{color:var(--color-text-primary);border-left-color:#7F77DD;background:var(--color-background-primary);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:26px 30px}
+.topic{display:none}.topic.visible{display:block}
+h1.ttl{font-size:20px;font-weight:500;margin-bottom:4px}
+.tnum{font-size:11px;color:var(--color-text-tertiary);margin-bottom:12px}
+.tags{margin-bottom:12px}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin:0 3px 3px 0}
+.tg{background:#E1F5EE;color:#085041}.tp{background:#EEEDFE;color:#3C3489}.tw{background:#FAEEDA;color:#633806}.td{background:#FCEBEB;color:#791F1F}.ti{background:#E6F1FB;color:#0C447C}.tc{background:#FAECE7;color:#712B13}
+.sl{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin:18px 0 6px;display:flex;align-items:center;gap:6px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{font-weight:500;color:var(--color-text-primary)}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+.g3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:7px}
+.sb{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.sb h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.sb p{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.cb{background:#1a1b26;border-radius:var(--border-radius-md);padding:13px 15px;margin:8px 0;overflow-x:auto}
+.cb pre{font-family:var(--font-mono);font-size:11.5px;line-height:1.75;color:#c0caf5;white-space:pre}
+.kw{color:#bb9af7}.fn{color:#7aa2f7}.cm{color:#565f89;font-style:italic}.str{color:#9ece6a}.num{color:#ff9e64}.vr{color:#f7768e}.cl{color:#e0af68}
+.mst{border-left:2px solid #E24B4A;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.tof{border-left:2px solid #EF9F27;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.iq{font-size:12.5px;padding:8px 11px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin:5px 0;border:0.5px solid var(--color-border-tertiary)}
+.iq .q{font-weight:500;margin-bottom:2px}
+.iq .d{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.55}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pill{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
+.pq{background:var(--color-background-info);color:var(--color-text-info)}
+.pc{background:#E1F5EE;color:#085041}
+.divline{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:26px 0}
+.divlabel{text-align:center;font-size:11px;color:var(--color-text-tertiary);margin:-10px 0 18px}
+.arch{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 13px;margin:5px 0}
+.arch h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.arch p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.65}
+.flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:8px 0}
+.fbox{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 10px;font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.farr{font-size:13px;color:var(--color-text-tertiary)}
+.fbox.g{border-color:#1D9E75;background:#E1F5EE;color:#085041}
+.fbox.p{border-color:#534AB7;background:#EEEDFE;color:#3C3489}
+.fbox.a{border-color:#BA7517;background:#FAEEDA;color:#633806}
+.fbox.r{border-color:#A32D2D;background:#FCEBEB;color:#791F1F}
+.fbox.b{border-color:#185FA5;background:#E6F1FB;color:#0C447C}
+.compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+.ccard{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;background:var(--color-background-primary)}
+.ccard h4{font-size:13px;font-weight:500;margin-bottom:6px}
+.ccard .badge{display:inline-block;font-size:10px;font-weight:500;padding:1px 6px;border-radius:3px;margin-bottom:6px}
+.ccard ul{list-style:none;padding:0}
+.ccard li{font-size:11.5px;color:var(--color-text-secondary);line-height:1.6;padding:1px 0}
+.ccard li::before{content:'·  ';color:var(--color-text-tertiary)}
+.norm-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin:8px 0}
+.norm-box{border-radius:var(--border-radius-md);padding:10px 12px}
+.norm-box h4{font-size:12.5px;font-weight:500;margin-bottom:4px}
+.norm-box p{font-size:12px;line-height:1.55}
+.nb-yes{background:#E1F5EE;border:0.5px solid #5DCAA5}.nb-yes h4{color:#085041}.nb-yes p{color:#0F6E56}
+.nb-no{background:#FAEEDA;border:0.5px solid #EF9F27}.nb-no h4{color:#633806}.nb-no p{color:#854F0B}
+</style>
+
+<div class="shell">
+<nav class="nav">
+  <div class="nav-title">Block 5 — State Management</div>
+  <div class="ni active" onclick="show(0,this)">1. Client state vs server state</div>
+  <div class="ni" onclick="show(1,this)">2. Redux internals</div>
+  <div class="ni" onclick="show(2,this)">3. Zustand vs Jotai vs Recoil</div>
+  <div class="ni" onclick="show(3,this)">4. React Query internals</div>
+  <div class="ni" onclick="show(4,this)">5. Optimistic UI</div>
+  <div class="ni" onclick="show(5,this)">6. Normalised vs denormalised state</div>
+</nav>
+
+<main class="content">
+
+<div class="topic visible" id="t0">
+  <div class="tnum">Topic 1 of 6 — Block 5: State Management</div>
+  <h1 class="ttl">Client state vs server state</h1>
+  <div class="tags"><span class="tag tp">Different problems</span><span class="tag tg">Ownership</span><span class="tag tw">Stale data</span><span class="tag td">Redux misuse</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Client state and server state are fundamentally different problems masquerading as the same one. <strong>Client state</strong> is UI state that lives exclusively in the browser: is this modal open, which tab is selected, what text is in this search input. You own it, it's always synchronous, it doesn't expire, and only your app can change it. <strong>Server state</strong> is data that lives on the server and is fetched asynchronously: the user's profile, the list of products, the current order status. You don't own it — the server does. It can change while your user is looking at it. It can become stale. It requires loading/error/success states. It needs caching, deduplication, background refresh, and pagination. Managing these two with the same tool (Redux) is the most common architectural mistake in large React codebases.</p>
+
+  <div class="sl">How they differ internally</div>
+
+  <div class="g2">
+    <div class="sb"><h4>Client state characteristics</h4><p>Synchronous. You control when it changes. Never stale — it only changes when your code changes it. No loading states. No network errors. Small, transient. Examples: modal open/close, selected filter, form draft, sidebar collapsed, dark mode preference.</p></div>
+    <div class="sb"><h4>Server state characteristics</h4><p>Async — requires fetch. Can change on the server at any time without your knowledge. Needs caching (don't re-fetch unchanged data). Needs deduplication (10 components mounting = 1 request, not 10). Needs background refresh. Can fail. Needs pagination and infinite scroll support. Examples: user data, API lists, order status, prices.</p></div>
+    <div class="sb"><h4>The Redux-for-server-state anti-pattern</h4><p>Redux was designed for client state. When teams use it for server state, they end up writing: manual loading flags, manual error states, manual cache invalidation, manual deduplication, manual background polling, manual optimistic updates — thousands of lines of boilerplate solving problems that TanStack Query solves in 3 lines.</p></div>
+    <div class="sb"><h4>The right split</h4><p>Server state → React Query / TanStack Query / SWR / RTK Query. Client UI state → useState / useReducer / Zustand / Jotai. Global client state that's truly global (theme, auth status) → Context or Zustand. Don't conflate layers.</p></div>
+  </div>
+
+  <div class="sl">The problems server state creates that client state doesn't</div>
+  <div class="g3">
+    <div class="sb"><h4>Staleness</h4><p>Server data fetched at T=0 may not reflect server reality at T=60s. Client state never stales — only you change it. Server state requires a TTL and background revalidation strategy.</p></div>
+    <div class="sb"><h4>Request deduplication</h4><p>10 components all call <code>useUser(id)</code> simultaneously on mount. Without deduplication: 10 network requests. React Query: 1 request, 10 subscribers to the result. Redux: you have to implement this yourself.</p></div>
+    <div class="sb"><h4>Cache synchronization</h4><p>User updates their profile. Now <code>GET /user</code> cached 30s ago is stale. You need to invalidate the cache. React Query: <code>queryClient.invalidateQueries(['user'])</code>. Redux: manually dispatch to clear + refetch, update reducer, update selectors.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ❌ Redux managing server state — the anti-pattern</span>
+<span class="cm">// actions.js</span>
+<span class="kw">export const</span> FETCH_USERS_REQUEST = <span class="str">'FETCH_USERS_REQUEST'</span>;
+<span class="kw">export const</span> FETCH_USERS_SUCCESS = <span class="str">'FETCH_USERS_SUCCESS'</span>;
+<span class="kw">export const</span> FETCH_USERS_FAILURE = <span class="str">'FETCH_USERS_FAILURE'</span>;
+
+<span class="cm">// reducer.js — manual loading/error/data states</span>
+<span class="kw">const</span> initialState = { data: [], loading: <span class="kw">false</span>, error: <span class="kw">null</span>, lastFetched: <span class="kw">null</span> };
+<span class="kw">function</span> <span class="fn">usersReducer</span>(state = initialState, action) {
+  <span class="kw">switch</span> (action.type) {
+    <span class="kw">case</span> FETCH_USERS_REQUEST: <span class="kw">return</span> { ...state, loading: <span class="kw">true</span>, error: <span class="kw">null</span> };
+    <span class="kw">case</span> FETCH_USERS_SUCCESS: <span class="kw">return</span> { data: action.payload, loading: <span class="kw">false</span>, lastFetched: <span class="cl">Date</span>.<span class="fn">now</span>() };
+    <span class="kw">case</span> FETCH_USERS_FAILURE: <span class="kw">return</span> { ...state, loading: <span class="kw">false</span>, error: action.error };
+  }
+}
+<span class="cm">// ~50 lines of boilerplate for one endpoint. Multiply by 20 endpoints.</span>
+<span class="cm">// No deduplication. No background refresh. No cache invalidation. No retries.</span>
+
+<span class="cm">// ✅ React Query — server state solved in 3 lines</span>
+<span class="kw">function</span> <span class="fn">UserList</span>() {
+  <span class="kw">const</span> { data, isLoading, error } = <span class="fn">useQuery</span>({
+    queryKey: [<span class="str">'users'</span>],
+    queryFn: () => <span class="fn">fetch</span>(<span class="str">'/api/users'</span>).<span class="fn">then</span>(r => r.<span class="fn">json</span>()),
+    staleTime: <span class="num">60_000</span>,      <span class="cm">// Fresh for 60s — no refetch if not stale</span>
+  });
+  <span class="cm">// Deduplication: 10 components mounting = 1 request</span>
+  <span class="cm">// Background refetch on window focus (when data might have changed)</span>
+  <span class="cm">// Automatic retry on network failure</span>
+  <span class="cm">// Loading/error/success states built in</span>
+}
+
+<span class="cm">// ✅ Client state stays in React — useState or Zustand</span>
+<span class="kw">const</span> [isModalOpen, setIsModalOpen] = <span class="fn">useState</span>(<span class="kw">false</span>); <span class="cm">// No Redux needed</span>
+<span class="kw">const</span> [selectedTab, setSelectedTab] = <span class="fn">useState</span>(<span class="str">'overview'</span>);</pre></div>
+
+  <div class="sl">Real-world architecture use case</div>
+  <div class="arch"><h4>Razorpay / CRED-style dashboard architecture</h4><p>A payments dashboard separates concerns cleanly. Server state (transactions, user KYC status, wallet balance, recent settlements): React Query, auto-refreshed every 30s, invalidated on any mutation. Client state (selected date range filter, sidebar open/closed, which transaction row is expanded, multi-select state): Zustand store, never touches the network. Auth state (session token, user role): Zustand with persistence, seeded from server on login, treated as client state after that. This separation means the server state layer can be swapped (React Query → SWR → RTK Query) without touching a single UI component.</p></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Storing API response data in Redux/Zustand and writing a manual cache layer on top of it. This is reinventing React Query poorly. If data lives on a server, use a data-fetching library that understands server state semantics.</div>
+  <div class="mst">Using React Query for UI state — <code>useQuery</code> with a local-only key and no <code>queryFn</code> (or a function that doesn't fetch). This misuses the cache layer for something that doesn't need caching or network semantics. Use useState.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Why is managing server state with Redux problematic?"</div><div class="d">Redux is designed for synchronous, you-own-it state. Server state has async lifecycle, staleness, deduplication, background refresh, cache invalidation — none of which Redux handles natively. Teams end up writing thousands of lines of middleware, reducers, and selectors to solve problems that TanStack Query solves out of the box. The real issue: Redux doesn't know your data is stale. React Query does.</div></div>
+  <div class="iq"><div class="q">"What belongs in global client state vs server state vs local component state?"</div><div class="d">Local component state: UI that doesn't need to be shared (form inputs, toggle states, hover effects). Global client state: UI state shared across distant components (theme, locale, sidebar collapsed, multi-step wizard progress). Server state: anything fetched from an API (use React Query / SWR). Don't over-globalize — component state is free; global state has coordination overhead.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">React Query (topic 4 — the right tool for server state)</span>
+    <span class="pill pq">Zustand (topic 3 — right tool for client state)</span>
+    <span class="pill pc">HTTP caching (same stale-while-revalidate concept)</span>
+    <span class="pill pc">Redux (topic 2 — its actual valid use cases)</span>
+  </div>
+</div>
+
+<div class="topic" id="t1">
+  <div class="tnum">Topic 2 of 6 — Block 5: State Management</div>
+  <h1 class="ttl">Redux internals</h1>
+  <div class="tags"><span class="tag tp">Store / reducer</span><span class="tag tg">Action flow</span><span class="tag tw">Middleware</span><span class="tag ti">Selector memoisation</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Redux is a predictable state container based on three principles: <strong>single source of truth</strong> (one store, one state tree), <strong>state is read-only</strong> (only actions can trigger changes), and <strong>changes are made with pure functions</strong> (reducers). The unidirectional data flow — action → dispatcher → reducer → new state → UI re-render — makes state changes traceable, reproducible, and time-travel-debuggable. Redux's primary valid use cases today: complex client-side state with many interdependencies, applications requiring strict audit trails, or teams already on Redux who haven't migrated. New projects should default to Zustand + React Query.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">The Redux store is an object with four methods: <code>getState()</code>, <code>dispatch(action)</code>, <code>subscribe(listener)</code>, and <code>replaceReducer(nextReducer)</code>. When <code>dispatch(action)</code> is called, the store passes the current state and the action to the root reducer, receives a new state object, stores it, then calls all subscriber listeners. React-Redux's <code>useSelector</code> subscribes to the store — when the store notifies listeners, it runs the selector function and re-renders the component if the selected value changed (using strict equality by default). <strong>Middleware</strong> is a higher-order function that wraps <code>dispatch</code> — it intercepts every action before it reaches the reducer, enabling async logic (thunk), logging, analytics, and sagas. The middleware chain is <code>dispatch → middleware1 → middleware2 → reducer</code>.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Reducer purity requirement</h4><p>Reducers must be pure functions: (state, action) → new state. No side effects (no API calls, no random values, no Date.now(), no mutations of the existing state). Purity enables: time-travel debugging (replay actions on pure functions), predictable testing, and concurrent renders in React 18.</p></div>
+    <div class="sb"><h4>Redux Thunk</h4><p>Allows dispatching functions (thunks) instead of plain objects. The thunk middleware checks if the dispatched value is a function; if so, calls it with (dispatch, getState). Enables async action creators. Simple, synchronous-looking async code. Limited: can't cancel, can't model complex async flows cleanly.</p></div>
+    <div class="sb"><h4>Redux Saga</h4><p>Uses ES6 generators to model complex async flows as readable sequential code. Sagas run as long-lived background threads, listening for actions via <code>take()</code> and running effects via <code>call()</code>/<code>put()</code>/<code>race()</code>/<code>takeLatest()</code>. Power: cancellation, debounce/throttle, complex orchestration. Cost: steep learning curve, large API surface.</p></div>
+    <div class="sb"><h4>Selector memoisation — Reselect</h4><p><code>createSelector(inputSelectors, resultFn)</code> memoises derived state computation. Only recomputes when any input selector's output changes (by reference). Prevents expensive transformations (filter + sort of large arrays) from running on every dispatch, even unrelated ones. RTK uses Reselect internally via <code>createSelector</code>.</p></div>
+    <div class="sb"><h4>Redux Toolkit (RTK)</h4><p>The modern way to write Redux. <code>createSlice</code> generates actions + reducer from one object. Uses Immer internally — lets you write mutating-looking code that actually produces immutable updates. <code>createAsyncThunk</code> handles pending/fulfilled/rejected action lifecycle. Eliminates 80% of Redux boilerplate.</p></div>
+    <div class="sb"><h4>Normalisation in Redux</h4><p>RTK's <code>createEntityAdapter</code> provides a normalised state structure (entities by ID + allIds array) with CRUD operations built in. Prevents the N+1 update problem where denormalised state requires updating the same data in multiple places.</p></div>
+  </div>
+
+  <div class="sl">Action flow diagram</div>
+  <div class="flow">
+    <div class="fbox b">UI event</div><div class="farr">→</div>
+    <div class="fbox">dispatch(action)</div><div class="farr">→</div>
+    <div class="fbox a">middleware chain</div><div class="farr">→</div>
+    <div class="fbox p">reducer (pure fn)</div><div class="farr">→</div>
+    <div class="fbox g">new state</div><div class="farr">→</div>
+    <div class="fbox">useSelector re-runs</div><div class="farr">→</div>
+    <div class="fbox b">UI re-renders</div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// RTK slice — modern Redux (no boilerplate)</span>
+<span class="kw">import</span> { createSlice, createAsyncThunk, createSelector } <span class="kw">from</span> <span class="str">'@reduxjs/toolkit'</span>;
+
+<span class="kw">export const</span> fetchCart = <span class="fn">createAsyncThunk</span>(<span class="str">'cart/fetch'</span>, <span class="kw">async</span> (userId) => {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`/api/cart/${userId}`</span>);
+  <span class="kw">return</span> res.<span class="fn">json</span>();
+}); <span class="cm">// Generates cart/fetch/pending, /fulfilled, /rejected actions</span>
+
+<span class="kw">const</span> cartSlice = <span class="fn">createSlice</span>({
+  name: <span class="str">'cart'</span>,
+  initialState: { items: [], status: <span class="str">'idle'</span>, error: <span class="kw">null</span> },
+  reducers: {
+    <span class="cm">// Immer: write "mutating" code → Immer produces new immutable state</span>
+    <span class="fn">addItem</span>(state, action) { state.items.<span class="fn">push</span>(action.payload); },
+    <span class="fn">removeItem</span>(state, action) {
+      state.items = state.items.<span class="fn">filter</span>(i => i.id !== action.payload);
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .<span class="fn">addCase</span>(fetchCart.pending,   (state) => { state.status = <span class="str">'loading'</span>; })
+      .<span class="fn">addCase</span>(fetchCart.fulfilled, (state, { payload }) => {
+        state.status = <span class="str">'succeeded'</span>; state.items = payload;
+      })
+      .<span class="fn">addCase</span>(fetchCart.rejected,  (state, { error }) => {
+        state.status = <span class="str">'failed'</span>; state.error = error.message;
+      });
+  },
+});
+
+<span class="cm">// Memoised selector — only recomputes when cart.items changes</span>
+<span class="kw">const</span> selectCartItems   = state => state.cart.items;
+<span class="kw">const</span> selectCartTotal   = <span class="fn">createSelector</span>(
+  selectCartItems,
+  (items) => items.<span class="fn">reduce</span>((sum, i) => sum + i.price * i.qty, <span class="num">0</span>)
+); <span class="cm">// Memoised: won't recompute if unrelated state changes (e.g. auth)</span>
+
+<span class="cm">// Redux Thunk vs Saga — same async logic, different model</span>
+<span class="cm">// Thunk: async function dispatching actions</span>
+<span class="kw">const</span> fetchAndProcess = (userId) => <span class="kw">async</span> (dispatch, getState) => {
+  dispatch({ type: <span class="str">'LOADING'</span> });
+  <span class="kw">try</span> {
+    <span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">fetchUser</span>(userId);
+    dispatch({ type: <span class="str">'SUCCESS'</span>, payload: data });
+  } <span class="kw">catch</span> (e) { dispatch({ type: <span class="str">'ERROR'</span>, error: e }); }
+};
+
+<span class="cm">// Saga: generator-based, cancellable, composable</span>
+<span class="kw">function</span>* <span class="fn">fetchUserSaga</span>(action) {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> user = <span class="kw">yield</span> <span class="fn">call</span>(fetchUser, action.payload);
+    <span class="kw">yield</span> <span class="fn">put</span>({ type: <span class="str">'SUCCESS'</span>, payload: user });
+  } <span class="kw">catch</span> (e) { <span class="kw">yield</span> <span class="fn">put</span>({ type: <span class="str">'ERROR'</span>, error: e }); }
+}
+<span class="kw">function</span>* <span class="fn">watchFetchUser</span>() {
+  <span class="kw">yield</span> <span class="fn">takeLatest</span>(<span class="str">'FETCH_USER'</span>, fetchUserSaga);
+  <span class="cm">// takeLatest: cancels in-flight saga if action fires again</span>
+  <span class="cm">// No equivalent without extra code in thunk</span>
+}</pre></div>
+
+  <div class="sl">Thunk vs Saga — when to choose</div>
+  <div class="g2">
+    <div class="sb"><h4>Use thunk when</h4><p>Simple async flows: fetch → dispatch success/error. Team knows async/await. RTK's <code>createAsyncThunk</code> covers 80% of real-world needs with built-in lifecycle actions. No saga learning curve needed.</p></div>
+    <div class="sb"><h4>Use saga when</h4><p>Complex orchestration: race conditions (search autocomplete — cancel previous request on new keystroke), long-running background tasks, action-watching patterns, debounce/throttle of dispatch, transactional flows that need rollback. Power comes at the cost of generator syntax familiarity.</p></div>
+  </div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Mutating state directly in reducers without Immer — Redux requires immutable updates. Without RTK/Immer, writing <code>state.user.name = action.payload</code> silently breaks Redux because the reference doesn't change, so subscribers aren't notified. Always use RTK (Immer included) or spread correctly.</div>
+  <div class="mst">Deriving state in components instead of memoised selectors — <code>const total = useSelector(state => state.cart.items.reduce(...))</code> inside a component re-runs the reduce on every dispatch, even ones completely unrelated to cart. Extract into a <code>createSelector</code> memoised selector.</div>
+  <div class="mst">Not using <code>takeLatest</code> in sagas for search/autocomplete — if the user types fast, multiple saga instances run simultaneously, and a slow earlier response can overwrite a faster later one. <code>takeLatest</code> cancels the previous saga on each new action.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Explain Redux's unidirectional data flow."</div><div class="d">UI dispatches an action (plain object with type). Middleware intercepts (thunk checks if it's a function, logging middleware logs it). The root reducer receives (currentState, action) and returns new state (pure function, no mutations). Store stores new state, notifies all useSelector subscribers. Subscribers re-run their selector; if the selected value changed (reference equality), component re-renders. One direction, always.</div></div>
+  <div class="iq"><div class="q">"Why must reducers be pure functions?"</div><div class="d">Purity enables time-travel debugging (replay action history on pure functions to reproduce any state). Enables predictable testing (same inputs → same output, always). Enables React 18 concurrent rendering (render phase may call reducers multiple times — side effects in reducers would fire multiple times). Immutable updates enable efficient change detection via reference equality.</div></div>
+  <div class="iq"><div class="q">"When would you choose Redux Saga over Thunk?"</div><div class="d">When you need: cancellation (takeLatest stops previous saga on new action), complex sequencing (take an action, call API, wait for another action, call second API), debouncing dispatches, or transactional patterns with compensation logic. Thunk is sufficient for straightforward fetch → dispatch flows.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Zustand (modern alternative, topic 3)</span>
+    <span class="pill pc">Generators (saga's implementation mechanism)</span>
+    <span class="pill pc">Immer (structural sharing for immutable updates)</span>
+    <span class="pill pq">Reselect memoisation (same concept as useMemo)</span>
+    <span class="pill pc">Redux DevTools (time-travel made possible by pure reducers)</span>
+  </div>
+</div>
+
+<div class="topic" id="t2">
+  <div class="tnum">Topic 3 of 6 — Block 5: State Management</div>
+  <h1 class="ttl">Zustand vs Jotai vs Recoil</h1>
+  <div class="tags"><span class="tag tp">Store model</span><span class="tag tg">Atom model</span><span class="tag tw">Re-render granularity</span><span class="tag td">Bundle size</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Zustand, Jotai, and Recoil represent two competing mental models for global state management without Redux's verbosity. <strong>Store model</strong> (Zustand): one or more stores hold all state. Components subscribe to slices of a store via selector functions. Re-renders only when the selected slice changes. <strong>Atom model</strong> (Jotai, Recoil): state is broken into smallest possible units called atoms. Components subscribe to individual atoms. When an atom changes, only components subscribed to that atom re-render. Atoms can derive from other atoms (selectors in Recoil, derived atoms in Jotai). The key architectural difference: store model is top-down (one store, many subscribers), atom model is bottom-up (many atoms, compose upward).</p>
+
+  <div class="compare-grid">
+    <div class="ccard">
+      <h4>Zustand</h4>
+      <div class="badge" style="background:#EEEDFE;color:#3C3489">store model</div>
+      <ul>
+        <li>~1KB bundle</li>
+        <li>No Provider needed</li>
+        <li>Selector-based subscriptions</li>
+        <li>Middleware (devtools, persist, immer)</li>
+        <li>Outside-React access (non-hook API)</li>
+        <li>Best for: shared client UI state</li>
+      </ul>
+    </div>
+    <div class="ccard">
+      <h4>Jotai</h4>
+      <div class="badge" style="background:#E1F5EE;color:#085041">atom model</div>
+      <ul>
+        <li>~3KB bundle</li>
+        <li>Provider optional</li>
+        <li>Atom = smallest unit of state</li>
+        <li>Derived atoms (computed)</li>
+        <li>React Suspense integration</li>
+        <li>Best for: granular, composable state</li>
+      </ul>
+    </div>
+    <div class="ccard">
+      <h4>Recoil</h4>
+      <div class="badge" style="background:#FAEEDA;color:#633806">atom model</div>
+      <ul>
+        <li>~21KB bundle (large)</li>
+        <li>RecoilRoot Provider required</li>
+        <li>Selectors with async support</li>
+        <li>Atom families (parameterised)</li>
+        <li>Meta-maintained (less active)</li>
+        <li>Best for: complex graph state</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sl">How Zustand works internally</div>
+  <p class="prose">Zustand uses a vanilla JS store (not tied to React). The store is a closure containing the current state and a set of subscriber functions. <code>useStore(selector)</code> is a React hook that subscribes to the store and calls <code>selector(state)</code> — it stores the previous selected value and re-renders only when the new selected value is not strictly equal to the previous. The React integration uses <code>useSyncExternalStore</code> internally (React 18). Because the store is external to React, you can read and write state from anywhere — event handlers, WebSocket listeners, non-React code. This is Zustand's key advantage over Context: no Provider tree, no re-render propagation through the component tree.</p>
+
+  <div class="sl">How Jotai works internally</div>
+  <p class="prose">Each atom is an object with a unique key and a config (initial value or read/write functions). Jotai maintains an atom store (a WeakMap keyed by atom objects) that holds current values and subscriber sets. <code>useAtom(atom)</code> reads from the store and subscribes to that atom. When <code>setAtom</code> is called, only components subscribed to that specific atom are notified — not all components subscribed to a parent store. Derived atoms (<code>atom(get => get(countAtom) * 2)</code>) re-compute when their dependencies change, and only notify their own subscribers. This makes re-render granularity extremely fine — changing atom A only re-renders components that subscribed to atom A or atoms derived from A.</p>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ── Zustand ──</span>
+<span class="kw">import</span> { create } <span class="kw">from</span> <span class="str">'zustand'</span>;
+<span class="kw">import</span> { immer } <span class="kw">from</span> <span class="str">'zustand/middleware/immer'</span>;
+<span class="kw">import</span> { devtools, persist } <span class="kw">from</span> <span class="str">'zustand/middleware'</span>;
+
+<span class="kw">const</span> useCartStore = <span class="fn">create</span>(
+  <span class="fn">devtools</span>(<span class="fn">persist</span>(<span class="fn">immer</span>((set) => ({
+    items: [],
+    count: <span class="num">0</span>,
+    <span class="fn">addItem</span>(item) {
+      <span class="fn">set</span>(state => { <span class="cm">// Immer middleware: mutate freely</span>
+        state.items.<span class="fn">push</span>(item);
+        state.count++;
+      });
+    },
+    <span class="fn">removeItem</span>(id) {
+      <span class="fn">set</span>(state => {
+        state.items = state.items.<span class="fn">filter</span>(i => i.id !== id);
+        state.count--;
+      });
+    },
+  })), { name: <span class="str">'cart-storage'</span> })) <span class="cm">// persist to localStorage</span>
+);
+
+<span class="cm">// Selector subscription — only re-renders when `count` changes</span>
+<span class="kw">const</span> count = <span class="fn">useCartStore</span>(state => state.count);
+<span class="cm">// This component is immune to `items` array changes</span>
+
+<span class="cm">// Outside React — Zustand's key advantage</span>
+<span class="fn">useCartStore</span>.<span class="fn">getState</span>().<span class="fn">addItem</span>(newItem); <span class="cm">// WebSocket handler, no React needed</span>
+
+<span class="cm">// ── Jotai ──</span>
+<span class="kw">import</span> { atom, useAtom, useAtomValue, useSetAtom } <span class="kw">from</span> <span class="str">'jotai'</span>;
+
+<span class="kw">const</span> countAtom = <span class="fn">atom</span>(<span class="num">0</span>);
+<span class="kw">const</span> doubledAtom = <span class="fn">atom</span>((get) => <span class="fn">get</span>(countAtom) * <span class="num">2</span>); <span class="cm">// Derived</span>
+<span class="kw">const</span> asyncUserAtom = <span class="fn">atom</span>(<span class="kw">async</span> (get) => { <span class="cm">// Async atom — integrates with Suspense</span>
+  <span class="kw">return</span> <span class="fn">fetch</span>(<span class="str">'/api/user'</span>).<span class="fn">then</span>(r => r.<span class="fn">json</span>());
+});
+
+<span class="kw">function</span> <span class="fn">Counter</span>() {
+  <span class="kw">const</span> [count, setCount] = <span class="fn">useAtom</span>(countAtom); <span class="cm">// Read + write</span>
+  <span class="kw">return</span> &lt;button onClick={() => <span class="fn">setCount</span>(c => c + <span class="num">1</span>)}&gt;{count}&lt;/button&gt;;
+}
+
+<span class="kw">function</span> <span class="fn">Display</span>() {
+  <span class="kw">const</span> doubled = <span class="fn">useAtomValue</span>(doubledAtom); <span class="cm">// Read-only subscription</span>
+  <span class="kw">return</span> &lt;span&gt;{doubled}&lt;/span&gt;;
+}
+<span class="cm">// Display re-renders when doubledAtom recomputes (when countAtom changes)</span>
+<span class="cm">// Other components not using countAtom/doubledAtom: zero re-renders</span></pre></div>
+
+  <div class="sl">Re-render granularity comparison</div>
+  <div class="g2">
+    <div class="sb"><h4>Context: worst granularity</h4><p>All consumers re-render when any part of the context value changes. No selector support natively. Fine for rarely-changing values (theme, locale). Terrible for frequently-changing values (counter, scroll position).</p></div>
+    <div class="sb"><h4>Zustand: selector granularity</h4><p>Components subscribe to a slice via selector. Only re-render when that slice changes (Object.is comparison). One component can select count; another selects items — they don't affect each other. Near-optimal without atom-level precision.</p></div>
+    <div class="sb"><h4>Jotai/Recoil: atom granularity</h4><p>Each atom is independently subscribed. Components only re-render when their specific atom(s) change. No false re-renders from unrelated state. Maximum granularity. Overhead: more atoms to manage, but composition via derived atoms is elegant.</p></div>
+    <div class="sb"><h4>When granularity matters</h4><p>High-frequency updates (scroll position, live counters, real-time data) benefit from fine granularity. Low-frequency updates (user settings, auth) — any approach works. Over-engineering granularity for slowly-changing state adds complexity without benefit.</p></div>
+  </div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Missing the selector in Zustand: <code>const store = useStore()</code> (no selector) subscribes to the entire store — every state change re-renders this component. Always pass a selector: <code>useStore(s => s.count)</code>.</div>
+  <div class="mst">Creating too many atoms in Jotai for state that always changes together — if atomA and atomB always update together, they should be one atom with an object value. Fine-grained atoms are for state that changes independently.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does Zustand achieve fine-grained re-renders without a Provider?"</div><div class="d">Zustand uses useSyncExternalStore (React 18) to subscribe components to an external vanilla JS store. The selector function determines which slice of state the component cares about. React compares the old and new selected value by reference — if unchanged, no re-render. No Provider means no re-render propagation through the tree — components directly subscribe to the store, bypassing React's context mechanism entirely.</div></div>
+  <div class="iq"><div class="q">"When would you choose Jotai over Zustand?"</div><div class="d">When state is genuinely fine-grained and independent (each form field as an atom, each list item's selection state as an atom). When you want React Suspense integration with async atoms. When you're building a library where users compose atoms rather than using a central store. For most application-level client state, Zustand's simplicity and DX are preferable.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Context API performance (topic from Block 3 — why selectors matter)</span>
+    <span class="pill pc">useSyncExternalStore (React 18 hook Zustand uses)</span>
+    <span class="pill pc">Redux Reselect (selector pattern same concept)</span>
+    <span class="pill pq">Jotai async atoms + Suspense (server state territory)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 1–3 complete ───</div>
+
+<div class="topic" id="t3">
+  <div class="tnum">Topic 4 of 6 — Block 5: State Management</div>
+  <h1 class="ttl">React Query / TanStack Query internals</h1>
+  <div class="tags"><span class="tag tp">stale-while-revalidate</span><span class="tag tg">Cache key</span><span class="tag tw">Background refetch</span><span class="tag ti">Optimistic updates</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">TanStack Query (formerly React Query) is an async state manager specifically designed for server state. It implements a sophisticated cache with lifecycle management: every query is identified by a <strong>query key</strong> (array), has a configurable <strong>staleTime</strong> (how long before data is considered stale), a <strong>gcTime</strong> (formerly cacheTime — how long to keep data in cache after no subscribers), automatic <strong>background refetch</strong> on window focus, tab visibility, and network reconnect, and built-in <strong>deduplication</strong> (multiple hooks with the same key share one inflight request). It solves the core problems of server state that Redux leaves to the developer.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">The <code>QueryClient</code> maintains a <code>QueryCache</code> — a Map keyed by serialised query keys. Each entry is a <code>Query</code> object containing: current <code>state</code> (status, data, error, dataUpdatedAt), a subscriber set, the <code>queryFn</code>, and scheduling state. When <code>useQuery</code> mounts, it registers a subscriber with the query. If no query exists for that key, one is created and the queryFn is executed. If a query exists and is <strong>fresh</strong> (data age &lt; staleTime), the cached data is returned immediately. If <strong>stale</strong>, cached data is returned <em>and</em> a background refetch is triggered — this is the stale-while-revalidate pattern. When multiple components mount with the same key, they all register as subscribers to the same Query object — only one network request fires. On unmount, the subscriber is removed. When subscriber count hits 0, a <code>gcTime</code> timer starts — if no new subscriber arrives before it expires, the query is removed from the cache.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Query key design</h4><p>Array-based: <code>['users']</code>, <code>['users', userId]</code>, <code>['users', userId, 'posts']</code>. Keys are serialised for comparison. Hierarchical: invalidating <code>['users']</code> also invalidates <code>['users', anyId]</code>. Include all dependencies that affect the query result in the key — if it changes, the query reruns.</p></div>
+    <div class="sb"><h4>staleTime vs gcTime</h4><p>staleTime: data is "fresh" for this duration — no refetch will trigger. After staleTime, data is "stale" — still shown but refetched in background. gcTime: how long to keep data in cache after all subscribers unmount. Default 5 minutes. After gcTime, cache entry is deleted.</p></div>
+    <div class="sb"><h4>Background refetch triggers</h4><p>On window focus (user switches tabs and comes back). On network reconnect. On mount (if data is stale). On configurable refetchInterval (polling). On manual <code>queryClient.invalidateQueries()</code>. All respect staleTime — no refetch if data is fresh.</p></div>
+    <div class="sb"><h4>Mutations &amp; cache invalidation</h4><p><code>useMutation</code> for write operations. In <code>onSuccess</code>: invalidate related queries via <code>queryClient.invalidateQueries(['users'])</code> — triggers all matching queries to refetch. This is how UI stays consistent after a POST/PUT/DELETE without manual state updates.</p></div>
+    <div class="sb"><h4>Prefetching</h4><p><code>queryClient.prefetchQuery()</code> fills the cache before the component mounts. On hover over a link, prefetch the next page's data — it's in cache when the user navigates. Used in Next.js with RSC: prefetch in Server Component, hydrate in Client Component.</p></div>
+    <div class="sb"><h4>Pagination &amp; infinite queries</h4><p><code>useInfiniteQuery</code> for infinite scroll. Each page is a separate query entry in the cache. <code>fetchNextPage()</code> fetches the next page and appends. <code>keepPreviousData</code> option prevents UI flash when changing page parameters (search, filters).</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Core useQuery patterns</span>
+<span class="kw">import</span> { useQuery, useMutation, useQueryClient } <span class="kw">from</span> <span class="str">'@tanstack/react-query'</span>;
+
+<span class="kw">function</span> <span class="fn">UserProfile</span>({ userId }) {
+  <span class="kw">const</span> { data: user, isLoading, isStale } = <span class="fn">useQuery</span>({
+    queryKey: [<span class="str">'user'</span>, userId],    <span class="cm">// Key includes all deps that affect the result</span>
+    queryFn: () => <span class="fn">getUser</span>(userId),
+    staleTime: <span class="num">5</span> * <span class="num">60</span> * <span class="num">1000</span>,      <span class="cm">// Fresh for 5min — no background refetch</span>
+    gcTime: <span class="num">10</span> * <span class="num">60</span> * <span class="num">1000</span>,        <span class="cm">// Keep in cache 10min after unmount</span>
+    refetchOnWindowFocus: <span class="kw">true</span>,    <span class="cm">// Refetch when user returns to tab</span>
+    retry: <span class="num">3</span>,                       <span class="cm">// Retry failed requests 3 times</span>
+    retryDelay: (attempt) => <span class="cl">Math</span>.<span class="fn">min</span>(<span class="num">1000</span> * <span class="num">2</span> ** attempt, <span class="num">30000</span>), <span class="cm">// Exp backoff</span>
+  });
+}
+
+<span class="cm">// useMutation + cache invalidation — the standard write pattern</span>
+<span class="kw">function</span> <span class="fn">UpdateProfile</span>({ userId }) {
+  <span class="kw">const</span> queryClient = <span class="fn">useQueryClient</span>();
+
+  <span class="kw">const</span> { mutate: updateUser, isPending } = <span class="fn">useMutation</span>({
+    mutationFn: (data) => <span class="fn">patchUser</span>(userId, data),
+    <span class="fn">onSuccess</span>() {
+      <span class="cm">// Invalidate: triggers background refetch of all matching queries</span>
+      queryClient.<span class="fn">invalidateQueries</span>({ queryKey: [<span class="str">'user'</span>, userId] });
+    },
+    <span class="fn">onError</span>(error) {
+      toast.<span class="fn">error</span>(<span class="str">`Update failed: ${error.message}`</span>);
+    },
+  });
+}
+
+<span class="cm">// Dependent queries — runs only when userId is available</span>
+<span class="kw">const</span> { data: user } = <span class="fn">useQuery</span>({ queryKey: [<span class="str">'user'</span>], queryFn: <span class="fn">getUser</span> });
+<span class="kw">const</span> { data: orders } = <span class="fn">useQuery</span>({
+  queryKey: [<span class="str">'orders'</span>, user?.id],
+  queryFn: () => <span class="fn">getOrders</span>(user.id),
+  enabled: !!user?.id,              <span class="cm">// Don't run until user is loaded</span>
+});
+
+<span class="cm">// Deduplication demo — these three hooks fire ONE network request</span>
+<span class="kw">function</span> <span class="fn">Header</span>()   { <span class="kw">const</span> { data } = <span class="fn">useQuery</span>({ queryKey: [<span class="str">'user'</span>], queryFn: <span class="fn">getUser</span> }); }
+<span class="kw">function</span> <span class="fn">Sidebar</span>()  { <span class="kw">const</span> { data } = <span class="fn">useQuery</span>({ queryKey: [<span class="str">'user'</span>], queryFn: <span class="fn">getUser</span> }); }
+<span class="kw">function</span> <span class="fn">Settings</span>() { <span class="kw">const</span> { data } = <span class="fn">useQuery</span>({ queryKey: [<span class="str">'user'</span>], queryFn: <span class="fn">getUser</span> }); }
+<span class="cm">// All three subscribe to the same Query object in QueryCache</span>
+<span class="cm">// Only one queryFn call is made for the first mount, result shared to all three</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Setting <code>staleTime: 0</code> (the default) and expecting no background refetches — default staleTime is 0ms, meaning data is immediately stale after fetching. Every window focus, network reconnect, and mount triggers a refetch. Set staleTime explicitly based on how frequently your data changes.</div>
+  <div class="mst">Including unstable objects in query keys — <code>queryKey: ['users', { filter }]</code> where <code>filter</code> is a new object reference on every render causes React Query to treat it as a new query and refetch constantly. Use primitive values in query keys, or stabilise objects with useMemo.</div>
+  <div class="mst">Calling invalidateQueries with a broad key after a targeted mutation — <code>invalidateQueries(['users'])</code> after updating one user invalidates all user queries (list, detail, infinite). Sometimes correct (list needs to update), sometimes wasteful. Use <code>setQueryData</code> to surgically update the cache without a refetch when you already have the new data from the mutation response.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does React Query handle request deduplication?"</div><div class="d">All components using the same query key share one Query object in the QueryCache. The first component to mount starts the fetch. Subsequent components mounting with the same key register as subscribers to the already-in-flight query — they don't start new requests. When the fetch resolves, all subscribers receive the result simultaneously. This is why 10 components calling useQuery with the same key = 1 network request.</div></div>
+  <div class="iq"><div class="q">"Explain the difference between staleTime and gcTime."</div><div class="d">staleTime: how long data is considered fresh — zero refetches within this window. After staleTime, data is stale: still shown immediately (good UX) but a background refetch starts (ensuring eventual freshness). gcTime: how long after the last subscriber unmounts before the cache entry is deleted. During gcTime, if the component remounts, it gets the cached data instantly and only background-refetches if stale. After gcTime, remounting starts fresh with a loading state.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Optimistic updates (next topic — React Query's onMutate)</span>
+    <span class="pill pc">HTTP stale-while-revalidate (same concept, different layer)</span>
+    <span class="pill pq">Server components (RSC prefetchQuery integration)</span>
+    <span class="pill pc">WebSocket (React Query + subscriptions pattern)</span>
+  </div>
+</div>
+
+<div class="topic" id="t4">
+  <div class="tnum">Topic 5 of 6 — Block 5: State Management</div>
+  <h1 class="ttl">Optimistic UI</h1>
+  <div class="tags"><span class="tag tp">Update locally first</span><span class="tag tg">Rollback on failure</span><span class="tag tw">Idempotency</span><span class="tag ti">Race conditions</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Optimistic UI is the pattern of updating the local UI state <em>immediately</em> on user action — before the server confirms the operation — and rolling back if the server returns an error. It makes interactions feel instantaneous. The user sees the effect of their action (message sent, item liked, todo deleted) without waiting 200-500ms for a server round trip. The tradeoff: you must be able to roll back cleanly if the server rejects the operation, and you must handle the window between the optimistic update and confirmation where the true state is uncertain. This requires idempotent operations and careful handling of concurrent mutations.</p>
+
+  <div class="sl">How it works with React Query's mutation lifecycle</div>
+  <p class="prose">React Query's <code>useMutation</code> provides three callbacks that form the optimistic update lifecycle: <code>onMutate</code> fires before the mutation network request starts — snapshot the current cache, apply the optimistic update to the cache. <code>onError</code> fires if the request fails — use the snapshot to roll back. <code>onSettled</code> fires after success OR error — always invalidate the query to sync with the server's true state. Between <code>onMutate</code> and <code>onSettled</code>, the UI shows the optimistic state. If the server succeeds, the eventual server response replaces the optimistic data. If the server fails, the rollback restores the snapshot.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Snapshot and rollback</h4><p>Before the optimistic update: <code>queryClient.getQueryData(key)</code> captures the current cache. If the mutation fails: <code>queryClient.setQueryData(key, snapshot)</code> restores it. The snapshot is what makes rollback possible — without it you can't undo the optimistic change.</p></div>
+    <div class="sb"><h4>Idempotency requirement</h4><p>Optimistic UI requires the server operation to be idempotent — running it multiple times produces the same result as running it once. If the mutation times out but actually succeeded on the server, a retry must not duplicate data. Use idempotency keys (UUID per request) on the backend.</p></div>
+    <div class="sb"><h4>Race conditions</h4><p>User fires mutation A (optimistic: item = red). Fires mutation B before A responds (optimistic: item = blue). A responds first (success, item = red). B responds (success, item = blue). Cache is now correct. But if A responds after B: server state = red but cache shows blue from B's optimistic update. Cancel in-flight queries during onMutate to prevent stale refetches overwriting.</p></div>
+    <div class="sb"><h4>Temporary IDs</h4><p>Adding items optimistically before server assigns an ID: generate a temporary client-side ID (e.g., <code>temp_${uuid()}</code>). Render with temp ID. On server success, replace with the real ID. Components using the temp ID must handle the swap gracefully — key stability matters here.</p></div>
+    <div class="sb"><h4>Error UX</h4><p>On rollback, show an error notification explaining what failed. The user must know their action didn't take effect. "Failed to send — tap to retry" pattern. Don't silently roll back without feedback — user thinks the action worked.</p></div>
+    <div class="sb"><h4>Zustand optimistic pattern</h4><p>Without React Query: store current state in a variable, apply optimistic update to Zustand store, on fetch failure restore from variable. Same concept, manual implementation. React Query's lifecycle callbacks formalise this pattern.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Optimistic todo deletion with React Query</span>
+<span class="kw">function</span> <span class="fn">useTodoDelete</span>() {
+  <span class="kw">const</span> queryClient = <span class="fn">useQueryClient</span>();
+
+  <span class="kw">return</span> <span class="fn">useMutation</span>({
+    mutationFn: (todoId) => <span class="fn">deleteTodo</span>(todoId),
+
+    <span class="kw">async</span> <span class="fn">onMutate</span>(todoId) {
+      <span class="cm">// 1. Cancel any in-flight refetches (prevent overwriting optimistic update)</span>
+      <span class="kw">await</span> queryClient.<span class="fn">cancelQueries</span>({ queryKey: [<span class="str">'todos'</span>] });
+
+      <span class="cm">// 2. Snapshot current state (needed for rollback)</span>
+      <span class="kw">const</span> previousTodos = queryClient.<span class="fn">getQueryData</span>([<span class="str">'todos'</span>]);
+
+      <span class="cm">// 3. Apply optimistic update — UI responds instantly</span>
+      queryClient.<span class="fn">setQueryData</span>([<span class="str">'todos'</span>], (old) =>
+        old.<span class="fn">filter</span>(todo => todo.id !== todoId)
+      );
+
+      <span class="cm">// 4. Return snapshot for potential rollback</span>
+      <span class="kw">return</span> { previousTodos };
+    },
+
+    <span class="fn">onError</span>(err, todoId, context) {
+      <span class="cm">// Server rejected — restore the snapshot</span>
+      queryClient.<span class="fn">setQueryData</span>([<span class="str">'todos'</span>], context.previousTodos);
+      toast.<span class="fn">error</span>(<span class="str">'Failed to delete todo. Please try again.'</span>);
+    },
+
+    <span class="fn">onSettled</span>() {
+      <span class="cm">// Always sync with server (success or error) — source of truth</span>
+      queryClient.<span class="fn">invalidateQueries</span>({ queryKey: [<span class="str">'todos'</span>] });
+    },
+  });
+}
+
+<span class="cm">// Optimistic add with temporary ID</span>
+<span class="fn">useMutation</span>({
+  mutationFn: (text) => <span class="fn">createTodo</span>(text),
+  <span class="kw">async</span> <span class="fn">onMutate</span>(text) {
+    <span class="kw">await</span> queryClient.<span class="fn">cancelQueries</span>({ queryKey: [<span class="str">'todos'</span>] });
+    <span class="kw">const</span> previous = queryClient.<span class="fn">getQueryData</span>([<span class="str">'todos'</span>]);
+    queryClient.<span class="fn">setQueryData</span>([<span class="str">'todos'</span>], (old) => [
+      ...old,
+      { id: <span class="str">`temp_${Date.now()}`</span>, text, done: <span class="kw">false</span> } <span class="cm">// Temp ID</span>
+    ]);
+    <span class="kw">return</span> { previous };
+  },
+  <span class="fn">onError</span>(err, text, ctx) { queryClient.<span class="fn">setQueryData</span>([<span class="str">'todos'</span>], ctx.previous); },
+  <span class="fn">onSettled</span>() { queryClient.<span class="fn">invalidateQueries</span>({ queryKey: [<span class="str">'todos'</span>] }); },
+  <span class="cm">// onSettled replaces temp ID with real ID via invalidation + refetch</span>
+});</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Forgetting to cancel in-flight queries in <code>onMutate</code> — if a background refetch completes after the optimistic update, it overwrites the optimistic state with stale server data. <code>queryClient.cancelQueries()</code> cancels in-flight requests for the affected key.</div>
+  <div class="mst">Assuming optimistic updates always succeed and skipping <code>onError</code> rollback — on poor network conditions or server validation errors, the rollback is exactly what separates a polished app from a data-corrupting one. Never skip the rollback path.</div>
+  <div class="mst">Using optimistic updates for non-idempotent operations without idempotency keys — a payment or order creation that times out (server succeeded, client got no response) followed by a retry creates a duplicate. Always send a UUID idempotency key for mutating operations in financial or critical flows.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Walk me through implementing an optimistic delete with React Query."</div><div class="d">Four steps: (1) onMutate: cancel in-flight queries, snapshot current cache, apply optimistic deletion, return snapshot. (2) Network request fires. (3) onError: restore snapshot, show error to user. (4) onSettled: invalidate query regardless of outcome to sync with server truth. The snapshot is the key — without it you can't roll back. cancelQueries is critical — without it a background refetch can overwrite your optimistic state.</div></div>
+  <div class="iq"><div class="q">"What is an idempotency key and why is it needed for optimistic UI?"</div><div class="d">A UUID sent with each mutation request that the server uses to deduplicate. If a request times out (client doesn't know if server succeeded), retrying with the same idempotency key causes the server to return the original result rather than executing again. Without it, a timed-out payment mutation retry creates a double charge. Optimistic UI creates retry scenarios — idempotency keys make them safe.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">React Query mutation lifecycle (the mechanism)</span>
+    <span class="pill pc">Idempotency (distributed systems concept)</span>
+    <span class="pill pc">CQRS (command/query separation at the API level)</span>
+    <span class="pill pq">Zustand rollback pattern (manual version)</span>
+  </div>
+</div>
+
+<div class="topic" id="t5">
+  <div class="tnum">Topic 6 of 6 — Block 5: State Management</div>
+  <h1 class="ttl">Normalised vs denormalised state</h1>
+  <div class="tags"><span class="tag tp">Relational data</span><span class="tag tg">Single source of truth</span><span class="tag tw">N+1 updates</span><span class="tag td">Complexity tradeoff</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">State shape is an architectural decision with major implications for update correctness, lookup performance, and code complexity. <strong>Normalised state</strong> stores each entity once, by ID, in flat lookup tables — like a database. Relationships are represented by IDs, not embedded objects. <strong>Denormalised state</strong> embeds related data directly — a comment object contains the full author object, not just an author ID. Denormalisation simplifies reads (one object has everything you need) but creates update problems: if the author changes their name, you must find and update every comment that embeds their data. The correct choice depends entirely on data shape and mutation patterns — not a universal rule.</p>
+
+  <div class="sl">How normalisation works</div>
+  <p class="prose">Normalised state transforms nested API responses into flat entity stores. A response like <code>{ post: { id: 1, author: { id: 5, name: "Somesh" }, comments: [{...}] } }</code> is split into: <code>posts: { 1: { id: 1, authorId: 5, commentIds: [10, 11] } }</code>, <code>users: { 5: { id: 5, name: "Somesh" } }</code>, <code>comments: { 10: {...}, 11: {...} }</code>. Now updating the user's name requires one write: <code>users[5].name = "Somesh K"</code>. Every component that displays the user's name from <code>users[5]</code> automatically reflects the change. Without normalisation, you'd need to find and update the author object embedded in every post and every comment.</p>
+
+  <div class="norm-row">
+    <div class="norm-box nb-yes">
+      <h4>Normalise when</h4>
+      <p>The same entity appears in multiple places (user in posts, comments, reactions). You have mutations that update an entity independently of its parent. You have relational data with many-to-many relationships. You're building a chat app, social feed, or CRM — data is deeply relational.</p>
+    </div>
+    <div class="norm-box nb-no">
+      <h4>Don't normalise when</h4>
+      <p>Data is display-only: you receive a list, render it, never update individual items. Data is simple (settings, config, user preferences). The nested structure matches exactly what you display. You're using React Query — it stores data as fetched, normalise on the server instead.</p>
+    </div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ❌ Denormalised — update author name = update everywhere</span>
+<span class="kw">const</span> state = {
+  posts: [
+    { id: <span class="num">1</span>, title: <span class="str">'Post 1'</span>, author: { id: <span class="num">5</span>, name: <span class="str">'Somesh'</span> }, comments: [
+      { id: <span class="num">10</span>, text: <span class="str">'...'</span>, author: { id: <span class="num">5</span>, name: <span class="str">'Somesh'</span> } } <span class="cm">// Duplicated!</span>
+    ]},
+    { id: <span class="num">2</span>, title: <span class="str">'Post 2'</span>, author: { id: <span class="num">5</span>, name: <span class="str">'Somesh'</span> }, comments: [] }
+  ]
+};
+<span class="cm">// To update name: find all posts authored by id:5, find all comments in each post...</span>
+<span class="cm">// O(posts × comments) traversal. Miss one: inconsistent UI.</span>
+
+<span class="cm">// ✅ Normalised — update in one place, consistent everywhere</span>
+<span class="kw">const</span> state = {
+  users:    { <span class="num">5</span>:  { id: <span class="num">5</span>, name: <span class="str">'Somesh'</span> } },
+  posts:    { <span class="num">1</span>:  { id: <span class="num">1</span>, title: <span class="str">'Post 1'</span>, authorId: <span class="num">5</span>, commentIds: [<span class="num">10</span>] },
+              <span class="num">2</span>:  { id: <span class="num">2</span>, title: <span class="str">'Post 2'</span>, authorId: <span class="num">5</span>, commentIds: [] } },
+  comments: { <span class="num">10</span>: { id: <span class="num">10</span>, text: <span class="str">'...'</span>, authorId: <span class="num">5</span>, postId: <span class="num">1</span> } },
+};
+<span class="cm">// Update name: state.users[5].name = 'Somesh K'. Done. One write. Always consistent.</span>
+
+<span class="cm">// RTK createEntityAdapter — normalised state built-in</span>
+<span class="kw">import</span> { createEntityAdapter, createSlice } <span class="kw">from</span> <span class="str">'@reduxjs/toolkit'</span>;
+
+<span class="kw">const</span> usersAdapter = <span class="fn">createEntityAdapter</span>();
+<span class="cm">// Produces: { ids: [5, 6, 7], entities: { 5: {...}, 6: {...}, 7: {...} } }</span>
+
+<span class="kw">const</span> usersSlice = <span class="fn">createSlice</span>({
+  name: <span class="str">'users'</span>,
+  initialState: usersAdapter.<span class="fn">getInitialState</span>(),
+  reducers: {
+    <span class="fn">addUser</span>:    usersAdapter.addOne,
+    <span class="fn">updateUser</span>: usersAdapter.updateOne,   <span class="cm">// updateOne({id, changes}) — O(1)</span>
+    <span class="fn">removeUser</span>: usersAdapter.removeOne,
+    <span class="fn">setUsers</span>:   usersAdapter.setAll,      <span class="cm">// Replace all from API response</span>
+  },
+});
+
+<span class="cm">// Selectors from adapter</span>
+<span class="kw">const</span> { selectAll, selectById, selectIds } = usersAdapter.<span class="fn">getSelectors</span>(
+  state => state.users
+);
+
+<span class="cm">// In component:</span>
+<span class="kw">const</span> user = <span class="fn">useSelector</span>(state => <span class="fn">selectById</span>(state, userId)); <span class="cm">// O(1) lookup</span>
+<span class="kw">const</span> allUsers = <span class="fn">useSelector</span>(<span class="fn">selectAll</span>);                       <span class="cm">// All as array</span>
+
+<span class="cm">// Normalizr — normalise API response</span>
+<span class="kw">import</span> { normalize, schema } <span class="kw">from</span> <span class="str">'normalizr'</span>;
+
+<span class="kw">const</span> user    = <span class="kw">new</span> schema.<span class="cl">Entity</span>(<span class="str">'users'</span>);
+<span class="kw">const</span> comment = <span class="kw">new</span> schema.<span class="cl">Entity</span>(<span class="str">'comments'</span>, { author: user });
+<span class="kw">const</span> post    = <span class="kw">new</span> schema.<span class="cl">Entity</span>(<span class="str">'posts'</span>, { author: user, comments: [comment] });
+
+<span class="kw">const</span> { entities, result } = <span class="fn">normalize</span>(apiResponse, post);
+<span class="cm">// entities: { users: {...}, posts: {...}, comments: {...} }</span>
+<span class="cm">// result: 1  (the root post ID)</span></pre></div>
+
+  <div class="sl">Real-world use case</div>
+  <div class="arch"><h4>EngineX-style app — when normalisation pays off</h4><p>Consider EngineX: resumes, users, job descriptions, and AI analysis results all reference each other. A user appears in their own profile, in resume metadata, in shared-access lists. An analysis result references both a resume ID and a job description ID. Without normalisation: updating a user's name requires finding and patching the user object in every resume's metadata. With normalisation: <code>users[id]</code> is the one source of truth. React Query stores raw API responses (denormalised) — normalisation is valuable here only if you're building an offline-capable app or managing complex relational state client-side. For most React Query-based apps, normalise on the server and let React Query cache per-endpoint.</p></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Normalising everything by default — normalisation adds lookup indirection (post has authorId, not author.name — you must join). For simple lists that are only displayed, never updated individually, normalisation adds complexity with no benefit. Measure the actual update problem before normalising.</div>
+  <div class="mst">Forgetting to update all related entity references when mutating normalised state — if you update the post title but forget to update the posts.ids array, or update an entity but leave stale IDs in another entity's relationship array, you get ghost references. RTK's entity adapter operations keep ids and entities in sync automatically.</div>
+  <div class="mst">Normalising state when using React Query — React Query caches per query key. If you're fetching <code>/users/5</code> and <code>/posts?authorId=5</code> separately, React Query handles the caching. Manual normalisation creates a parallel cache you have to synchronise. Use React Query's <code>queryClient.setQueryData</code> for surgical updates instead of building a normalisation layer on top.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"When would you normalise client state and when would you not?"</div><div class="d">Normalise when: the same entity is referenced in multiple places and can be updated independently (users in posts and comments; order items in both list and detail views). Don't normalise when: data is display-only, comes from one query and is only rendered once, or you're using React Query (normalise at the API/server layer instead). Normalisation trades read complexity for write consistency — worth it only when you have the write consistency problem.</div></div>
+  <div class="iq"><div class="q">"What is the N+1 update problem and how does normalisation solve it?"</div><div class="d">Without normalisation: updating an entity requires finding and patching it everywhere it's embedded — O(N entities × M nesting levels). Miss one: inconsistent UI showing different names/statuses for the same entity. Normalisation stores each entity once by ID. Update = one write to one location. All components reading from the same ID automatically get the updated value. RTK's createEntityAdapter implements this pattern with built-in CRUD operations.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Redux EntityAdapter (normalisation built into RTK)</span>
+    <span class="pill pc">Database normalisation (same concept, 1NF/2NF/3NF)</span>
+    <span class="pill pc">GraphQL (normalised cache built into Apollo/Relay)</span>
+    <span class="pill pq">React Query setQueryData (surgical updates without normalisation)</span>
+    <span class="pill pc">Normalizr library (transform nested → normalised)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── All 6 topics complete · Block 5 done ───</div>
+
+</main>
+</div>
+
+<script>
+function show(idx,el){
+  document.querySelectorAll('.topic').forEach(t=>t.classList.remove('visible'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('t'+idx).classList.add('visible');
+  el.classList.add('active');
+  document.querySelector('.content').scrollTop=0;
+}
+</script>

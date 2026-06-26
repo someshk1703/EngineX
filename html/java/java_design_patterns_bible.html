@@ -1,0 +1,1140 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,system-ui);background:transparent;color:var(--color-text-primary)}
+.w{padding:.5rem 0 2.5rem}
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem}
+.nb{padding:6px 12px;border:.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.nb:hover{background:var(--color-background-secondary)}
+.nb.on{background:#EEEDFE;border-color:#534AB7;color:#3C3489;font-weight:500}
+.tp{display:none}.tp.vis{display:block}
+.ttl{font-size:20px;font-weight:500;margin-bottom:3px}
+.sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.25rem}
+.pat-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:500;margin-bottom:.75rem}
+.pb-c{background:#EEEDFE;color:#3C3489;border:.5px solid #AFA9EC}
+.pb-s{background:#E1F5EE;color:#085041;border:.5px solid #5DCAA5}
+.pb-b{background:#FAEEDA;color:#633806;border:.5px solid #EF9F27}
+.stabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.25rem;padding-bottom:10px;border-bottom:.5px solid var(--color-border-tertiary)}
+.st{padding:5px 12px;font-size:12px;border-radius:16px;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.st:hover{background:var(--color-background-secondary)}
+.st.on{background:#EEEDFE;color:#3C3489;font-weight:500}
+.sc{display:none}.sc.vis{display:block}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.def{font-size:15px;line-height:1.7}
+code{font-family:var(--font-mono,monospace);font-size:.9em;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px}
+.cb{background:var(--color-background-secondary);border:.5px solid var(--color-border-tertiary);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;font-size:12px;line-height:1.8;margin-bottom:1rem;white-space:pre;font-family:var(--font-mono,monospace)}
+.kw{color:#534AB7;font-weight:500}.cm{color:var(--color-text-secondary)}.str{color:#085041}.nm{color:#993C1D}
+.flow{display:flex;flex-direction:column;gap:8px}
+.fs{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:8px;background:var(--color-background-secondary);border-left:3px solid #AFA9EC}
+.fs.t{border-left-color:#5DCAA5}.fs.a{border-left-color:#EF9F27}.fs.r{border-left-color:#E24B4A}.fs.c{border-left-color:#F0997B}
+.fn{min-width:22px;height:22px;border-radius:50%;background:#EEEDFE;color:#3C3489;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.fn.t{background:#E1F5EE;color:#085041}.fn.a{background:#FAEEDA;color:#633806}.fn.r{background:#FCEBEB;color:#A32D2D}
+.ft{font-size:13.5px;line-height:1.6}
+.mi{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.mi:last-child{border-bottom:none}
+.mico{width:22px;height:22px;border-radius:50%;background:#FCEBEB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:13px}
+.mt{font-size:13.5px;line-height:1.6}.mt strong{font-weight:500;color:#A32D2D}
+.qi{padding:10px 12px;border-radius:8px;background:var(--color-background-secondary);margin-bottom:8px;font-size:13.5px;cursor:pointer;border:.5px solid var(--color-border-tertiary);transition:all .15s}
+.qi:hover{border-color:#AFA9EC;background:#EEEDFE}
+.ql{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.qa{font-size:13px;color:var(--color-text-secondary);margin-top:6px;padding-top:6px;border-top:.5px solid var(--color-border-tertiary);display:none;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:5px 13px;border-radius:16px;font-size:13px;background:#EEEDFE;color:#3C3489;border:.5px solid #AFA9EC;cursor:pointer}
+.chip:hover{background:#CECBF6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hl{border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.6;border:.5px solid}
+.hlp{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.hlt{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.hla{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.hlc{background:#FAECE7;border-color:#F0997B;color:#712B13}
+.hlb{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.hlr{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.hlg{background:#EAF3DE;border-color:#97C459;color:#3B6D11}
+.hn{font-weight:500;font-size:12px;margin-bottom:4px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:7px 10px;background:var(--color-background-secondary);color:var(--color-text-secondary);font-weight:500;border-bottom:.5px solid var(--color-border-tertiary)}
+.tbl td{padding:7px 10px;border-bottom:.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5}
+.tbl tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;margin-right:3px;vertical-align:middle}
+.bp{background:#EEEDFE;color:#3C3489}.bt{background:#E1F5EE;color:#085041}.ba{background:#FAEEDA;color:#633806}
+.br{background:#FCEBEB;color:#A32D2D}.bg{background:#EAF3DE;color:#3B6D11}
+.uml-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:.75rem}
+.uml-box{border-radius:8px;border:.5px solid;font-size:12px;overflow:hidden;flex:1;min-width:120px}
+.uml-head{padding:6px 10px;font-weight:500;font-size:12px}
+.uml-body{padding:5px 10px;font-family:var(--font-mono,monospace);font-size:11px;line-height:1.7;border-top:.5px solid}
+.uml-p{border-color:#AFA9EC}.uml-p .uml-head{background:#EEEDFE;color:#3C3489}.uml-p .uml-body{border-color:#AFA9EC;color:#534AB7}
+.uml-t{border-color:#5DCAA5}.uml-t .uml-head{background:#E1F5EE;color:#085041}.uml-t .uml-body{border-color:#5DCAA5;color:#0F6E56}
+.uml-a{border-color:#EF9F27}.uml-a .uml-head{background:#FAEEDA;color:#633806}.uml-a .uml-body{border-color:#EF9F27;color:#854F0B}
+.uml-g{border-color:#97C459}.uml-g .uml-head{background:#EAF3DE;color:#3B6D11}.uml-g .uml-body{border-color:#97C459;color:#3B6D11}
+.arr{font-size:18px;color:var(--color-text-secondary);display:flex;align-items:center;flex-shrink:0}
+</style>
+
+<div class="w">
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Java Design Patterns Visual Bible — 10 GoF patterns with interactive sections</h2>
+<div style="margin-bottom:1.25rem">
+  <p style="font-size:13px;color:var(--color-text-secondary)">Block 6 · Design Patterns (GoF) · 10 patterns · Creational <span class="badge bp">C</span> Structural <span class="badge bt">S</span> Behavioural <span class="badge ba">B</span></p>
+</div>
+
+<div class="nav">
+  <button class="nb on" onclick="T(0)">1 · Singleton</button>
+  <button class="nb" onclick="T(1)">2 · Factory</button>
+  <button class="nb" onclick="T(2)">3 · Builder</button>
+  <button class="nb" onclick="T(3)">4 · Prototype</button>
+  <button class="nb" onclick="T(4)">5 · Adapter</button>
+  <button class="nb" onclick="T(5)">6 · Decorator</button>
+  <button class="nb" onclick="T(6)">7 · Observer</button>
+  <button class="nb" onclick="T(7)">8 · Strategy</button>
+  <button class="nb" onclick="T(8)">9 · Template Method</button>
+  <button class="nb" onclick="T(9)">10 · Command</button>
+</div>
+
+<!-- ════════ T0: SINGLETON ════════ -->
+<div class="tp vis" id="t0">
+  <div class="ttl">Singleton</div>
+  <div class="pat-badge pb-c">Creational</div>
+  <div class="sub">Ensures one instance exists · lazy vs eager · thread-safe DCL · enum singleton</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t0','s0')">Definition</button>
+    <button class="st" onclick="S('t0','s1')">4 implementations</button>
+    <button class="st" onclick="S('t0','s2')">Code</button>
+    <button class="st" onclick="S('t0','s3')">Real world</button>
+    <button class="st" onclick="S('t0','s4')">Mistakes</button>
+    <button class="st" onclick="S('t0','s5')">Interview</button>
+    <button class="st" onclick="S('t0','s6')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t0-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Singleton ensures a class has exactly one instance and provides a global access point to it. The class itself controls instantiation — the constructor is private, and a static method returns the single shared instance. Used for shared resources where multiple instances would cause incorrect behaviour (config, connection pool, registry).</p>
+    </div>
+    <div class="two">
+      <div class="hl hlp"><div class="hn">Eager initialisation</div>Instance created at class-load time. Thread-safe by the JVM's class-loading guarantee. Wastes memory if the instance is never used.</div>
+      <div class="hl hlt"><div class="hn">Lazy initialisation</div>Instance created on first request. Saves memory. Requires thread-safety mechanism — naive implementation has a race condition.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s1">
+    <div class="card"><div class="ct">4 implementations — ranked from worst to best</div>
+      <div class="flow">
+        <div class="fs r"><div class="fn r">1</div><div class="ft"><strong>Naive lazy (broken)</strong> — <code>if(instance == null) instance = new Singleton()</code> with no synchronisation. Two threads can both pass the null check simultaneously and create two instances. Never use in multithreaded code.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Eager (JVM-guaranteed)</strong> — <code>private static final Singleton INSTANCE = new Singleton()</code>. JVM class loading is thread-safe by spec — the class is loaded once. Safe. Downside: created even if never used, can't handle exceptions cleanly in constructor.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Double-checked locking (DCL)</strong> — check → sync → check again. Requires <code>volatile</code> on the field to prevent partial construction visibility (see Block 4 JMM). Best when: lazy + thread-safe + performance matters (avoids lock on every read after first init).</div></div>
+        <div class="fs t"><div class="fn t">4</div><div class="ft"><strong>Enum singleton — the gold standard</strong> — Java's enum guarantees: single instance per JVM, thread-safe construction by the JVM, serialisation-safe (enums survive deserialization as the same instance), reflection-proof (can't call enum constructor via reflection). The only approach that handles all edge cases. Joshua Bloch's Effective Java: "single-element enum type is often the best way to implement a singleton."</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s2">
+    <div class="card"><div class="ct">Code — all four implementations</div>
+<div class="cb"><span class="cm">// 1. Eager — simple, JVM-thread-safe</span>
+<span class="kw">public class</span> <span class="nm">Config</span> {
+    <span class="kw">private static final</span> <span class="nm">Config</span> INSTANCE = <span class="kw">new</span> <span class="nm">Config</span>();
+    <span class="kw">private</span> <span class="nm">Config</span>() {}
+    <span class="kw">public static</span> <span class="nm">Config</span> getInstance() { <span class="kw">return</span> INSTANCE; }
+}
+
+<span class="cm">// 2. DCL — lazy + thread-safe</span>
+<span class="kw">public class</span> <span class="nm">Cache</span> {
+    <span class="kw">private static volatile</span> <span class="nm">Cache</span> instance; <span class="cm">// volatile: mandatory for DCL</span>
+    <span class="kw">private</span> <span class="nm">Cache</span>() {}
+    <span class="kw">public static</span> <span class="nm">Cache</span> getInstance() {
+        <span class="kw">if</span> (instance == <span class="kw">null</span>) {               <span class="cm">// 1st check — avoid lock on every call</span>
+            <span class="kw">synchronized</span>(<span class="nm">Cache</span>.<span class="kw">class</span>) {
+                <span class="kw">if</span> (instance == <span class="kw">null</span>)         <span class="cm">// 2nd check — win the race</span>
+                    instance = <span class="kw">new</span> <span class="nm">Cache</span>();
+            }
+        }
+        <span class="kw">return</span> instance;
+    }
+}
+
+<span class="cm">// 3. Enum singleton — best practice (Effective Java Item 3)</span>
+<span class="kw">public enum</span> <span class="nm">AppRegistry</span> {
+    INSTANCE;
+    <span class="kw">private final</span> <span class="nm">Map</span>&lt;<span class="nm">String</span>, <span class="nm">Object</span>&gt; registry = <span class="kw">new</span> <span class="nm">HashMap</span>&lt;&gt;();
+    <span class="kw">public void</span> register(<span class="nm">String</span> key, <span class="nm">Object</span> val) { registry.put(key, val); }
+    <span class="kw">public</span> <span class="nm">Object</span> lookup(<span class="nm">String</span> key)              { <span class="kw">return</span> registry.get(key); }
+}
+<span class="cm">// Usage: AppRegistry.INSTANCE.register("svc", myService);</span>
+
+<span class="cm">// 4. Holder idiom — lazy without synchronized</span>
+<span class="kw">public class</span> <span class="nm">MetricsService</span> {
+    <span class="kw">private</span> <span class="nm">MetricsService</span>() {}
+    <span class="kw">private static class</span> <span class="nm">Holder</span> {          <span class="cm">// loaded only when referenced</span>
+        <span class="kw">static final</span> <span class="nm">MetricsService</span> INSTANCE = <span class="kw">new</span> <span class="nm">MetricsService</span>();
+    }
+    <span class="kw">public static</span> <span class="nm">MetricsService</span> get() { <span class="kw">return</span> <span class="nm">Holder</span>.INSTANCE; }
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">🔧</div><div class="mt"><strong>Spring ApplicationContext</strong> — Spring manages beans as singletons by default (<code>@Scope("singleton")</code>). The bean is created once, stored in the context, and injected everywhere. Spring's container IS the singleton manager — you don't write Singleton pattern yourself for beans.</div></div>
+      <div class="mi"><div class="mico">📊</div><div class="mt"><strong>Connection pool (HikariCP)</strong> — the HikariDataSource is a singleton — one pool per application, shared by all threads. Creating multiple pools per request would exhaust DB connections.</div></div>
+      <div class="mi"><div class="mico">⚙️</div><div class="mt"><strong>Configuration registry</strong> — application config loaded once from environment variables, exposed as a singleton. All services read from the same immutable config object.</div></div>
+      <div class="mi"><div class="mico">📝</div><div class="mt"><strong>Logger</strong> — <code>LogManager.getLogger()</code> returns the same logger instance per name. Creating a new logger per call would lose context and waste memory.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Omitting volatile in DCL</strong> — without volatile, the JIT can reorder object construction: assign the reference before the constructor finishes. Thread B reads a non-null but partially-constructed object. This is a real bug that surfaces under load.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Singleton broken by serialisation</strong> — deserialising a singleton creates a new instance via <code>readObject</code>. Fix: implement <code>readResolve() { return INSTANCE; }</code> to return the existing instance. Enum singletons handle this automatically.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Singleton broken by reflection</strong> — <code>Constructor.newInstance()</code> can bypass the private constructor. Fix: throw an exception in the constructor if already initialised. Enum constructors cannot be called via reflection.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Overusing singleton</strong> — Singleton is a global variable in disguise. It creates hidden dependencies, makes testing hard (can't swap with a mock), and causes coupling. In modern Java, use dependency injection (Spring) — the container manages singleton scope without the pattern's drawbacks.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Write a thread-safe Singleton in Java.<div class="qa">Three acceptable answers: (1) Enum singleton — the best answer. enum AppSingleton { INSTANCE; } — thread-safe by JVM, serialisation-safe, reflection-proof. (2) Eager initialisation — private static final instance at field declaration. (3) DCL with volatile — two null checks, synchronized on the class, volatile field. If they ask WHY volatile is required: the JVM can reorder the assignment before constructor completion; volatile adds a store fence preventing this. Mention you'd use Spring @Scope("singleton") in production rather than hand-rolling this pattern.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Why volatile</div>Why must the instance field be volatile in double-checked locking?<div class="qa">Object creation has three steps: (1) allocate memory, (2) run constructor, (3) assign reference. The JIT can reorder to 1→3→2. Thread A assigns the reference before the constructor runs. Thread B reads a non-null reference and uses a partially constructed object. volatile adds a store fence between steps 2 and 3 (via the JMM's happens-before for volatile writes), preventing the reordering. This bug was only formally documented and fixed in Java 5 with the updated JMM specification.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Enum</div>Why is the enum singleton considered the best approach?<div class="qa">It gets thread safety, lazy class loading safety, serialisation safety, and reflection safety for free — handled by the JVM, not by application code. No boilerplate. No edge cases. The spec explicitly guarantees enum values are created once per JVM. The only downside: can't extend another class (enums implicitly extend Enum). Joshua Bloch, Effective Java Item 3: "a single-element enum type is often the best way to implement a singleton."</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How does Spring manage singleton beans and how is it different from the Singleton design pattern?')">Spring @Scope singleton</span>
+      <span class="chip" onclick="sendPrompt('Explain the Initialization on Demand Holder idiom for lazy singletons in Java')">Holder idiom</span>
+      <span class="chip" onclick="sendPrompt('Explain volatile and double-checked locking in Java concurrency')">volatile DCL</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T1: FACTORY ════════ -->
+<div class="tp" id="t1">
+  <div class="ttl">Factory & Abstract Factory</div>
+  <div class="pat-badge pb-c">Creational</div>
+  <div class="sub">Decouple object creation · Factory Method · Abstract Factory · when to use each</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t1','s0')">Definition</button>
+    <button class="st" onclick="S('t1','s1')">Structure</button>
+    <button class="st" onclick="S('t1','s2')">Code</button>
+    <button class="st" onclick="S('t1','s3')">Real world</button>
+    <button class="st" onclick="S('t1','s4')">Mistakes</button>
+    <button class="st" onclick="S('t1','s5')">Interview</button>
+    <button class="st" onclick="S('t1','s6')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t1-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Factory patterns decouple the caller from the concrete class being created. The caller asks for a "shape" or a "payment processor" — the factory decides which concrete implementation to instantiate. This enables the Open/Closed Principle: add new product types without changing existing client code.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlp"><div class="hn">Factory Method</div>One factory method per product type. Subclasses override the method to decide which concrete class to create. Creates one product family member at a time.</div>
+      <div class="hl hlt"><div class="hn">Abstract Factory</div>A factory of factories. One interface creates entire families of related products. Ensures the created products are compatible with each other (all "Dark theme" or all "MySQL" components).</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s1">
+    <div class="card"><div class="ct">Structure — UML in code form</div>
+      <div class="uml-row">
+        <div class="uml-box uml-p"><div class="uml-head">«interface» PaymentProcessor</div><div class="uml-body">+ process(amount): Receipt<br>+ refund(id): boolean</div></div>
+        <div class="arr">→</div>
+        <div class="uml-box uml-t"><div class="uml-head">StripeProcessor</div><div class="uml-body">+ process(amount): Receipt<br>+ refund(id): boolean</div></div>
+      </div>
+      <div class="uml-row">
+        <div class="uml-box uml-a"><div class="uml-head">PaymentFactory (abstract)</div><div class="uml-body">+ createProcessor(): PaymentProcessor<br>+ createWebhook(): WebhookHandler</div></div>
+        <div class="arr">→</div>
+        <div class="uml-box uml-g"><div class="uml-head">StripeFactory</div><div class="uml-body">+ createProcessor(): StripeProcessor<br>+ createWebhook(): StripeWebhook</div></div>
+      </div>
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">Abstract Factory ensures the processor and webhook are always from the same payment provider — you can't accidentally mix Stripe's processor with Razorpay's webhook.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s2">
+    <div class="card"><div class="ct">Code — Factory Method + Abstract Factory</div>
+<div class="cb"><span class="cm">// FACTORY METHOD — one product, subclasses decide which</span>
+<span class="kw">interface</span> <span class="nm">NotificationSender</span> { <span class="kw">void</span> send(<span class="nm">String</span> msg); }
+<span class="kw">class</span> <span class="nm">EmailSender</span>   <span class="kw">implements</span> <span class="nm">NotificationSender</span> { <span class="kw">public void</span> send(<span class="nm">String</span> m) { <span class="cm">/*smtp*/</span> } }
+<span class="kw">class</span> <span class="nm">SmsSender</span>     <span class="kw">implements</span> <span class="nm">NotificationSender</span> { <span class="kw">public void</span> send(<span class="nm">String</span> m) { <span class="cm">/*twilio*/</span> } }
+<span class="kw">class</span> <span class="nm">PushSender</span>    <span class="kw">implements</span> <span class="nm">NotificationSender</span> { <span class="kw">public void</span> send(<span class="nm">String</span> m) { <span class="cm">/*fcm*/</span> } }
+
+<span class="kw">class</span> <span class="nm">SenderFactory</span> {
+    <span class="kw">public static</span> <span class="nm">NotificationSender</span> create(<span class="nm">String</span> type) {
+        <span class="kw">return switch</span>(type) {
+            <span class="kw">case</span> <span class="str">"EMAIL"</span> -> <span class="kw">new</span> <span class="nm">EmailSender</span>();
+            <span class="kw">case</span> <span class="str">"SMS"</span>   -> <span class="kw">new</span> <span class="nm">SmsSender</span>();
+            <span class="kw">case</span> <span class="str">"PUSH"</span>  -> <span class="kw">new</span> <span class="nm">PushSender</span>();
+            <span class="kw">default</span> -> <span class="kw">throw new</span> <span class="nm">IllegalArgumentException</span>(<span class="str">"Unknown: "</span> + type);
+        };
+    }
+}
+
+<span class="cm">// ABSTRACT FACTORY — family of related objects</span>
+<span class="kw">interface</span> <span class="nm">UIFactory</span> {
+    <span class="nm">Button</span>    createButton();
+    <span class="nm">TextField</span> createTextField();
+    <span class="nm">Dialog</span>    createDialog();
+}
+<span class="kw">class</span> <span class="nm">DarkThemeFactory</span> <span class="kw">implements</span> <span class="nm">UIFactory</span> {
+    <span class="kw">public</span> <span class="nm">Button</span>    createButton()    { <span class="kw">return new</span> <span class="nm">DarkButton</span>(); }
+    <span class="kw">public</span> <span class="nm">TextField</span> createTextField() { <span class="kw">return new</span> <span class="nm">DarkTextField</span>(); }
+    <span class="kw">public</span> <span class="nm">Dialog</span>    createDialog()    { <span class="kw">return new</span> <span class="nm">DarkDialog</span>(); }
+}
+<span class="cm">// Caller only knows UIFactory — can swap theme without changing UI code</span>
+<span class="nm">UIFactory</span> factory = getThemeFactory(userPref); <span class="cm">// dark or light</span>
+<span class="nm">Button</span> btn = factory.createButton();            <span class="cm">// always consistent</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">🏭</div><div class="mt"><strong>JDBC DriverManager</strong> — <code>DriverManager.getConnection(url)</code> is a factory method. The URL prefix determines which Driver implementation to instantiate (MySQL, PostgreSQL, H2). Your code never references a concrete driver class.</div></div>
+      <div class="mi"><div class="mico">🌿</div><div class="mt"><strong>Spring BeanFactory / ApplicationContext</strong> — Spring's IoC container IS an Abstract Factory. <code>getBean("userService")</code> creates (or returns) the configured bean. The caller never calls <code>new</code>. Changing the implementation requires only config changes, not code changes.</div></div>
+      <div class="mi"><div class="mico">📱</div><div class="mt"><strong>Notification routing</strong> — a <code>NotificationService</code> uses a factory to get the right sender (Email/SMS/Push) based on user preference or notification urgency. Adding WhatsApp support = add a new sender + register it in the factory, zero change to routing logic.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Using a factory when a simple constructor or static method is enough</strong> — factories add indirection. If you have one concrete type and no variation anticipated, just use <code>new</code>. Don't pattern-match prematurely.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Confusing Factory Method with Abstract Factory</strong> — Factory Method = one method, one product. Abstract Factory = one factory interface, creates a family of related products. The distinction matters in interviews and design discussions.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Distinguish</div>What is the difference between Factory Method and Abstract Factory?<div class="qa">Factory Method: defines one factory method in a superclass, subclasses override it to decide which concrete class to instantiate. One method, one product type. Abstract Factory: an interface with multiple factory methods, each creating a different product in a family. Guarantees the created objects are compatible with each other. Use Factory Method when you need to vary one product type. Use Abstract Factory when you need to create families of related objects and ensure they stay compatible.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">SOLID</div>How do factory patterns support the Open/Closed and Dependency Inversion principles?<div class="qa">Open/Closed: adding a new payment processor (e.g., RazorpayProcessor) requires creating a new class and registering it in the factory — zero changes to existing client code or routing logic. The factory is the only change point. Dependency Inversion: the caller depends on the PaymentProcessor interface (abstraction), not on StripeProcessor (concretion). The factory resolves the abstraction to a concrete type at runtime, keeping the caller isolated from implementation details.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain how Spring uses the Factory pattern internally in its IoC container')">Spring IoC factory</span>
+      <span class="chip" onclick="sendPrompt('Explain the SOLID Open/Closed Principle with a Factory pattern example in Java')">OCP principle</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T2: BUILDER ════════ -->
+<div class="tp" id="t2">
+  <div class="ttl">Builder</div>
+  <div class="pat-badge pb-c">Creational</div>
+  <div class="sub">Fluent API · complex object construction · telescoping constructor problem</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t2','s0')">Definition</button>
+    <button class="st" onclick="S('t2','s1')">Internals</button>
+    <button class="st" onclick="S('t2','s2')">Code</button>
+    <button class="st" onclick="S('t2','s3')">Real world</button>
+    <button class="st" onclick="S('t2','s4')">Interview</button>
+    <button class="st" onclick="S('t2','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t2-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Builder separates the construction of a complex object from its representation, allowing the same construction process to create different representations. It solves the <strong>telescoping constructor problem</strong>: when a class has many optional parameters, constructors multiply (all combinations) or one mega-constructor with many nulls is needed. Builder provides a readable, fluent alternative.</p>
+    </div>
+    <div class="card" style="background:var(--color-background-secondary)">
+      <div class="ct">The problem builder solves</div>
+      <div class="two">
+        <div><p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Without builder — which null means what?</p>
+        <code style="font-size:11px;display:block;line-height:1.7">new User("Somesh", null, null, true, false, 25, null)</code></div>
+        <div><p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">With builder — self-documenting</p>
+        <code style="font-size:11px;display:block;line-height:1.7">User.builder().name("Somesh").age(25).active(true).build()</code></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s1">
+    <div class="card"><div class="ct">How builder works internally</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Static inner Builder class</strong> — the Builder mirrors all the fields of the target class. Each setter on the Builder returns <code>this</code> (the Builder) — enabling method chaining. The target class's constructor is private, forcing callers to use the Builder.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>build() method</strong> — performs validation (mandatory fields, constraints) and passes all accumulated values to the private constructor of the target class. This is the single place where construction correctness is enforced.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Immutability</strong> — Builder pattern pairs naturally with immutable classes. The target object has final fields set once in the private constructor. The Builder accumulates the mutable state, then creates one final immutable object. This is how <code>record</code>'s compact constructor and Lombok's <code>@Builder</code> work.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>Director (optional)</strong> — a Director class knows HOW to use a builder to construct specific configurations: <code>director.buildMinimalUser(builder)</code> vs <code>director.buildAdminUser(builder)</code>. Used when you have multiple fixed "recipes" for the same product.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s2">
+    <div class="card"><div class="ct">Code — hand-rolled + Lombok + real HTTP client example</div>
+<div class="cb"><span class="cm">// Hand-rolled Builder</span>
+<span class="kw">public class</span> <span class="nm">HttpRequest</span> {
+    <span class="kw">private final</span> <span class="nm">String</span>  url, method, body;
+    <span class="kw">private final</span> <span class="nm">Map</span>&lt;<span class="nm">String</span>,<span class="nm">String</span>&gt; headers;
+    <span class="kw">private final int</span>     timeoutMs;
+
+    <span class="kw">private</span> <span class="nm">HttpRequest</span>(<span class="nm">Builder</span> b) {  <span class="cm">// private — only Builder creates it</span>
+        <span class="kw">this</span>.url = b.url; <span class="kw">this</span>.method = b.method;
+        <span class="kw">this</span>.body = b.body; <span class="kw">this</span>.headers = <span class="nm">Map</span>.copyOf(b.headers);
+        <span class="kw">this</span>.timeoutMs = b.timeoutMs;
+    }
+
+    <span class="kw">public static class</span> <span class="nm">Builder</span> {
+        <span class="kw">private</span> <span class="nm">String</span>  url, method = <span class="str">"GET"</span>, body;
+        <span class="kw">private</span> <span class="nm">Map</span>&lt;<span class="nm">String</span>,<span class="nm">String</span>&gt; headers = <span class="kw">new</span> <span class="nm">HashMap</span>&lt;&gt;();
+        <span class="kw">private int</span>     timeoutMs = 5000;
+
+        <span class="kw">public</span> <span class="nm">Builder</span> url(<span class="nm">String</span> u)        { <span class="kw">this</span>.url=u; <span class="kw">return this</span>; }
+        <span class="kw">public</span> <span class="nm">Builder</span> method(<span class="nm">String</span> m)     { <span class="kw">this</span>.method=m; <span class="kw">return this</span>; }
+        <span class="kw">public</span> <span class="nm">Builder</span> body(<span class="nm">String</span> b)       { <span class="kw">this</span>.body=b; <span class="kw">return this</span>; }
+        <span class="kw">public</span> <span class="nm">Builder</span> header(<span class="nm">String</span> k,<span class="nm">String</span> v) { headers.put(k,v); <span class="kw">return this</span>; }
+        <span class="kw">public</span> <span class="nm">Builder</span> timeout(<span class="kw">int</span> ms)      { <span class="kw">this</span>.timeoutMs=ms; <span class="kw">return this</span>; }
+
+        <span class="kw">public</span> <span class="nm">HttpRequest</span> build() {
+            <span class="nm">Objects</span>.requireNonNull(url, <span class="str">"url is required"</span>); <span class="cm">// validation</span>
+            <span class="kw">return new</span> <span class="nm">HttpRequest</span>(<span class="kw">this</span>);
+        }
+    }
+}
+
+<span class="cm">// Usage — fluent, self-documenting</span>
+<span class="nm">HttpRequest</span> req = <span class="kw">new</span> <span class="nm">HttpRequest</span>.<span class="nm">Builder</span>()
+    .url(<span class="str">"https://api.example.com/users"</span>)
+    .method(<span class="str">"POST"</span>)
+    .header(<span class="str">"Authorization"</span>, <span class="str">"Bearer "</span> + token)
+    .body(jsonPayload)
+    .timeout(3000)
+    .build();
+
+<span class="cm">// Lombok @Builder — generates all this automatically</span>
+<span class="kw">@Builder @Getter</span>
+<span class="kw">public class</span> <span class="nm">OrderRequest</span> {
+    <span class="kw">private final</span> <span class="nm">String</span> userId, productId;
+    <span class="kw">private final int</span> quantity;
+    <span class="nm">@Builder</span>.Default <span class="kw">private final</span> <span class="nm">String</span> currency = <span class="str">"INR"</span>;
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">🌐</div><div class="mt"><strong>OkHttp / RestTemplate</strong> — <code>new Request.Builder().url(...).addHeader(...).build()</code>. HTTP requests have dozens of optional parameters — builder is the natural fit.</div></div>
+      <div class="mi"><div class="mico">🔎</div><div class="mt"><strong>JPA Criteria API / QueryDSL</strong> — building complex queries fluently: <code>criteriaBuilder.and(...).or(...)</code>. The query object is only constructed when <code>build()</code> is called after all predicates are accumulated.</div></div>
+      <div class="mi"><div class="mico">☁️</div><div class="mt"><strong>AWS SDK v2</strong> — <code>S3Client.builder().region(Region.AP_SOUTH_1).credentialsProvider(...).build()</code>. All AWS service clients use Builder.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What problem does the Builder pattern solve and how?<div class="qa">It solves the telescoping constructor problem: when a class has many optional parameters, you'd need constructors for every combination (N parameters = 2^N constructors) or one big constructor with nulls that's unreadable. Builder provides a fluent, named-parameter API where callers set only what they need, and build() performs validation at construction time. Additional benefits: natural fit for immutable objects (Builder holds mutable state during construction, product is final/immutable), self-documenting call sites, and the ability to reuse a builder to create similar objects.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Lombok</div>How does Lombok's @Builder work and what are its limitations?<div class="qa">@Builder generates: a static inner Builder class with all fields, setter methods returning 'this', a static builder() method, and a build() method calling the all-args constructor. Limitations: (1) @Builder on a class with inheritance is complex — use @SuperBuilder for parent-child hierarchies. (2) @Builder.Default for field defaults (non-null defaults aren't auto-carried). (3) Generated builders are not validated — you must add validation manually in a custom build() method or use @Builder with toBuilder=true for copy-modification patterns. In production Spring Boot: @Builder + @Getter + @Value (Lombok) covers most DTO use cases.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How does Lombok @Builder compare to Java records for DTOs?')">Lombok vs records</span>
+      <span class="chip" onclick="sendPrompt('Explain the telescoping constructor problem and all solutions to it in Java')">Telescoping constructors</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T3: PROTOTYPE ════════ -->
+<div class="tp" id="t3">
+  <div class="ttl">Prototype</div>
+  <div class="pat-badge pb-c">Creational</div>
+  <div class="sub">Cloning objects · shallow vs deep copy · Cloneable vs copy constructors</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t3','s0')">Definition</button>
+    <button class="st" onclick="S('t3','s1')">Shallow vs deep</button>
+    <button class="st" onclick="S('t3','s2')">Code</button>
+    <button class="st" onclick="S('t3','s3')">Interview</button>
+    <button class="st" onclick="S('t3','s4')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t3-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Prototype creates new objects by copying an existing object (the prototype) instead of creating from scratch. Useful when object creation is expensive (network call, complex computation) and the new object differs only slightly from an existing one. In Java, implemented via <code>Object.clone()</code> or copy constructors.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s1">
+    <div class="card"><div class="ct">Shallow vs deep copy — the critical distinction</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">S</div><div class="ft"><strong>Shallow copy</strong> — copies the object's fields. Primitives are duplicated. Object references are SHARED — the copy and the original point to the same nested objects. Mutating a nested list in the copy also mutates the original. <code>Object.clone()</code> does a shallow copy by default.</div></div>
+        <div class="fs t"><div class="fn t">D</div><div class="ft"><strong>Deep copy</strong> — recursively copies all nested objects. The copy is fully independent. Methods: (1) manual: clone each nested object in <code>clone()</code>. (2) serialisation round-trip: serialise to bytes, deserialise to a new object (slow but complete). (3) copy constructor: <code>new Order(original)</code> — manually copy each field including nested collections.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft"><strong>Cloneable pitfalls</strong> — <code>Cloneable</code> is a marker interface with no <code>clone()</code> method — the method is on <code>Object</code>. Implementing <code>Cloneable</code> but not overriding <code>clone()</code> gives a protected shallow copy. <code>clone()</code> throws <code>CloneNotSupportedException</code> if <code>Cloneable</code> not implemented. Most modern Java: prefer copy constructors over <code>Cloneable</code>. Effective Java Item 13: "Avoid Cloneable."</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s2">
+    <div class="card"><div class="ct">Code — Cloneable vs copy constructor vs serialisation</div>
+<div class="cb"><span class="cm">// 1. Cloneable — avoid in modern Java</span>
+<span class="kw">class</span> <span class="nm">ShallowOrder</span> <span class="kw">implements</span> <span class="nm">Cloneable</span> {
+    <span class="nm">String</span> id;
+    <span class="nm">List</span>&lt;<span class="nm">Item</span>&gt; items; <span class="cm">// shared reference in shallow copy!</span>
+    <span class="kw">public</span> <span class="nm">ShallowOrder</span> clone() <span class="kw">throws</span> <span class="nm">CloneNotSupportedException</span> {
+        <span class="kw">return</span> (<span class="nm">ShallowOrder</span>) <span class="kw">super</span>.clone(); <span class="cm">// items list is SHARED</span>
+    }
+}
+
+<span class="cm">// 2. Copy constructor — preferred (explicit, safe)</span>
+<span class="kw">class</span> <span class="nm">Order</span> {
+    <span class="kw">final</span> <span class="nm">String</span>      id;
+    <span class="kw">final</span> <span class="nm">List</span>&lt;<span class="nm">Item</span>&gt;  items;
+    <span class="kw">final</span> <span class="nm">Address</span>     shippingAddr;
+
+    <span class="nm">Order</span>(<span class="nm">Order</span> src) { <span class="cm">// copy constructor — deep copy</span>
+        <span class="kw">this</span>.id = src.id;
+        <span class="kw">this</span>.items = src.items.stream()
+            .map(Item::<span class="kw">new</span>)     <span class="cm">// Item also has a copy constructor</span>
+            .collect(<span class="nm">Collectors</span>.toList());
+        <span class="kw">this</span>.shippingAddr = <span class="kw">new</span> <span class="nm">Address</span>(src.shippingAddr);
+    }
+}
+
+<span class="cm">// 3. Serialisation deep clone — convenient but slow</span>
+<span class="kw">@SuppressWarnings</span>(<span class="str">"unchecked"</span>)
+<span class="kw">public static</span> &lt;<span class="nm">T</span> <span class="kw">extends</span> <span class="nm">Serializable</span>&gt; <span class="nm">T</span> deepClone(<span class="nm">T</span> obj) {
+    <span class="kw">try</span> (<span class="kw">var</span> bos = <span class="kw">new</span> <span class="nm">ByteArrayOutputStream</span>();
+         <span class="kw">var</span> oos = <span class="kw">new</span> <span class="nm">ObjectOutputStream</span>(bos)) {
+        oos.writeObject(obj);
+        <span class="kw">try</span> (<span class="kw">var</span> ois = <span class="kw">new</span> <span class="nm">ObjectInputStream</span>(
+                <span class="kw">new</span> <span class="nm">ByteArrayInputStream</span>(bos.toByteArray()))) {
+            <span class="kw">return</span> (<span class="nm">T</span>) ois.readObject();
+        }
+    } <span class="kw">catch</span> (<span class="nm">Exception</span> e) { <span class="kw">throw new</span> <span class="nm">RuntimeException</span>(e); }
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s3">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What is the difference between shallow and deep copy in Java?<div class="qa">Shallow copy: duplicates the object's field values. Primitive fields get new copies. Reference fields get copied references — both the original and the copy point to the same nested objects. Mutating a shared nested object affects both. Default Object.clone() is shallow. Deep copy: recursively copies all nested objects. The result is fully independent — modifying the copy doesn't affect the original. Implement via copy constructors, manual clone() overrides, or serialisation round-trip.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Why</div>Why does Effective Java say to avoid Cloneable?<div class="qa">Multiple issues: (1) Cloneable has no clone() method — the contract is on Object, not the interface you implement. (2) You must call super.clone() up the hierarchy correctly to get the right type back. (3) Final fields can't be set by clone() — they'd require using reflection. (4) Exception handling is awkward. (5) Inheritance complicates it further. Preferred alternatives: copy constructor new MyClass(original) — explicit, refactoring-friendly, no exception contract. Or static factory method MyClass.copyOf(original). Records get a free canonical constructor for reconstruction.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s4">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain defensive copying in Java and when it is needed for immutability')">Defensive copy</span>
+      <span class="chip" onclick="sendPrompt('How does Java serialization work and what are its security risks?')">Java serialisation</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T4: ADAPTER ════════ -->
+<div class="tp" id="t4">
+  <div class="ttl">Adapter</div>
+  <div class="pat-badge pb-s">Structural</div>
+  <div class="sub">Bridging incompatible interfaces · class adapter vs object adapter · real integrations</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t4','s0')">Definition</button>
+    <button class="st" onclick="S('t4','s1')">Structure</button>
+    <button class="st" onclick="S('t4','s2')">Code</button>
+    <button class="st" onclick="S('t4','s3')">Real world</button>
+    <button class="st" onclick="S('t4','s4')">Interview</button>
+    <button class="st" onclick="S('t4','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t4-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Adapter converts the interface of a class into another interface the client expects. It wraps an existing object (the adaptee) and exposes a different interface. The client talks to the adapter in the language it knows; the adapter translates and delegates to the adaptee. Like a plug adapter — same power, different socket shape.</p>
+    </div>
+    <div class="uml-row" style="margin-top:.75rem">
+      <div class="uml-box uml-p"><div class="uml-head">Client</div><div class="uml-body">calls: target.request()</div></div>
+      <div class="arr">→</div>
+      <div class="uml-box uml-t"><div class="uml-head">«interface» Target</div><div class="uml-body">+ request(): void</div></div>
+      <div class="arr">←implements</div>
+      <div class="uml-box uml-a"><div class="uml-head">Adapter</div><div class="uml-body">+ request() {<br>  adaptee.specificCall()<br>}</div></div>
+      <div class="arr">→wraps</div>
+      <div class="uml-box uml-g"><div class="uml-head">Adaptee (legacy)</div><div class="uml-body">+ specificCall(): void</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s1">
+    <div class="card"><div class="ct">Object vs class adapter</div>
+      <div class="two">
+        <div class="hl hlt"><div class="hn">Object Adapter (preferred)</div>Wraps the adaptee via composition. Works even when adaptee is final. More flexible — can adapt a class and its subclasses. This is the Go4 recommended approach for Java.</div>
+        <div class="hl hlp"><div class="hn">Class Adapter (rare in Java)</div>Extends the adaptee and implements the target interface. Only possible when adaptee is not final. Java's single inheritance limits usefulness. Prefer composition.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s2">
+    <div class="card"><div class="ct">Code — payment gateway integration + Java I/O adapter</div>
+<div class="cb"><span class="cm">// Target interface — what your system expects</span>
+<span class="kw">interface</span> <span class="nm">PaymentGateway</span> {
+    <span class="nm">PaymentResult</span> charge(<span class="nm">String</span> customerId, <span class="kw">long</span> amountPaisa);
+}
+
+<span class="cm">// Adaptee — Stripe's actual SDK (you can't change this)</span>
+<span class="kw">class</span> <span class="nm">StripeSDK</span> {
+    <span class="kw">public</span> <span class="nm">StripeCharge</span> createCharge(<span class="nm">Map</span>&lt;<span class="nm">String</span>,<span class="nm">Object</span>&gt; params) { <span class="cm">/* ... */</span> <span class="kw">return null</span>; }
+}
+
+<span class="cm">// Adapter — translates PaymentGateway to StripeSDK</span>
+<span class="kw">class</span> <span class="nm">StripeAdapter</span> <span class="kw">implements</span> <span class="nm">PaymentGateway</span> {
+    <span class="kw">private final</span> <span class="nm">StripeSDK</span> stripe; <span class="cm">// composition — object adapter</span>
+
+    <span class="nm">StripeAdapter</span>(<span class="nm">StripeSDK</span> sdk) { <span class="kw">this</span>.stripe = sdk; }
+
+    <span class="kw">public</span> <span class="nm">PaymentResult</span> charge(<span class="nm">String</span> customerId, <span class="kw">long</span> amountPaisa) {
+        <span class="nm">Map</span>&lt;<span class="nm">String</span>,<span class="nm">Object</span>&gt; params = <span class="nm">Map</span>.of(
+            <span class="str">"customer"</span>, customerId,
+            <span class="str">"amount"</span>,   amountPaisa,  <span class="cm">// Stripe expects paise natively</span>
+            <span class="str">"currency"</span>, <span class="str">"inr"</span>
+        );
+        <span class="nm">StripeCharge</span> charge = stripe.createCharge(params);
+        <span class="kw">return new</span> <span class="nm">PaymentResult</span>(charge.getId(), charge.getStatus());
+    }
+}
+
+<span class="cm">// Client never knows it's talking to Stripe specifically</span>
+<span class="nm">PaymentGateway</span> gateway = <span class="kw">new</span> <span class="nm">StripeAdapter</span>(<span class="kw">new</span> <span class="nm">StripeSDK</span>());
+<span class="nm">PaymentResult</span>  result  = gateway.charge(userId, 50000L);
+
+<span class="cm">// Java I/O — classic adapter usage</span>
+<span class="cm">// InputStreamReader adapts InputStream (byte stream) to Reader (char stream)</span>
+<span class="nm">Reader</span> reader = <span class="kw">new</span> <span class="nm">InputStreamReader</span>(socket.getInputStream(), <span class="nm">StandardCharsets</span>.UTF_8);</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">🔌</div><div class="mt"><strong>Java I/O</strong> — <code>InputStreamReader</code> adapts <code>InputStream</code> (bytes) to <code>Reader</code> (chars). <code>OutputStreamWriter</code> adapts <code>OutputStream</code> to <code>Writer</code>. Classic adapter pattern in the JDK.</div></div>
+      <div class="mi"><div class="mico">💳</div><div class="mt"><strong>Payment gateway aggregators</strong> — a <code>PaymentGateway</code> interface in your system. <code>StripeAdapter</code>, <code>RazorpayAdapter</code>, <code>UPIAdapter</code> wrap each SDK. Switching providers = swap the adapter, zero change to business logic.</div></div>
+      <div class="mi"><div class="mico">📚</div><div class="mt"><strong>Arrays.asList() / List.of()</strong> — wraps an array in a List interface. The array is the adaptee; the List is the target interface your code expects.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Distinguish</div>What is the difference between Adapter and Decorator patterns?<div class="qa">Adapter changes the interface — it wraps a class with a different interface so clients that expect interface A can use an object that implements interface B. The purpose is compatibility. Decorator keeps the same interface — it wraps a class with the same interface to add behaviour. The purpose is extension. Memory device: Adapter = translator (different language). Decorator = wrapper (same language, added meaning). Both use composition/wrapping but for opposite purposes.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain Facade pattern in Java and how it differs from Adapter')">Facade pattern</span>
+      <span class="chip" onclick="sendPrompt('Explain the Decorator pattern in Java with I/O streams example')">Decorator pattern</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T5: DECORATOR ════════ -->
+<div class="tp" id="t5">
+  <div class="ttl">Decorator</div>
+  <div class="pat-badge pb-s">Structural</div>
+  <div class="sub">Same interface · adds behaviour by wrapping · Java I/O is a decorator stack</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t5','s0')">Definition</button>
+    <button class="st" onclick="S('t5','s1')">How it works</button>
+    <button class="st" onclick="S('t5','s2')">Code</button>
+    <button class="st" onclick="S('t5','s3')">Real world</button>
+    <button class="st" onclick="S('t5','s4')">Interview</button>
+    <button class="st" onclick="S('t5','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t5-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Decorator attaches additional responsibilities to an object dynamically by wrapping it with another object that implements the same interface. It's an alternative to subclassing for extending behaviour. You can stack multiple decorators — each adds one concern — producing composed behaviour without class explosion.</p>
+    </div>
+    <div class="card" style="background:var(--color-background-secondary)">
+      <div class="ct">Java I/O — a decorator stack you use every day</div>
+      <div style="font-family:var(--font-mono,monospace);font-size:12px;line-height:2">
+        <span style="color:#085041">new BufferedReader(</span><br>
+        &nbsp;&nbsp;<span style="color:#3C3489">new InputStreamReader(</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#633806">new GZIPInputStream(</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#993C1D">socket.getInputStream()</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#633806">)</span>&nbsp;<span style="color:var(--color-text-secondary)">← adds decompression</span><br>
+        &nbsp;&nbsp;<span style="color:#3C3489">)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--color-text-secondary)">← adds char encoding</span><br>
+        <span style="color:#085041">)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--color-text-secondary)">← adds buffering</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s1">
+    <div class="card"><div class="ct">How decorator works</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Same interface</strong> — the decorator implements the same interface as the component it wraps. This makes it transparent to the client — the client doesn't know whether it's talking to the raw component or a stack of decorators.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Delegates to wrapped component</strong> — the decorator holds a reference to the component (or another decorator). It calls the wrapped component's method and adds behaviour before, after, or instead of the delegation.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Composable at runtime</strong> — unlike inheritance (fixed at compile time), decorator composition is dynamic. You can choose to add logging, caching, and rate-limiting to one service instance and only logging to another, using the same decorator classes.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft"><strong>vs inheritance</strong> — 3 base classes with 3 optional features = 8 subclasses (2³) with inheritance. With decorator: 3 base classes + 3 decorator classes = 9 total classes, but unlimited combinations at runtime. This is why the GoF says "favour composition over inheritance" — decorator is the composition solution to feature explosion.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s2">
+    <div class="card"><div class="ct">Code — service decorator with logging + caching</div>
+<div class="cb"><span class="kw">interface</span> <span class="nm">UserService</span> {
+    <span class="nm">User</span> getUser(<span class="nm">String</span> id);
+}
+
+<span class="kw">class</span> <span class="nm">UserServiceImpl</span> <span class="kw">implements</span> <span class="nm">UserService</span> {
+    <span class="kw">public</span> <span class="nm">User</span> getUser(<span class="nm">String</span> id) { <span class="kw">return</span> db.findById(id); } <span class="cm">// real work</span>
+}
+
+<span class="cm">// Logging decorator</span>
+<span class="kw">class</span> <span class="nm">LoggingUserService</span> <span class="kw">implements</span> <span class="nm">UserService</span> {
+    <span class="kw">private final</span> <span class="nm">UserService</span> delegate; <span class="cm">// wraps any UserService</span>
+    <span class="kw">public</span> <span class="nm">User</span> getUser(<span class="nm">String</span> id) {
+        log.info(<span class="str">"getUser({})"</span>, id);
+        <span class="nm">User</span> u = delegate.getUser(id);   <span class="cm">// delegate, then add logging</span>
+        log.info(<span class="str">"returned: {}"</span>, u);
+        <span class="kw">return</span> u;
+    }
+}
+
+<span class="cm">// Caching decorator</span>
+<span class="kw">class</span> <span class="nm">CachingUserService</span> <span class="kw">implements</span> <span class="nm">UserService</span> {
+    <span class="kw">private final</span> <span class="nm">UserService</span> delegate;
+    <span class="kw">private final</span> <span class="nm">Cache</span>&lt;<span class="nm">String</span>,<span class="nm">User</span>&gt; cache;
+    <span class="kw">public</span> <span class="nm">User</span> getUser(<span class="nm">String</span> id) {
+        <span class="kw">return</span> cache.computeIfAbsent(id, delegate::getUser);
+    }
+}
+
+<span class="cm">// Compose at runtime — order matters (outer decorator runs first)</span>
+<span class="nm">UserService</span> svc = <span class="kw">new</span> <span class="nm">LoggingUserService</span>(
+                      <span class="kw">new</span> <span class="nm">CachingUserService</span>(
+                          <span class="kw">new</span> <span class="nm">UserServiceImpl</span>(), cache
+                      )
+                  );
+<span class="cm">// Request: log → check cache → (if miss) hit DB → log result</span>
+
+<span class="cm">// Spring does this for you: @Transactional, @Cacheable, @Async
+// all wrap beans with proxy decorators at startup</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">📦</div><div class="mt"><strong>Java I/O streams</strong> — every <code>InputStream</code>, <code>OutputStream</code>, <code>Reader</code>, <code>Writer</code> wrapper is a decorator. <code>BufferedInputStream</code> adds buffering. <code>GZIPInputStream</code> adds decompression. Stack them arbitrarily.</div></div>
+      <div class="mi"><div class="mico">🌿</div><div class="mt"><strong>Spring AOP proxies</strong> — <code>@Transactional</code>, <code>@Cacheable</code>, <code>@Async</code>, <code>@Retryable</code> all wrap your beans with JDK dynamic proxies or CGLIB proxies that implement the same interface. The Decorator pattern at framework scale.</div></div>
+      <div class="mi"><div class="mico">🔒</div><div class="mt"><strong>Security middleware</strong> — authentication filter → authorisation filter → rate-limiting filter → your endpoint. Each filter is a decorator on the request handler chain.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Explain the Decorator pattern with a real Java example.<div class="qa">Decorator wraps an object with the same interface to add behaviour. Classic example: Java I/O. BufferedReader(new InputStreamReader(new FileInputStream(...))). Each layer adds a concern — buffering, character encoding, file reading — without modifying the others. In application code: @Transactional in Spring works this way — Spring wraps your @Service bean with a proxy that begins a transaction before your method runs and commits/rolls back after. Your code is unaware of the wrapping. This is the decorator at framework scale.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">vs Inheritance</div>Why use Decorator instead of inheritance to add behaviour?<div class="qa">Inheritance is static (fixed at compile time) and causes class explosion with multiple optional features (3 features × 2 states = 8 subclasses). Decorator is dynamic — you compose any combination of decorators at runtime. You can add caching to one instance, logging to another, and both to a third, using the same decorator classes. The Open/Closed Principle: you add new decorators without modifying existing code. Decorator also supports single responsibility — each decorator does exactly one thing.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain Spring AOP and how it implements the Decorator pattern with proxies')">Spring AOP proxies</span>
+      <span class="chip" onclick="sendPrompt('Explain Chain of Responsibility pattern in Java with servlet filter example')">Chain of Responsibility</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T6: OBSERVER ════════ -->
+<div class="tp" id="t6">
+  <div class="ttl">Observer</div>
+  <div class="pat-badge pb-b">Behavioural</div>
+  <div class="sub">Event-driven · publish-subscribe · Spring events · decoupling producers from consumers</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t6','s0')">Definition</button>
+    <button class="st" onclick="S('t6','s1')">How it works</button>
+    <button class="st" onclick="S('t6','s2')">Code</button>
+    <button class="st" onclick="S('t6','s3')">Real world</button>
+    <button class="st" onclick="S('t6','s4')">Interview</button>
+    <button class="st" onclick="S('t6','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t6-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Observer defines a one-to-many dependency so that when one object (the <em>subject/publisher</em>) changes state, all its dependents (the <em>observers/subscribers</em>) are notified automatically. It decouples the publisher from the subscribers — the publisher doesn't know who's listening or what they do with the notification.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlp"><div class="hn">Push model</div>Publisher sends event data to observers. Observers receive what the publisher decided to send. Simpler, tighter coupling on the event shape.</div>
+      <div class="hl hlt"><div class="hn">Pull model</div>Publisher sends only a notification. Observers pull the data they need from the publisher. More flexible — observers choose their data — but requires a reference to the subject.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s1">
+    <div class="card"><div class="ct">How it works</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Registration</strong> — observers call <code>subject.subscribe(this)</code> to register. The subject maintains a list of observers (a <code>List&lt;Observer&gt;</code>). Observers can also unsubscribe — crucial to prevent memory leaks (a registered observer is a GC root via the subject's list).</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Notification</strong> — when the subject's state changes, it iterates its observer list and calls <code>observer.update(event)</code> on each. Synchronous by default — observers run in the publisher's thread. For decoupled async notification: post to a queue, use Spring's <code>@Async @EventListener</code>, or Guava EventBus.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Memory leak risk</strong> — if observers register but never deregister, the subject holds strong references to them indefinitely. They're never garbage-collected even if the observer is logically "done". Fix: use <code>WeakReference&lt;Observer&gt;</code> in the subject's list, or always deregister in lifecycle callbacks (Spring's <code>@PreDestroy</code>, Android's onPause).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s2">
+    <div class="card"><div class="ct">Code — hand-rolled + Spring ApplicationEvent</div>
+<div class="cb"><span class="cm">// Hand-rolled observer</span>
+<span class="kw">interface</span> <span class="nm">OrderObserver</span> { <span class="kw">void</span> onOrderPlaced(<span class="nm">Order</span> order); }
+
+<span class="kw">class</span> <span class="nm">OrderService</span> {
+    <span class="kw">private final</span> <span class="nm">List</span>&lt;<span class="nm">OrderObserver</span>&gt; observers = <span class="kw">new</span> <span class="nm">CopyOnWriteArrayList</span>&lt;&gt;();
+
+    <span class="kw">public void</span> subscribe(<span class="nm">OrderObserver</span> o)   { observers.add(o); }
+    <span class="kw">public void</span> unsubscribe(<span class="nm">OrderObserver</span> o) { observers.remove(o); }
+
+    <span class="kw">public void</span> placeOrder(<span class="nm">Order</span> order) {
+        persist(order);
+        observers.forEach(o -> o.onOrderPlaced(order)); <span class="cm">// notify all</span>
+    }
+}
+
+<span class="kw">class</span> <span class="nm">InventoryService</span> <span class="kw">implements</span> <span class="nm">OrderObserver</span> {
+    <span class="kw">public void</span> onOrderPlaced(<span class="nm">Order</span> o) { reserveStock(o); }
+}
+<span class="kw">class</span> <span class="nm">NotificationService</span> <span class="kw">implements</span> <span class="nm">OrderObserver</span> {
+    <span class="kw">public void</span> onOrderPlaced(<span class="nm">Order</span> o) { sendConfirmation(o); }
+}
+
+<span class="cm">// Spring ApplicationEvent — production approach</span>
+<span class="kw">record</span> <span class="nm">OrderPlacedEvent</span>(<span class="nm">Order</span> order) <span class="kw">extends</span> <span class="nm">ApplicationEvent</span> {
+    <span class="nm">OrderPlacedEvent</span>(<span class="nm">Order</span> o) { <span class="kw">super</span>(o); <span class="kw">this</span>.order = o; }
+}
+
+<span class="kw">@Service class</span> <span class="nm">OrderSvc</span> {
+    <span class="nm">ApplicationEventPublisher</span> pub;
+    <span class="kw">void</span> place(<span class="nm">Order</span> o) { persist(o); pub.publishEvent(<span class="kw">new</span> <span class="nm">OrderPlacedEvent</span>(o)); }
+}
+
+<span class="kw">@Component class</span> <span class="nm">InvSvc</span> {
+    <span class="kw">@EventListener @Async</span>                 <span class="cm">// async: different thread</span>
+    <span class="kw">void</span> handle(<span class="nm">OrderPlacedEvent</span> e) { reserveStock(e.order()); }
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">🎯</div><div class="mt"><strong>Spring ApplicationEvents</strong> — <code>@EventListener</code> is the Observer pattern at framework scale. Order placed → inventory reserved, email sent, analytics tracked. Services don't know about each other — they both listen to the same event.</div></div>
+      <div class="mi"><div class="mico">📡</div><div class="mt"><strong>Kafka / RabbitMQ</strong> — the message queue IS the Observer pattern at infrastructure scale. Producers publish events. Multiple consumer groups subscribe. Adding a new consumer (observer) requires zero change to the producer.</div></div>
+      <div class="mi"><div class="mico">🌊</div><div class="mt"><strong>Reactive streams (RxJava, Reactor)</strong> — <code>Observable/Flux</code> is a publisher; <code>Observer/Subscriber</code> is the consumer. The entire reactive paradigm is observer pattern + backpressure + async composition.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Explain the Observer pattern with a real production example.<div class="qa">Observer: subject maintains a list of observers and notifies them on state changes. Observers don't know about each other — only the subject. Production example: order processing. OrderService publishes an OrderPlacedEvent (Spring ApplicationEvent). InventoryService, NotificationService, and AnalyticsService each have an @EventListener. When an order is placed, all three are notified. Adding a new RewardService requires zero change to OrderService — just add an @EventListener. This is the Open/Closed Principle applied to event handling.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Memory</div>How can the Observer pattern cause memory leaks and how do you prevent them?<div class="qa">When an observer registers with a long-lived subject, the subject holds a strong reference to it. If the observer's lifecycle ends but it never unregisters, the GC can't collect it. The subject's list is a GC root. Classic case: Android Activity registering with a singleton EventBus and not unregistering in onDestroy — the Activity leaks. Prevention: (1) always unsubscribe in lifecycle callbacks (Spring @PreDestroy, Android onPause). (2) Use WeakReference in the observer list — the observer can be GC'd even if not explicitly unregistered. (3) Use Spring ApplicationEvents — Spring manages listener lifecycles with bean lifecycle; when a bean is destroyed, its listeners are deregistered.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain event-driven architecture and how Observer scales to Kafka and message queues')">Event-driven architecture</span>
+      <span class="chip" onclick="sendPrompt('Explain Spring ApplicationEvents and @TransactionalEventListener')">Spring events</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T7: STRATEGY ════════ -->
+<div class="tp" id="t7">
+  <div class="ttl">Strategy</div>
+  <div class="pat-badge pb-b">Behavioural</div>
+  <div class="sub">Swappable algorithms · lambdas as strategies · Comparator is a strategy</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t7','s0')">Definition</button>
+    <button class="st" onclick="S('t7','s1')">How it works</button>
+    <button class="st" onclick="S('t7','s2')">Code</button>
+    <button class="st" onclick="S('t7','s3')">Real world</button>
+    <button class="st" onclick="S('t7','s4')">Interview</button>
+    <button class="st" onclick="S('t7','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t7-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Strategy defines a family of algorithms, encapsulates each one, and makes them interchangeable. The client holds a reference to a <em>strategy interface</em> and delegates the algorithm to whatever concrete strategy is injected. This lets the algorithm vary independently of the clients that use it.</p>
+    </div>
+    <div class="card" style="background:var(--color-background-secondary)">
+      <div class="ct">Modern Java: lambdas replaced boilerplate Strategy classes</div>
+      <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">Before Java 8: Strategy = interface + concrete class per algorithm. After Java 8: a functional interface IS the Strategy interface; a lambda IS a concrete strategy. <code>Comparator</code>, <code>Predicate</code>, <code>Function</code> are all built-in strategy interfaces in the JDK.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s1">
+    <div class="card"><div class="ct">How it works</div>
+      <div class="uml-row">
+        <div class="uml-box uml-p"><div class="uml-head">Context (e.g. Sorter)</div><div class="uml-body">- strategy: SortStrategy<br>+ setStrategy(s)<br>+ sort(data)</div></div>
+        <div class="arr">uses →</div>
+        <div class="uml-box uml-t"><div class="uml-head">«interface» SortStrategy</div><div class="uml-body">+ sort(data): void</div></div>
+      </div>
+      <div class="uml-row" style="margin-top:6px">
+        <div class="uml-box uml-a"><div class="uml-head">QuickSort</div><div class="uml-body">+ sort(data)</div></div>
+        <div class="uml-box uml-g"><div class="uml-head">MergeSort</div><div class="uml-body">+ sort(data)</div></div>
+        <div class="uml-box uml-p"><div class="uml-head">RadixSort</div><div class="uml-body">+ sort(data)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s2">
+    <div class="card"><div class="ct">Code — classic + lambda strategies + payment routing</div>
+<div class="cb"><span class="cm">// Classic Strategy — discount calculation</span>
+<span class="kw">interface</span> <span class="nm">DiscountStrategy</span> { <span class="kw">double</span> apply(<span class="kw">double</span> price); }
+<span class="kw">class</span> <span class="nm">NoDiscount</span>      <span class="kw">implements</span> <span class="nm">DiscountStrategy</span> { <span class="kw">public double</span> apply(<span class="kw">double</span> p) {<span class="kw">return</span> p;} }
+<span class="kw">class</span> <span class="nm">SeasonalDiscount</span> <span class="kw">implements</span> <span class="nm">DiscountStrategy</span> { <span class="kw">public double</span> apply(<span class="kw">double</span> p) {<span class="kw">return</span> p*0.8;} }
+
+<span class="kw">class</span> <span class="nm">PricingService</span> {
+    <span class="kw">private</span> <span class="nm">DiscountStrategy</span> strategy;
+    <span class="kw">public void</span> setStrategy(<span class="nm">DiscountStrategy</span> s) { <span class="kw">this</span>.strategy = s; }
+    <span class="kw">public double</span> price(<span class="kw">double</span> base) { <span class="kw">return</span> strategy.apply(base); }
+}
+
+<span class="cm">// Modern Java — lambda IS the strategy (no concrete class needed)</span>
+<span class="nm">DiscountStrategy</span> flash   = price -> price * 0.7;  <span class="cm">// 30% off</span>
+<span class="nm">DiscountStrategy</span> premium = price -> price * 0.85; <span class="cm">// 15% off</span>
+<span class="nm">DiscountStrategy</span> none    = price -> price;
+
+<span class="cm">// Map of strategies — dependency on config, not code</span>
+<span class="nm">Map</span>&lt;<span class="nm">String</span>, <span class="nm">DiscountStrategy</span>&gt; strategies = <span class="nm">Map</span>.of(
+    <span class="str">"FLASH"</span>,   price -> price * 0.7,
+    <span class="str">"PREMIUM"</span>, price -> price * 0.85,
+    <span class="str">"DEFAULT"</span>, price -> price
+);
+<span class="kw">double</span> finalPrice = strategies
+    .getOrDefault(userType, strategies.get(<span class="str">"DEFAULT"</span>))
+    .apply(basePrice);
+
+<span class="cm">// Comparator IS a strategy — sort users by different criteria</span>
+users.sort(<span class="nm">Comparator</span>.comparing(<span class="nm">User</span>::getName));         <span class="cm">// strategy: by name</span>
+users.sort(<span class="nm">Comparator</span>.comparingInt(<span class="nm">User</span>::getAge).reversed()); <span class="cm">// strategy: by age desc</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">🔀</div><div class="mt"><strong>Payment routing</strong> — <code>PaymentStrategy</code> interface, implementations for Stripe/Razorpay/UPI. Selected based on user country, amount, or preference. Switching providers for A/B testing = swap the strategy bean in config.</div></div>
+      <div class="mi"><div class="mico">📊</div><div class="mt"><strong>Sorting / Comparator</strong> — <code>Comparator</code> is a built-in Strategy in the JDK. <code>Collections.sort(list, comparator)</code> — the sorting algorithm is fixed, but the comparison strategy is injected.</div></div>
+      <div class="mi"><div class="mico">🗃️</div><div class="mt"><strong>Spring Security authentication</strong> — <code>AuthenticationProvider</code> is a Strategy interface. Multiple providers can be chained: username/password, OAuth, JWT, SAML. Spring tries each strategy in order.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Modern Java</div>How do lambdas change the way you implement the Strategy pattern in Java 8+?<div class="qa">Before Java 8: Strategy required a dedicated interface AND a concrete class per algorithm. After Java 8: any @FunctionalInterface IS a Strategy interface; a lambda IS the concrete strategy. Instead of new SeasonalDiscountStrategy(), you write price -> price * 0.8. This eliminates class files for simple strategies — the algorithm is an inline value. The pattern's intent is unchanged: inject behaviour, vary the algorithm independently. Lambdas just eliminate the boilerplate. Comparator, Predicate, Function — all GoF Strategy pattern instances already in the JDK.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">vs Template Method</div>How does Strategy differ from Template Method?<div class="qa">Both allow varying part of an algorithm. Template Method: the skeleton is fixed in the superclass, variable parts are abstract methods that subclasses override. Uses inheritance. Strategy: the entire algorithm is encapsulated in a separate strategy object injected into the context. Uses composition. Key difference: Template Method uses inheritance (IS-A), Strategy uses composition (HAS-A). Strategy is more flexible — you can change the algorithm at runtime. Template Method is set at compile time by subclassing. Prefer Strategy; it aligns with "favour composition over inheritance."</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain the SOLID Open/Closed Principle and how Strategy pattern implements it')">OCP + Strategy</span>
+      <span class="chip" onclick="sendPrompt('Compare Strategy, Template Method, and Command patterns')">Strategy vs Template vs Command</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T8: TEMPLATE METHOD ════════ -->
+<div class="tp" id="t8">
+  <div class="ttl">Template Method</div>
+  <div class="pat-badge pb-b">Behavioural</div>
+  <div class="sub">Fixed skeleton · variable steps · Hollywood Principle · Spring's JdbcTemplate</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t8','s0')">Definition</button>
+    <button class="st" onclick="S('t8','s1')">Structure</button>
+    <button class="st" onclick="S('t8','s2')">Code</button>
+    <button class="st" onclick="S('t8','s3')">Real world</button>
+    <button class="st" onclick="S('t8','s4')">Interview</button>
+    <button class="st" onclick="S('t8','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t8-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Template Method defines the skeleton of an algorithm in a base class, deferring some steps to subclasses. Subclasses can override specific steps without changing the algorithm's overall structure. Implements the <strong>Hollywood Principle</strong>: "Don't call us, we'll call you" — the framework calls your hooks, not the other way around.</p>
+    </div>
+    <div class="card" style="background:var(--color-background-secondary)">
+      <div class="ct">Algorithm skeleton — what's fixed vs what's variable</div>
+      <div style="font-family:var(--font-mono,monospace);font-size:12px;line-height:2">
+        <span style="color:#085041">final</span> processOrder() {      <span style="color:var(--color-text-secondary);font-family:var(--font-sans,sans-serif);font-size:11px">← fixed: can't override</span><br>
+        &nbsp;&nbsp;validateOrder();          <span style="color:var(--color-text-secondary);font-family:var(--font-sans,sans-serif);font-size:11px">← fixed step</span><br>
+        &nbsp;&nbsp;<span style="color:#3C3489">applyDiscount();</span>         <span style="color:var(--color-text-secondary);font-family:var(--font-sans,sans-serif);font-size:11px">← <strong>hook</strong> — subclass overrides</span><br>
+        &nbsp;&nbsp;<span style="color:#3C3489">processPayment();</span>        <span style="color:var(--color-text-secondary);font-family:var(--font-sans,sans-serif);font-size:11px">← <strong>abstract</strong> — subclass must implement</span><br>
+        &nbsp;&nbsp;sendConfirmation();       <span style="color:var(--color-text-secondary);font-family:var(--font-sans,sans-serif);font-size:11px">← fixed step</span><br>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t8-s1">
+    <div class="card"><div class="ct">Two types of variable steps</div>
+      <div class="two">
+        <div class="hl hlp"><div class="hn">Abstract steps</div>No default implementation. Subclass MUST override. Used for steps that are mandatory and fundamentally different per variant. Compile error if not implemented.</div>
+        <div class="hl hlt"><div class="hn">Hook methods</div>Have a default implementation (often empty). Subclass MAY override for optional extensions. The template calls them at defined points — subclasses opt in to customise.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t8-s2">
+    <div class="card"><div class="ct">Code — data export pipeline + Spring JdbcTemplate analogy</div>
+<div class="cb"><span class="cm">// Template Method — data export pipeline</span>
+<span class="kw">abstract class</span> <span class="nm">DataExporter</span> {
+    <span class="cm">// TEMPLATE METHOD — final: algorithm skeleton is fixed</span>
+    <span class="kw">public final void</span> export(<span class="nm">String</span> destination) {
+        <span class="nm">List</span>&lt;?&gt; data = fetchData();        <span class="cm">// abstract — subclass provides data</span>
+        <span class="nm">List</span>&lt;?&gt; transformed = transform(data); <span class="cm">// hook — default = no-op</span>
+        validate(transformed);              <span class="cm">// fixed — always validates</span>
+        write(transformed, destination);   <span class="cm">// abstract — subclass writes format</span>
+        onExportComplete(destination);     <span class="cm">// hook — optional post-action</span>
+    }
+
+    <span class="kw">protected abstract</span> <span class="nm">List</span>&lt;?&gt; fetchData();
+    <span class="kw">protected abstract void</span>   write(<span class="nm">List</span>&lt;?&gt; data, <span class="nm">String</span> dest);
+
+    <span class="kw">protected</span> <span class="nm">List</span>&lt;?&gt; transform(<span class="nm">List</span>&lt;?&gt; data) { <span class="kw">return</span> data; } <span class="cm">// hook: default no-op</span>
+    <span class="kw">protected void</span>    onExportComplete(<span class="nm">String</span> d) {}  <span class="cm">// hook: default empty</span>
+    <span class="kw">private void</span>      validate(<span class="nm">List</span>&lt;?&gt; d) { <span class="cm">/* always validates */</span> }
+}
+
+<span class="kw">class</span> <span class="nm">CsvExporter</span> <span class="kw">extends</span> <span class="nm">DataExporter</span> {
+    <span class="kw">protected</span> <span class="nm">List</span>&lt;<span class="nm">Order</span>&gt; fetchData()               { <span class="kw">return</span> orderRepo.findAll(); }
+    <span class="kw">protected void</span>        write(<span class="nm">List</span>&lt;?&gt; d, <span class="nm">String</span> p) { <span class="cm">/* write CSV */</span> }
+    <span class="kw">protected void</span>        onExportComplete(<span class="nm">String</span> p) { notify(p); } <span class="cm">// opt-in hook</span>
+}
+
+<span class="cm">// Spring JdbcTemplate IS Template Method
+// You provide the SQL and RowMapper; Spring handles connection, exception, close</span>
+<span class="nm">List</span>&lt;<span class="nm">User</span>&gt; users = jdbcTemplate.query(
+    <span class="str">"SELECT * FROM users WHERE active=?"</span>,
+    (<span class="nm">rs</span>, <span class="nm">row</span>) -> <span class="kw">new</span> <span class="nm">User</span>(rs.getString(<span class="str">"id"</span>), rs.getString(<span class="str">"name"</span>)),
+    <span class="kw">true</span>
+); <span class="cm">// YOUR hooks: sql + mapper. Spring's skeleton: get conn → execute → map → close</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t8-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">🌿</div><div class="mt"><strong>Spring JdbcTemplate</strong> — the skeleton: acquire connection, prepare statement, execute, map results, close connection, handle exceptions. Your hook: the SQL string and RowMapper. You never write the connection lifecycle code.</div></div>
+      <div class="mi"><div class="mico">🌐</div><div class="mt"><strong>HttpServlet</strong> — <code>service()</code> is the template method. It dispatches to <code>doGet()</code>, <code>doPost()</code>, etc. — which are hooks you override. The request parsing, response flushing, error handling are all in the fixed skeleton.</div></div>
+      <div class="mi"><div class="mico">🧪</div><div class="mt"><strong>JUnit</strong> — <code>@BeforeEach</code>, <code>@Test</code>, <code>@AfterEach</code> are hooks the JUnit framework calls at fixed points in the test lifecycle. You fill in the hooks; the test runner manages the skeleton.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t8-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What is the Hollywood Principle and how does Template Method implement it?<div class="qa">"Don't call us, we'll call you." The framework or base class controls the flow. Your code (the subclass) doesn't call the base class — the base class calls you at specific extension points (abstract methods and hooks). Template Method: the base class's final method drives execution and calls abstract/hook methods that subclasses implement. You never explicitly invoke the skeleton — you just provide the hooks and the framework invokes them. This inverts control: you extend the framework's behaviour without controlling when it runs. Same principle as Spring's lifecycle callbacks — you implement @PostConstruct; Spring calls it at the right time.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">vs Strategy</div>When do you choose Template Method over Strategy?<div class="qa">Template Method: fixed algorithm structure, vary specific steps using inheritance. Best when: the steps are tightly coupled to the skeleton, you want to reuse large chunks of the base implementation, and you control the class hierarchy. Strategy: encapsulate the entire algorithm in a separate object, inject it. Best when: you need to change the whole algorithm at runtime, you want to compose behaviours without inheritance, or you want to test strategies independently. Modern preference: Strategy (via lambdas) over Template Method because inheritance locks you in. Template Method shines in frameworks (Spring, Servlet, JUnit) where the framework owns the skeleton and you extend it.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t8-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain Spring JdbcTemplate internals and how it implements Template Method')">JdbcTemplate internals</span>
+      <span class="chip" onclick="sendPrompt('Explain Inversion of Control and how it relates to Template Method and Strategy')">IoC principle</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T9: COMMAND ════════ -->
+<div class="tp" id="t9">
+  <div class="ttl">Command</div>
+  <div class="pat-badge pb-b">Behavioural</div>
+  <div class="sub">Encapsulate requests · undo/redo · queuing commands · macros</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t9','s0')">Definition</button>
+    <button class="st" onclick="S('t9','s1')">Structure</button>
+    <button class="st" onclick="S('t9','s2')">Code</button>
+    <button class="st" onclick="S('t9','s3')">Real world</button>
+    <button class="st" onclick="S('t9','s4')">Interview</button>
+    <button class="st" onclick="S('t9','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t9-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Command encapsulates a request as an object, thereby allowing you to parameterise clients with different requests, queue or log requests, and support undoable operations. It decouples the object that invokes the operation (invoker) from the object that knows how to perform it (receiver). The command object bridges them.</p>
+    </div>
+    <div class="four" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:.5rem">
+      <div class="hl hlp"><div class="hn">Client</div>Creates command, sets receiver, passes to invoker</div>
+      <div class="hl hlt"><div class="hn">Command</div>Interface with execute() and optionally undo()</div>
+      <div class="hl hla"><div class="hn">Invoker</div>Calls execute() at the right time. Doesn't know what it does</div>
+      <div class="hl hlg"><div class="hn">Receiver</div>Knows HOW to perform the actual work</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t9-s1">
+    <div class="card"><div class="ct">What Command enables</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">1</div><div class="ft"><strong>Undo/Redo</strong> — push executed commands onto a history stack. <code>undo()</code> pops and calls the reverse operation. Text editors, drawing apps, IDEs all use this. The command stores enough state to reverse itself.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>Queuing</strong> — commands are serialisable objects. Put them in a <code>BlockingQueue</code>. Worker threads drain the queue and execute. Rate limiting, job scheduling, retry — all natural fits.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Macro commands</strong> — a <code>MacroCommand</code> implements <code>Command</code> and holds a list of sub-commands. <code>execute()</code> runs them in order. Transactions, batch operations, workflow steps.</div></div>
+        <div class="fs t"><div class="fn t">4</div><div class="ft"><strong>Audit logging</strong> — every executed command is logged (who, what, when, with what params). The command object carries all context needed for the audit trail.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t9-s2">
+    <div class="card"><div class="ct">Code — text editor undo/redo + async command queue</div>
+<div class="cb"><span class="kw">interface</span> <span class="nm">Command</span> {
+    <span class="kw">void</span> execute();
+    <span class="kw">void</span> undo();
+}
+
+<span class="kw">class</span> <span class="nm">TextEditor</span> {           <span class="cm">// Receiver</span>
+    <span class="nm">StringBuilder</span> content = <span class="kw">new</span> <span class="nm">StringBuilder</span>();
+    <span class="kw">void</span> insert(<span class="kw">int</span> pos, <span class="nm">String</span> text) { content.insert(pos, text); }
+    <span class="kw">void</span> delete(<span class="kw">int</span> pos, <span class="kw">int</span> len)    { content.delete(pos, pos+len); }
+}
+
+<span class="kw">class</span> <span class="nm">InsertCommand</span> <span class="kw">implements</span> <span class="nm">Command</span> {
+    <span class="kw">private final</span> <span class="nm">TextEditor</span> editor;
+    <span class="kw">private final int</span>         position;
+    <span class="kw">private final</span> <span class="nm">String</span>      text;
+
+    <span class="kw">public void</span> execute() { editor.insert(position, text); }
+    <span class="kw">public void</span> undo()    { editor.delete(position, text.length()); }
+}
+
+<span class="kw">class</span> <span class="nm">CommandHistory</span> {        <span class="cm">// Invoker with undo/redo</span>
+    <span class="nm">Deque</span>&lt;<span class="nm">Command</span>&gt; history = <span class="kw">new</span> <span class="nm">ArrayDeque</span>&lt;&gt;();
+    <span class="kw">void</span> execute(<span class="nm">Command</span> cmd) { cmd.execute(); history.push(cmd); }
+    <span class="kw">void</span> undo()               { <span class="kw">if</span>(!history.isEmpty()) history.pop().undo(); }
+}
+
+<span class="cm">// Modern Java: Runnable/lambda IS a Command (execute only, no undo)</span>
+<span class="nm">BlockingQueue</span>&lt;<span class="nm">Runnable</span>&gt; jobQueue = <span class="kw">new</span> <span class="nm">LinkedBlockingQueue</span>&lt;&gt;();
+jobQueue.put(() -> processOrder(order));    <span class="cm">// command as lambda</span>
+jobQueue.put(() -> sendEmail(user));
+<span class="cm">// Worker thread drains and executes — invoker never knows what the command does</span>
+
+<span class="cm">// Spring @Async — Command queued and executed by framework</span>
+<span class="kw">@Async</span>
+<span class="kw">void</span> sendWelcomeEmail(<span class="nm">User</span> user) { emailService.send(user.email()); }
+<span class="cm">// Caller: just calls the method. Spring wraps it as a Runnable, submits to executor</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t9-s3">
+    <div class="card"><div class="ct">Real-world use cases</div>
+      <div class="mi"><div class="mico">↩️</div><div class="mt"><strong>Text editor undo/redo</strong> — IntelliJ, VS Code, Google Docs all maintain a command history. Ctrl+Z pops the last command and calls undo(). Each keystroke creates a command object with enough state to reverse it.</div></div>
+      <div class="mi"><div class="mico">📋</div><div class="mt"><strong>ExecutorService / thread pools</strong> — <code>executor.submit(runnable)</code> — the Runnable is a Command. The pool is the Invoker. It executes commands on whatever thread is available. You can queue, cancel (Future), and track completion.</div></div>
+      <div class="mi"><div class="mico">💳</div><div class="mt"><strong>Database transactions as commands</strong> — a <code>TransactionalCommand</code> wraps multiple DB operations. execute() runs them in a transaction. undo() runs a compensating transaction. This is the Saga pattern at the service level.</div></div>
+      <div class="mi"><div class="mico">🤖</div><div class="mt"><strong>EngineX use case</strong> — interview question generation, feedback scoring, resume parsing — each is a Command. They can be queued, retried on failure, prioritised, and tracked independently. The AI invocation is the Receiver; the pipeline orchestrator is the Invoker.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t9-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What does the Command pattern enable that plain method calls don't?<div class="qa">Command encapsulates a request as an object, which enables: (1) Undo/redo — the command stores state for reversal; a history stack of executed commands can be popped and undone. (2) Queuing — commands are objects; they can be put in queues, delayed, retried, and rate-limited independent of the caller. (3) Logging/audit — the command object carries all context; execution can be logged with full parameters. (4) Macro commands — a command can contain other commands and execute them in sequence (batch operations, transactions). None of these are possible with plain method calls because the call is ephemeral — it doesn't exist as a first-class object.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Modern Java</div>Is Runnable the Command pattern in Java?<div class="qa">Runnable implements the execute() part of Command. It's a degenerate Command — execute only, no undo. ExecutorService.submit(runnable) is textbook Command pattern: you (the client) create the command (runnable), hand it to the invoker (executor), and the receiver (pool thread) executes it. You can cancel (Future.cancel()), which is a form of preventing execution. For full Command with undo, you implement a custom interface with execute() and undo(). In practice: Runnable/Callable covers 90% of Command use cases in Java; undo is only needed in specific domains (editors, drawing tools).</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t9-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain the Saga pattern in distributed systems and how it relates to the Command pattern')">Saga pattern</span>
+      <span class="chip" onclick="sendPrompt('Explain CQRS (Command Query Responsibility Segregation) and how it uses the Command pattern')">CQRS</span>
+      <span class="chip" onclick="sendPrompt('Explain Event Sourcing and how it stores Commands as the source of truth')">Event sourcing</span>
+    </div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function T(i){
+  document.querySelectorAll('.tp').forEach((p,j)=>p.classList.toggle('vis',j===i));
+  document.querySelectorAll('.nb').forEach((b,j)=>b.classList.toggle('on',j===i));
+  var tp=document.querySelectorAll('.tp')[i];
+  if(tp){var st=tp.querySelector('.st');if(st)st.click();}
+}
+function S(tid,sid){
+  var tp=document.getElementById(tid);
+  if(!tp)return;
+  tp.querySelectorAll('.sc').forEach(s=>s.classList.remove('vis'));
+  var sc=document.getElementById(tid+'-'+sid);
+  if(sc)sc.classList.add('vis');
+  var sids=['s0','s1','s2','s3','s4','s5','s6'];
+  tp.querySelectorAll('.st').forEach((b,i)=>b.classList.toggle('on',sids[i]===sid));
+}
+function A(el){
+  var a=el.querySelector('.qa');
+  if(a)a.style.display=a.style.display==='block'?'none':'block';
+}
+</script>

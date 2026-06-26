@@ -1,0 +1,906 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.shell{display:flex;height:100vh;min-height:640px;overflow:hidden}
+.nav{width:232px;min-width:232px;border-right:0.5px solid var(--color-border-tertiary);padding:12px 0;overflow-y:auto;background:var(--color-background-secondary)}
+.nav-title{font-size:10px;font-weight:500;color:var(--color-text-tertiary);padding:6px 16px 4px;letter-spacing:.07em;text-transform:uppercase}
+.ni{display:block;padding:7px 16px;font-size:12.5px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent;line-height:1.4;transition:all .12s}
+.ni:hover{color:var(--color-text-primary);background:var(--color-background-primary)}
+.ni.active{color:var(--color-text-primary);border-left-color:#D85A30;background:var(--color-background-primary);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:26px 30px}
+.topic{display:none}.topic.visible{display:block}
+h1.ttl{font-size:20px;font-weight:500;margin-bottom:4px}
+.tnum{font-size:11px;color:var(--color-text-tertiary);margin-bottom:12px}
+.tags{margin-bottom:12px}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin:0 3px 3px 0}
+.tg{background:#E1F5EE;color:#085041}.tp{background:#EEEDFE;color:#3C3489}.tw{background:#FAEEDA;color:#633806}.td{background:#FCEBEB;color:#791F1F}.ti{background:#E6F1FB;color:#0C447C}.tc{background:#FAECE7;color:#712B13}
+.sl{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin:18px 0 6px;display:flex;align-items:center;gap:6px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{font-weight:500;color:var(--color-text-primary)}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+.g3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:7px}
+.sb{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.sb h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.sb p{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.cb{background:#1a1b26;border-radius:var(--border-radius-md);padding:13px 15px;margin:8px 0;overflow-x:auto}
+.cb pre{font-family:var(--font-mono);font-size:11.5px;line-height:1.75;color:#c0caf5;white-space:pre}
+.kw{color:#bb9af7}.fn{color:#7aa2f7}.cm{color:#565f89;font-style:italic}.str{color:#9ece6a}.num{color:#ff9e64}.vr{color:#f7768e}.cl{color:#e0af68}
+.mst{border-left:2px solid #E24B4A;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.tof{border-left:2px solid #EF9F27;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.iq{font-size:12.5px;padding:8px 11px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin:5px 0;border:0.5px solid var(--color-border-tertiary)}
+.iq .q{font-weight:500;margin-bottom:2px}
+.iq .d{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.55}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pill{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
+.pq{background:var(--color-background-info);color:var(--color-text-info)}
+.pc{background:#E1F5EE;color:#085041}
+.divline{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:26px 0}
+.divlabel{text-align:center;font-size:11px;color:var(--color-text-tertiary);margin:-10px 0 18px}
+.arch{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 13px;margin:5px 0}
+.arch h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.arch p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.65}
+.vitals-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}
+.vital-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;background:var(--color-background-primary)}
+.vital-name{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.vital-thresh{font-size:11px;color:var(--color-text-secondary);line-height:1.5}
+.good{color:#3B6D11}.needs{color:#854F0B}.poor{color:#A32D2D}
+.strategy-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:7px;margin:8px 0}
+.strat{border-radius:var(--border-radius-md);padding:10px 12px}
+.strat h4{font-size:12px;font-weight:500;margin-bottom:4px}
+.strat p{font-size:11.5px;line-height:1.55}
+.s-cf{background:#E1F5EE;border:0.5px solid #5DCAA5}.s-cf h4{color:#085041}.s-cf p{color:#0F6E56}
+.s-nf{background:#E6F1FB;border:0.5px solid #85B7EB}.s-nf h4{color:#0C447C}.s-nf p{color:#185FA5}
+.s-sw{background:#FAEEDA;border:0.5px solid #EF9F27}.s-sw h4{color:#633806}.s-sw p{color:#854F0B}
+</style>
+
+<div class="shell">
+<nav class="nav">
+  <div class="nav-title">Block 4 — Performance Engineering</div>
+  <div class="ni active" onclick="show(0,this)">1. Core Web Vitals</div>
+  <div class="ni" onclick="show(1,this)">2. Code splitting</div>
+  <div class="ni" onclick="show(2,this)">3. Tree shaking</div>
+  <div class="ni" onclick="show(3,this)">4. Bundle optimisation</div>
+  <div class="ni" onclick="show(4,this)">5. Image optimisation</div>
+  <div class="ni" onclick="show(5,this)">6. Font optimisation</div>
+  <div class="ni" onclick="show(6,this)">7. Prefetch &amp; preload</div>
+  <div class="ni" onclick="show(7,this)">8. Service workers &amp; offline</div>
+  <div class="ni" onclick="show(8,this)">9. Performance measurement</div>
+</nav>
+
+<main class="content">
+
+<div class="topic visible" id="t0">
+  <div class="tnum">Topic 1 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Core Web Vitals</h1>
+  <div class="tags"><span class="tag tg">LCP</span><span class="tag tp">INP</span><span class="tag tw">CLS</span><span class="tag ti">TTFB</span></div>
+
+  <div class="vitals-grid">
+    <div class="vital-card">
+      <div class="vital-name" style="color:#0C447C">LCP</div>
+      <div style="font-size:15px;font-weight:500;margin-bottom:4px">Largest Contentful Paint</div>
+      <div class="vital-thresh"><span class="good">Good: &lt;2.5s</span><br><span class="needs">Needs work: &lt;4s</span><br><span class="poor">Poor: &gt;4s</span></div>
+    </div>
+    <div class="vital-card">
+      <div class="vital-name" style="color:#085041">INP</div>
+      <div style="font-size:15px;font-weight:500;margin-bottom:4px">Interaction to Next Paint</div>
+      <div class="vital-thresh"><span class="good">Good: &lt;200ms</span><br><span class="needs">Needs work: &lt;500ms</span><br><span class="poor">Poor: &gt;500ms</span></div>
+    </div>
+    <div class="vital-card">
+      <div class="vital-name" style="color:#633806">CLS</div>
+      <div style="font-size:15px;font-weight:500;margin-bottom:4px">Cumulative Layout Shift</div>
+      <div class="vital-thresh"><span class="good">Good: &lt;0.1</span><br><span class="needs">Needs work: &lt;0.25</span><br><span class="poor">Poor: &gt;0.25</span></div>
+    </div>
+    <div class="vital-card">
+      <div class="vital-name" style="color:#712B13">TTFB</div>
+      <div style="font-size:15px;font-weight:500;margin-bottom:4px">Time to First Byte</div>
+      <div class="vital-thresh"><span class="good">Good: &lt;800ms</span><br><span class="needs">Needs work: &lt;1.8s</span><br><span class="poor">Poor: &gt;1.8s</span></div>
+    </div>
+  </div>
+
+  <div class="sl">What each metric measures & root causes</div>
+
+  <div class="g2">
+    <div class="sb"><h4>LCP — what it measures</h4><p>Time from navigation start to when the largest visible content element (hero image, H1, video poster) finishes rendering. Not total page load — just the dominant above-fold element. Reported element: largest by rendered area (img, video, background-image via CSS, block text).</p></div>
+    <div class="sb"><h4>LCP — what makes it poor</h4><p>Slow TTFB (server not responding fast enough). Render-blocking CSS/JS in &lt;head&gt; (delays first paint). LCP resource not discovered early by preload scanner. No CDN edge caching. Large unoptimized images. Lazy-loading the LCP image (critical mistake — should be eager).</p></div>
+    <div class="sb"><h4>LCP — how to fix</h4><p>CDN with edge caching for HTML (sub-200ms TTFB). Inline critical CSS. <code>fetchpriority="high"</code> on LCP image. <code>&lt;link rel="preload" as="image"&gt;</code>. Never lazy-load LCP element. AVIF/WebP + correct sizing. Remove render-blocking scripts above LCP element.</p></div>
+    <div class="sb"><h4>INP — what it measures</h4><p>Responsiveness to user input across the entire page lifetime (not just first interaction like old FID). Measures the worst-case input latency: time from user gesture (click, key, tap) to the next visual update (next paint after the handler). 75th percentile of all interactions.</p></div>
+    <div class="sb"><h4>INP — what makes it poor</h4><p>Long JS tasks on the main thread blocking the event loop (&gt;50ms). Heavy synchronous event handlers. Layout thrashing triggered by handlers. Third-party scripts monopolizing the main thread. Large React re-renders triggered by interactions without startTransition.</p></div>
+    <div class="sb"><h4>INP — how to fix</h4><p>Break long tasks with <code>scheduler.yield()</code>. Move computation to Web Workers. Wrap non-urgent state updates in <code>startTransition</code>. Debounce high-frequency handlers. Remove/defer third-party scripts. Measure with PerformanceObserver <code>event</code> type for long event handlers.</p></div>
+    <div class="sb"><h4>CLS — what it measures</h4><p>Unexpected layout shifts throughout page lifetime. Each shift scored by: impact fraction (how much of the viewport shifted) × distance fraction (how far elements moved). Cumulative score across all unexpected shifts (excluding shifts within 500ms of user interaction).</p></div>
+    <div class="sb"><h4>CLS — what makes it poor</h4><p>Images/video without explicit width+height (browser can't reserve space). Late-loading ads or banners injected above content. Web fonts causing FOUT (text reflow). Dynamically injected content above existing content. Animations using top/left instead of transform.</p></div>
+    <div class="sb"><h4>CLS — how to fix</h4><p>Always set width+height on img/video elements. CSS aspect-ratio for responsive images. font-display: optional eliminates FOUT entirely. Reserve space for ads with min-height. Use transform for animations (compositor-only, no layout). Avoid inserting DOM nodes above existing content.</p></div>
+    <div class="sb"><h4>TTFB — what it measures</h4><p>Time from navigation request to first byte of the response body. Encompasses: DNS lookup + TCP handshake + TLS negotiation + server processing time + first byte of response. Not a Core Web Vital but a diagnostic metric that bottlenecks LCP.</p></div>
+  </div>
+
+  <div class="sl">Code example — measuring all vitals</div>
+  <div class="cb"><pre><span class="cm">// web-vitals library — report to analytics</span>
+<span class="kw">import</span> { onLCP, onINP, onCLS, onTTFB, onFCP } <span class="kw">from</span> <span class="str">'web-vitals'</span>;
+
+<span class="kw">function</span> <span class="fn">sendToAnalytics</span>({ name, value, rating, id }) {
+  <span class="fn">fetch</span>(<span class="str">'/analytics'</span>, {
+    method: <span class="str">'POST'</span>,
+    body: <span class="cl">JSON</span>.<span class="fn">stringify</span>({ name, value: <span class="cl">Math</span>.<span class="fn">round</span>(value), rating, id }),
+    keepalive: <span class="kw">true</span>,  <span class="cm">// Survives page unload</span>
+  });
+}
+
+<span class="fn">onLCP</span>(sendToAnalytics);
+<span class="fn">onINP</span>(sendToAnalytics);   <span class="cm">// INP replaced FID in March 2024</span>
+<span class="fn">onCLS</span>(sendToAnalytics);
+<span class="fn">onTTFB</span>(sendToAnalytics);
+
+<span class="cm">// Manual INP investigation — find long event handlers</span>
+<span class="kw">const</span> obs = <span class="kw">new</span> <span class="cl">PerformanceObserver</span>((list) => {
+  <span class="kw">for</span> (<span class="kw">const</span> entry <span class="kw">of</span> list.getEntries()) {
+    <span class="kw">if</span> (entry.duration > <span class="num">200</span>) {
+      console.<span class="fn">warn</span>(<span class="str">`Slow interaction: ${entry.name} took ${Math.round(entry.duration)}ms`</span>);
+      console.<span class="fn">warn</span>(<span class="str">`Processing time: ${Math.round(entry.processingEnd - entry.processingStart)}ms`</span>);
+    }
+  }
+});
+obs.<span class="fn">observe</span>({ type: <span class="str">'event'</span>, durationThreshold: <span class="num">16</span>, buffered: <span class="kw">true</span> });
+
+<span class="cm">// CLS investigation — which elements shift</span>
+<span class="kw">const</span> clsObs = <span class="kw">new</span> <span class="cl">PerformanceObserver</span>((list) => {
+  <span class="kw">for</span> (<span class="kw">const</span> entry <span class="kw">of</span> list.getEntries()) {
+    <span class="kw">if</span> (!entry.hadRecentInput) { <span class="cm">// Exclude user-initiated shifts</span>
+      entry.sources?.<span class="fn">forEach</span>(source => {
+        console.<span class="fn">warn</span>(<span class="str">'CLS source:'</span>, source.node, <span class="str">'score:'</span>, entry.value.<span class="fn">toFixed</span>(<span class="num">3</span>));
+      });
+    }
+  }
+});
+clsObs.<span class="fn">observe</span>({ type: <span class="str">'layout-shift'</span>, buffered: <span class="kw">true</span> });</pre></div>
+
+  <div class="sl">Performance implications per vital</div>
+  <p class="prose">LCP is the primary SEO and UX signal for perceived load speed — Google uses CWVs as a ranking signal. INP replaced FID in March 2024 because FID only measured the first interaction; INP measures the worst interaction across the session lifetime, making it far harder to game. CLS directly causes users to mis-click (tap target shifts while they're tapping) — a conversion killer in e-commerce. TTFB is a prerequisite for everything: no amount of client-side optimization compensates for a 3-second server response time.</p>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Adding <code>loading="lazy"</code> to the LCP image — lazy loading defers the request until the image is near the viewport. For the LCP element (which is usually already in the viewport), this delays the most important image on the page. Never lazy-load the LCP element. Use <code>loading="eager"</code> (default) or add <code>fetchpriority="high"</code>.</div>
+  <div class="mst">Measuring CWVs only in Lighthouse (lab data) and not in Real User Monitoring. Lighthouse runs on a controlled throttled connection — it won't surface INP issues from complex interaction patterns or CLS issues from ad networks that load differently in the lab.</div>
+  <div class="mst">Ignoring INP because "FID was fine" — FID measured input delay only (time before JS starts handling), while INP measures the full interaction latency including processing time and next paint delay. A "good" FID score app can have terrible INP.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"INP replaced FID — why? What does INP measure that FID didn't?"</div><div class="d">FID measured only the delay before the first interaction's handler started — it excluded processing time and paint delay. It also only measured the first interaction. INP measures the full latency (input → next paint) across all interactions during the session, taking the 75th percentile. Harder to game, more representative of real user experience under load.</div></div>
+  <div class="iq"><div class="q">"Walk me through diagnosing a poor LCP score in production."</div><div class="d">Check TTFB first (server/CDN response speed). Check if LCP element is render-blocked (CSS/JS in head). Check if LCP image has fetchpriority=high or rel=preload. Check image format and size (should be AVIF/WebP, correctly sized for viewport). Check if lazy loading is accidentally applied. Use CrUX data + web-vitals library for field data vs Lighthouse for lab diagnosis.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Critical rendering path (Block 1)</span>
+    <span class="pill pq">Image optimisation (topic 5)</span>
+    <span class="pill pq">Service worker caching (affects TTFB on repeat visits)</span>
+    <span class="pill pc">Google Search ranking (CWV as SEO signal)</span>
+    <span class="pill pc">Real User Monitoring (topic 9)</span>
+  </div>
+</div>
+
+<div class="topic" id="t1">
+  <div class="tnum">Topic 2 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Code splitting</h1>
+  <div class="tags"><span class="tag tg">dynamic import</span><span class="tag tp">React.lazy</span><span class="tag tw">Route splitting</span><span class="tag ti">TTI</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Code splitting is the technique of dividing a JavaScript bundle into smaller chunks that are loaded on demand rather than all at once. Without splitting, every user downloads the entire application JS on the first visit — including code for routes they may never visit, features hidden behind permissions, and third-party libraries used only in specific flows. Code splitting reduces the <strong>initial parse and execute cost</strong> (directly improving TTI and INP), downloads only what's needed for the current view, and allows parallel chunk loading via HTTP/2.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">Dynamic <code>import()</code> is the native ECMAScript mechanism. When a bundler (Vite, webpack) encounters <code>import('./Module')</code>, it creates a new chunk boundary — the referenced module and its entire dependency subtree are extracted into a separate file. The bundler outputs a <strong>chunk manifest</strong> (in Vite: <code>manifest.json</code>) mapping module IDs to chunk filenames. At runtime, <code>import('./Module')</code> returns a Promise. The browser fetches the chunk file (a network request), parses it, executes it, and resolves the Promise with the module exports. <code>React.lazy()</code> wraps this in React's Suspense protocol — it calls the dynamic import, and if the Promise is pending, throws it (triggering the nearest Suspense boundary to show its fallback). When the chunk loads and the Promise resolves, React re-renders the Suspense boundary with the actual component.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Route-based splitting</h4><p>Split by page/route — the most impactful split. Each route's component tree becomes its own chunk. Load only the current route's JS. On navigation, load the next route's chunk. In Next.js App Router, this is automatic — each page.tsx is a separate chunk.</p></div>
+    <div class="sb"><h4>Component-based splitting</h4><p>Split heavy components that are conditionally shown: modals, rich text editors, data visualization libraries, admin panels. Only load the chunk when the user triggers the component (opens modal, navigates to admin page).</p></div>
+    <div class="sb"><h4>Vendor splitting</h4><p>Extract stable third-party libraries (React, lodash, charting libs) into a separate vendor chunk. The vendor chunk changes rarely — cached long-term with content-hash. App code changes frequently — its chunk is small and invalidates often. Separate caching profiles.</p></div>
+    <div class="sb"><h4>Suspense boundary placement</h4><p>The fallback UI shows while the chunk loads. Place Suspense boundaries strategically: too high = blank page during load; too low = awkward partial renders. Route-level Suspense is standard. Nested Suspense enables progressive streaming of page sections.</p></div>
+    <div class="sb"><h4>Preloading split chunks</h4><p>After initial load, preload likely-needed chunks using <code>import(/* webpackPrefetch: true */ './Heavy')</code> or <code>&lt;link rel="prefetch"&gt;</code>. On hover over a nav link, preload that route's chunk — it'll be in browser cache by the time the user clicks.</p></div>
+    <div class="sb"><h4>Chunk naming &amp; debugging</h4><p>Use magic comments for readable chunk names: <code>import(/* webpackChunkName: "editor" */ './Editor')</code>. Names appear in bundle analyzers and DevTools network tab. Vite uses module path as chunk name by default.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Route-based splitting with React.lazy + Suspense</span>
+<span class="kw">import</span> { lazy, Suspense } <span class="kw">from</span> <span class="str">'react'</span>;
+<span class="kw">import</span> { Routes, Route } <span class="kw">from</span> <span class="str">'react-router-dom'</span>;
+
+<span class="cm">// Each route becomes a separate chunk — not in initial bundle</span>
+<span class="kw">const</span> <span class="cl">Dashboard</span>  = <span class="fn">lazy</span>(() => <span class="kw">import</span>(<span class="str">'./pages/Dashboard'</span>));
+<span class="kw">const</span> <span class="cl">Settings</span>   = <span class="fn">lazy</span>(() => <span class="kw">import</span>(<span class="str">'./pages/Settings'</span>));
+<span class="kw">const</span> <span class="cl">Analytics</span>  = <span class="fn">lazy</span>(() => <span class="kw">import</span>(<span class="str">'./pages/Analytics'</span>));
+
+<span class="kw">export function</span> <span class="fn">App</span>() {
+  <span class="kw">return</span> (
+    &lt;<span class="cl">Suspense</span> fallback={&lt;<span class="cl">PageSkeleton</span> /&gt;}&gt;
+      &lt;<span class="cl">Routes</span>&gt;
+        &lt;<span class="cl">Route</span> path=<span class="str">"/"</span>          element={&lt;<span class="cl">Dashboard</span>  /&gt;} /&gt;
+        &lt;<span class="cl">Route</span> path=<span class="str">"/settings"</span>  element={&lt;<span class="cl">Settings</span>   /&gt;} /&gt;
+        &lt;<span class="cl">Route</span> path=<span class="str">"/analytics"</span> element={&lt;<span class="cl">Analytics</span>  /&gt;} /&gt;
+      &lt;/<span class="cl">Routes</span>&gt;
+    &lt;/<span class="cl">Suspense</span>&gt;
+  );
+}
+
+<span class="cm">// Component-based splitting — heavy modal loaded on demand</span>
+<span class="kw">const</span> <span class="cl">RichTextEditor</span> = <span class="fn">lazy</span>(() =>
+  <span class="kw">import</span>(<span class="cm">/* webpackChunkName: "editor" */</span> <span class="str">'./components/RichTextEditor'</span>)
+);
+
+<span class="kw">function</span> <span class="fn">EditPostModal</span>({ open }) {
+  <span class="kw">if</span> (!open) <span class="kw">return</span> <span class="kw">null</span>; <span class="cm">// Don't render, don't load chunk</span>
+  <span class="kw">return</span> (
+    &lt;<span class="cl">Suspense</span> fallback={&lt;<span class="cl">EditorSkeleton</span> /&gt;}&gt;
+      &lt;<span class="cl">RichTextEditor</span> /&gt; <span class="cm">// Chunk fetched only when modal opens</span>
+    &lt;/<span class="cl">Suspense</span>&gt;
+  );
+}
+
+<span class="cm">// Preload on hover — chunk ready before user clicks</span>
+<span class="kw">const</span> preloadDashboard = () => <span class="kw">import</span>(<span class="str">'./pages/Dashboard'</span>); <span class="cm">// Warm network</span>
+
+&lt;NavLink
+  to=<span class="str">"/dashboard"</span>
+  onMouseEnter={preloadDashboard}
+  onFocus={preloadDashboard}
+&gt;Dashboard&lt;/NavLink&gt;
+
+<span class="cm">// Vite config — explicit chunk splitting</span>
+<span class="cm">// vite.config.ts</span>
+<span class="kw">export default</span> <span class="fn">defineConfig</span>({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [<span class="str">'react'</span>, <span class="str">'react-dom'</span>],
+          charts:  [<span class="str">'recharts'</span>, <span class="str">'d3'</span>],
+          editor:  [<span class="str">'@tiptap/react'</span>, <span class="str">'@tiptap/starter-kit'</span>],
+        },
+      },
+    },
+  },
+});</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Over-splitting — splitting every tiny component creates too many HTTP requests and chunk overhead. The waterfall of small chunk fetches can be slower than one medium bundle. Meaningful split points: routes, heavy libraries (&gt;50KB), features with distinct user flows.</div>
+  <div class="mst">Not placing <code>Suspense</code> correctly — forgetting a Suspense boundary causes React to throw an unhandled error when the lazy import is encountered. The boundary must be an ancestor of the lazy component, not a sibling.</div>
+  <div class="mst">Splitting eagerly-needed code — don't split components that are required for the above-the-fold render. Splitting the header, hero, or navigation only adds a network roundtrip to the initial load.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does React.lazy work under the hood?"</div><div class="d">It calls the dynamic import function (which triggers a network fetch of the chunk). If the returned Promise is pending, the component throws it — Suspense catches the thrown Promise and shows the fallback. When the Promise resolves, Suspense re-renders with the loaded component. This is React's "throw a Promise" protocol that also powers Suspense for data fetching.</div></div>
+  <div class="iq"><div class="q">"What's the difference between route-based and component-based code splitting?"</div><div class="d">Route-based: split at page boundaries — most impactful, each route is a separate chunk, automatic in Next.js. Component-based: split heavy conditional components (modals, admin panels, rich editors) that aren't needed on every page render. Route-based is always the starting point; component-based is the next level of optimization for specific heavy features.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Tree shaking (related bundler optimization)</span>
+    <span class="pill pq">Suspense (mechanism React.lazy uses)</span>
+    <span class="pill pc">HTTP/2 multiplexing (parallel chunk loading)</span>
+    <span class="pill pq">Prefetching (preload split chunks on hover)</span>
+    <span class="pill pc">TTI improvement (less JS to parse on initial load)</span>
+  </div>
+</div>
+
+<div class="topic" id="t2">
+  <div class="tnum">Topic 3 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Tree shaking</h1>
+  <div class="tags"><span class="tag tg">Dead code elimination</span><span class="tag tp">ES modules</span><span class="tag tw">sideEffects</span><span class="tag ti">Static analysis</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Tree shaking is the bundler process of statically analyzing module import/export graphs and eliminating code that is never imported (dead code). The metaphor: shake a tree and the dead leaves (unused exports) fall away. It depends entirely on <strong>ES module static syntax</strong> (<code>import</code>/<code>export</code>) — not CommonJS (<code>require</code>/<code>module.exports</code>), which is dynamic and cannot be analyzed at build time. When tree shaking works correctly, importing one function from a 200-function utility library only bundles that one function, not the entire library.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">Rollup (and Vite, which uses Rollup for production builds) builds a <strong>module graph</strong> — a directed graph of all imports starting from the entry point. It marks which exports are actually consumed by the entry point's reachable code. Exports that are not reachable are marked as dead. The "shaking" pass removes these dead exports. The key requirement: <strong>ESM static imports</strong> let bundlers know at parse time (before execution) exactly which symbols are imported. <code>import { debounce } from 'lodash-es'</code> — bundler statically knows only <code>debounce</code> is used. Compare: <code>const { debounce } = require('lodash')</code> — bundler cannot know what <code>require('lodash')</code> returns at parse time, so the entire library must be included. The <strong><code>sideEffects</code> field</strong> in <code>package.json</code> tells bundlers whether any module in the package has side effects on import (e.g., adds to a global registry, patches prototypes). If <code>"sideEffects": false</code>, bundlers can safely remove entire files that export nothing used. If specific files have side effects, list them: <code>"sideEffects": ["./src/polyfill.js"]</code>.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>ES modules requirement</h4><p>Static <code>import</code>/<code>export</code> syntax only. CommonJS modules (<code>require</code>) cannot be tree-shaken — the entire module is included. This is why lodash-es (ESM version) tree-shakes perfectly while lodash (CJS) doesn't. Always check if a library ships an ESM build.</p></div>
+    <div class="sb"><h4>sideEffects field</h4><p><code>"sideEffects": false</code> in package.json: all files can be safely removed if their exports aren't used. Incorrect value causes live code to be dropped. Incorrect <code>false</code> causes CSS imports in JS files to be dropped silently. CSS-in-JS and global styles are common side effects.</p></div>
+    <div class="sb"><h4>Named vs default exports</h4><p>Named exports tree-shake more reliably: <code>export const fn = ...</code>. Default exports export a single value — if that value is an object with methods, bundlers can't selectively include methods (all-or-nothing). Prefer named exports in utility libraries.</p></div>
+    <div class="sb"><h4>Dynamic imports exception</h4><p><code>import(variable)</code> cannot be tree-shaken — the bundler doesn't know what module is being imported at parse time. Only static <code>import './specific-file'</code> is analyzable. Dynamic imports create chunk boundaries but don't enable tree shaking within the chunk.</p></div>
+    <div class="sb"><h4>Barrel files anti-pattern</h4><p><code>index.ts</code> that re-exports everything: <code>export * from './ComponentA'; export * from './ComponentB'</code>. Even if you only import ComponentA, bundlers must include the barrel file which pulls in all re-exports if sideEffects is not false. Barrel files can defeat tree shaking.</p></div>
+    <div class="sb"><h4>Class methods</h4><p>Class method tree shaking is hard — a class is typically treated as one unit. If you import a class, all methods come with it even if you only call two. Functional programming patterns (exported functions) tree-shake better than large classes with many methods.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ❌ CJS — entire lodash bundled (70KB+)</span>
+<span class="kw">const</span> { debounce } = <span class="fn">require</span>(<span class="str">'lodash'</span>);
+
+<span class="cm">// ❌ ESM default import with CJS package underneath — no tree shaking</span>
+<span class="kw">import</span> _ <span class="kw">from</span> <span class="str">'lodash'</span>;
+<span class="kw">const</span> debounced = _.debounce(fn, <span class="num">300</span>);
+
+<span class="cm">// ✅ ESM named import from ESM-published package</span>
+<span class="kw">import</span> { debounce } <span class="kw">from</span> <span class="str">'lodash-es'</span>; <span class="cm">// Only debounce included (~2KB)</span>
+
+<span class="cm">// package.json — sideEffects field</span>
+{
+  <span class="str">"name"</span>: <span class="str">"my-ui-lib"</span>,
+  <span class="str">"sideEffects"</span>: [
+    <span class="str">"**/*.css"</span>,                <span class="cm">// CSS imports have side effects (injected into DOM)</span>
+    <span class="str">"./src/polyfills.js"</span>       <span class="cm">// Polyfills mutate globals — keep them</span>
+  ]
+  <span class="cm">// All other .js files: no side effects → can be dropped if unused</span>
+}
+
+<span class="cm">// ❌ Barrel file anti-pattern</span>
+<span class="cm">// src/components/index.ts</span>
+<span class="kw">export</span> * <span class="kw">from</span> <span class="str">'./Button'</span>;      <span class="cm">// 5KB</span>
+<span class="kw">export</span> * <span class="kw">from</span> <span class="str">'./DataTable'</span>;   <span class="cm">// 80KB — chart library dep</span>
+<span class="kw">export</span> * <span class="kw">from</span> <span class="str">'./RichEditor'</span>;  <span class="cm">// 120KB — prosemirror</span>
+<span class="cm">// Importing just Button: import { Button } from '@/components'</span>
+<span class="cm">// Result: bundler pulls in entire barrel → potentially all 205KB</span>
+<span class="cm">// if sideEffects is not configured correctly</span>
+
+<span class="cm">// ✅ Direct import — guaranteed tree shaking</span>
+<span class="kw">import</span> { <span class="cl">Button</span> } <span class="kw">from</span> <span class="str">'@/components/Button'</span>; <span class="cm">// Only 5KB</span>
+
+<span class="cm">// Verify tree shaking in Vite — check bundle output</span>
+<span class="cm">// vite build --report → opens rollup-plugin-visualizer</span>
+<span class="cm">// Look for unexpectedly large chunks from utility libs</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Setting <code>"sideEffects": false</code> in a library that imports CSS files — Vite/webpack will drop CSS imports during tree shaking, resulting in unstyled components. Always list CSS files in the sideEffects array: <code>"sideEffects": ["**/*.css"]</code>.</div>
+  <div class="mst">Importing from a library's CJS build assuming tree shaking works — check the <code>"module"</code> or <code>"exports"</code> field in the library's package.json to confirm an ESM build exists. If only <code>"main"</code> is specified, it's CJS.</div>
+  <div class="mst">Using large barrel files in your own codebase and relying on bundler tree shaking to compensate — barrel files slow down TypeScript type checking, HMR, and may cause tree shaking to fail if sideEffects is misconfigured. Prefer direct imports in large monorepos.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Why can't CommonJS modules be tree-shaken?"</div><div class="d">CJS uses dynamic require() — the module specifier can be a variable, making it impossible to determine statically at parse time which exports are needed. ESM import statements are syntactically static — the bundler knows exactly which symbols are imported before executing any code. Static analysis = tree shaking. Dynamic resolution = bundler must include everything.</div></div>
+  <div class="iq"><div class="q">"What is the sideEffects field in package.json?"</div><div class="d">A hint to bundlers about which files can be safely removed if their exports aren't consumed. false = all files are side-effect-free. Array of glob patterns = only listed files have side effects. Without it, bundlers default to "everything might have side effects" and skip dead-code elimination on the package.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Bundle optimisation (next topic)</span>
+    <span class="pill pc">ES module specification (static imports)</span>
+    <span class="pill pq">Vite/Rollup build internals</span>
+    <span class="pill pc">TypeScript module resolution (barrel file impact on TS server)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 1–3 complete ───</div>
+
+<div class="topic" id="t3">
+  <div class="tnum">Topic 4 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Bundle optimisation</h1>
+  <div class="tags"><span class="tag tg">Chunk strategy</span><span class="tag tp">Vendor split</span><span class="tag tw">Visualizer</span><span class="tag ti">Cache busting</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Bundle optimisation is the practice of structuring your JavaScript output files (chunks) to minimize the amount of code downloaded on first visit, maximize browser cache utilization across deployments, and eliminate code that was never needed. It combines tree shaking, code splitting, chunk grouping strategy, compression, and content-hash-based caching into a coherent build pipeline. The goal: users download exactly what they need, as fast as possible, and re-download as little as possible on subsequent visits.</p>
+
+  <div class="sl">How it works internally — chunk splitting strategy</div>
+  <p class="prose">Bundlers produce multiple output files. The optimal chunk structure depends on how often each piece of code changes. <strong>Stable code</strong> (React, lodash, charting libs) should be in a separate vendor chunk — it changes rarely, so the browser cache hits on subsequent visits and after deployments. <strong>Application code</strong> changes frequently — keep it in small, route-scoped chunks so that changing one page only invalidates that page's chunk. Each chunk gets a <strong>content hash</strong> in its filename (<code>dashboard-B3k2mX9P.js</code>) — if the content hasn't changed, the hash hasn't changed, and the browser serves it from cache with <code>Cache-Control: immutable</code> (no re-validation needed). The HTML file references these chunks and uses <code>Cache-Control: no-cache</code> (always revalidate) — so users always get the latest HTML pointing to the correct content-hashed assets.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>rollup-plugin-visualizer</h4><p>Generates an interactive treemap/sunburst of bundle contents — which modules are in which chunks, and their sizes. Run after build: <code>npx vite build</code> outputs <code>stats.html</code>. Look for: unexpectedly large modules, duplicate dependencies in multiple chunks, entire library imports where one function was needed.</p></div>
+    <div class="sb"><h4>Vendor chunk</h4><p>Group stable third-party dependencies into a separate chunk via manualChunks. The vendor chunk rarely changes → long-term cache (max-age=1y, immutable). Application chunks change per-deployment → also content-hashed but expected to miss cache more often.</p></div>
+    <div class="sb"><h4>Chunk size targets</h4><p>No hard rule, but common guidelines: initial bundle &lt;170KB gzipped (Lighthouse budget). Each route chunk &lt;100KB parsed. Chunks &lt;30KB may not benefit from splitting (HTTP/2 overhead). Vite warns when chunks exceed 500KB uncompressed.</p></div>
+    <div class="sb"><h4>Compression</h4><p>Brotli (br) compression achieves ~15-20% better ratios than gzip on text/JS. Serve pre-compressed .br files from CDN — avoids on-the-fly compression cost. Vite plugin: vite-plugin-compression generates .br and .gz alongside each chunk.</p></div>
+    <div class="sb"><h4>Module federation</h4><p>Webpack Module Federation (Vite with vite-plugin-federation) allows multiple independently deployed apps to share runtime modules. A host app loads a remote module from a different deployment — dynamic chunk loading across deployment boundaries. Used in micro-frontend architectures.</p></div>
+    <div class="sb"><h4>Analyzing duplicate dependencies</h4><p>Multiple chunks including the same library at different versions (e.g., React 17 in vendor chunk, React 17.0.1 in a widget bundle) bloat the total download. Use bundler deduplication config or peer dependencies to enforce single instance.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// vite.config.ts — production bundle optimisation</span>
+<span class="kw">import</span> { visualizer } <span class="kw">from</span> <span class="str">'rollup-plugin-visualizer'</span>;
+<span class="kw">import</span> viteCompression <span class="kw">from</span> <span class="str">'vite-plugin-compression'</span>;
+
+<span class="kw">export default</span> <span class="fn">defineConfig</span>({
+  plugins: [
+    <span class="fn">react</span>(),
+    <span class="fn">visualizer</span>({ open: <span class="kw">true</span>, gzipSize: <span class="kw">true</span>, brotliSize: <span class="kw">true</span> }),
+    <span class="fn">viteCompression</span>({ algorithm: <span class="str">'brotliCompress'</span> }),
+  ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          <span class="cm">// Stable third-party libs → vendor chunk (long cache)</span>
+          <span class="kw">if</span> (id.<span class="fn">includes</span>(<span class="str">'node_modules/react'</span>) ||
+              id.<span class="fn">includes</span>(<span class="str">'node_modules/react-dom'</span>)) {
+            <span class="kw">return</span> <span class="str">'vendor-react'</span>;
+          }
+          <span class="kw">if</span> (id.<span class="fn">includes</span>(<span class="str">'node_modules/recharts'</span>) ||
+              id.<span class="fn">includes</span>(<span class="str">'node_modules/d3'</span>)) {
+            <span class="kw">return</span> <span class="str">'vendor-charts'</span>; <span class="cm">// Charts only loaded on analytics page</span>
+          }
+        },
+        <span class="cm">// Content-hash filenames — change = new URL = cache bust</span>
+        chunkFileNames: <span class="str">'assets/[name]-[hash].js'</span>,
+        assetFileNames: <span class="str">'assets/[name]-[hash][extname]'</span>,
+      },
+    },
+    <span class="cm">// Warn on large chunks before they reach production</span>
+    chunkSizeWarningLimit: <span class="num">500</span>, <span class="cm">// KB</span>
+  },
+});
+
+<span class="cm">// Nginx: serve pre-compressed brotli + long cache for hashed assets</span>
+<span class="cm">// location ~* \.(js|css|woff2)$ {</span>
+<span class="cm">//   add_header Cache-Control "public, max-age=31536000, immutable";</span>
+<span class="cm">//   brotli_static on;  # Serve .br files if available</span>
+<span class="cm">// }</span>
+<span class="cm">// location / {</span>
+<span class="cm">//   add_header Cache-Control "no-cache";  # HTML always revalidates</span>
+<span class="cm">// }</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Putting everything in one vendor chunk — if any vendor dependency updates, the entire vendor chunk cache is busted. Split by update frequency: <code>vendor-react</code> (changes almost never), <code>vendor-ui</code> (changes sometimes), <code>vendor-charts</code> (changes when you add features).</div>
+  <div class="mst">Forgetting that content hashing requires the HTML to always revalidate — if the HTML is also cached with a long TTL, users won't get the new chunk filenames after a deployment, loading stale chunks. HTML must use <code>Cache-Control: no-cache</code>.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Describe your strategy for splitting chunks in a large SPA."</div><div class="d">Start with route-based splitting (biggest win). Extract a vendor chunk for stable third-party deps (React, router). Group heavy libraries used on specific routes into their own chunks (chart libs, rich text editors). Use content hashing for cache busting. Serve vendor chunks with max-age=1y immutable. Run the visualizer after every major dependency change to catch bundle regressions.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Tree shaking (prerequisite for effective splitting)</span>
+    <span class="pill pq">Code splitting (the splitting half)</span>
+    <span class="pill pc">HTTP cache headers (caching strategy)</span>
+    <span class="pill pc">Brotli vs gzip compression</span>
+  </div>
+</div>
+
+<div class="topic" id="t4">
+  <div class="tnum">Topic 5 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Image optimisation</h1>
+  <div class="tags"><span class="tag tg">WebP / AVIF</span><span class="tag tp">lazy loading</span><span class="tag tw">srcset</span><span class="tag td">LCP impact</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Images are typically the largest assets on a web page and the dominant cause of poor LCP scores. Image optimisation addresses three dimensions: <strong>format</strong> (choose the most efficient encoding), <strong>size</strong> (serve dimensions matching the display size, not the original camera resolution), and <strong>loading strategy</strong> (load eagerly for above-fold, lazily for below-fold). A 4MB JPEG hero image converted to AVIF at correct dimensions can become 80KB — a 50x size reduction with identical perceptual quality, directly translating to 2-3 second LCP improvement on mobile.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g3">
+    <div class="sb"><h4>AVIF</h4><p>Best compression (30-50% smaller than WebP at same quality). Slow encoding. Excellent browser support (95%+). Use for hero images, product photos. Encodes at build time, not on-the-fly.</p></div>
+    <div class="sb"><h4>WebP</h4><p>~25-35% smaller than JPEG/PNG. Near-universal support. Fast encoding. Good fallback for AVIF. Use when encoding speed matters (user-uploaded images, dynamic transforms).</p></div>
+    <div class="sb"><h4>JPEG/PNG</h4><p>JPEG: photos, no transparency. PNG: lossless, transparency. Both significantly larger than modern formats. Only use when AVIF/WebP unavailable or when tooling doesn't support conversion.</p></div>
+    <div class="sb"><h4>srcset &amp; sizes</h4><p>Serve different resolution images per viewport: srcset lists available sizes, sizes tells browser which to pick at which viewport width. Browser chooses smallest image that covers the display size × device pixel ratio.</p></div>
+    <div class="sb"><h4>lazy loading</h4><p><code>loading="lazy"</code> defers image fetch until image approaches viewport (intersection observer internally). Native browser API — no JS needed. Never apply to LCP element. Apply to all below-fold images.</p></div>
+    <div class="sb"><h4>fetchpriority</h4><p><code>fetchpriority="high"</code> on LCP image moves it to the network's high-priority queue, fetched before lower-priority resources competing on the same connection. Replaces the pattern of <code>rel=preload</code> for images.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">&lt;!-- LCP image — eager, high priority, responsive --&gt;</span>
+&lt;picture&gt;
+  &lt;source
+    type=<span class="str">"image/avif"</span>
+    srcset=<span class="str">"hero-400.avif 400w, hero-800.avif 800w, hero-1200.avif 1200w"</span>
+    sizes=<span class="str">"(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 1200px"</span>
+  /&gt;
+  &lt;source
+    type=<span class="str">"image/webp"</span>
+    srcset=<span class="str">"hero-400.webp 400w, hero-800.webp 800w, hero-1200.webp 1200w"</span>
+    sizes=<span class="str">"(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 1200px"</span>
+  /&gt;
+  &lt;img
+    src=<span class="str">"hero-1200.jpg"</span>             <span class="cm">&lt;!-- fallback --&gt;</span>
+    alt=<span class="str">"Hero image"</span>
+    width=<span class="str">"1200"</span> height=<span class="str">"600"</span>       <span class="cm">&lt;!-- explicit dims → no CLS --&gt;</span>
+    loading=<span class="str">"eager"</span>                <span class="cm">&lt;!-- never lazy on LCP element --&gt;</span>
+    fetchpriority=<span class="str">"high"</span>           <span class="cm">&lt;!-- high network priority --&gt;</span>
+    decoding=<span class="str">"async"</span>               <span class="cm">&lt;!-- decode off main thread --&gt;</span>
+  /&gt;
+&lt;/picture&gt;
+
+<span class="cm">&lt;!-- Below-fold images — lazy loaded --&gt;</span>
+&lt;img
+  src=<span class="str">"product-thumb.webp"</span>
+  loading=<span class="str">"lazy"</span>                  <span class="cm">&lt;!-- deferred until near viewport --&gt;</span>
+  width=<span class="str">"300"</span> height=<span class="str">"300"</span>          <span class="cm">&lt;!-- prevents CLS --&gt;</span>
+  alt=<span class="str">"Product thumbnail"</span>
+/&gt;
+
+<span class="cm">// Next.js Image component — handles all of this automatically</span>
+<span class="kw">import</span> <span class="cl">Image</span> <span class="kw">from</span> <span class="str">'next/image'</span>;
+
+&lt;<span class="cl">Image</span>
+  src=<span class="str">"/hero.jpg"</span>
+  alt=<span class="str">"Hero"</span>
+  width={<span class="num">1200</span>} height={<span class="num">600</span>}
+  priority          <span class="cm">// = fetchpriority=high + eager + preload link</span>
+  sizes=<span class="str">"(max-width: 768px) 100vw, 1200px"</span>
+/&gt;
+<span class="cm">// Next/image: auto AVIF/WebP conversion, correct srcset generation,</span>
+<span class="cm">// on-demand resizing via /api/image route, blur placeholder</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Lazy loading the hero/LCP image — the most common and impactful image optimisation mistake. Adds a Largest Contentful Paint penalty of 300-500ms on fast connections, seconds on slow ones. Use <code>loading="eager"</code> (the default) or add <code>fetchpriority="high"</code> for the LCP element.</div>
+  <div class="mst">Serving desktop-sized images on mobile — a 1200×600px image displayed at 375×188px (standard mobile) wastes 10x the bytes. Use srcset and sizes to serve appropriately sized images per device. On a 2x DPR mobile, 750px wide is sufficient, not 1200px.</div>
+  <div class="mst">Not setting explicit width and height attributes — causes CLS because the browser allocates no space before the image loads. Always set width and height that match the image's intrinsic aspect ratio.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How would you optimize a page's LCP when the LCP element is an image?"</div><div class="d">Check fetchpriority=high is set (and loading is not lazy). Verify image format: AVIF or WebP. Check if the image is correctly sized for the display (srcset + sizes). Preconnect to the image CDN domain. Ensure the image URL is in the initial HTML (not injected by JS). Check TTFB for the image resource itself. Measure with both Lighthouse and field data.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Core Web Vitals — LCP, CLS</span>
+    <span class="pill pc">HTTP/2 resource prioritization</span>
+    <span class="pill pq">Next.js Image component</span>
+    <span class="pill pc">CDN image transformation services</span>
+  </div>
+</div>
+
+<div class="topic" id="t5">
+  <div class="tnum">Topic 6 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Font optimisation</h1>
+  <div class="tags"><span class="tag tg">font-display</span><span class="tag tp">FOIT / FOUT</span><span class="tag tw">variable fonts</span><span class="tag td">CLS risk</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Web fonts are render-blocking for the text they style. The browser downloads font files (which can be 100-500KB each) and must decide what to display while they load. Without optimization, users see either invisible text (FOIT — Flash of Invisible Text) or unstyled fallback text (FOUT — Flash of Unstyled Text). Both hurt Core Web Vitals: FOIT harms LCP (largest text element invisible), FOUT causes CLS when the font swap shifts layout. Font optimization covers: choosing the right <code>font-display</code> strategy, preloading critical fonts, subsetting font files, and using variable fonts to reduce the number of font files needed.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>font-display: swap</h4><p>Show fallback immediately, swap to web font when loaded. Prevents FOIT. Causes FOUT (flash when font swaps in) which contributes to CLS. Suitable for body text where invisible text is unacceptable but a brief font flash is acceptable.</p></div>
+    <div class="sb"><h4>font-display: optional</h4><p>Give font a very short window (100ms). If not loaded, use fallback for this page — don't swap. Zero FOUT, zero CLS from font swap. Font loads in background for subsequent pages. Best for CLS optimization. Bad for brand consistency on first load.</p></div>
+    <div class="sb"><h4>font-display: block</h4><p>Invisible text for up to 3 seconds (block period) then swap. Worst of both worlds: user sees nothing (FOIT) then a shift (FOUT). Only valid for icon fonts where fallback characters would be meaningless.</p></div>
+    <div class="sb"><h4>Font preloading</h4><p><code>&lt;link rel="preload" as="font" crossorigin&gt;</code>. Moves font fetch into the preload scanner's early fetch queue, alongside HTML parsing. Reduces time-to-font from sequential (HTML parse → CSS → @font-face → font fetch) to parallel with initial HTML load.</p></div>
+    <div class="sb"><h4>Font subsetting</h4><p>Only include characters actually used: <code>unicode-range</code> in @font-face allows browsers to download only the character subsets used on the page. A full Latin font file: 80KB. Latin subset (basic English): 20KB. Chinese font subset: even more critical.</p></div>
+    <div class="sb"><h4>Variable fonts</h4><p>A single font file containing an entire type family (all weights, widths, italics) via OpenType variable axes. Replace 6 separate files (Regular, Bold, Italic, Bold Italic, Light, Light Italic) with one ~50-100KB file. Reduces font requests from 6 to 1.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">&lt;!-- In &lt;head&gt;: preload critical fonts early --&gt;</span>
+&lt;link
+  rel=<span class="str">"preload"</span>
+  as=<span class="str">"font"</span>
+  type=<span class="str">"font/woff2"</span>
+  href=<span class="str">"/fonts/inter-var.woff2"</span>
+  crossorigin               <span class="cm">&lt;!-- Required for fonts, even same-origin --&gt;</span>
+/&gt;
+
+<span class="cm">/* CSS — self-hosted variable font */</span>
+<span class="fn">@font-face</span> {
+  font-family: <span class="str">'Inter'</span>;
+  src: <span class="fn">url</span>(<span class="str">'/fonts/inter-var.woff2'</span>) format(<span class="str">'woff2-variations'</span>);
+  font-weight: <span class="num">100</span> <span class="num">900</span>;          <span class="cm">/* Variable weight range */</span>
+  font-style: normal italic;      <span class="cm">/* Both normal and italic from one file */</span>
+  font-display: swap;             <span class="cm">/* FOUT over FOIT */</span>
+  unicode-range: U+0000-024F;    <span class="cm">/* Basic Latin + Latin Extended */</span>
+}
+
+<span class="cm">/* font-display: optional — zero CLS, best for body text at scale */</span>
+<span class="fn">@font-face</span> {
+  font-family: <span class="str">'Inter'</span>;
+  src: <span class="fn">url</span>(<span class="str">'/fonts/inter-var.woff2'</span>) format(<span class="str">'woff2-variations'</span>);
+  font-display: optional;         <span class="cm">/* No swap → no layout shift */</span>
+}
+
+<span class="cm">/* Size-adjust: reduce CLS from font swap by matching metric */</span>
+<span class="fn">@font-face</span> {
+  font-family: <span class="str">'FallbackForInter'</span>;
+  src: local(<span class="str">'Arial'</span>);
+  size-adjust: <span class="num">107</span>%;              <span class="cm">/* Adjust fallback to match Inter's metrics */</span>
+  ascent-override: <span class="num">90</span>%;
+  descent-override: <span class="num">22</span>%;
+  <span class="cm">/* Fallback now visually matches Inter → swap causes minimal shift */</span>
+}
+body { font-family: <span class="str">'Inter'</span>, <span class="str">'FallbackForInter'</span>, sans-serif; }
+
+<span class="cm">// Next.js font optimization — zero-config</span>
+<span class="kw">import</span> { <span class="cl">Inter</span> } <span class="kw">from</span> <span class="str">'next/font/google'</span>;
+<span class="kw">const</span> inter = <span class="fn">Inter</span>({
+  subsets: [<span class="str">'latin'</span>],
+  display: <span class="str">'swap'</span>,
+  variable: <span class="str">'--font-inter'</span>,
+  preload: <span class="kw">true</span>,
+});
+<span class="cm">// Next.js: downloads at build time, self-hosts, generates optimal @font-face,</span>
+<span class="cm">// adds preload link, applies size-adjust automatically</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using <code>font-display: block</code> for text fonts — creates invisible text for up to 3 seconds (full FOIT block period). Only appropriate for icon fonts where the fallback character is meaningless. Text should use <code>swap</code> or <code>optional</code>.</div>
+  <div class="mst">Preloading fonts without <code>crossorigin</code> attribute — font preloads require <code>crossorigin="anonymous"</code> even for same-origin fonts (CORS mode for font fetches). Without it, the preload hint is ignored and the font is fetched again by the @font-face rule — double download.</div>
+  <div class="mst">Preloading every font variant — preloading 6 font files removes the benefit of conditional loading. Preload only the font files that are immediately rendered above-the-fold. Others load on demand via @font-face rules.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between FOIT and FOUT, and how does font-display control this?"</div><div class="d">FOIT (Flash of Invisible Text): text is invisible while font loads (font-display: block behavior). FOUT (Flash of Unstyled Text): fallback font shows immediately, then swaps to web font when loaded (font-display: swap). FOIT harms LCP and UX. FOUT harms CLS. font-display: optional eliminates both by using the web font only if it's cached, with no swap on first load. size-adjust reduces FOUT-induced CLS by making the fallback font metrically similar to the web font.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">CLS (font swap causes layout shift)</span>
+    <span class="pill pq">LCP (invisible text hides LCP candidate)</span>
+    <span class="pill pq">Prefetch / preload (font preloading mechanics)</span>
+    <span class="pill pc">@font-face specification</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 4–6 complete ───</div>
+
+<div class="topic" id="t6">
+  <div class="tnum">Topic 7 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Prefetching &amp; preloading</h1>
+  <div class="tags"><span class="tag tg">rel=preload</span><span class="tag tp">rel=prefetch</span><span class="tag tw">preconnect</span><span class="tag ti">DNS-prefetch</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Resource hints are HTML link tags that instruct the browser to perform network operations ahead of when they're actually needed — shifting resource discovery from "the parser found this" to "the developer told us about this". The four hints are: <code>preload</code> (fetch this resource now, I need it for this page), <code>prefetch</code> (fetch this resource speculatively, I might need it on the next page), <code>preconnect</code> (establish a connection to this origin, I'll be fetching from it soon), <code>dns-prefetch</code> (just do DNS resolution for this origin). Each operates at a different network layer and has different priority, cost, and appropriate use cases.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>rel=preload</h4><p>High-priority fetch for resources needed <strong>in the current page</strong>. Fires immediately on HTML parse. Use for: LCP image, critical fonts, critical scripts that the preload scanner would miss (dynamically constructed URLs, CSS background images). Must specify <code>as=</code> attribute or the hint is ignored.</p></div>
+    <div class="sb"><h4>rel=prefetch</h4><p>Low-priority speculative fetch for resources needed <strong>on future navigations</strong>. Fires during browser idle time. Use for: next-page's JS chunks, likely-next resources based on user navigation patterns. Stored in HTTP cache, used on next navigation.</p></div>
+    <div class="sb"><h4>rel=preconnect</h4><p>Establishes TCP connection + TLS handshake to an origin in advance. Saves 100-500ms per origin at request time (depending on RTT + TLS version). Use for: CDN origin, Google Fonts, analytics domains, API servers on different origins. Limit to 4-6 preconnects — each maintains an open connection with overhead.</p></div>
+    <div class="sb"><h4>rel=dns-prefetch</h4><p>Performs only DNS resolution (no TCP/TLS). Cheaper than preconnect. Use for origins you might connect to but aren't certain about (A/B test CDNs, optional third parties). Fallback for browsers that don't support preconnect.</p></div>
+    <div class="sb"><h4>modulepreload</h4><p><code>&lt;link rel="modulepreload"&gt;</code> preloads ES modules (and their imports recursively). Use in Vite apps to preload critical route modules without waiting for the JS to parse and discover them. Parses and compiles the module immediately, not just downloads it.</p></div>
+    <div class="sb"><h4>Priority ordering</h4><p>Browser priority hierarchy: preload (Highest) → prefetch (Lowest) → normal fetch (varies by resource type). Don't preload low-priority resources — elevating their priority competes with the critical path. Preload should be reserved for truly render-critical or LCP-critical resources.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">&lt;head&gt;</span>
+  <span class="cm">&lt;!-- 1. Preconnect to critical third-party origins --&gt;</span>
+  &lt;link rel=<span class="str">"preconnect"</span> href=<span class="str">"https://fonts.googleapis.com"</span> /&gt;
+  &lt;link rel=<span class="str">"preconnect"</span> href=<span class="str">"https://fonts.gstatic.com"</span> crossorigin /&gt;
+  &lt;link rel=<span class="str">"preconnect"</span> href=<span class="str">"https://cdn.myapp.com"</span> /&gt;
+
+  <span class="cm">&lt;!-- DNS-prefetch for less-certain third parties --&gt;</span>
+  &lt;link rel=<span class="str">"dns-prefetch"</span> href=<span class="str">"https://analytics.third-party.com"</span> /&gt;
+
+  <span class="cm">&lt;!-- 2. Preload LCP image (discovered before CSS is parsed) --&gt;</span>
+  &lt;link
+    rel=<span class="str">"preload"</span>
+    as=<span class="str">"image"</span>
+    href=<span class="str">"/hero-800.avif"</span>
+    type=<span class="str">"image/avif"</span>
+    fetchpriority=<span class="str">"high"</span>
+  /&gt;
+
+  <span class="cm">&lt;!-- 3. Preload critical font --&gt;</span>
+  &lt;link
+    rel=<span class="str">"preload"</span>
+    as=<span class="str">"font"</span>
+    type=<span class="str">"font/woff2"</span>
+    href=<span class="str">"/fonts/inter-var.woff2"</span>
+    crossorigin
+  /&gt;
+
+  <span class="cm">&lt;!-- 4. Preload critical JS (if not already in &lt;script&gt; in head) --&gt;</span>
+  &lt;link rel=<span class="str">"modulepreload"</span> href=<span class="str">"/assets/vendor-react-B3k2mX.js"</span> /&gt;
+&lt;/head&gt;
+
+<span class="cm">// JS: programmatic prefetch on hover (next-page chunks)</span>
+navLinks.<span class="fn">forEach</span>(link => {
+  link.<span class="fn">addEventListener</span>(<span class="str">'mouseenter'</span>, () => {
+    <span class="kw">const</span> hint = document.<span class="fn">createElement</span>(<span class="str">'link'</span>);
+    hint.rel = <span class="str">'prefetch'</span>;
+    hint.href = link.dataset.chunkUrl;  <span class="cm">// Next route's JS chunk</span>
+    hint.as = <span class="str">'script'</span>;
+    document.head.<span class="fn">appendChild</span>(hint);
+  }, { once: <span class="kw">true</span> });
+});
+
+<span class="cm">// React Router v6 + loader prefetching (built-in)</span>
+&lt;<span class="cl">Link</span> to=<span class="str">"/dashboard"</span> prefetch=<span class="str">"intent"</span>&gt;Dashboard&lt;/<span class="cl">Link</span>&gt;
+<span class="cm">// prefetch="intent": prefetch chunk + route loader data on hover/focus</span>
+<span class="cm">// prefetch="render": prefetch immediately on route render</span>
+<span class="cm">// prefetch="none": no prefetch (default)</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Preloading too many resources — every preload competes with other critical resources for bandwidth. Preloading 10 assets elevates all of them to high priority, defeating the priority system. The browser's automatic prioritization is often better than indiscriminate preloading. Limit to 1-3 critical above-fold resources.</div>
+  <div class="mst">Using <code>rel=preload</code> without the <code>as=</code> attribute — the browser fetches the resource with a generic priority instead of the correct content-type priority, and may fetch it again when the actual resource type is needed. Always specify <code>as="image"</code>, <code>as="font"</code>, <code>as="script"</code>, etc.</div>
+  <div class="mst">Preloading resources that appear conditionally — if the preloaded resource isn't actually used on this page, the browser reports an "unused preload" warning in DevTools. This wastes bandwidth. Only preload resources that are definitely needed on the current page.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between rel=preload and rel=prefetch?"</div><div class="d">preload: high-priority fetch for resources needed on the current page — fires immediately, competing with critical resources. prefetch: low-priority speculative fetch for resources likely needed on future pages — fires during idle time, doesn't compete with current page. Using prefetch for current-page resources wastes time; using preload for next-page resources wastes bandwidth and priority.</div></div>
+  <div class="iq"><div class="q">"When would you use preconnect vs dns-prefetch?"</div><div class="d">preconnect when you're certain you'll fetch from that origin soon (CDN, fonts, API) — it does DNS + TCP + TLS, saving all three round trips. dns-prefetch when you're not sure or want a lightweight hint for many origins — only DNS, cheaper. Don't preconnect to more than 4-6 origins; unused connections are wasted resources.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Critical rendering path (where preload fits)</span>
+    <span class="pill pq">Code splitting (prefetch = preload split chunks)</span>
+    <span class="pill pc">TCP/TLS handshake (what preconnect avoids)</span>
+    <span class="pill pc">HTTP/2 server push (deprecated alternative)</span>
+  </div>
+</div>
+
+<div class="topic" id="t7">
+  <div class="tnum">Topic 8 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Service workers &amp; offline</h1>
+  <div class="tags"><span class="tag tg">Cache-first</span><span class="tag tp">Network-first</span><span class="tag tw">SWR strategy</span><span class="tag ti">Workbox</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">A Service Worker is a JavaScript file that runs in a separate browser context (its own thread, separate from the page), acting as a <strong>programmable network proxy</strong>. It intercepts all <code>fetch</code> events from its scope (origin + path prefix) and can respond with: a cached response, a network response, a fabricated response, or any combination. This enables offline functionality, instant repeat-visit loads, and background sync. Service Workers have a strict lifecycle: install → activate → fetch. They persist independently of any page and are essential for Progressive Web Apps (PWAs).</p>
+
+  <div class="sl">Cache strategies</div>
+  <div class="strategy-row">
+    <div class="strat s-cf">
+      <h4>Cache-first</h4>
+      <p>Try cache first. Fall back to network if miss. Cache network response for future. Use for: static assets (JS, CSS, images) with content hashing. Speed: instant on cache hit. Freshness: stale until cache eviction.</p>
+    </div>
+    <div class="strat s-nf">
+      <h4>Network-first</h4>
+      <p>Try network first. Fall back to cache on network failure. Use for: API data, frequently-updated content, HTML documents. Speed: network latency on success. Freshness: always current when online. Offline: last cached response.</p>
+    </div>
+    <div class="strat s-sw">
+      <h4>Stale-while-revalidate</h4>
+      <p>Serve stale immediately, fetch fresh in background for next time. Use for: non-critical content, news feeds, social data. Speed: instant. Freshness: one response behind. Best balance for most content.</p>
+    </div>
+  </div>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>SW lifecycle</h4><p>Install: SW script downloaded, evaluated, caches pre-cached assets (precaching). Activate: old SW removed, new SW takes control. By default, new SW waits until all tabs using old SW close. skipWaiting() + clients.claim() take control immediately on activate.</p></div>
+    <div class="sb"><h4>Precaching vs runtime caching</h4><p>Precaching: during install, explicitly cache a list of assets (app shell, critical routes) — guaranteed available offline. Runtime caching: cache responses on first fetch using a strategy — builds cache over user's browsing session, not guaranteed on first offline use.</p></div>
+    <div class="sb"><h4>Cache Storage API</h4><p>Separate from HTTP cache — explicitly controlled by JS. <code>caches.open(name)</code> creates a named cache bucket. <code>cache.put(request, response)</code>, <code>cache.match(request)</code>. Persist independently of HTTP cache eviction. Must be manually versioned and cleaned up.</p></div>
+    <div class="sb"><h4>Workbox</h4><p>Google's library for Service Worker patterns. Abstracts cache strategies into one-liner: <code>registerRoute(pattern, new CacheFirst())</code>. Handles precaching manifest generation, cache versioning, cache cleanup, background sync, and push notifications. Used by Next.js (next-pwa), Create React App, and Vite PWA plugin.</p></div>
+    <div class="sb"><h4>Background sync</h4><p>Queue network requests that fail (offline). When connectivity restores, SW replays the queue. Use for: form submissions, analytics events, data mutations while offline. Requires the Background Sync API (supported in Chrome/Edge, not Safari).</p></div>
+    <div class="sb"><h4>Cache versioning</h4><p>On SW update: delete old named caches in the activate event. Serve stale cache with old SW, new cache with new SW. Critically: if cache names aren't changed between deployments, old and new SW can read each other's stale assets.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Manual Service Worker — demonstrates all three strategies</span>
+<span class="cm">// sw.js</span>
+
+<span class="kw">const</span> CACHE_VERSION = <span class="str">'v3'</span>;
+<span class="kw">const</span> STATIC_ASSETS = [<span class="str">'/'</span>, <span class="str">'/offline.html'</span>, <span class="str">'/assets/vendor-react-B3k.js'</span>];
+
+<span class="cm">// Install: precache static shell</span>
+self.<span class="fn">addEventListener</span>(<span class="str">'install'</span>, (event) => {
+  event.<span class="fn">waitUntil</span>(
+    caches.<span class="fn">open</span>(<span class="str">`static-${CACHE_VERSION}`</span>)
+      .<span class="fn">then</span>(cache => cache.<span class="fn">addAll</span>(STATIC_ASSETS))
+      .<span class="fn">then</span>(() => self.<span class="fn">skipWaiting</span>()) <span class="cm">// Don't wait for old SW to close</span>
+  );
+});
+
+<span class="cm">// Activate: clean old caches</span>
+self.<span class="fn">addEventListener</span>(<span class="str">'activate'</span>, (event) => {
+  event.<span class="fn">waitUntil</span>(
+    caches.<span class="fn">keys</span>().<span class="fn">then</span>(keys =>
+      <span class="cl">Promise</span>.<span class="fn">all</span>(keys.<span class="fn">filter</span>(k => !k.<span class="fn">includes</span>(CACHE_VERSION)).<span class="fn">map</span>(k => caches.<span class="fn">delete</span>(k)))
+    ).<span class="fn">then</span>(() => clients.<span class="fn">claim</span>())
+  );
+});
+
+<span class="cm">// Fetch: route to different strategies</span>
+self.<span class="fn">addEventListener</span>(<span class="str">'fetch'</span>, (event) => {
+  <span class="kw">const</span> { request } = event;
+
+  <span class="cm">// Cache-first: hashed static assets</span>
+  <span class="kw">if</span> (request.url.<span class="fn">includes</span>(<span class="str">'/assets/'</span>)) {
+    event.<span class="fn">respondWith</span>(<span class="fn">cacheFirst</span>(request, <span class="str">`static-${CACHE_VERSION}`</span>));
+    <span class="kw">return</span>;
+  }
+  <span class="cm">// Network-first: API calls</span>
+  <span class="kw">if</span> (request.url.<span class="fn">includes</span>(<span class="str">'/api/'</span>)) {
+    event.<span class="fn">respondWith</span>(<span class="fn">networkFirst</span>(request, <span class="str">`api-${CACHE_VERSION}`</span>));
+    <span class="kw">return</span>;
+  }
+  <span class="cm">// Stale-while-revalidate: HTML pages</span>
+  event.<span class="fn">respondWith</span>(<span class="fn">staleWhileRevalidate</span>(request, <span class="str">`pages-${CACHE_VERSION}`</span>));
+});
+
+<span class="cm">// Workbox equivalent (much simpler):</span>
+<span class="kw">import</span> { registerRoute } <span class="kw">from</span> <span class="str">'workbox-routing'</span>;
+<span class="kw">import</span> { CacheFirst, NetworkFirst, StaleWhileRevalidate } <span class="kw">from</span> <span class="str">'workbox-strategies'</span>;
+<span class="kw">import</span> { precacheAndRoute } <span class="kw">from</span> <span class="str">'workbox-precaching'</span>;
+
+precacheAndRoute(self.__WB_MANIFEST);  <span class="cm">// Injected by Workbox build plugin</span>
+<span class="fn">registerRoute</span>(({ url }) => url.pathname.<span class="fn">startsWith</span>(<span class="str">'/api/'</span>), <span class="kw">new</span> <span class="fn">NetworkFirst</span>());
+<span class="fn">registerRoute</span>(({ request }) => request.destination === <span class="str">'image'</span>, <span class="kw">new</span> <span class="fn">CacheFirst</span>());</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Not incrementing the cache version name on SW update — the new SW serves assets from the old cache, potentially mixing old JS chunks with new HTML. Cache names must change with each deployment containing precached asset changes.</div>
+  <div class="mst">Applying cache-first strategy to HTML documents — users receive stale HTML (old chunk references) for up to the cache TTL. HTML should use network-first (serve fresh, fall back to cache if offline) or stale-while-revalidate.</div>
+  <div class="mst">Not testing offline behavior explicitly — SW offline strategies only matter when the network fails. Use DevTools → Application → Service Workers → Offline checkbox to test. Many teams ship SWs that break in offline mode because they've never tested the fallback path.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Explain the three main service worker caching strategies and when to use each."</div><div class="d">Cache-first: speed over freshness. Use for content-hashed static assets (JS, CSS, fonts, images) that never change without a URL change. Network-first: freshness over speed. Use for API responses and HTML pages where stale content is incorrect. Stale-while-revalidate: instant load + background freshness. Use for content that benefits from speed but can tolerate being one version behind (news, avatars, non-critical API data).</div></div>
+  <div class="iq"><div class="q">"What is the Service Worker lifecycle and what does skipWaiting() do?"</div><div class="d">Install (fetch+cache precache list) → waiting (old SW still active) → activate (old SW removed, new takes control). Without skipWaiting(), a new SW waits for all open tabs using the old SW to close — can take hours in production. skipWaiting() activates immediately; clients.claim() takes control of open pages without reload. Required for fast SW updates but can cause issues if old and new SW have incompatible cache formats.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Browser caching (Block 1 — how SW cache differs from HTTP cache)</span>
+    <span class="pill pc">HTTP stale-while-revalidate header (same concept, server-side)</span>
+    <span class="pill pq">PWA / offline-first architecture</span>
+    <span class="pill pc">Background sync API</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 7–8 complete ───</div>
+
+<div class="topic" id="t8">
+  <div class="tnum">Topic 9 of 9 — Block 4: Performance Engineering</div>
+  <h1 class="ttl">Performance measurement</h1>
+  <div class="tags"><span class="tag tg">Lighthouse</span><span class="tag tp">Chrome DevTools</span><span class="tag tw">RUM vs synthetic</span><span class="tag ti">web-vitals</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Performance measurement divides into two categories: <strong>synthetic (lab) testing</strong> — controlled, reproducible measurements from a scripted environment (Lighthouse, WebPageTest); and <strong>Real User Monitoring (RUM)</strong> — measurements collected from actual users in the wild, aggregated and reported to analytics. Synthetic tests help identify issues in development and CI; RUM reveals what users actually experience across device types, network conditions, and geographic regions that no lab can simulate. The gap between them is meaningful: a "100 Lighthouse score" site can have terrible field CWV scores due to third-party scripts, slow user devices, or bad network conditions that the lab doesn't replicate.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Lighthouse</h4><p>Google's automated auditing tool. Simulates a throttled mid-tier Android device (Moto G4) on a slow 4G connection. Scores 0-100 across Performance, Accessibility, SEO, Best Practices. Performance score is a weighted average of FCP, LCP, TBT (Total Blocking Time), CLS, Speed Index. Run in DevTools, CLI (<code>npx lighthouse url</code>), or CI via Lighthouse CI.</p></div>
+    <div class="sb"><h4>Chrome DevTools — Performance tab</h4><p>Frame-by-frame recording of the page lifecycle. Shows: call stack, long tasks (red blocks), layout events, paint events, network requests, JS execution, GC pauses. Use for: debugging specific INP interactions, identifying which JS function causes a long task, tracing CLS back to a specific layout event.</p></div>
+    <div class="sb"><h4>Chrome DevTools — Network tab</h4><p>Waterfall view of all resource fetches. Shows: request priority, connection reuse, TTFB per resource, time to download. Use for: identifying render-blocking resources, visualizing prefetch/preload behavior, measuring per-resource load times.</p></div>
+    <div class="sb"><h4>web-vitals library</h4><p>Google's library for measuring Core Web Vitals in production. Callbacks fire with actual metric values when the browser finalizes them (LCP fires when user scrolls/clicks; CLS accumulates throughout session). Essential for RUM infrastructure. 1KB gzipped.</p></div>
+    <div class="sb"><h4>RUM infrastructure</h4><p>web-vitals → Beacon API / fetch with keepalive → backend ingest → analytics DB → dashboards. Use Beacon API (<code>navigator.sendBeacon</code>) for unload-time events (session-end CLS, final INP). Segment by: URL pattern, device type, network type, geography.</p></div>
+    <div class="sb"><h4>CrUX (Chrome UX Report)</h4><p>Google's field data aggregated from real Chrome users (opt-in). Available in: PageSpeed Insights, Search Console, BigQuery. 28-day rolling window. The source of truth for what Google sees when evaluating your CWV for search ranking. Shows p75 values for LCP, INP, CLS per URL and site.</p></div>
+    <div class="sb"><h4>Lighthouse CI</h4><p>Run Lighthouse against a staging URL on every pull request. Assert that performance scores and specific metrics don't regress below thresholds. Block merges on performance regressions. Prevents the common pattern of introducing a 200KB dependency without noticing.</p></div>
+    <div class="sb"><h4>WebPageTest</h4><p>More granular than Lighthouse. Real devices on real networks. Filmstrip view (frame-by-frame visual progress). Waterfall analysis. Comparison between multiple page versions. Tests from multiple global locations. Use for deep CWV diagnosis and competitor benchmarking.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// RUM setup — collect field data from real users</span>
+<span class="kw">import</span> { onLCP, onINP, onCLS, onTTFB, onFCP } <span class="kw">from</span> <span class="str">'web-vitals'</span>;
+
+<span class="kw">const</span> queue = <span class="kw">new</span> <span class="cl">Set</span>();
+
+<span class="kw">function</span> <span class="fn">addToQueue</span>(metric) {
+  queue.<span class="fn">add</span>({ ...metric, url: location.href, timestamp: <span class="cl">Date</span>.<span class="fn">now</span>() });
+}
+
+<span class="kw">function</span> <span class="fn">flush</span>() {
+  <span class="kw">if</span> (!queue.size) <span class="kw">return</span>;
+  <span class="cm">// Beacon API: fires even during page unload</span>
+  navigator.<span class="fn">sendBeacon</span>(<span class="str">'/metrics'</span>, <span class="cl">JSON</span>.<span class="fn">stringify</span>([...queue]));
+  queue.<span class="fn">clear</span>();
+}
+
+<span class="kw">const</span> opts = { reportAllChanges: <span class="kw">false</span> }; <span class="cm">// Only final values</span>
+<span class="fn">onLCP</span>(addToQueue, opts);
+<span class="fn">onINP</span>(addToQueue, opts);    <span class="cm">// Reports 75th percentile of all interactions</span>
+<span class="fn">onCLS</span>(addToQueue, opts);    <span class="cm">// Cumulative value at session end</span>
+<span class="fn">onTTFB</span>(addToQueue, opts);
+<span class="fn">onFCP</span>(addToQueue, opts);
+
+<span class="cm">// Flush on visibility change (page hide / tab close)</span>
+document.<span class="fn">addEventListener</span>(<span class="str">'visibilitychange'</span>, () => {
+  <span class="kw">if</span> (document.visibilityState === <span class="str">'hidden'</span>) <span class="fn">flush</span>();
+});
+
+<span class="cm">// Lighthouse CI config — lighthouse-ci.js</span>
+module.exports = {
+  ci: {
+    collect: {
+      url: [<span class="str">'http://localhost:3000'</span>, <span class="str">'http://localhost:3000/dashboard'</span>],
+      numberOfRuns: <span class="num">3</span>,
+    },
+    assert: {
+      assertions: {
+        <span class="str">'first-contentful-paint'</span>: [<span class="str">'error'</span>, { maxNumericValue: <span class="num">2000</span> }],
+        <span class="str">'largest-contentful-paint'</span>: [<span class="str">'error'</span>, { maxNumericValue: <span class="num">2500</span> }],
+        <span class="str">'total-blocking-time'</span>: [<span class="str">'error'</span>, { maxNumericValue: <span class="num">300</span> }],
+        <span class="str">'cumulative-layout-shift'</span>: [<span class="str">'error'</span>, { maxNumericValue: <span class="num">0.1</span> }],
+        <span class="str">'unused-javascript'</span>: [<span class="str">'warn'</span>, { maxNumericValue: <span class="num">100000</span> }],
+      },
+    },
+    upload: { target: <span class="str">'temporary-public-storage'</span> },
+  },
+};</pre></div>
+
+  <div class="sl">RUM vs synthetic — the key distinctions</div>
+  <div class="g2">
+    <div class="sb"><h4>Synthetic (Lighthouse, WebPageTest)</h4><p>Controlled environment. Reproducible. Identifies issues before production. Fixed device + network = not representative. Good for development, CI regression prevention, A/B comparison between code changes.</p></div>
+    <div class="sb"><h4>RUM (web-vitals + CrUX)</h4><p>Real users, real devices, real networks. Reveals geographic distribution, device-class breakdown, real percentiles. Delayed (aggregated over time). Reveals what Lighthouse can't: slow user devices, third-party script impact, real long session INP.</p></div>
+  </div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using only Lighthouse scores as the performance KPI in production dashboards. A Lighthouse 100 can coexist with a poor CrUX field score if Lighthouse's throttling doesn't match your actual users' conditions. Always compare lab scores against field data (CrUX / web-vitals RUM).</div>
+  <div class="mst">Running Lighthouse once on a single page and calling it done — Lighthouse results vary by ~10 points between runs due to CPU contention. Run 3-5 times and median the result. Lighthouse CI automates this with <code>numberOfRuns</code> config.</div>
+  <div class="mst">Using <code>performance.now()</code> inside <code>requestAnimationFrame</code> to measure "render time" — rAF fires before paint, not after. The actual paint time is measured by PerformanceObserver with <code>'paint'</code> entries. Custom metrics should use the PerformanceObserver API, not rAF timestamps.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between lab data and field data for web performance?"</div><div class="d">Lab (synthetic): controlled device/network in a tool like Lighthouse. Reproducible, useful in CI. Misses: real user devices (often slower), third-party scripts, geographic latency, long session patterns. Field (RUM): actual user experience from web-vitals library or CrUX. Shows 75th percentile across real conditions. Lab gives you the problem; field confirms you fixed it for users.</div></div>
+  <div class="iq"><div class="q">"How would you set up a performance monitoring pipeline for a production app?"</div><div class="d">Three layers: (1) Lighthouse CI in PR pipeline — catch regressions before merge, assert on LCP/TBT/CLS thresholds. (2) web-vitals library in production — beacon real user metrics to analytics, segment by URL/device/geography. (3) CrUX monitoring in Search Console — track 28-day field data for Google ranking signal. Alert when p75 LCP > 2.5s or INP > 200ms in field data.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Core Web Vitals (topic 1 — the metrics being measured)</span>
+    <span class="pill pc">PerformanceObserver API (measurement primitives)</span>
+    <span class="pill pc">Beacon API (unload-safe metric delivery)</span>
+    <span class="pill pq">CrUX / Google Search Console</span>
+    <span class="pill pc">CI/CD pipeline integration</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── All 9 topics complete · Block 4 done ───</div>
+
+</main>
+</div>
+
+<script>
+function show(idx,el){
+  document.querySelectorAll('.topic').forEach(t=>t.classList.remove('visible'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('t'+idx).classList.add('visible');
+  el.classList.add('active');
+  document.querySelector('.content').scrollTop=0;
+}
+</script>

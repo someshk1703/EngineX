@@ -1,0 +1,942 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:720px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:220px;min-width:220px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary);display:flex;flex-direction:column}
+.sidebar-header{padding:14px 16px 10px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.nav-item{padding:10px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;line-height:1.35}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.nav-item .num{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:2px}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic{display:none}.topic.active{display:block}
+.topic-title{font-size:20px;font-weight:500;margin-bottom:4px;color:var(--color-text-primary)}
+.topic-sub{font-size:13px;color:var(--color-text-tertiary);margin-bottom:24px}
+.section{margin-bottom:24px}
+.section-label{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:14px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px}
+.kv-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px;font-weight:500}
+.kv-val{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:12px;padding:3px 10px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.tag.g{background:#EAF3DE;color:#3B6D11;border-color:#97C459} 
+.tag.r{background:#FCEBEB;color:#A32D2D;border-color:#F09595}
+.tag.b{background:#E6F1FB;color:#185FA5;border-color:#85B7EB}
+.tag.a{background:#FAEEDA;color:#854F0B;border-color:#EF9F27}
+.tradeoff-item{display:flex;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tradeoff-item:last-child{border-bottom:none}
+.tradeoff-side{font-size:12px;flex:1}
+.tradeoff-side .lbl{font-weight:500;margin-bottom:3px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.gain .lbl{color:#3B6D11}.lose .lbl{color:#A32D2D}
+.tradeoff-side p{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:20px 0}
+.failure-item{padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px;line-height:1.6;color:var(--color-text-secondary)}
+.failure-item:last-child{border-bottom:none}
+.failure-item strong{color:var(--color-text-primary);font-weight:500}
+.interview-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:16px}
+.interview-box ol{padding-left:18px;font-size:13px;line-height:2;color:var(--color-text-secondary)}
+.interview-box li strong{color:var(--color-text-primary);font-weight:500}
+.connects{display:flex;flex-wrap:wrap;gap:8px}
+.connects a{font-size:12px;padding:4px 12px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.connects a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.arch-block{font-family:var(--font-mono);font-size:12px;line-height:1.65;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:16px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.scale-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.scale-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px}
+.scale-num{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.scale-desc{font-size:12px;color:var(--color-text-tertiary);line-height:1.4}
+.tab-row{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:20px}
+.tab{font-size:12px;padding:8px 14px;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:all .15s}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.next-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:8px 16px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:24px}
+.next-btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+</style>
+<h2 class="sr-only">System Design Foundations — Interactive Reference Guide covering 6 core topics: horizontal vs vertical scaling, load balancing, latency vs throughput vs availability, CAP theorem, PACELC, and fault tolerance.</h2>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="sidebar-header">Block 1 — Foundations</div>
+    <div class="nav-item active" onclick="show(0)"><span class="num">01</span>Horizontal vs Vertical Scaling</div>
+    <div class="nav-item" onclick="show(1)"><span class="num">02</span>Load Balancing</div>
+    <div class="nav-item" onclick="show(2)"><span class="num">03</span>Latency · Throughput · Availability</div>
+    <div class="nav-item" onclick="show(3)"><span class="num">04</span>CAP Theorem</div>
+    <div class="nav-item" onclick="show(4)"><span class="num">05</span>PACELC</div>
+    <div class="nav-item" onclick="show(5)"><span class="num">06</span>Fault Tolerance &amp; Redundancy</div>
+  </nav>
+
+  <main class="content">
+
+  <!-- ═══════════════ TOPIC 0: H vs V Scaling ═══════════════ -->
+  <div class="topic active" id="t0">
+    <div class="topic-title">Horizontal vs Vertical Scaling</div>
+    <div class="topic-sub">When each applies · limits · real cost</div>
+
+    <div class="section">
+      <div class="section-label">Definition &amp; Core Purpose</div>
+      <div class="prose">
+        <strong>Vertical scaling (scale up)</strong> means adding more resources — CPU, RAM, faster disk — to an existing machine. One node becomes a bigger, more powerful node.<br><br>
+        <strong>Horizontal scaling (scale out)</strong> means adding more machines to a pool. The load is distributed across many smaller, commodity nodes.<br><br>
+        Both exist because a single machine has a physical ceiling. The problem they solve: <em>what do you do when one machine is no longer enough?</em> The answer depends on your bottleneck, your budget, and how much complexity you can tolerate.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">How It Works — Deep Mechanics</div>
+      <div class="tab-row">
+        <div class="tab active" onclick="switchTab(this,'mech0','mv')">Vertical</div>
+        <div class="tab" onclick="switchTab(this,'mech0','mh')">Horizontal</div>
+      </div>
+      <div id="mech0">
+        <div class="tab-panel active" id="mv">
+          <div class="prose">
+            <strong>1. Provision a larger instance.</strong> In AWS terms: move from m5.large (2 vCPU, 8GB) → m5.4xlarge (16 vCPU, 64GB). Downtime required unless the platform supports live resize (rare for major jumps).<br><br>
+            <strong>2. OS picks up new resources automatically.</strong> The JVM, Postgres, or whatever runs on it can now use more RAM. But it won't automatically unless you tune: Postgres `shared_buffers`, JVM `-Xmx`, thread pool sizes all need reconfiguring.<br><br>
+            <strong>3. Hard ceiling: the largest machine money can buy.</strong> AWS largest general-purpose is u-24tb1.metal — 448 vCPUs, 24TB RAM. Beyond that: no bigger box exists. You're forced horizontal.<br><br>
+            <strong>4. Single point of failure remains.</strong> One machine, one failure domain. No redundancy by default.
+          </div>
+        </div>
+        <div class="tab-panel" id="mh">
+          <div class="prose">
+            <strong>1. Add a node to the pool.</strong> New instance registers with the load balancer or service discovery system (e.g., Consul, Kubernetes endpoints).<br><br>
+            <strong>2. Application must be stateless</strong> — or state must be externalized (Redis, DB). If node A handles request 1 and node B handles request 2 from the same session, they must agree on user state.<br><br>
+            <strong>3. Coordination overhead grows.</strong> Distributed systems need consensus (who's the leader?), data partitioning (which shard holds user X?), and replication (does node B have the write node A just did?). Each adds latency and failure modes.<br><br>
+            <strong>4. Linear (or near-linear) cost scaling.</strong> 10 m5.large machines ≈ cost of 1 m5.10xlarge. But you get redundancy and can add/remove without downtime. Auto-scaling groups (ASG) do this dynamically based on CPU/RPS metrics.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Subtypes &amp; Variants</div>
+      <div class="kv-grid">
+        <div class="kv-card"><div class="kv-label">Vertical — Storage scaling</div><div class="kv-val">Add larger SSD, NVMe arrays, or attach EBS volumes. Independent of compute scaling.</div></div>
+        <div class="kv-card"><div class="kv-label">Vertical — Memory scaling</div><div class="kv-val">Add RAM to reduce disk I/O. Most impactful for databases (Postgres buffer pool, Redis).</div></div>
+        <div class="kv-card"><div class="kv-label">Horizontal — Stateless</div><div class="kv-val">Pure compute workers (API servers, Lambda functions). Easiest — no coordination needed.</div></div>
+        <div class="kv-card"><div class="kv-label">Horizontal — Stateful</div><div class="kv-val">Databases, caches, queues. Requires sharding, replication, consistent hashing.</div></div>
+        <div class="kv-card"><div class="kv-label">Diagonal / hybrid</div><div class="kv-val">Scale up individual nodes while also scaling out. Common in Kafka (larger brokers + more brokers).</div></div>
+        <div class="kv-card"><div class="kv-label">Auto-scaling</div><div class="kv-val">Horizontal scaling driven by metrics (CPU > 70%, RPS > threshold). AWS ASG, k8s HPA.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Scale Estimation</div>
+      <div class="scale-grid">
+        <div class="scale-card"><div class="scale-num">~96 cores</div><div class="scale-desc">Max practical vertical on AWS (c7g.metal). Beyond this: no more headroom.</div></div>
+        <div class="scale-card"><div class="scale-num">~10–50ms</div><div class="scale-desc">Coordination overhead added per request when horizontal nodes need to agree (Raft round-trip).</div></div>
+        <div class="scale-card"><div class="scale-num">0ms downtime</div><div class="scale-desc">Ideal horizontal scale-out. Vertical resizes typically require 2–15 min instance restart.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Architecture Diagram — Text</div>
+      <div class="arch-block">VERTICAL (before → after)
+  ┌────────────┐         ┌──────────────────────┐
+  │ 2 vCPU/8GB │  →→→   │  16 vCPU / 64GB RAM  │
+  │  App + DB  │         │  Same App + DB        │
+  └────────────┘         └──────────────────────┘
+  One box. Bigger box. Same architecture.
+
+HORIZONTAL (scale-out)
+  Clients
+     │
+  ┌──▼──────────────────────────────────────┐
+  │           Load Balancer (L7)             │
+  └──┬──────────┬──────────┬────────────────┘
+     │          │          │
+  ┌──▼──┐   ┌──▼──┐   ┌──▼──┐
+  │ App │   │ App │   │ App │   ← stateless
+  │  1  │   │  2  │   │  3  │     workers
+  └──┬──┘   └──┬──┘   └──┬──┘
+     └──────────┴──────────┘
+               │
+        ┌──────▼──────┐
+        │  Shared DB  │  ← state externalized
+        │  or Redis   │
+        └─────────────┘</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Trade-offs</div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Gain (Vertical)</div><p>Simple — no code changes, no distributed systems complexity. Works immediately.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Lose (Vertical)</div><p>Hard ceiling. Downtime during resize. No redundancy — one machine fails, you're down.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Gain (Horizontal)</div><p>No theoretical ceiling. Redundancy built-in. Cost-efficient at scale using commodity hardware.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Lose (Horizontal)</div><p>Application must be stateless or handle distributed state. Added latency from coordination. Ops complexity explodes.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Gain (Vertical for DBs)</div><p>Avoids complex sharding logic. Postgres on a beefy machine handles millions of QPS before you need to shard.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Lose (Vertical for DBs)</div><p>A single-master DB cannot scale writes horizontally without sharding. Vertical only helps reads (with replicas).</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Failure Modes</div>
+      <div class="failure-item"><strong>Vertical SPOF:</strong> Machine dies → full outage. Mitigation: RDS Multi-AZ standby, warm standby replica.</div>
+      <div class="failure-item"><strong>Horizontal — split brain:</strong> Network partition causes two nodes to think they're primary. Write both → data divergence. Mitigation: use a consensus protocol (Raft, ZooKeeper) or single-primary DB.</div>
+      <div class="failure-item"><strong>Horizontal — thundering herd:</strong> All nodes restart simultaneously after a deploy, flood the DB. Mitigation: staggered deploys, circuit breakers, connection pools.</div>
+      <div class="failure-item"><strong>Auto-scaling lag:</strong> Spike hits before new instances are warm. Mitigation: predictive scaling, keep warm pool, over-provision slightly.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Real-World Examples</div>
+      <div class="prose">
+        <strong>Netflix:</strong> Stateless API nodes scale horizontally via AWS ASG. Cassandra (horizontally sharded) stores user data. A single Cassandra node is also vertically sized to hold hot partition data in memory.<br><br>
+        <strong>Uber:</strong> Started with a monolith on vertical iron. Migrated to horizontal microservices when driver-location writes exceeded what a single Postgres could handle (~100K writes/sec).<br><br>
+        <strong>Razorpay:</strong> Payment processing is write-heavy. They vertically scale Postgres primaries and horizontally scale read replicas. API layer is stateless and horizontally auto-scaled.<br><br>
+        <strong>WhatsApp:</strong> Famously ran 450 million users on ~50 engineers and ~few hundred servers. Heavy vertical scaling of FreeBSD servers (64+ cores, custom tuning). Eventually added horizontal sharding for message routing.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Interview Perspective</div>
+      <div class="interview-box">
+        <ol>
+          <li><strong>Start with vertical</strong> — always acknowledge it's simpler and works fine until ~10–50K RPS depending on service type.</li>
+          <li><strong>Trigger for horizontal</strong> — "When I hit the machine ceiling, or when I need redundancy for SLA guarantees, I move to horizontal."</li>
+          <li><strong>State the constraint clearly:</strong> "Horizontal requires stateless services — so I externalize sessions to Redis, store uploads in S3."</li>
+          <li><strong>Probe question:</strong> "Your DB is the bottleneck — vertical or horizontal?" → Vertical for reads (read replicas), eventually horizontal sharding for writes. Never say "just shard it" without explaining the coordination cost.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Connects To</div>
+      <div class="connects">
+        <a onclick="show(1)">Load Balancing →</a>
+        <a onclick="sendPrompt('Explain database sharding in system design')">Database Sharding</a>
+        <a onclick="sendPrompt('Explain consistent hashing in system design')">Consistent Hashing</a>
+        <a onclick="sendPrompt('Explain stateless vs stateful services')">Stateless Services</a>
+        <a onclick="show(5)">Fault Tolerance →</a>
+      </div>
+    </div>
+    <button class="next-btn" onclick="show(1)">Next: Load Balancing <i class="ti ti-arrow-right"></i></button>
+  </div>
+
+  <!-- ═══════════════ TOPIC 1: Load Balancing ═══════════════ -->
+  <div class="topic" id="t1">
+    <div class="topic-title">Load Balancing</div>
+    <div class="topic-sub">L4 vs L7 · Algorithms · Health checks · Sticky sessions</div>
+
+    <div class="section">
+      <div class="section-label">Definition &amp; Core Purpose</div>
+      <div class="prose">
+        A load balancer is a traffic distributor. It sits in front of a pool of servers and routes each incoming request to one of them, based on a chosen algorithm.<br><br>
+        The problem it solves: <strong>a single server is a bottleneck and a single point of failure.</strong> Without a load balancer, adding server 2 means clients need to know about both — impossible at scale. The LB is the single, stable entry point; the pool of servers behind it is elastic and interchangeable.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">How It Works — Deep Mechanics</div>
+      <div class="tab-row">
+        <div class="tab active" onclick="switchTab(this,'mech1','l4')">L4 (Transport)</div>
+        <div class="tab" onclick="switchTab(this,'mech1','l7')">L7 (Application)</div>
+        <div class="tab" onclick="switchTab(this,'mech1','algos')">Algorithms</div>
+      </div>
+      <div id="mech1">
+        <div class="tab-panel active" id="l4">
+          <div class="prose">
+            <strong>Layer 4 = TCP/UDP level.</strong> The LB sees: source IP, destination IP, source port, destination port — nothing else. It does not decrypt TLS, does not read HTTP headers, does not know the URL path.<br><br>
+            <strong>How it routes:</strong> Opens two TCP connections — one from client→LB, one from LB→server. Uses NAT (Network Address Translation) to rewrite source/destination IPs on the fly. Ultra-fast: decision made in microseconds, no packet inspection.<br><br>
+            <strong>When to use:</strong> Raw TCP throughput (game servers, IoT telemetry, non-HTTP protocols), latency-critical paths where header inspection overhead matters, high-PPS (packets per second) workloads. AWS NLB is L4.
+          </div>
+        </div>
+        <div class="tab-panel" id="l7">
+          <div class="prose">
+            <strong>Layer 7 = Application level.</strong> The LB terminates TLS, reads the full HTTP request — method, URL path, headers, cookies, body (partially). This costs CPU but buys intelligence.<br><br>
+            <strong>What it can do that L4 cannot:</strong><br>
+            — Route <code>/api/*</code> to API servers, <code>/static/*</code> to CDN origin, <code>/ws</code> to WebSocket pool<br>
+            — A/B testing: route 10% of requests to new service version based on header<br>
+            — Sticky sessions via cookie: always send user 42 to server 3<br>
+            — SSL termination: decrypt once at the LB, send plain HTTP internally (saves server CPU)<br>
+            — Rate limiting per endpoint<br>
+            — WAF integration (block SQL injection, XSS patterns)<br><br>
+            AWS ALB, Nginx, HAProxy (mode http), Envoy are L7. This is the default choice for web services.
+          </div>
+        </div>
+        <div class="tab-panel" id="algos">
+          <div class="prose">
+            <strong>Round Robin:</strong> Requests cycle server 1→2→3→1→2→3. Simple, works when servers are identical and requests are similar in cost. Breaks down when some requests take 10ms and others take 5 seconds — fast servers idle while slow ones queue.<br><br>
+            <strong>Weighted Round Robin:</strong> Server with 8 cores gets 2× requests of the 4-core server. Useful for heterogeneous hardware.<br><br>
+            <strong>Least Connections:</strong> Route to the server with fewest active connections. Better for variable-length requests (file uploads, streaming). Requires the LB to track connection counts.<br><br>
+            <strong>IP Hash:</strong> <code>hash(client_ip) % n_servers</code> → deterministic server. Same client always hits the same server. Good for "soft" stickiness without cookies, but breaks badly when servers are added/removed (all hashes shift). Use consistent hashing to fix this.<br><br>
+            <strong>Consistent Hashing:</strong> Hash space is a ring. Servers are placed on it. Client hashes to a point on the ring, routes to the nearest server clockwise. Adding/removing a server only remaps ~1/n of clients. Used in distributed caches (Memcached, Redis Cluster).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Architecture Diagram — Text</div>
+      <div class="arch-block">L7 Load Balancer — Read Path
+  Client
+    │  HTTPS req (GET /api/feed)
+    ▼
+  ┌────────────────────────────────────────┐
+  │  L7 Load Balancer (ALB / Nginx)        │
+  │  • TLS termination (decrypt here)      │
+  │  • Read headers / cookies / URL        │
+  │  • Apply routing rules                 │
+  │  • Health check pool every 10s         │
+  └──────────┬──────────┬──────────────────┘
+             │          │
+         /api/*      /static/*
+             │          │
+     ┌───────▼───┐  ┌───▼──────────┐
+     │ API Pool  │  │ CDN / Origin │
+     │  srv 1-3  │  │  (S3/CF)     │
+     └───────┬───┘  └──────────────┘
+             │
+     ┌───────▼───────┐
+     │  Redis Cache  │
+     └───────┬───────┘
+             │
+     ┌───────▼───────┐
+     │   Postgres    │
+     └───────────────┘
+
+Health Check Loop:
+  LB → GET /health → srv1  [200 OK → healthy]
+  LB → GET /health → srv2  [timeout → mark unhealthy → remove from pool]</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Sticky Sessions — Deep Dive</div>
+      <div class="prose">
+        <strong>Problem:</strong> If a user uploads state to server 1 (e.g., a shopping cart in memory), routing them to server 2 on the next request loses that state.<br><br>
+        <strong>Cookie-based sticky sessions (L7 only):</strong> LB sets a cookie (e.g., <code>AWSALB=srv1id</code>). Every subsequent request from that browser includes the cookie → LB always routes to server 1. Expires after a configured duration.<br><br>
+        <strong>The problem with stickiness:</strong> If server 1 crashes, all its sticky clients get errors (or must be re-routed, losing state anyway). Stickiness makes horizontal scaling less effective — you can't drain server 1 for maintenance without disrupting users pinned to it.<br><br>
+        <strong>The real fix:</strong> Make servers stateless. Move session state to Redis. Now any server can handle any request. Stickiness becomes unnecessary.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Trade-offs</div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Gain (L7 over L4)</div><p>Content-aware routing, SSL termination, WAF, A/B testing. Smarter and more powerful.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Lose (L7 over L4)</div><p>Higher CPU cost (TLS decrypt, header parsing). Extra latency (~1–3ms). LB itself can become a bottleneck.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Gain (Least Connections)</div><p>Fair distribution under variable-length workloads. No server piles up while others idle.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Lose (Least Connections)</div><p>LB must track state (connection counts). Slightly more complex. Still doesn't account for request cost (CPU vs I/O).</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Gain (IP Hash)</div><p>Zero-overhead stickiness — no cookie, no session tracking at LB.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Lose (IP Hash)</div><p>Breaks when server pool changes. Users behind NAT (same IP) all hit one server.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Gain (Health Checks)</div><p>Automatic removal of unhealthy nodes. Self-healing routing without manual intervention.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Lose (Health Checks)</div><p>Lag between failure and detection (interval × threshold = 30s typical). In-flight requests to the dead node fail during that window.</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Failure Modes</div>
+      <div class="failure-item"><strong>LB itself as SPOF:</strong> If the load balancer dies, everything is down. Mitigation: LB HA pair (active-passive with VIP failover, e.g., AWS ALB is managed and internally redundant).</div>
+      <div class="failure-item"><strong>Cascading overload:</strong> Backend server dies → its load redistributes → surviving servers get overloaded → they die too → cascade. Mitigation: circuit breaker at LB, reject excess requests with 503 rather than forwarding them.</div>
+      <div class="failure-item"><strong>Health check gaming:</strong> Server returns 200 to health check but fails real requests (e.g., DB connection pool exhausted). Mitigation: deep health checks that actually test downstream dependencies.</div>
+      <div class="failure-item"><strong>Slow server problem:</strong> Server becomes slow (GC pause, I/O wait) but doesn't fail health checks. LB keeps sending it traffic. Mitigation: least-connections or outlier detection (Envoy's outlier ejection).</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Real-World Examples</div>
+      <div class="prose">
+        <strong>Netflix:</strong> Uses AWS ALB (L7) for HTTP traffic. Zuul (their own L7 LB) for cross-region routing with custom logic (chaos injection, canary routing).<br><br>
+        <strong>Cloudflare:</strong> Uses consistent hashing at L4 for their Anycast network to route users to nearest PoP, then L7 routing within the PoP.<br><br>
+        <strong>CRED:</strong> Nginx as L7 LB in front of Spring Boot microservices. Sticky sessions via Redis-backed token — not at the LB layer, making the design stateless at the LB and correct.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Interview Perspective</div>
+      <div class="interview-box">
+        <ol>
+          <li><strong>Default to L7 ALB</strong> for web/API services. Only mention L4 NLB if you need ultra-low latency or non-HTTP protocol.</li>
+          <li><strong>Default algorithm: round robin or least connections.</strong> Mention consistent hashing only when the interviewer asks about caching or stateful routing.</li>
+          <li><strong>Sticky sessions is a red flag question.</strong> If you mention stickiness, immediately follow with "but the better solution is to externalize state so stickiness is unnecessary."</li>
+          <li><strong>LB as SPOF:</strong> Always note that the LB itself needs HA — managed services (ALB) solve this, self-hosted needs an active-passive pair.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Connects To</div>
+      <div class="connects">
+        <a onclick="show(0)">← Horizontal Scaling</a>
+        <a onclick="sendPrompt('Explain consistent hashing in system design')">Consistent Hashing</a>
+        <a onclick="sendPrompt('Explain rate limiting in system design')">Rate Limiting</a>
+        <a onclick="show(5)">Fault Tolerance →</a>
+        <a onclick="sendPrompt('Explain service discovery in system design')">Service Discovery</a>
+      </div>
+    </div>
+    <button class="next-btn" onclick="show(2)">Next: Latency · Throughput · Availability <i class="ti ti-arrow-right"></i></button>
+  </div>
+
+  <!-- ═══════════════ TOPIC 2: Latency / Throughput / Availability ═══════════════ -->
+  <div class="topic" id="t2">
+    <div class="topic-title">Latency · Throughput · Availability</div>
+    <div class="topic-sub">Definitions · How they conflict · SLA / SLO / SLI</div>
+
+    <div class="section">
+      <div class="section-label">Definition &amp; Core Purpose</div>
+      <div class="prose">
+        <strong>Latency</strong> = time for a single operation to complete. Measured in ms. "How long did request 1 take?"<br><br>
+        <strong>Throughput</strong> = number of operations completed per unit time. Measured in RPS, QPS, MB/s. "How many requests can the system handle per second?"<br><br>
+        <strong>Availability</strong> = fraction of time the system is operational and serving requests. Measured in nines (99.9% = 8.76 hours downtime/year).<br><br>
+        These are the three axes of system performance. Every architectural decision trades one against another. Understanding how they conflict is the core skill of system design.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">How It Works — The Fundamental Tension</div>
+      <div class="prose">
+        <strong>Latency vs Throughput:</strong> At low load, latency is low and throughput scales linearly. As you approach system capacity, queues form. Queuing latency grows exponentially near 100% utilization (Little's Law: L = λW). You cannot simultaneously minimize latency AND maximize throughput — pushing throughput to the ceiling destroys latency.<br><br>
+        Rule of thumb: keep utilization under 70–80% to maintain predictable latency.<br><br>
+        <strong>Availability vs Latency:</strong> High availability often means replication. Replication adds coordination — synchronous replication forces the write to wait for all replicas to ack before returning. This doubles+ your write latency. Async replication is fast but risks data loss on crash (availability vs durability tension).<br><br>
+        <strong>Availability vs Consistency (preview of CAP):</strong> To stay available during a network partition, you must accept stale reads. To stay consistent, you must refuse requests you can't verify. You cannot have both.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">SLA · SLO · SLI — The Hierarchy</div>
+      <div class="kv-grid">
+        <div class="kv-card"><div class="kv-label">SLI — Service Level Indicator</div><div class="kv-val">The raw metric. "p99 latency of /checkout endpoint." Measured continuously from production traffic. It's a number.</div></div>
+        <div class="kv-card"><div class="kv-label">SLO — Service Level Objective</div><div class="kv-val">Internal target for that metric. "p99 latency must be ≤ 200ms, 99.9% of the time, measured monthly." It's a contract with yourself.</div></div>
+        <div class="kv-card"><div class="kv-label">SLA — Service Level Agreement</div><div class="kv-val">External contract with customers. "If availability drops below 99.9%, we credit 10% of monthly fee." Legal. Money changes hands.</div></div>
+        <div class="kv-card"><div class="kv-label">Error Budget</div><div class="kv-val">SLO = 99.9% uptime → budget = 0.1% = 43.8 min/month. Spend it on risky deploys. Exhaust it → freeze changes.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Latency Numbers — Memorize These</div>
+      <div class="scale-grid">
+        <div class="scale-card"><div class="scale-num">~0.5ns</div><div class="scale-desc">L1 cache access</div></div>
+        <div class="scale-card"><div class="scale-num">~100ns</div><div class="scale-desc">L3 cache / RAM access</div></div>
+        <div class="scale-card"><div class="scale-num">~100µs</div><div class="scale-desc">SSD random read</div></div>
+        <div class="scale-card"><div class="scale-num">~1ms</div><div class="scale-desc">Same-DC network round-trip</div></div>
+        <div class="scale-card"><div class="scale-num">~150ms</div><div class="scale-desc">Cross-continent (NYC→LON)</div></div>
+        <div class="scale-card"><div class="scale-num">~10ms</div><div class="scale-desc">Redis GET (same DC)</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Architecture Diagram — Latency Budget</div>
+      <div class="arch-block">Request → response: total budget = 200ms SLO
+
+  Client (browser)
+    │ 20ms  DNS + TCP connect
+    ▼
+  CDN Edge (TLS termination)
+    │ 5ms   TLS handshake cached / session resume
+    ▼
+  Load Balancer
+    │ 1ms   routing decision
+    ▼
+  API Server
+    │ 10ms  business logic (CPU-bound)
+    │
+    ├── Redis cache HIT?
+    │     └─ 1ms ── return cached ───────────────────┐
+    │                                                  │
+    └── Cache MISS → Postgres                          │
+          │ 20ms  query (indexed)                      │
+          │ 5ms   serialize response                   │
+          ▼                                            │
+  Serialize JSON → 2ms                                 │
+    ▼                                                  │
+  Response ←──────────────────────────────────────────┘
+  
+  Cache HIT total:  ~37ms  ✓ well within 200ms SLO
+  Cache MISS total: ~63ms  ✓ still within SLO
+  Without cache / slow query (100ms): ~130ms — approaching limit</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Trade-offs</div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Async processing</div><p>Decouple producer from consumer via queue. Throughput skyrockets — producer never waits.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Async cost</div><p>Latency for the end-to-end operation increases. User gets "processing" instead of immediate confirmation.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Caching</div><p>Dramatically reduces latency for reads. Throughput of DB is effectively amplified.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Caching cost</div><p>Stale data. Cache invalidation is notoriously hard. Thundering herd on cache miss.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ More replicas</div><p>Read throughput scales linearly. Availability improves (one replica down, others serve).</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Replication cost</div><p>Write latency up (synchronous), or risk of data loss (async). Replication lag creates stale reads.</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Failure Modes</div>
+      <div class="failure-item"><strong>Latency tail explosion:</strong> p50=10ms, p99=500ms, p999=10s. One slow operation (GC pause, lock contention, hot DB row) destroys tail latency. Fix: timeouts, async, connection pooling.</div>
+      <div class="failure-item"><strong>Throughput cliff:</strong> System handles 5000 RPS smoothly, then falls off a cliff at 5001. Queue backs up, timeouts cascade. Fix: load shedding, backpressure signaling to upstream.</div>
+      <div class="failure-item"><strong>Availability math mistake:</strong> Two 99.9% services in series = 99.9% × 99.9% = 99.8% availability. Chains of dependencies dramatically reduce overall availability.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Real-World Examples</div>
+      <div class="prose">
+        <strong>Google:</strong> Internal SRE practice — 99.9% SLO internally, 99.99% external SLA. Error budget is ~43min/month. Teams that exhaust it freeze feature deployments until budget recovers.<br><br>
+        <strong>Amazon:</strong> Every 100ms of additional latency = 1% decrease in sales. That's why every service has strict latency SLOs and aggressive caching.<br><br>
+        <strong>Zepto:</strong> 10-minute delivery requires p99 checkout latency under 500ms. They cache product catalog aggressively, async inventory reservation, sync only payment confirmation.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Interview Perspective</div>
+      <div class="interview-box">
+        <ol>
+          <li><strong>Always ask for the SLO first.</strong> "What's our latency target? What's the availability requirement?" This frames your entire design.</li>
+          <li><strong>Use the latency budget technique.</strong> Show you can decompose 200ms into sub-budgets per layer. Interviewers love this — it shows engineering maturity.</li>
+          <li><strong>Know the nines:</strong> 99% = 3.65 days/yr downtime. 99.9% = 8.76 hrs. 99.99% = 52 min. 99.999% = 5 min. Say these without hesitation.</li>
+          <li><strong>Error budget:</strong> Mentioning error budgets signals SRE knowledge — a huge differentiator at senior level.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Connects To</div>
+      <div class="connects">
+        <a onclick="show(3)">CAP Theorem →</a>
+        <a onclick="sendPrompt('Explain caching strategies in system design')">Caching</a>
+        <a onclick="sendPrompt('Explain message queues and async processing in system design')">Async / Queues</a>
+        <a onclick="show(5)">Fault Tolerance →</a>
+        <a onclick="sendPrompt('Explain database replication in system design')">Replication</a>
+      </div>
+    </div>
+    <button class="next-btn" onclick="show(3)">Next: CAP Theorem <i class="ti ti-arrow-right"></i></button>
+  </div>
+
+  <!-- ═══════════════ TOPIC 3: CAP Theorem ═══════════════ -->
+  <div class="topic" id="t3">
+    <div class="topic-title">CAP Theorem</div>
+    <div class="topic-sub">Consistency · Availability · Partition Tolerance — pick 2</div>
+
+    <div class="section">
+      <div class="section-label">Definition &amp; Core Purpose</div>
+      <div class="prose">
+        Proved by Eric Brewer (2000), formalized by Gilbert &amp; Lynch (2002): <strong>In a distributed system, you can guarantee at most 2 of 3 properties simultaneously:</strong><br><br>
+        <strong>Consistency (C):</strong> Every read receives the most recent write or an error. All nodes see the same data at the same time. This is linearizability — reads are guaranteed to see the last committed write.<br><br>
+        <strong>Availability (A):</strong> Every request receives a (non-error) response — not guaranteed to be the latest data.<br><br>
+        <strong>Partition Tolerance (P):</strong> The system continues operating even when network messages are dropped or delayed between nodes.<br><br>
+        <strong>The key insight:</strong> Partitions happen in real networks. They're not optional. Therefore, you always choose P — and then you choose between C and A during that partition.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">How It Works — Why You Can't Have All Three</div>
+      <div class="prose">
+        Imagine two database nodes: Node A and Node B. A user writes to Node A. Before Node A can replicate to Node B, the network between them partitions (packets dropped).<br><br>
+        Now a second user reads from Node B. You have exactly two choices:<br><br>
+        <strong>CP (return error):</strong> Node B knows it might be stale. It refuses to serve the read → returns an error or blocks. Consistent (no stale data served) but unavailable.<br><br>
+        <strong>AP (return stale data):</strong> Node B serves its last known value. The user gets an answer but it might be stale. Available but inconsistent.<br><br>
+        CA (consistent + available but no partition tolerance) only works if the two nodes share the same physical machine — i.e., no distribution. Single-node Postgres is "CA" in this sense, but it's not a distributed system. The moment you distribute, partitions are possible and you must choose.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">CP vs AP — Real Examples</div>
+      <div class="kv-grid">
+        <div class="kv-card"><div class="kv-label">CP Systems</div><div class="kv-val">HBase, Zookeeper, etcd, Consul, MongoDB (w/ strong consistency). During partition: blocks or returns error. Use when: financial transactions, distributed locks, leader election — stale data is dangerous.</div></div>
+        <div class="kv-card"><div class="kv-label">AP Systems</div><div class="kv-val">Cassandra, CouchDB, DynamoDB (default), DNS. During partition: serves potentially stale data. Use when: shopping cart, user profiles, social feeds — staleness is acceptable, availability is critical.</div></div>
+        <div class="kv-card"><div class="kv-label">CP in practice: ZooKeeper</div><div class="kv-val">Quorum writes — a write only succeeds if majority of nodes ack. If majority unreachable, writes fail. Reads from leader only → always consistent. Used by Kafka for leader election.</div></div>
+        <div class="kv-card"><div class="kv-label">AP in practice: Cassandra</div><div class="kv-val">Every node can accept writes. During partition, both sides accept writes → divergence. On recovery, last-write-wins (LWW) or CRDT merge resolves conflict. Tunable with consistency levels (ONE/QUORUM/ALL).</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Architecture Diagram — Text</div>
+      <div class="arch-block">PARTITION EVENT — Node A and B can't talk to each other
+
+  ┌──────────────────────────────────────────────────────┐
+  │                   Distributed DB                      │
+  │                                                       │
+  │   Node A                    ╳         Node B          │
+  │  [Write: x=5]     ← partition →    [Read request]    │
+  │                                                       │
+  │  CP CHOICE:                    AP CHOICE:             │
+  │  Node B detects no contact     Node B serves x=3     │
+  │  with A → returns ERROR        (its last known val)  │
+  │  or blocks indefinitely.       Response arrives,     │
+  │  Consistent, unavailable.      possibly stale.       │
+  └──────────────────────────────────────────────────────┘
+
+CONSISTENCY SPECTRUM (not binary):
+  Strong (linearizable) → Sequential → Causal → Eventual
+  ←────── more consistent ──────────── more available ──────→
+  
+  Cassandra tunable: consistency level ONE (AP) or QUORUM (closer to CP)</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Trade-offs</div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Choosing CP</div><p>Data correctness guaranteed. No conflicts to resolve. Simple reasoning about state.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Choosing CP</div><p>Service is unavailable during partitions. Timeouts spike. User experience degrades or breaks entirely.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Choosing AP</div><p>Always responsive. Users always get an answer. Great for high-availability products where staleness is tolerable.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Choosing AP</div><p>Data can diverge. Conflict resolution is hard (LWW loses updates, CRDTs only work for some data types).</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Tunable consistency</div><p>Cassandra's consistency levels let you choose per-operation. Critical writes use QUORUM, non-critical reads use ONE.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Tunable consistency</div><p>Developer must understand the tradeoff and set it correctly. Wrong setting = silent data bugs.</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Failure Modes</div>
+      <div class="failure-item"><strong>Assuming CA:</strong> Treating a distributed DB like a single-node system. Works until the first network partition, then data diverges silently. Common in teams new to distributed systems.</div>
+      <div class="failure-item"><strong>False CP:</strong> System claims CP but uses eventual consistency under the hood. Reads return stale data during normal operation, not just during partitions. Check: does the system use quorum reads?</div>
+      <div class="failure-item"><strong>Conflict explosion (AP):</strong> Two nodes both accept conflicting writes. LWW discards one silently. For money/inventory data, this is catastrophic. Fix: use CP for writes, AP only for reads where staleness is tolerable.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Real-World Examples</div>
+      <div class="prose">
+        <strong>Amazon DynamoDB:</strong> AP by default (eventual consistency). Can opt into strongly consistent reads per-request (closer to CP but slower, costs more RCU). Shopping cart uses AP — if your cart briefly shows an item that's out of stock, that's caught at checkout.<br><br>
+        <strong>Google Spanner:</strong> Achieves "CP with high availability" using TrueTime (GPS/atomic clock synchronization). Technically breaks the CAP impossibility result in practice by making partitions extremely rare and brief. Still CP — during a real partition, it blocks.<br><br>
+        <strong>Razorpay payments:</strong> Payment ledger must be CP — a duplicate payment due to conflict resolution is worse than a timeout. They use Postgres with synchronous replication + quorum reads.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Interview Perspective</div>
+      <div class="interview-box">
+        <ol>
+          <li><strong>Never say "we can have all three."</strong> This is the classic trap. P is always required. You choose C or A.</li>
+          <li><strong>Frame as a business decision:</strong> "For the payment service, I'll choose CP — a stale balance is worse than a timeout. For the user profile service, I'll choose AP — showing a slightly old profile is fine."</li>
+          <li><strong>Know CAP ≠ binary:</strong> Consistency is a spectrum (linearizable → causal → eventual). Mention this to show depth.</li>
+          <li><strong>Probe question:</strong> "What does Cassandra do during a partition?" → It stays AP — serves stale data. Divergent writes are resolved by LWW or read-repair after partition heals.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Connects To</div>
+      <div class="connects">
+        <a onclick="show(4)">PACELC →</a>
+        <a onclick="sendPrompt('Explain eventual consistency and strong consistency in distributed systems')">Consistency Models</a>
+        <a onclick="sendPrompt('Explain database replication in system design')">Replication</a>
+        <a onclick="sendPrompt('Explain Raft consensus algorithm')">Raft / Consensus</a>
+        <a onclick="show(5)">Fault Tolerance →</a>
+      </div>
+    </div>
+    <button class="next-btn" onclick="show(4)">Next: PACELC <i class="ti ti-arrow-right"></i></button>
+  </div>
+
+  <!-- ═══════════════ TOPIC 4: PACELC ═══════════════ -->
+  <div class="topic" id="t4">
+    <div class="topic-title">PACELC</div>
+    <div class="topic-sub">Extends CAP — what happens even without partitions?</div>
+
+    <div class="section">
+      <div class="section-label">Definition &amp; Core Purpose</div>
+      <div class="prose">
+        Proposed by Daniel Abadi (2012). PACELC recognizes the limitation of CAP: <strong>CAP only describes behavior during partitions. But partitions are rare. What about normal operation?</strong><br><br>
+        During normal operation (no partition), a distributed system must still choose between <strong>Latency (L)</strong> and <strong>Consistency (C)</strong>. Replication takes time. If you wait for all replicas to confirm a write (strong consistency), latency goes up. If you acknowledge immediately and replicate asynchronously (low latency), you risk temporary inconsistency.<br><br>
+        PACELC = <strong>If Partition: choose A or C. Else (no partition): choose L or C.</strong>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">How It Works — The Full Framework</div>
+      <div class="prose">
+        <strong>PAC:</strong> During a Partition, choose between Availability (A) or Consistency (C). This is the CAP choice.<br><br>
+        <strong>ELC:</strong> Else (normal operation), choose between Latency (L) or Consistency (C).<br><br>
+        This gives 4 positions a system can occupy:<br><br>
+        <strong>PA/EL:</strong> During partition → Available. Normal → Low Latency. E.g., Cassandra, DynamoDB (default). Most available, least consistent. Writes always go through, but replicas may lag.<br><br>
+        <strong>PC/EC:</strong> During partition → Consistent. Normal → Consistent. E.g., HBase, Google Spanner, VoltDB. Write must be ack'd by all (or quorum). Highest latency but strongest guarantees.<br><br>
+        <strong>PA/EC:</strong> During partition → Available. Normal → Consistent. E.g., MongoDB (default in later versions). Tries to be available during chaos, consistent otherwise.<br><br>
+        <strong>PC/EL:</strong> During partition → Consistent. Normal → Low Latency. Rare. Hard to implement. PNUTS (Yahoo) approximated this with timeline consistency.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Subtypes &amp; Variants — Real Systems Mapped</div>
+      <div class="kv-grid">
+        <div class="kv-card"><div class="kv-label">Cassandra — PA/EL</div><div class="kv-val">Always available, always low latency. Consistency is eventual. Tunable per-op. Use for: time-series, activity feeds, user events.</div></div>
+        <div class="kv-card"><div class="kv-label">Google Spanner — PC/EC</div><div class="kv-val">Always consistent, even cross-globe. Latency is higher (~10ms commit). Use for: global financial ledgers, multi-region ACID transactions.</div></div>
+        <div class="kv-card"><div class="kv-label">DynamoDB — PA/EL</div><div class="kv-val">Default eventual consistency. Strongly consistent reads cost 2× RCU. Typical: PA/EL; with strong reads: PA/EC.</div></div>
+        <div class="kv-card"><div class="kv-label">MySQL / Postgres (single master) — PC/EC</div><div class="kv-val">Single master = no partition scenario in typical setup. Synchronous replication = PC/EC. High latency writes if replica is slow.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Architecture Diagram — Text</div>
+      <div class="arch-block">PACELC Decision Matrix
+
+                  NORMAL OPERATION          │  DURING PARTITION
+  ─────────────────────────────────────────┼──────────────────────
+  Want LOW LATENCY + some inconsistency    │  Stay AVAILABLE
+  (PA/EL): Cassandra, DynamoDB default     │  (serve stale data)
+                                           │
+  Want CONSISTENCY at higher latency       │  Stay AVAILABLE
+  (PA/EC): MongoDB w/ strong reads         │  (block non-critical)
+                                           │
+  Want CONSISTENCY at higher latency       │  Block / return error
+  (PC/EC): Spanner, etcd, HBase            │  (CP)
+  ─────────────────────────────────────────┴──────────────────────
+
+  Write path comparison — 3 replicas:
+
+  PA/EL (Cassandra, quorum=ONE):
+  Client → Write to any node → Ack immediately → replicate async
+  Write latency: ~1ms. Risk: node crash before replication = data loss.
+
+  PC/EC (Spanner):
+  Client → Write → wait for Paxos quorum (2/3 replicas ack) → Ack
+  Write latency: ~5–15ms (cross-DC: ~100ms). Risk: none — data safe.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Trade-offs</div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ PA/EL</div><p>Sub-millisecond writes. Always available. Linear scale-out. Global write throughput.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ PA/EL</div><p>Stale reads. Conflicts must be resolved by application. Not suitable for money, inventory, anything where two conflicting writes must not both succeed.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ PC/EC</div><p>Correctness guaranteed. Easier to reason about. No conflict resolution logic in application code.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ PC/EC</div><p>Higher write latency (quorum round-trips). Lower write throughput. More expensive (Spanner: $0.90/million writes vs DynamoDB: $0.25).</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Failure Modes</div>
+      <div class="failure-item"><strong>Applying PA/EL to financial data:</strong> Cassandra LWW silently discards a payment write. Money disappears. Fix: use PC/EC for critical writes, PA/EL only for analytics/activity data.</div>
+      <div class="failure-item"><strong>Treating PACELC as binary:</strong> Most systems are tunable. Cassandra with QUORUM consistency is much closer to PC/EC. Don't label systems as fixed — ask what consistency level is configured.</div>
+      <div class="failure-item"><strong>Latency misattribution:</strong> Blaming the DB for slow writes when the issue is cross-DC replication. PC/EC systems across regions have inherent physics-limited latency floors (~150ms for transcontinental commits).</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Real-World Examples</div>
+      <div class="prose">
+        <strong>WhatsApp message storage:</strong> PA/EL. A message delivered slightly out of order or a brief duplicate is acceptable. Availability and low latency are critical — a message store that refuses writes during network turbulence is unacceptable.<br><br>
+        <strong>Razorpay payment ledger:</strong> PC/EC. A missed payment or double-credit due to conflict resolution is catastrophic. They accept higher write latency for correctness.<br><br>
+        <strong>Uber driver location:</strong> PA/EL. Driver location updates 4×/sec. Serving a location 500ms stale is fine. A system that refuses to serve driver location during a partition is worse than serving a slightly stale one.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Interview Perspective</div>
+      <div class="interview-box">
+        <ol>
+          <li><strong>Use PACELC to impress.</strong> Most candidates know CAP. Mentioning PACELC and explaining the ELC dimension signals senior-level thinking.</li>
+          <li><strong>Frame every DB choice with PACELC.</strong> "I'm choosing Cassandra here because this service needs PA/EL — it's event data where staleness is fine and write availability is critical."</li>
+          <li><strong>Probe: "Your Cassandra cluster has network turbulence — what happens?"</strong> → Replicas accept writes independently. After recovery, anti-entropy (read-repair, Merkle trees) reconciles differences. LWW applies for conflicts.</li>
+          <li><strong>Know when NOT to use PA/EL:</strong> Inventory, payments, seat reservations — anything that requires mutual exclusion needs PC/EC or application-level locking.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Connects To</div>
+      <div class="connects">
+        <a onclick="show(3)">← CAP Theorem</a>
+        <a onclick="sendPrompt('Explain eventual consistency and strong consistency in distributed systems')">Consistency Models</a>
+        <a onclick="sendPrompt('Explain Raft consensus algorithm')">Consensus (Raft)</a>
+        <a onclick="sendPrompt('Explain database replication in system design')">Replication</a>
+        <a onclick="show(5)">Fault Tolerance →</a>
+      </div>
+    </div>
+    <button class="next-btn" onclick="show(5)">Next: Fault Tolerance &amp; Redundancy <i class="ti ti-arrow-right"></i></button>
+  </div>
+
+  <!-- ═══════════════ TOPIC 5: Fault Tolerance & Redundancy ═══════════════ -->
+  <div class="topic" id="t5">
+    <div class="topic-title">Fault Tolerance &amp; Redundancy</div>
+    <div class="topic-sub">Active-passive · Active-active · SPOF elimination · Resilience patterns</div>
+
+    <div class="section">
+      <div class="section-label">Definition &amp; Core Purpose</div>
+      <div class="prose">
+        <strong>Fault tolerance</strong> = the ability of a system to continue operating correctly even when components fail.<br><br>
+        <strong>Redundancy</strong> = having duplicate components so that if one fails, another takes over.<br><br>
+        The key distinction: fault tolerance is the property; redundancy is the mechanism that achieves it. A system without redundancy has a Single Point of Failure (SPOF) — one component whose failure brings down the entire system. Eliminating SPOFs is the primary job of redundancy design.<br><br>
+        The problem it solves: hardware fails, software crashes, networks partition, datacenters flood. In any sufficiently complex system, component failure is not a question of if — it's when.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">How It Works — Active-Passive vs Active-Active</div>
+      <div class="tab-row">
+        <div class="tab active" onclick="switchTab(this,'mech5','ap')">Active-Passive</div>
+        <div class="tab" onclick="switchTab(this,'mech5','aa')">Active-Active</div>
+        <div class="tab" onclick="switchTab(this,'mech5','spof')">SPOF Elimination</div>
+      </div>
+      <div id="mech5">
+        <div class="tab-panel active" id="ap">
+          <div class="prose">
+            <strong>Active-Passive (Primary-Standby):</strong> One node handles all traffic (active). One or more nodes sit idle, continuously receiving replicated state (passive/standby).<br><br>
+            <strong>Failover flow:</strong> Health monitor detects primary failure → promotes standby → updates DNS/VIP to point to new primary → traffic routes to new primary. Takes 10–60 seconds typically (depends on detection + promotion time).<br><br>
+            <strong>Warm standby:</strong> Passive is running, receives replication, can promote quickly (seconds). Extra cost: you're paying for an idle machine.<br><br>
+            <strong>Cold standby:</strong> Passive is not running. Must be started on failure. Cheaper but slow failover (minutes). Used for DR (Disaster Recovery) scenarios where minutes of downtime is acceptable.<br><br>
+            <strong>When to use:</strong> Databases (Postgres streaming replication, MySQL primary-replica), stateful services where coordination is complex. AWS RDS Multi-AZ is active-passive.
+          </div>
+        </div>
+        <div class="tab-panel" id="aa">
+          <div class="prose">
+            <strong>Active-Active:</strong> Multiple nodes all handle live traffic simultaneously. No idle standby. If one fails, the load balancer redistributes its traffic to surviving nodes.<br><br>
+            <strong>Requirements:</strong> Nodes must be stateless (or state must be synchronized in real-time, which is very hard). Shared state (DB, cache) must handle the combined write load.<br><br>
+            <strong>Benefits:</strong> No failover delay (traffic re-routes instantly). Better resource utilization (no idle standby). Higher throughput (all capacity is used).<br><br>
+            <strong>Challenges:</strong> Write conflicts if state is distributed (split-brain). More complex coordination. Load balancer must detect failures fast.<br><br>
+            <strong>When to use:</strong> Stateless API servers (always active-active), Redis Cluster (multi-primary for different hash slots), multi-region active-active (very complex — Google, Netflix do this).
+          </div>
+        </div>
+        <div class="tab-panel" id="spof">
+          <div class="prose">
+            <strong>Every layer can have a SPOF. Here's how to eliminate them layer by layer:</strong><br><br>
+            <strong>DNS:</strong> SPOF if single DNS provider. Fix: use multiple DNS providers (Route 53 + Cloudflare), TTL tuning for fast failover.<br><br>
+            <strong>Load Balancer:</strong> SPOF if self-hosted single LB. Fix: LB HA pair with Virtual IP (VIP) — keepalived for failover. Or use managed LB (AWS ALB — internally redundant).<br><br>
+            <strong>Application Servers:</strong> SPOF if single instance. Fix: always 2+ instances behind LB. Minimum viable: N+1 (can lose one and still handle peak load).<br><br>
+            <strong>Database:</strong> Biggest SPOF risk. Fix: primary-replica replication (read scaling + failover), or multi-primary (Galera, CockroachDB) for active-active writes.<br><br>
+            <strong>Cache:</strong> SPOF if single Redis node. Fix: Redis Sentinel (primary failover) or Redis Cluster (horizontal sharding + HA).<br><br>
+            <strong>Message Queue:</strong> SPOF if single Kafka broker. Fix: Kafka replication factor ≥ 3, min.insync.replicas = 2.<br><br>
+            <strong>Datacenter:</strong> SPOF if single AZ/region. Fix: multi-AZ deployment (99.99%), multi-region (99.999%).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Scale Estimation</div>
+      <div class="scale-grid">
+        <div class="scale-card"><div class="scale-num">10–60s</div><div class="scale-desc">Typical active-passive failover time (detection + promotion + DNS TTL)</div></div>
+        <div class="scale-card"><div class="scale-num">&lt;1s</div><div class="scale-desc">Active-active failover (load balancer health check interval → remove node)</div></div>
+        <div class="scale-card"><div class="scale-num">2×</div><div class="scale-desc">Cost multiplier for full active-passive redundancy (idle standby paid for)</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Architecture Diagram — Text</div>
+      <div class="arch-block">MULTI-LAYER FAULT TOLERANT ARCHITECTURE
+
+  Internet
+     │
+  ┌──▼─────────────────────────────────────────────┐
+  │  DNS (Route 53 — multi-AZ, health routing)      │
+  └──┬──────────────────────────────────────────────┘
+     │ (Anycast — nearest PoP)
+  ┌──▼──────────────────────────────────────────────┐
+  │  Load Balancer Pair (active-passive, VIP)         │
+  │  LB-1 [ACTIVE]  ←→ keepalived ←→ LB-2 [STANDBY] │
+  └──┬──────────────────────────────────────────────┘
+     │ (round-robin)
+  ┌──▼──┐   ┌──────┐   ┌──────┐    ← Active-Active
+  │ App │   │ App  │   │ App  │      stateless workers
+  │  1  │   │  2   │   │  3   │      N+1 minimum
+  └──┬──┘   └──┬───┘   └──┬───┘
+     └──────────┴──────────┘
+               │
+  ┌────────────▼────────────────────────────────────┐
+  │  Redis Sentinel / Redis Cluster                  │
+  │  Primary ──replicates──→ Replica-1, Replica-2   │
+  │  Sentinel monitors, auto-promotes on failure     │
+  └────────────┬────────────────────────────────────┘
+               │
+  ┌────────────▼────────────────────────────────────┐
+  │  Postgres Primary + Streaming Replica            │
+  │  Primary (AZ-1) ──WAL stream──→ Replica (AZ-2)  │
+  │  RDS Multi-AZ: automatic failover ~60s           │
+  └─────────────────────────────────────────────────┘
+
+  FAILURE SCENARIOS:
+  App-1 dies     → LB detects in 10s, removes from pool. App-2, App-3 handle all traffic.
+  Redis Primary  → Sentinel promotes Replica-1 in ~30s. Brief cache misses hit DB.
+  Postgres fails → RDS promotes AZ-2 replica. 30–60s outage. DNS updates automatically.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Trade-offs</div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Active-Passive</div><p>Simple failover logic. No write conflicts. Standby has full consistent state.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Active-Passive</div><p>Failover takes 30–60s (downtime). Standby wastes resources. Single point of write throughput.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Active-Active</div><p>No failover delay. Full resource utilization. Horizontal write scale (for stateless layers).</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Active-Active</div><p>Write conflicts if stateful. Split-brain risk. Much more complex coordination. Hard for DBs.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Multi-AZ</div><p>Survives datacenter-level failure (power, cooling, hardware rack failure). 99.99% availability.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Multi-AZ</div><p>Cross-AZ data transfer costs. Replication latency adds to write path. ~1–5ms AZ-to-AZ round-trip.</p></div>
+      </div>
+      <div class="tradeoff-item">
+        <div class="tradeoff-side gain"><div class="lbl">✓ Multi-Region</div><p>Survives region-level disasters (hurricane, major cloud outage). 99.999% availability possible.</p></div>
+        <div class="tradeoff-side lose"><div class="lbl">✗ Multi-Region</div><p>150ms+ cross-region latency for synchronous writes. Massive operational complexity. 2–3× cost.</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Failure Modes</div>
+      <div class="failure-item"><strong>Split-brain (active-active DB):</strong> Network partition causes both nodes to accept writes as primary. On reconnect, state diverges irreconcilably. Fix: use a quorum-based system (Raft), or accept that only one node can be primary (use fencing tokens).</div>
+      <div class="failure-item"><strong>Thundering herd on failover:</strong> Primary dies → all clients reconnect to replica simultaneously → replica is overwhelmed. Fix: exponential backoff with jitter on reconnect, circuit breakers.</div>
+      <div class="failure-item"><strong>Replication lag:</strong> Async replica is 10 seconds behind when primary fails. 10 seconds of data lost. Fix: synchronous replication (higher write latency) or accept the RPO (Recovery Point Objective) tradeoff explicitly.</div>
+      <div class="failure-item"><strong>VIP failover storm:</strong> DNS TTL too high → clients still hit dead LB for minutes. Fix: short DNS TTL (30–60s) for internal services, use connection-level VIP (keepalived) for instant failover.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Real-World Examples</div>
+      <div class="prose">
+        <strong>Netflix:</strong> Runs active-active across 3 AWS regions. Every region can serve 100% of traffic. They regularly run Chaos Monkey to randomly kill instances and Chaos Kong to kill entire regions, validating their fault tolerance continuously.<br><br>
+        <strong>WhatsApp:</strong> Multi-datacenter active-active for message routing. Messages are stored in Mnesia (Erlang distributed DB) with replication across nodes. Node failure is handled by the BEAM VM's built-in process supervision (OTP).<br><br>
+        <strong>AWS RDS Multi-AZ:</strong> Active-passive. Primary in AZ-1, synchronous standby in AZ-2. Automatic failover in 60–120s. DNS endpoint updates to point to new primary. Used by Razorpay, CRED, and most Indian product companies for their DB tier.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Interview Perspective</div>
+      <div class="interview-box">
+        <ol>
+          <li><strong>Always mention SPOF elimination as a first principle.</strong> Walk through your design layer by layer: "At the LB layer, I'll use managed ALB — it's internally redundant. At the DB layer, I'll use RDS Multi-AZ."</li>
+          <li><strong>Know your RTO and RPO:</strong> RTO (Recovery Time Objective) = how long can you be down. RPO (Recovery Point Objective) = how much data can you lose. Design your failover strategy around these.</li>
+          <li><strong>Active-active for stateless, active-passive for stateful</strong> — this is the safe default to state. Then qualify with "for the DB tier, active-active requires CRDTs or conflict resolution — I'd default to active-passive with a read replica unless we need global multi-region writes."</li>
+          <li><strong>Chaos engineering:</strong> Mention that you'd validate fault tolerance with chaos testing (kill random instances, inject network latency). Netflix Chaos Monkey shows you've read beyond textbooks.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Connects To</div>
+      <div class="connects">
+        <a onclick="show(0)">← Horizontal Scaling</a>
+        <a onclick="show(1)">← Load Balancing</a>
+        <a onclick="show(3)">← CAP Theorem</a>
+        <a onclick="sendPrompt('Explain circuit breaker pattern in system design')">Circuit Breaker</a>
+        <a onclick="sendPrompt('Explain database replication in system design')">Replication</a>
+        <a onclick="sendPrompt('Explain Kafka replication and fault tolerance')">Kafka Replication</a>
+      </div>
+    </div>
+    <button class="next-btn" onclick="sendPrompt('Continue with the next block of system design topics: Caching (Redis, CDN, strategies, eviction), Databases (SQL vs NoSQL, indexing, ACID, isolation levels, replication, sharding, WAL, MVCC)')">Continue to Next Block ↗</button>
+  </div>
+
+  </main>
+</div>
+
+<script>
+function show(idx) {
+  document.querySelectorAll('.topic').forEach((t,i)=>{
+    t.classList.toggle('active', i===idx);
+  });
+  document.querySelectorAll('.nav-item').forEach((n,i)=>{
+    n.classList.toggle('active', i===idx);
+  });
+  document.querySelector('.content').scrollTop=0;
+}
+
+function switchTab(el, groupId, panelId) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  group.querySelector('#'+panelId).classList.add('active');
+  const tabRow = el.parentElement;
+  tabRow.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>

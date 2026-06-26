@@ -1,0 +1,1147 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{display:flex;height:100vh;min-height:640px;overflow:hidden;font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.sidebar{width:210px;min-width:210px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 0;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 14px 8px}
+.tbtn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 14px;border:none;background:transparent;text-align:left;cursor:pointer;font-size:12.5px;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;line-height:1.4}
+.tbtn:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.tbtn.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left:2px solid #1D9E75;font-weight:500}
+.tnum{font-size:11px;color:var(--color-text-tertiary);min-width:16px;flex-shrink:0}
+.main{flex:1;overflow-y:auto;padding:0;min-width:0}
+.stabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);padding:0 18px;position:sticky;top:0;background:var(--color-background-primary);z-index:10;overflow-x:auto;gap:0}
+.stab{padding:9px 11px;font-size:11.5px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.stab:hover{color:var(--color-text-primary)}
+.stab.active{color:#0F6E56;border-bottom:2px solid #1D9E75}
+.cnt{padding:18px}
+.th{font-size:19px;font-weight:500;margin-bottom:3px}
+.ts{font-size:12.5px;color:var(--color-text-secondary);margin-bottom:16px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-tertiary);margin-bottom:7px}
+.ct{font-size:13.5px;color:var(--color-text-secondary);line-height:1.7}
+.hl{background:var(--color-background-secondary);border-left:3px solid #1D9E75;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:9px 13px;margin:8px 0;font-size:13px;color:var(--color-text-primary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;font-family:var(--font-mono);font-size:11.5px;line-height:1.6;color:var(--color-text-primary);overflow-x:auto;white-space:pre;margin:8px 0}
+.ctbl{width:100%;font-size:12.5px;border-collapse:collapse}
+.ctbl th{text-align:left;padding:5px 7px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.ctbl td{padding:6px 7px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);vertical-align:top;font-size:12.5px}
+.ctbl td:first-child{font-weight:500;color:var(--color-text-primary)}
+.og{color:#3B6D11;font-weight:500}.om{color:#854F0B;font-weight:500}.ob{color:#A32D2D;font-weight:500}
+.pc{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px;margin-bottom:9px}
+.pn{font-size:13.5px;font-weight:500;margin-bottom:4px}
+.trig{font-size:11.5px;color:#0F6E56;background:#E1F5EE;padding:3px 9px;border-radius:var(--border-radius-md);display:inline-block;margin:3px 0}
+.pw{font-size:12.5px;color:var(--color-text-secondary);margin-top:5px;line-height:1.6}
+.sr{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12.5px}
+.sr:last-child{border-bottom:none}
+.si{color:var(--color-text-tertiary);min-width:52px;font-size:10.5px;font-weight:500;text-transform:uppercase;padding-top:2px}
+.sth{color:#085041;font-weight:500;min-width:130px}
+.sw{color:var(--color-text-secondary)}
+.prb{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:11px;margin-bottom:7px}
+.diff{font-size:11px;font-weight:500;padding:2px 7px;border-radius:var(--border-radius-md);display:inline-block;margin-bottom:5px}
+.easy{background:#EAF3DE;color:#27500A}.medium{background:#FAEEDA;color:#633806}.hard{background:#FAECE7;color:#712B13}
+.pname{font-size:13.5px;font-weight:500;margin-bottom:3px}
+.pmeta{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.ipill{display:flex;gap:7px;align-items:flex-start;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6}
+.dot{width:5px;height:5px;border-radius:50%;background:#1D9E75;margin-top:7px;flex-shrink:0}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 7px;border-radius:var(--border-radius-md);margin:2px}
+.tp{background:#EEEDFE;color:#3C3489}.tt{background:#E1F5EE;color:#085041}.ta{background:#FAEEDA;color:#633806}
+</style>
+
+<h2 class="sr-only">Block 6: Dynamic Programming — interactive DSA study bible covering 9 DP topics</h2>
+<div class="app">
+<div class="sidebar">
+  <div class="sidebar-title">Block 6 — DP</div>
+  <button class="tbtn active" onclick="sel(0)"><span class="tnum">1</span>DP Fundamentals</button>
+  <button class="tbtn" onclick="sel(1)"><span class="tnum">2</span>1D DP</button>
+  <button class="tbtn" onclick="sel(2)"><span class="tnum">3</span>2D DP</button>
+  <button class="tbtn" onclick="sel(3)"><span class="tnum">4</span>Knapsack Patterns</button>
+  <button class="tbtn" onclick="sel(4)"><span class="tnum">5</span>Longest Subsequences</button>
+  <button class="tbtn" onclick="sel(5)"><span class="tnum">6</span>Interval DP</button>
+  <button class="tbtn" onclick="sel(6)"><span class="tnum">7</span>DP on Strings</button>
+  <button class="tbtn" onclick="sel(7)"><span class="tnum">8</span>DP on Trees</button>
+  <button class="tbtn" onclick="sel(8)"><span class="tnum">9</span>Bitmask DP</button>
+</div>
+<div class="main" id="main">
+  <div class="stabs" id="stabs"></div>
+  <div class="cnt" id="cnt"></div>
+</div>
+</div>
+
+<script>
+const TABS=["Definition","Mechanics","Complexity","Variants","Patterns","Smell→Pattern","Java Code","Worked Example","Practice","Interview"];
+
+const D=[
+{title:"DP Fundamentals",sub:"Overlapping subproblems · Optimal substructure · Memo vs tabulation",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Dynamic Programming solves problems by breaking them into overlapping subproblems, solving each subproblem once, and storing results to avoid recomputation. DP applies when the problem has two properties: <strong>overlapping subproblems</strong> (same sub-calculation appears many times) and <strong>optimal substructure</strong> (optimal solution built from optimal solutions of subproblems).</div></div>
+<div class="hl"><strong>DP = recursion + memoization.</strong> Or equivalently: DP = smart brute force that never recomputes the same thing twice.</div>
+<div class="card"><div class="lbl">DP vs D&C vs Greedy</div><div class="ct"><strong>D&C</strong>: subproblems are independent (merge sort). <strong>DP</strong>: subproblems overlap (fibonacci). <strong>Greedy</strong>: local optimal = global optimal (always pick largest coin). DP is the most general — it explores all possibilities but caches results.</div></div>`,
+
+`<div class="card"><div class="lbl">Two formulations</div><div class="ct"><strong>Top-down (memoization):</strong> Write recursive solution naturally. Add a cache (HashMap or array). Before computing, check cache. After computing, store in cache. Natural to write, lazy evaluation.<br><br><strong>Bottom-up (tabulation):</strong> Fill a DP table from smallest subproblems to largest. No recursion, no stack overhead. Often more space-efficient (can discard old rows). Harder to see the state transition initially.</div></div>
+<div class="code">// TOP-DOWN (memoization)
+Map&lt;Integer,Integer&gt; memo = new HashMap&lt;&gt;();
+int fib(int n) {
+    if (n &lt;= 1) return n;
+    if (memo.containsKey(n)) return memo.get(n); // cache hit
+    int res = fib(n-1) + fib(n-2);
+    memo.put(n, res);                            // cache store
+    return res;
+}
+
+// BOTTOM-UP (tabulation)
+int fib(int n) {
+    if (n &lt;= 1) return n;
+    int[] dp = new int[n+1];
+    dp[0]=0; dp[1]=1;
+    for (int i=2; i&lt;=n; i++)
+        dp[i] = dp[i-1] + dp[i-2];    // fill from small → large
+    return dp[n];
+}
+
+// SPACE-OPTIMIZED bottom-up (only need prev 2)
+int fib(int n) {
+    if (n &lt;= 1) return n;
+    int a=0, b=1;
+    for (int i=2; i&lt;=n; i++) { int c=a+b; a=b; b=c; }
+    return b;
+}</div>`,
+
+`<table class="ctbl"><tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
+<tr><td>Naive recursion</td><td class="ob">O(2ⁿ)</td><td class="og">O(n)</td><td>Recomputes same subproblems exponentially</td></tr>
+<tr><td>Top-down memo</td><td class="og">O(n·k)</td><td class="om">O(n·k)</td><td>n = states, k = work per state; cache overhead</td></tr>
+<tr><td>Bottom-up table</td><td class="og">O(n·k)</td><td class="om">O(n·k)</td><td>No stack, fill order matters</td></tr>
+<tr><td>Space-optimized</td><td class="og">O(n·k)</td><td class="og">O(k)</td><td>Discard rows no longer needed</td></tr>
+</table>
+<div class="hl" style="margin-top:10px"><strong>State count is key.</strong> Time = (number of unique states) × (work per state). If you have n items and capacity W, states = n×W, work = O(1) → O(nW) total. This framework applies to every DP problem.</div>`,
+
+`<div class="pc"><div class="pn">Linear DP (1D)</div><div class="pw">dp[i] depends on dp[i-1], dp[i-2], or a window of previous states. Climbing stairs, house robber, coin change.</div></div>
+<div class="pc"><div class="pn">Grid DP (2D)</div><div class="pw">dp[i][j] depends on dp[i-1][j], dp[i][j-1], dp[i-1][j-1]. Unique paths, edit distance, LCS.</div></div>
+<div class="pc"><div class="pn">Interval DP</div><div class="pw">dp[i][j] = optimal answer for subarray/substring [i..j]. Build from short intervals to long. Burst balloons, matrix chain.</div></div>
+<div class="pc"><div class="pn">Knapsack DP</div><div class="pw">0/1 knapsack, unbounded knapsack, partition. Classic "include/exclude" decision at each item.</div></div>
+<div class="pc"><div class="pn">Bitmask DP</div><div class="pw">State = bitmask of which elements are included/visited. Exponential states but each in O(1). TSP, assignment problems.</div></div>
+<div class="pc"><div class="pn">Tree DP</div><div class="pw">dp defined on tree nodes. Result for a node depends on results of its children. Post-order traversal.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Identify the state</div><div class="trig">Mental trigger: "what information do I need at each step?"</div><div class="pw">State = minimum info needed to describe a subproblem uniquely. Wrong state = wrong DP. E.g., for coin change: state = remaining amount. For knapsack: state = (item index, remaining capacity).</div></div>
+<div class="pc"><div class="pn">2. Write the recurrence</div><div class="trig">Mental trigger: "how does dp[i] relate to smaller states?"</div><div class="pw">The recurrence IS the algorithm. Express dp[i] in terms of dp[i-1], dp[i-2], dp[i][j-1] etc. This is the hardest step — write it on paper first.</div></div>
+<div class="pc"><div class="pn">3. Identify base cases</div><div class="trig">Mental trigger: "what's the smallest subproblem I can answer directly?"</div><div class="pw">Base cases anchor the recurrence. Wrong base case = wrong answer. dp[0], dp[1], dp[i][0], dp[0][j] are common.</div></div>
+<div class="pc"><div class="pn">4. Determine fill order</div><div class="trig">Mental trigger: "when I compute dp[i], are all its dependencies already computed?"</div><div class="pw">For bottom-up: ensure you fill dependencies before dependents. Typically left→right, top→bottom, or diagonal for interval DP.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"how many ways to do X"</span><span class="sw">→ Counting DP — sum over choices</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"minimum/maximum cost/steps"</span><span class="sw">→ Optimization DP — min/max over choices</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">recursive solution recomputes same args</span><span class="sw">→ Add memoization (top-down DP)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">overlapping subproblems + optimal substructure</span><span class="sw">→ DP over greedy or backtracking</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">choosing from a sequence with future consequences</span><span class="sw">→ DP — decision at each step, build table</span></div>
+</div>`,
+
+`<div class="code">// DP PROBLEM-SOLVING FRAMEWORK (apply every time)
+//
+// STEP 1: Define state
+//   dp[i] = answer for subproblem of size i
+//   dp[i][j] = answer considering first i items with constraint j
+//
+// STEP 2: Write recurrence
+//   dp[i] = f(dp[i-1], dp[i-2], ...)  ← define the transition
+//
+// STEP 3: Base cases
+//   dp[0] = ?, dp[1] = ?  ← smallest answerable subproblem
+//
+// STEP 4: Fill order + answer
+//   for i from small to large: fill dp[i]
+//   return dp[n] or dp[n][W] etc.
+//
+// STEP 5: Space optimization (if needed)
+//   If dp[i] only depends on dp[i-1], use two variables.
+//   If 2D dp[i][j] only depends on current+prev row, use 1D.
+
+// TEMPLATE: top-down
+int solve(int n, int[] memo) {
+    if (n == BASE) return BASE_VALUE;
+    if (memo[n] != -1) return memo[n];
+    return memo[n] = Math.min(
+        solve(n-1, memo) + ...,
+        solve(n-2, memo) + ...
+    );
+}
+
+// TEMPLATE: bottom-up
+int[] dp = new int[n+1];
+dp[0] = BASE_VALUE_0;
+dp[1] = BASE_VALUE_1;
+for (int i = 2; i &lt;= n; i++)
+    dp[i] = Math.min(dp[i-1] + ..., dp[i-2] + ...);</div>`,
+
+`<div class="card"><div class="lbl">LC 70 — Climbing Stairs (DP fundamentals demo)</div><div class="ct">How many distinct ways to climb n stairs if you can take 1 or 2 steps?</div></div>
+<div class="hl"><strong>Brute force:</strong> backtracking — try 1 step and 2 step at each position. O(2ⁿ). Recomputes stairs(3) in many branches.</div>
+<div class="code">// DP approach:
+// State: dp[i] = ways to reach stair i
+// Recurrence: dp[i] = dp[i-1] + dp[i-2]
+//   (arrived from stair i-1 via 1 step, OR from i-2 via 2 steps)
+// Base: dp[1]=1, dp[2]=2
+
+int climbStairs(int n) {
+    if (n &lt;= 2) return n;
+    int prev2 = 1, prev1 = 2;
+    for (int i = 3; i &lt;= n; i++) {
+        int curr = prev1 + prev2;  // recurrence
+        prev2 = prev1;
+        prev1 = curr;
+    }
+    return prev1;
+}
+// Identical to Fibonacci! dp[i] only needs prev 2 → O(1) space.</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 70 — Climbing Stairs</div><div class="pmeta"><strong>Why:</strong> Canonical DP intro. Fibonacci recurrence in disguise.<br><strong>Key insight:</strong> At each stair, you came from i-1 or i-2 → sum of both.</div></div>
+<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 509 — Fibonacci Number</div><div class="pmeta"><strong>Why:</strong> Teaches memo vs tabulation vs space-optimized on same problem.<br><strong>Key insight:</strong> Same recurrence, three implementations to compare.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 322 — Coin Change</div><div class="pmeta"><strong>Why:</strong> Classic optimization DP. Forces clear state/recurrence thinking.<br><strong>Key insight:</strong> dp[i] = min coins for amount i. Try each coin.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 198 — House Robber</div><div class="pmeta"><strong>Why:</strong> Include/exclude decision at each element.<br><strong>Key insight:</strong> dp[i] = max(dp[i-1], dp[i-2] + nums[i]).</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 10 — Regular Expression Matching</div><div class="pmeta"><strong>Why:</strong> 2D DP with complex state transitions. Tests DP mastery.<br><strong>Key insight:</strong> dp[i][j] = does s[0..i-1] match p[0..j-1]?</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you articulate the state definition clearly before coding?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you write the recurrence on paper/whiteboard before the loop?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you convert top-down to bottom-up?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you mention space optimization when applicable?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud template:</strong> "I see overlapping subproblems here. Let me define dp[i] as [X]. The recurrence is dp[i] = [f(smaller states)] because [reason]. Base case is dp[0] = [Y]. I'll fill left to right. Time O([Z]), space O([Z]) — or O(1) if I only keep the last two values."</div>`
+]},
+
+{title:"1D DP",sub:"Climbing stairs · House robber · Coin change · Decode ways",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">1D DP uses a single array (or two variables) where dp[i] represents the answer for a subproblem of size i. The recurrence relates dp[i] to a fixed number of previous entries. Core problems: climbing stairs, house robber, coin change, decode ways. All share the same template — state is one index, transition looks back 1, 2, or k steps.</div></div>
+<div class="hl">1D DP recognition: "answer for the first i elements" or "answer for amount i" — single parameter defines the state completely.</div>
+<div class="card"><div class="lbl">Four canonical problems</div><div class="ct"><strong>Climbing Stairs:</strong> dp[i] = dp[i-1] + dp[i-2]. Count ways.<br><strong>House Robber:</strong> dp[i] = max(dp[i-1], dp[i-2]+nums[i]). Can't take adjacent.<br><strong>Coin Change:</strong> dp[i] = min(dp[i-coin]+1) for each coin. Min coins for amount i.<br><strong>Decode Ways:</strong> dp[i] = ways to decode s[0..i-1]. Depends on single vs double digit validity.</div></div>`,
+
+`<div class="card"><div class="lbl">House Robber decision tree</div></div>
+<div class="code">nums = [2, 7, 9, 3, 1]
+dp[0] = 2   (take house 0)
+dp[1] = 7   (max(2,7) — take house 1 alone)
+dp[2] = 11  (max(dp[1], dp[0]+9) = max(7,11))
+dp[3] = 11  (max(dp[2], dp[1]+3) = max(11,10))
+dp[4] = 12  (max(dp[3], dp[2]+1) = max(11,12))
+Answer: 12 (houses 0,2,4: 2+9+1=12)</div>
+<div class="card"><div class="lbl">Coin Change BFS analogy</div><div class="ct">Think of dp[amount] as shortest path from 0 to amount where each coin is an edge of that weight. BFS would work too but DP is cleaner. dp[0]=0 (base). For each amount i, try each coin c: dp[i] = min(dp[i], dp[i-c]+1).</div></div>
+<div class="card"><div class="lbl">Decode Ways state</div><div class="ct">dp[i] = number of ways to decode s[0..i-1]. Two transitions: (1) single digit s[i-1] valid (1-9) → dp[i] += dp[i-1]. (2) double digit s[i-2..i-1] valid (10-26) → dp[i] += dp[i-2]. Edge case: '0' digit — not valid alone, only valid if preceded by 1 or 2.</div></div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>State</th><th>Time</th><th>Space</th></tr>
+<tr><td>Climbing Stairs</td><td>dp[i] = ways to reach i</td><td class="og">O(n)</td><td class="og">O(1)</td></tr>
+<tr><td>House Robber</td><td>dp[i] = max rob first i houses</td><td class="og">O(n)</td><td class="og">O(1)</td></tr>
+<tr><td>Coin Change</td><td>dp[i] = min coins for amount i</td><td class="og">O(n·m)</td><td class="og">O(n)</td></tr>
+<tr><td>Decode Ways</td><td>dp[i] = ways to decode s[0..i-1]</td><td class="og">O(n)</td><td class="og">O(1)</td></tr>
+<tr><td>House Robber II (circle)</td><td>Two runs: exclude first or last</td><td class="og">O(n)</td><td class="og">O(1)</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">Linear scan — look back 1 or 2</div><div class="pw">Climbing stairs, house robber. dp[i] depends on dp[i-1] and/or dp[i-2]. Space-optimize to O(1) using two variables.</div></div>
+<div class="pc"><div class="pn">Unbounded choices per state</div><div class="pw">Coin change. For each dp[i], iterate all coins. dp[i] = min/sum over all valid coins. Inner loop over choices, outer loop over states.</div></div>
+<div class="pc"><div class="pn">Conditional transitions</div><div class="pw">Decode ways. Transition is valid only if a condition holds (digit in range, character valid). Always check validity before adding to dp[i].</div></div>
+<div class="pc"><div class="pn">Circular constraint</div><div class="pw">House Robber II. Can't rob first and last. Run robber twice: once on nums[0..n-2], once on nums[1..n-1]. Answer = max of both runs.</div></div>`,
+
+`<div class="pc"><div class="pn">1. "Can't take adjacent" pattern</div><div class="trig">Mental trigger: "skip or take, but no two in a row"</div><div class="pw">dp[i] = max(dp[i-1], dp[i-2] + val[i]). Core house robber logic. Extends to: delete-and-earn, jump game variants.</div></div>
+<div class="pc"><div class="pn">2. "Min cost to reach amount" pattern</div><div class="trig">Mental trigger: "min coins/steps to reach target from choices"</div><div class="pw">dp[amount] = min over all choices c of dp[amount-c]+1. Init dp[0]=0, all others to INF. Check dp[i-c] != INF before using.</div></div>
+<div class="pc"><div class="pn">3. "Count distinct ways" pattern</div><div class="trig">Mental trigger: "how many ways to reach state i"</div><div class="pw">dp[i] += dp[i-step] for each valid step. Climbing stairs, decode ways, coin change II (count, not min). Be careful: += not = .</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"no two adjacent elements"</span><span class="sw">→ House Robber: dp[i]=max(dp[i-1], dp[i-2]+val[i])</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"min coins/steps to reach amount"</span><span class="sw">→ Coin Change: dp[i]=min(dp[i-c]+1) for each coin c</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"count ways to decode/split string"</span><span class="sw">→ Decode Ways: check 1-digit and 2-digit validity</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"circular array, can't use both ends"</span><span class="sw">→ House Robber II: two passes, take max</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"ways to make change (count, not min)"</span><span class="sw">→ Coin Change II: dp[i] += dp[i-coin] (order matters for outer/inner loop)</span></div>
+</div>`,
+
+`<div class="code">// LC 198 — House Robber
+int rob(int[] nums) {
+    int n = nums.length;
+    if (n == 1) return nums[0];
+    int prev2 = nums[0], prev1 = Math.max(nums[0], nums[1]);
+    for (int i = 2; i &lt; n; i++) {
+        int curr = Math.max(prev1, prev2 + nums[i]);
+        prev2 = prev1;
+        prev1 = curr;
+    }
+    return prev1;
+}
+
+// LC 322 — Coin Change
+int coinChange(int[] coins, int amount) {
+    int[] dp = new int[amount + 1];
+    Arrays.fill(dp, amount + 1);   // "infinity"
+    dp[0] = 0;
+    for (int i = 1; i &lt;= amount; i++)
+        for (int c : coins)
+            if (c &lt;= i)
+                dp[i] = Math.min(dp[i], dp[i - c] + 1);
+    return dp[amount] &gt; amount ? -1 : dp[amount];
+}
+
+// LC 91 — Decode Ways
+int numDecodings(String s) {
+    int n = s.length();
+    int prev2 = 1, prev1 = s.charAt(0) == '0' ? 0 : 1;
+    for (int i = 2; i &lt;= n; i++) {
+        int curr = 0;
+        int oneDigit  = Integer.parseInt(s.substring(i-1, i));
+        int twoDigits = Integer.parseInt(s.substring(i-2, i));
+        if (oneDigit &gt;= 1) curr += prev1;    // valid single digit
+        if (twoDigits &gt;= 10 &amp;&amp; twoDigits &lt;= 26) curr += prev2; // valid pair
+        prev2 = prev1; prev1 = curr;
+    }
+    return prev1;
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 322 — Coin Change deep dive</div><div class="ct">Given coins and an amount, find minimum coins to make exact change.</div></div>
+<div class="hl"><strong>Brute force:</strong> Backtracking — try every coin at each step. Exponential. Recomputes sub-amounts repeatedly.</div>
+<div class="code">// WHY DP: sub-amounts overlap massively.
+// amount=11, coins=[1,5,6,9]
+// dp[0]=0 (base)
+// dp[1]=min(dp[0]+1)=1
+// dp[5]=min(dp[4]+1, dp[0]+1)=1   ← take coin 5 directly
+// dp[6]=min(dp[5]+1, dp[0]+1)=1   ← take coin 6 directly
+// dp[9]=min(dp[8]+1, dp[3]+1, dp[0]+1)=1
+// dp[10]=min(dp[9]+1, dp[5]+1, dp[4]+1, dp[1]+1)=2 (9+1)
+// dp[11]=min(dp[10]+1, dp[6]+1, dp[5]+1, dp[2]+1)=2 (5+6)
+// Answer: 2
+
+// Key: dp[i] depends on ALL previous amounts minus coin value.
+// Outer loop: amounts 1..n.  Inner loop: each coin.
+// Init with "infinity" so min() works correctly.</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 70 — Climbing Stairs</div><div class="pmeta"><strong>Why:</strong> Intro. Fibonacci disguise. dp[i]=dp[i-1]+dp[i-2].<br><strong>Key insight:</strong> You arrive from i-1 or i-2 → add both ways.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 198 — House Robber</div><div class="pmeta"><strong>Why:</strong> Include/exclude with adjacency constraint.<br><strong>Key insight:</strong> Space-optimize to two variables.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 322 — Coin Change</div><div class="pmeta"><strong>Why:</strong> BFS-like DP over amounts. Min cost with choices.<br><strong>Key insight:</strong> Init dp[1..n]=INF. Check dp[i-c]!=INF.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 91 — Decode Ways</div><div class="pmeta"><strong>Why:</strong> Conditional transitions. "0" is the tricky edge case.<br><strong>Key insight:</strong> Both 1-digit and 2-digit transitions, each conditioned.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 123 — Best Time to Buy/Sell Stock III</div><div class="pmeta"><strong>Why:</strong> State machines in 1D DP. 5 states: no trans, held1, sold1, held2, sold2.<br><strong>Key insight:</strong> Each state's max updated by valid preceding state.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Do you initialize dp correctly (INF vs 0 depends on min vs count)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you spot the O(1) space optimization after writing O(n)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you handle edge cases: empty array, amount=0, s starts with '0'?</span></div>
+</div>
+<div class="hl"><strong>Common mistakes:</strong> Forgetting to check dp[i-c] != INF before using it in coin change. In decode ways, not handling leading zeros. In house robber circular, forgetting to handle n=1 and n=2 specially.</div>`
+]},
+
+{title:"2D DP",sub:"Unique paths · Minimum path sum · Edit distance",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">2D DP uses a 2D table dp[i][j] where the state is defined by two indices — typically (row, column) for grid problems or (i, j) for two-sequence problems. The recurrence combines values from adjacent cells. Classic problems: unique paths (grid counting), minimum path sum (grid optimization), edit distance (string transformation).</div></div>
+<div class="hl">2D DP recognition: "grid traversal with cost" OR "two sequences being compared/aligned" → two indices needed to describe a state.</div>
+<div class="card"><div class="lbl">State intuition</div><div class="ct"><strong>Grid DP:</strong> dp[i][j] = answer when at cell (i,j). Depends on dp[i-1][j] (from above) and dp[i][j-1] (from left).<br><strong>String DP:</strong> dp[i][j] = answer considering first i chars of s1 and first j chars of s2. Depends on dp[i-1][j], dp[i][j-1], dp[i-1][j-1].</div></div>`,
+
+`<div class="card"><div class="lbl">Edit distance state transitions</div></div>
+<div class="code">// Edit Distance: s="horse", t="ros"
+//     ""  r  o  s
+// ""   0  1  2  3    (base: insert j chars)
+// h    1  1  2  3
+// o    2  2  1  2
+// r    3  2  2  2
+// s    4  3  3  2
+// e    5  4  4  3    ← answer: 3 operations
+//
+// Recurrence:
+// if s[i-1] == t[j-1]: dp[i][j] = dp[i-1][j-1]  (no op needed)
+// else: dp[i][j] = 1 + min(
+//     dp[i-1][j],    // delete from s
+//     dp[i][j-1],    // insert into s
+//     dp[i-1][j-1]   // replace in s
+// )</div>
+<div class="card"><div class="lbl">Space optimization for 2D DP</div><div class="ct">Many 2D DP only look at the previous row. So instead of dp[m][n], use two 1D arrays: prev[] and curr[]. Update curr from prev. At each row end, swap. This reduces O(m·n) space to O(n).</div></div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>State</th><th>Time</th><th>Space</th></tr>
+<tr><td>Unique Paths</td><td>dp[i][j] = paths to (i,j)</td><td class="og">O(m·n)</td><td class="og">O(n)</td></tr>
+<tr><td>Min Path Sum</td><td>dp[i][j] = min cost to (i,j)</td><td class="og">O(m·n)</td><td class="og">O(n)</td></tr>
+<tr><td>Edit Distance</td><td>dp[i][j] = ops to align s[0..i], t[0..j]</td><td class="og">O(m·n)</td><td class="og">O(n)</td></tr>
+<tr><td>LCS</td><td>dp[i][j] = LCS of s[0..i], t[0..j]</td><td class="og">O(m·n)</td><td class="og">O(n)</td></tr>
+<tr><td>Unique Paths II (obstacles)</td><td>dp[i][j]=0 if obstacle</td><td class="og">O(m·n)</td><td class="og">O(n)</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">Grid traversal (right+down only)</div><div class="pw">Unique paths, min path sum. dp[i][j] comes from dp[i-1][j] and dp[i][j-1]. Base: first row and first column.</div></div>
+<div class="pc"><div class="pn">String alignment (3-way choice)</div><div class="pw">Edit distance, LCS. dp[i][j] depends on dp[i-1][j], dp[i][j-1], dp[i-1][j-1]. Match/mismatch/insert/delete.</div></div>
+<div class="pc"><div class="pn">Grid with obstacles</div><div class="pw">Unique Paths II. If obstacle at (i,j), dp[i][j]=0. Otherwise same recurrence. Be careful about first row/column initialization with obstacles.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Count paths in grid</div><div class="trig">Mental trigger: "how many ways from top-left to bottom-right"</div><div class="pw">dp[i][j] = dp[i-1][j] + dp[i][j-1]. Base: dp[0][j]=1, dp[i][0]=1 (one way along border).</div></div>
+<div class="pc"><div class="pn">2. Optimal path in grid</div><div class="trig">Mental trigger: "min/max cost path from corner to corner"</div><div class="pw">dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1]).</div></div>
+<div class="pc"><div class="pn">3. String transformation cost</div><div class="trig">Mental trigger: "transform s into t with min operations"</div><div class="pw">Edit distance. Three operations: insert, delete, replace → 3-way recurrence.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"grid, move only right/down, count paths"</span><span class="sw">→ Unique paths DP: dp[i][j]=dp[i-1][j]+dp[i][j-1]</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"grid, move only right/down, minimize cost"</span><span class="sw">→ Min path sum: dp[i][j]=grid[i][j]+min(top,left)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"min operations to convert s to t"</span><span class="sw">→ Edit distance: 3-way recurrence with insert/delete/replace</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"longest common substring of two strings"</span><span class="sw">→ 2D DP: dp[i][j]=dp[i-1][j-1]+1 if chars match, else 0</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">obstacle cells block paths</span><span class="sw">→ Set dp[i][j]=0 for obstacle; adjust border initialization</span></div>
+</div>`,
+
+`<div class="code">// LC 62 — Unique Paths
+int uniquePaths(int m, int n) {
+    int[] dp = new int[n];
+    Arrays.fill(dp, 1);            // base: first row all 1s
+    for (int i = 1; i &lt; m; i++)
+        for (int j = 1; j &lt; n; j++)
+            dp[j] += dp[j-1];      // dp[j]=from_above + dp[j-1]=from_left
+    return dp[n-1];
+}
+
+// LC 64 — Minimum Path Sum
+int minPathSum(int[][] grid) {
+    int m = grid.length, n = grid[0].length;
+    int[] dp = new int[n];
+    dp[0] = grid[0][0];
+    for (int j = 1; j &lt; n; j++) dp[j] = dp[j-1] + grid[0][j]; // first row
+    for (int i = 1; i &lt; m; i++) {
+        dp[0] += grid[i][0];       // first column: only from above
+        for (int j = 1; j &lt; n; j++)
+            dp[j] = grid[i][j] + Math.min(dp[j], dp[j-1]);
+    }
+    return dp[n-1];
+}
+
+// LC 72 — Edit Distance
+int minDistance(String s, String t) {
+    int m = s.length(), n = t.length();
+    int[] dp = new int[n+1];
+    for (int j = 0; j &lt;= n; j++) dp[j] = j;  // base: delete all of t
+    for (int i = 1; i &lt;= m; i++) {
+        int prev = dp[0];
+        dp[0] = i;                 // base: delete first i chars of s
+        for (int j = 1; j &lt;= n; j++) {
+            int temp = dp[j];
+            if (s.charAt(i-1) == t.charAt(j-1)) dp[j] = prev;
+            else dp[j] = 1 + Math.min(prev, Math.min(dp[j], dp[j-1]));
+            prev = temp;
+        }
+    }
+    return dp[n];
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 72 — Edit Distance walkthrough</div></div>
+<div class="hl"><strong>Why DP?</strong> At each character pair (i,j), the decision (match/insert/delete/replace) depends on the optimal answer for 3 smaller subproblems. These overlap across all character pairs → DP.</div>
+<div class="code">// "horse" → "ros": 3 operations
+// Filling dp[i][j] for i=1 (h), j=1 (r):
+//   h != r → 1 + min(dp[0][1]=1, dp[1][0]=1, dp[0][0]=0) = 1
+// For i=2 (o), j=2 (o):
+//   o == o → dp[1][1] = 1  (no cost, inherited diagonally)
+//
+// Three operations:
+//   dp[i-1][j]:   delete s[i] (move up in table)
+//   dp[i][j-1]:   insert t[j] into s (move left)
+//   dp[i-1][j-1]: replace s[i] with t[j] (move diagonal)</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 62 — Unique Paths</div><div class="pmeta"><strong>Why:</strong> Cleanest 2D DP intro. Space optimize to 1D easily.<br><strong>Key insight:</strong> dp[j] += dp[j-1] in-place works as "from above + from left".</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 64 — Minimum Path Sum</div><div class="pmeta"><strong>Why:</strong> Adds cost function to grid traversal.<br><strong>Key insight:</strong> Same 1D optimization. First row/col handled separately.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 72 — Edit Distance</div><div class="pmeta"><strong>Why:</strong> 2D DP with 3-way recurrence. Classic string alignment.<br><strong>Key insight:</strong> Track prev diagonal value when doing 1D space optimization.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1143 — Longest Common Subsequence</div><div class="pmeta"><strong>Why:</strong> Foundation for edit distance and diff algorithms.<br><strong>Key insight:</strong> If match: dp[i][j]=dp[i-1][j-1]+1. Else: max of top/left.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 115 — Distinct Subsequences</div><div class="pmeta"><strong>Why:</strong> Count 2D DP with careful transition (no replace/delete here).<br><strong>Key insight:</strong> dp[i][j] = dp[i-1][j] always + dp[i-1][j-1] if chars match.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you set up base cases correctly for first row and column?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you space-optimize 2D → 1D and handle the "prev diagonal" issue in edit distance?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you know which direction to fill the table?</span></div>
+</div>
+<div class="hl"><strong>Space optimization trick:</strong> When going 2D→1D for edit distance, you need to save dp[i-1][j-1] before overwriting dp[j]. Store it in a variable called prev before the inner loop updates dp[j].</div>`
+]},
+
+{title:"Knapsack Patterns",sub:"0/1 knapsack · Unbounded · Partition equal subset sum",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Knapsack problems involve selecting items with weights/values to maximize value within a weight constraint. Three variants: <strong>0/1 knapsack</strong> (each item used at most once), <strong>unbounded knapsack</strong> (each item usable unlimited times), <strong>partition/subset sum</strong> (can we partition into groups with equal sum?). These three variants share one template with small changes.</div></div>
+<div class="hl">Knapsack template: dp[i][w] = best value using first i items with capacity w. Decision: include item i (w≥weight[i]) or exclude it.</div>
+<div class="card"><div class="lbl">Key variants comparison</div><div class="ct"><strong>0/1 knapsack:</strong> each item once → iterate items outer, capacity inner (backwards or 2D).<br><strong>Unbounded knapsack:</strong> infinite copies → iterate capacity inner forward.<br><strong>Subset sum:</strong> is a particular sum achievable? → boolean dp.</div></div>`,
+
+`<div class="card"><div class="lbl">0/1 vs Unbounded mechanics</div></div>
+<div class="code">// 0/1 Knapsack — each item used AT MOST ONCE
+// Iterate capacity BACKWARDS in 1D to prevent reuse:
+for (int i = 0; i &lt; n; i++)
+    for (int w = capacity; w &gt;= weight[i]; w--)  // BACKWARDS
+        dp[w] = Math.max(dp[w], dp[w - weight[i]] + value[i]);
+
+// Unbounded Knapsack — each item can be used UNLIMITED times
+// Iterate capacity FORWARDS to allow reuse:
+for (int i = 0; i &lt; n; i++)
+    for (int w = weight[i]; w &lt;= capacity; w++)  // FORWARDS
+        dp[w] = Math.max(dp[w], dp[w - weight[i]] + value[i]);</div>
+<div class="hl"><strong>The one rule to remember:</strong> Backwards = each item once (0/1). Forwards = unlimited reuse (unbounded). This is the ONLY difference in code.</div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>Time</th><th>Space</th><th>Key difference</th></tr>
+<tr><td>0/1 Knapsack</td><td class="og">O(n·W)</td><td class="og">O(W)</td><td>Inner loop backwards</td></tr>
+<tr><td>Unbounded Knapsack</td><td class="og">O(n·W)</td><td class="og">O(W)</td><td>Inner loop forwards</td></tr>
+<tr><td>Subset Sum (bool)</td><td class="og">O(n·W)</td><td class="og">O(W)</td><td>Boolean dp, OR logic</td></tr>
+<tr><td>Partition Equal Subset</td><td class="og">O(n·sum)</td><td class="og">O(sum)</td><td>Target = total/2</td></tr>
+<tr><td>Coin Change (unbounded)</td><td class="og">O(n·W)</td><td class="og">O(W)</td><td>Min instead of max, forward loop</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">0/1 Knapsack</div><div class="pw">Each item used once. dp[w] = max value achievable with capacity w. Iterate capacity backwards so each item is only counted once per pass.</div></div>
+<div class="pc"><div class="pn">Unbounded Knapsack</div><div class="pw">Items reusable. Same DP but forward iteration lets current item be used again in same pass. E.g., coin change, integer break.</div></div>
+<div class="pc"><div class="pn">Subset Sum / Partition</div><div class="pw">Boolean variant. dp[w] = can we achieve exactly weight w? Use OR: dp[w] |= dp[w-weight[i]]. Target: sum/2 for partition problem.</div></div>`,
+
+`<div class="pc"><div class="pn">1. "Select items, max value, limited capacity"</div><div class="trig">Mental trigger: "0/1 knapsack — each item once"</div><div class="pw">2D: dp[i][w] = max(dp[i-1][w], dp[i-1][w-wt[i]]+val[i]). 1D: backwards inner loop.</div></div>
+<div class="pc"><div class="pn">2. "Can we partition into equal sums?"</div><div class="trig">Mental trigger: "subset sum is total/2"</div><div class="pw">Compute total. If odd, return false. Run subset sum DP with target=total/2. Boolean result.</div></div>
+<div class="pc"><div class="pn">3. "Unlimited items, reach target"</div><div class="trig">Mental trigger: "unbounded → coin change / integer break"</div><div class="pw">Forward inner loop. dp[0]=0 or 1 (base). Fill up to target.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"select items, max value, each item once"</span><span class="sw">→ 0/1 Knapsack — backwards inner loop</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"select items, items reusable"</span><span class="sw">→ Unbounded knapsack — forward inner loop</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"can array be partitioned into two equal sums"</span><span class="sw">→ Subset sum target=total/2. Boolean DP.</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"minimum coins for exact amount"</span><span class="sw">→ Unbounded knapsack variant: min instead of max</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"number of ways to reach sum"</span><span class="sw">→ Count knapsack: dp[w] += dp[w-wt[i]]</span></div>
+</div>`,
+
+`<div class="code">// LC 416 — Partition Equal Subset Sum
+boolean canPartition(int[] nums) {
+    int total = Arrays.stream(nums).sum();
+    if (total % 2 != 0) return false;  // odd total → impossible
+    int target = total / 2;
+    boolean[] dp = new boolean[target + 1];
+    dp[0] = true;                      // empty subset sums to 0
+    for (int num : nums)
+        for (int w = target; w &gt;= num; w--)  // BACKWARDS = 0/1
+            dp[w] |= dp[w - num];
+    return dp[target];
+}
+
+// Classic 0/1 Knapsack (max value)
+int knapsack(int[] weights, int[] values, int W) {
+    int[] dp = new int[W + 1];
+    for (int i = 0; i &lt; weights.length; i++)
+        for (int w = W; w &gt;= weights[i]; w--)  // BACKWARDS
+            dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);
+    return dp[W];
+}
+
+// Unbounded Knapsack (coin change — min coins)
+int coinChange(int[] coins, int amount) {
+    int[] dp = new int[amount + 1];
+    Arrays.fill(dp, amount + 1);
+    dp[0] = 0;
+    for (int coin : coins)
+        for (int w = coin; w &lt;= amount; w++)   // FORWARDS
+            dp[w] = Math.min(dp[w], dp[w - coin] + 1);
+    return dp[amount] &gt; amount ? -1 : dp[amount];
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 416 — Partition Equal Subset walkthrough</div></div>
+<div class="hl"><strong>Why it's knapsack:</strong> Can we "fill a knapsack" of capacity total/2 using these numbers as item weights (value=weight, each used once)?</div>
+<div class="code">// nums=[1,5,11,5], total=22, target=11
+// dp = [T,F,F,F,F,F,F,F,F,F,F,F]  (size 12)
+//
+// Process 1: w=11..1 backwards
+//   dp[1] |= dp[0] → dp[1]=T
+// Process 5: w=11..5
+//   dp[6] |= dp[1] → dp[6]=T
+//   dp[5] |= dp[0] → dp[5]=T
+// Process 11: w=11
+//   dp[11] |= dp[0] → dp[11]=T  ← TARGET REACHED
+// Process 5: ...doesn't matter, already found
+// return dp[11] = true ✓
+// Partition: {1,5,5} and {11}</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 416 — Partition Equal Subset Sum</div><div class="pmeta"><strong>Why:</strong> Classic 0/1 knapsack in disguise. Boolean DP.<br><strong>Key insight:</strong> Target = total/2. Backwards loop prevents reuse.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 518 — Coin Change II</div><div class="pmeta"><strong>Why:</strong> Count ways (not min). Unbounded → forward loop.<br><strong>Key insight:</strong> Outer=coins, inner=amounts forward → combinations (not permutations).</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 494 — Target Sum</div><div class="pmeta"><strong>Why:</strong> Count ways to assign +/- to reach target. 0/1 knapsack counting variant.<br><strong>Key insight:</strong> Reduce to subset sum: (pos_sum - neg_sum = target, pos+neg=total).</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 474 — Ones and Zeroes</div><div class="pmeta"><strong>Why:</strong> 2D knapsack. Two capacity dimensions: count of 0s and 1s.<br><strong>Key insight:</strong> dp[i][j] = max strings using at most i zeros and j ones.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 879 — Profitable Schemes</div><div class="pmeta"><strong>Why:</strong> 2D knapsack: member limit AND profit threshold. Count solutions.<br><strong>Key insight:</strong> dp[member][profit] = count schemes. Profit clamped at minProfit.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you explain WHY backward loop = 0/1 and forward loop = unbounded?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you reduce partition sum to a knapsack formulation on the fly?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you know when to swap outer/inner loop order (items vs capacity)?</span></div>
+</div>
+<div class="hl"><strong>Loop order matters for counting:</strong> Outer=capacities, inner=items → counts permutations. Outer=items, inner=capacities → counts combinations. Coin Change II needs combinations (outer=coins, inner=amounts).</div>`
+]},
+
+{title:"Longest Subsequences",sub:"LCS · LIS with O(n log n) patience sorting",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct"><strong>LCS (Longest Common Subsequence):</strong> longest sequence of characters appearing in both strings in the same relative order (not necessarily contiguous).<br><br><strong>LIS (Longest Increasing Subsequence):</strong> longest subsequence of a given array where elements are strictly increasing. Classic O(n²) DP exists; patience sorting enables O(n log n).</div></div>
+<div class="hl">Subsequence ≠ substring. Subsequence elements don't need to be contiguous. "ace" is a subsequence of "abcde" but not a substring.</div>
+<div class="card"><div class="lbl">LCS vs LCS</div><div class="ct"><strong>LCS (subsequence):</strong> dp[i][j] = 0 if chars differ (take max of dp[i-1][j], dp[i][j-1]).<br><strong>LCS (substring, contiguous):</strong> dp[i][j] = 0 if chars differ (reset to 0), else dp[i-1][j-1]+1. Track running max.</div></div>`,
+
+`<div class="card"><div class="lbl">Patience sorting for LIS — O(n log n)</div></div>
+<div class="code">// Patience sorting intuition: maintain "piles"
+// Rule: place card on leftmost pile whose top is >= card.
+//       If none found, start new pile.
+// Number of piles = LIS length.
+//
+// nums = [10, 9, 2, 5, 3, 7, 101, 18]
+// Process 10: piles=[[10]]
+// Process 9:  9 &lt; 10, replace top: piles=[[9]]
+// Process 2:  2 &lt; 9, replace top: piles=[[2]]
+// Process 5:  5 &gt; 2, new pile:   piles=[[2],[5]]
+// Process 3:  3 &lt; 5, replace:    piles=[[2],[3]]
+// Process 7:  7 &gt; 3, new pile:   piles=[[2],[3],[7]]
+// Process 101: new pile:          piles=[[2],[3],[7],[101]]
+// Process 18: 18&lt;101, replace:   piles=[[2],[3],[7],[18]]
+// Answer: 4 piles = LIS length 4 → [2,3,7,18] or [2,5,7,101] etc.
+//
+// Binary search finds the correct pile in O(log n)</div>`,
+
+`<table class="ctbl"><tr><th>Algorithm</th><th>Time</th><th>Space</th><th>Notes</th></tr>
+<tr><td>LCS</td><td class="og">O(m·n)</td><td class="og">O(n)</td><td>2D DP space-optimized to 1D</td></tr>
+<tr><td>LIS — O(n²)</td><td class="om">O(n²)</td><td class="og">O(n)</td><td>dp[i] = max LIS ending at index i</td></tr>
+<tr><td>LIS — Patience O(n log n)</td><td class="og">O(n log n)</td><td class="og">O(n)</td><td>Binary search on piles array</td></tr>
+<tr><td>LCS as LIS</td><td class="og">O(n log n)</td><td class="og">O(n)</td><td>If one string has distinct chars, reduce LCS to LIS</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">LCS — 2D DP</div><div class="pw">dp[i][j]: if match, dp[i-1][j-1]+1. If no match, max(dp[i-1][j], dp[i][j-1]). Space optimize to 1D with diagonal tracking.</div></div>
+<div class="pc"><div class="pn">LIS — O(n²) DP</div><div class="pw">dp[i] = longest increasing subsequence ending at nums[i]. For each i, look back at all j&lt;i where nums[j]&lt;nums[i]: dp[i]=max(dp[j])+1.</div></div>
+<div class="pc"><div class="pn">LIS — O(n log n) Patience</div><div class="pw">Maintain tails[] array where tails[i] = smallest tail element of all increasing subsequences of length i+1. Binary search to place each element.</div></div>
+<div class="pc"><div class="pn">LCS Variants</div><div class="pw">Longest Common Substring (reset on mismatch). Shortest Common Supersequence (m+n-LCS). Edit Distance (related to LCS). Many string problems reduce to these.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Two-sequence alignment</div><div class="trig">Mental trigger: "longest common / minimum edits between two strings"</div><div class="pw">LCS or edit distance. Set up dp[i][j] over both string lengths. Fill in order.</div></div>
+<div class="pc"><div class="pn">2. Monotone subsequence in array</div><div class="trig">Mental trigger: "longest increasing / decreasing / non-decreasing sequence"</div><div class="pw">LIS variants. O(n log n) patience sorting. Longest decreasing = reverse + LIS.</div></div>
+<div class="pc"><div class="pn">3. LIS as building block</div><div class="trig">Mental trigger: "Russian dolls / envelopes / box stacking"</div><div class="pw">Sort by one dimension, run LIS on the other. Classic LIS reduction.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"longest common subsequence of two strings"</span><span class="sw">→ LCS 2D DP: match→diagonal+1, no match→max(top,left)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"longest increasing subsequence"</span><span class="sw">→ Patience sort O(n log n): tails[] + binary search</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"nesting / stacking with two constraints"</span><span class="sw">→ Sort by one dim, LIS on other (Russian Dolls pattern)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"number of longest increasing subsequences"</span><span class="sw">→ O(n²) DP tracking both length and count arrays</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"shortest string containing both as subsequences"</span><span class="sw">→ Shortest Common Supersequence = m+n-LCS(m,n)</span></div>
+</div>`,
+
+`<div class="code">// LC 1143 — Longest Common Subsequence
+int longestCommonSubsequence(String s, String t) {
+    int m = s.length(), n = t.length();
+    int[] dp = new int[n + 1];
+    for (int i = 1; i &lt;= m; i++) {
+        int prev = 0;              // tracks dp[i-1][j-1]
+        for (int j = 1; j &lt;= n; j++) {
+            int temp = dp[j];
+            if (s.charAt(i-1) == t.charAt(j-1))
+                dp[j] = prev + 1; // chars match: extend diagonal
+            else
+                dp[j] = Math.max(dp[j], dp[j-1]); // no match: max(top,left)
+            prev = temp;
+        }
+    }
+    return dp[n];
+}
+
+// LC 300 — Longest Increasing Subsequence O(n log n)
+int lengthOfLIS(int[] nums) {
+    List&lt;Integer&gt; tails = new ArrayList&lt;&gt;();
+    for (int num : nums) {
+        int lo = 0, hi = tails.size();
+        while (lo &lt; hi) {          // binary search: first tail &gt;= num
+            int mid = (lo + hi) / 2;
+            if (tails.get(mid) &lt; num) lo = mid + 1;
+            else hi = mid;
+        }
+        if (lo == tails.size()) tails.add(num);  // new pile
+        else tails.set(lo, num);                 // replace top
+    }
+    return tails.size();           // number of piles = LIS length
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 354 — Russian Doll Envelopes (LIS application)</div></div>
+<div class="hl"><strong>Pattern:</strong> Sort by width ASC, then height DESC. Run LIS on heights. DESC height sorting prevents counting same-width envelopes.</div>
+<div class="code">// WHY DESC for same width:
+// If we sort height ASC for same width, LIS could pick
+// multiple same-width envelopes. DESC prevents that:
+// width=5: heights [3,4,6] sorted desc = [6,4,3]
+// LIS can only pick ONE of these (each is smaller than prev)
+int maxEnvelopes(int[][] env) {
+    Arrays.sort(env, (a,b) -&gt; a[0]!=b[0] ? a[0]-b[0] : b[1]-a[1]);
+    int[] heights = Arrays.stream(env).mapToInt(e-&gt;e[1]).toArray();
+    // now run O(n log n) LIS on heights
+    List&lt;Integer&gt; tails = new ArrayList&lt;&gt;();
+    for (int h : heights) {
+        int pos = Collections.binarySearch(tails, h);
+        if (pos &lt; 0) pos = -(pos+1);
+        if (pos == tails.size()) tails.add(h);
+        else tails.set(pos, h);
+    }
+    return tails.size();
+}</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1143 — Longest Common Subsequence</div><div class="pmeta"><strong>Why:</strong> Foundation of all string alignment DP.<br><strong>Key insight:</strong> Track prev diagonal for 1D space optimization.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 300 — Longest Increasing Subsequence</div><div class="pmeta"><strong>Why:</strong> Must know O(n log n) patience sort approach.<br><strong>Key insight:</strong> tails[i] = smallest tail of LIS of length i+1.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 354 — Russian Doll Envelopes</div><div class="pmeta"><strong>Why:</strong> LIS in 2D. Sort trick to reduce 2D to 1D.<br><strong>Key insight:</strong> Sort width ASC, height DESC → run LIS on height.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1048 — Longest String Chain</div><div class="pmeta"><strong>Why:</strong> LIS variant on strings. Sort by length, check predecessor.<br><strong>Key insight:</strong> dp[word] = longest chain ending at word. Try removing each char.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1092 — Shortest Common Supersequence</div><div class="pmeta"><strong>Why:</strong> Build on LCS. Reconstruct the actual supersequence string.<br><strong>Key insight:</strong> Use LCS DP table to reconstruct merged string.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you prove tails[] produces correct LIS length (not actual sequence)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you know WHY we replace (not skip) when binary search hits an existing value?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you explain the Russian Doll sort trick — especially DESC height for same width?</span></div>
+</div>
+<div class="hl"><strong>Common confusion:</strong> tails[] is NOT the actual LIS — it's a synthetic array used to track pile tops. The values in tails[] at the end may not form an increasing sequence themselves. The LENGTH of tails is what matters.</div>`
+]},
+
+{title:"Interval DP",sub:"Burst balloons · Matrix chain multiplication",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Interval DP solves problems on contiguous subarrays/substrings. State dp[i][j] = optimal answer for the interval [i, j]. The key insight: <strong>enumerate a "split point" k within [i,j]</strong> and combine dp[i][k] and dp[k][j]. Fill table by increasing interval length.</div></div>
+<div class="hl">Interval DP recognition: "optimal way to process a contiguous range" or "what's the last operation performed?" — the answer to the latter gives the split point k.</div>
+<div class="card"><div class="lbl">Fill order (critical)</div><div class="ct">Fill by increasing interval length. Start with length 1 (base), then 2, then 3, ..., finally length n. When filling dp[i][j] of length L, all dp[i][k] and dp[k][j] of shorter lengths are already filled.</div></div>`,
+
+`<div class="card"><div class="lbl">Burst Balloons — the "last to burst" trick</div></div>
+<div class="code">// nums = [3, 1, 5, 8] → add sentinels: [1, 3, 1, 5, 8, 1]
+// dp[i][j] = max coins from bursting all balloons between i and j (exclusive)
+//
+// Key insight: instead of "first to burst", think "LAST to burst k in [i,j]"
+// When k is last, its neighbors are nums[i] and nums[j] (not yet burst)
+// Coins for bursting k last = nums[i]*nums[k]*nums[j]
+// Total = dp[i][k] + coins_for_k + dp[k][j]
+//
+// Fill by interval length:
+// len=2: all dp[i][i+2] (one balloon between sentinels)
+// len=3: dp[i][i+3], etc.
+// Answer: dp[0][n+1] (full range with sentinels)</div>
+<div class="card"><div class="lbl">Matrix Chain Multiplication</div><div class="ct">Given n matrices, find optimal parenthesization to minimize scalar multiplications. dp[i][j] = min cost to multiply matrices i through j. Split at k: cost = dp[i][k] + dp[k+1][j] + dims[i-1]*dims[k]*dims[j].</div></div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>State</th><th>Time</th><th>Space</th></tr>
+<tr><td>Burst Balloons</td><td>dp[i][j] = max coins in (i,j)</td><td class="om">O(n³)</td><td class="om">O(n²)</td></tr>
+<tr><td>Matrix Chain</td><td>dp[i][j] = min ops for i..j</td><td class="om">O(n³)</td><td class="om">O(n²)</td></tr>
+<tr><td>Palindrome Partition (min cuts)</td><td>dp[i][j] = min cuts in i..j</td><td class="om">O(n³) or O(n²)</td><td class="om">O(n²)</td></tr>
+<tr><td>Stone Merge</td><td>dp[i][j] = min cost to merge i..j</td><td class="om">O(n³)</td><td class="om">O(n²)</td></tr>
+</table>
+<div class="hl" style="margin-top:10px">All interval DP problems run O(n³) from three nested loops: outer two define the interval, inner one enumerates split points.</div>`,
+
+`<div class="pc"><div class="pn">Last-split-point insight</div><div class="pw">Ask: "what is the last operation in [i,j]?" That operation is the split point k. Think backwards from the final state.</div></div>
+<div class="pc"><div class="pn">Sentinel padding</div><div class="pw">Burst Balloons adds 1s at both ends. This avoids boundary checks when a balloon at edge is burst last. A common interval DP technique.</div></div>
+<div class="pc"><div class="pn">Fill by length</div><div class="pw">len=1 (base), len=2, ..., len=n. Or equivalently: for each i from n to 0, for each j from i+1 to n.</div></div>`,
+
+`<div class="pc"><div class="pn">1. "Best way to merge a range"</div><div class="trig">Mental trigger: "cost to combine [i..j] depends on how you split it"</div><div class="pw">Interval DP with split point k. Stone merge, matrix chain, optimal BST.</div></div>
+<div class="pc"><div class="pn">2. "Reverse the order of operations"</div><div class="trig">Mental trigger: "last to be removed / processed defines the structure"</div><div class="pw">Burst balloons: thinking about last balloon burst instead of first simplifies the dependencies.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"burst/remove elements, gain depends on neighbors"</span><span class="sw">→ Burst Balloons: think last-to-burst, dp[i][j] over intervals</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"optimal parenthesization of chain"</span><span class="sw">→ Matrix Chain / Interval DP with split point k</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"merge stones/piles with minimum cost"</span><span class="sw">→ Interval DP: dp[i][j] = min cost to merge i..j into one</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"optimal answer on every contiguous subarray"</span><span class="sw">→ Interval DP: fill by increasing length, O(n³)</span></div>
+</div>`,
+
+`<div class="code">// LC 312 — Burst Balloons
+int maxCoins(int[] nums) {
+    int n = nums.length;
+    int[] arr = new int[n + 2];    // sentinels
+    arr[0] = arr[n+1] = 1;
+    for (int i = 1; i &lt;= n; i++) arr[i] = nums[i-1];
+    int[][] dp = new int[n+2][n+2];
+
+    // Fill by interval length
+    for (int len = 2; len &lt;= n+1; len++) {        // length of interval
+        for (int i = 0; i &lt;= n+1-len; i++) {
+            int j = i + len;
+            for (int k = i+1; k &lt; j; k++) {        // k is LAST to burst
+                int coins = arr[i] * arr[k] * arr[j];
+                dp[i][j] = Math.max(dp[i][j], dp[i][k] + coins + dp[k][j]);
+            }
+        }
+    }
+    return dp[0][n+1];
+}
+
+// Matrix Chain Multiplication
+int matrixChain(int[] dims) {
+    int n = dims.length - 1;       // number of matrices
+    int[][] dp = new int[n][n];
+    for (int len = 2; len &lt;= n; len++) {
+        for (int i = 0; i &lt;= n-len; i++) {
+            int j = i + len - 1;
+            dp[i][j] = Integer.MAX_VALUE;
+            for (int k = i; k &lt; j; k++) {  // split point
+                int cost = dp[i][k] + dp[k+1][j] + dims[i]*dims[k+1]*dims[j+1];
+                dp[i][j] = Math.min(dp[i][j], cost);
+            }
+        }
+    }
+    return dp[0][n-1];
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 312 — Burst Balloons deep dive</div></div>
+<div class="hl"><strong>The inversion trick:</strong> Instead of deciding which balloon to burst FIRST (creates dependency on future state), decide which balloon to burst LAST in each subrange. When k is burst last in (i,j), its neighbors are definitively arr[i] and arr[j].</div>
+<div class="code">// dp[i][j] = max coins from open interval (i, j) — exclusive boundaries
+// Sentinels: arr[0]=arr[n+1]=1 handle edges cleanly
+// When k is last burst in (i,j):
+//   Left subproblem: burst all in (i,k) → dp[i][k]
+//   Right subproblem: burst all in (k,j) → dp[k][j]
+//   Burst k last: arr[i]*arr[k]*arr[j] (neighbors are sentinels/boundary)
+// Total: dp[i][k] + arr[i]*arr[k]*arr[j] + dp[k][j]</div>`,
+
+`<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 312 — Burst Balloons</div><div class="pmeta"><strong>Why:</strong> Hardest canonical interval DP. Tests "last operation" thinking.<br><strong>Key insight:</strong> Think last-to-burst. Add sentinel 1s at boundaries.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1039 — Minimum Score Triangulation of Polygon</div><div class="pmeta"><strong>Why:</strong> Interval DP on polygon vertices. Choose middle vertex of each triangle.<br><strong>Key insight:</strong> dp[i][j] = min score to triangulate polygon from i to j.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1000 — Minimum Cost to Merge Stones</div><div class="pmeta"><strong>Why:</strong> Interval DP with constraint (merge exactly k adjacent piles).<br><strong>Key insight:</strong> Only possible if (n-1) % (k-1) == 0.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 375 — Guess Number Higher or Lower II</div><div class="pmeta"><strong>Why:</strong> Interval DP minimax. Worst case over split point.<br><strong>Key insight:</strong> dp[i][j] = min of (k + max(dp[i][k-1], dp[k+1][j])) for k in [i,j].</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 546 — Remove Boxes</div><div class="pmeta"><strong>Why:</strong> Interval DP with extra state dimension (attached boxes count).<br><strong>Key insight:</strong> dp[i][j][k] = max points removing boxes[i..j] with k extra same-color boxes appended.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you identify the "split point" / "last operation" insight without hints?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you fill the table by interval length (not row by row)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you explain why boundary sentinels simplify the burst balloons solution?</span></div>
+</div>
+<div class="hl"><strong>Interview signal:</strong> Interval DP is rarely the first approach. Show you tried O(n³) brute force, recognized overlapping subproblems, and arrived at DP systematically. The "last operation" insight is the key unlock — mentioning it proactively impresses interviewers.</div>`
+]},
+
+{title:"DP on Strings",sub:"Palindromic substrings · Palindrome partitioning",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">String DP problems where the state involves positions within a single string. Two canonical forms: <strong>palindrome detection</strong> (dp[i][j] = is s[i..j] a palindrome?) and <strong>palindrome partitioning</strong> (min cuts to make all parts palindromes). Also covers: longest palindromic substring, count of palindromic substrings.</div></div>
+<div class="hl">Palindrome check: s[i..j] is palindrome ↔ s[i]==s[j] AND s[i+1..j-1] is palindrome. This recurrence makes DP natural.</div>
+<div class="card"><div class="lbl">Two approaches for palindromes</div><div class="ct"><strong>Expand around center:</strong> O(n²) time, O(1) space. For each center (n centers for odd, n-1 for even), expand outwards while characters match. Great for longest palindromic substring.<br><strong>DP table:</strong> O(n²) time and space. Precompute all palindrome ranges. Better when you need to query many ranges (e.g., palindrome partitioning).</div></div>`,
+
+`<div class="card"><div class="lbl">Palindrome DP table mechanics</div></div>
+<div class="code">// s = "aabaa"
+// isPalin[i][j] = true if s[i..j] is palindrome
+// Fill by length:
+// len=1: all single chars are palindromes → isPalin[i][i]=true
+// len=2: s[i]==s[i+1] → isPalin[i][i+1]=true
+// len≥3: s[i]==s[j] AND isPalin[i+1][j-1] → true
+//
+// isPalin table for "aabaa":
+//     a  a  b  a  a
+// a  [T  T  F  F  T]   (row i)
+// a  [   T  F  F  T]
+// b  [      T  F  F]
+// a  [         T  T]
+// a  [            T]
+// "aabaa" is palindrome: s[0]==s[4]='a' AND isPalin[1][3]="aba"=T</div>
+<div class="card"><div class="lbl">Palindrome partitioning — min cuts</div><div class="ct">dp[i] = min cuts for s[0..i]. For each j &lt;= i: if s[j..i] is palindrome, dp[i] = min(dp[i], dp[j-1]+1). Precompute isPalin table in O(n²), then fill dp in O(n²) total.</div></div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>Time</th><th>Space</th><th>Approach</th></tr>
+<tr><td>Longest Palindromic Substring</td><td class="og">O(n²)</td><td class="og">O(1)</td><td>Expand around center</td></tr>
+<tr><td>Count Palindromic Substrings</td><td class="og">O(n²)</td><td class="og">O(1)</td><td>Expand around center, count</td></tr>
+<tr><td>Palindrome Partitioning II (min cuts)</td><td class="og">O(n²)</td><td class="om">O(n²)</td><td>Precompute isPalin table + 1D DP</td></tr>
+<tr><td>Longest Palindromic Subsequence</td><td class="og">O(n²)</td><td class="og">O(n)</td><td>LCS of s and reverse(s)</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">Expand around center</div><div class="pw">O(1) space. Iterate each center, expand while s[l]==s[r]. Handle odd (single char center) and even (between two chars) separately.</div></div>
+<div class="pc"><div class="pn">DP palindrome table</div><div class="pw">O(n²) space. Precompute isPalin[i][j] for all pairs. Enables O(1) palindrome check during other DP computations.</div></div>
+<div class="pc"><div class="pn">LCS reduction</div><div class="pw">Longest palindromic subsequence = LCS(s, reverse(s)). Shortest palindrome by adding chars = n - LPS(s). Elegant reduction.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Palindrome range precomputation</div><div class="trig">Mental trigger: "need to check if multiple ranges are palindromes"</div><div class="pw">Precompute isPalin[i][j] in O(n²). Then partitioning or counting becomes O(n) or O(n²).</div></div>
+<div class="pc"><div class="pn">2. Minimum cuts for palindrome partition</div><div class="trig">Mental trigger: "split string into min palindromic substrings"</div><div class="pw">dp[i] = min cuts for s[0..i]. dp[i] = min(dp[j-1]+1) for all j where isPalin[j][i].</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"longest palindromic substring"</span><span class="sw">→ Expand around center: O(n²) time O(1) space</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"count palindromic substrings"</span><span class="sw">→ Expand around center, count expansions</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"min cuts to partition into palindromes"</span><span class="sw">→ Precompute isPalin table + 1D DP cuts</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"longest palindromic subsequence"</span><span class="sw">→ LCS(s, reverse(s))</span></div>
+</div>`,
+
+`<div class="code">// LC 5 — Longest Palindromic Substring (expand around center)
+String longestPalindrome(String s) {
+    int start = 0, maxLen = 1;
+    for (int center = 0; center &lt; s.length(); center++) {
+        // Odd length
+        int l = center, r = center;
+        while (l &gt;= 0 &amp;&amp; r &lt; s.length() &amp;&amp; s.charAt(l) == s.charAt(r)) {
+            if (r-l+1 &gt; maxLen) { maxLen=r-l+1; start=l; }
+            l--; r++;
+        }
+        // Even length
+        l = center; r = center+1;
+        while (l &gt;= 0 &amp;&amp; r &lt; s.length() &amp;&amp; s.charAt(l) == s.charAt(r)) {
+            if (r-l+1 &gt; maxLen) { maxLen=r-l+1; start=l; }
+            l--; r++;
+        }
+    }
+    return s.substring(start, start + maxLen);
+}
+
+// LC 132 — Palindrome Partitioning II (min cuts)
+int minCut(String s) {
+    int n = s.length();
+    boolean[][] isPalin = new boolean[n][n];
+    for (int len = 1; len &lt;= n; len++)
+        for (int i = 0; i &lt;= n-len; i++) {
+            int j = i + len - 1;
+            isPalin[i][j] = s.charAt(i) == s.charAt(j) &amp;&amp;
+                (len &lt;= 2 || isPalin[i+1][j-1]);
+        }
+    int[] dp = new int[n];
+    Arrays.fill(dp, Integer.MAX_VALUE);
+    for (int i = 0; i &lt; n; i++) {
+        if (isPalin[0][i]) { dp[i] = 0; continue; } // whole prefix is palindrome
+        for (int j = 1; j &lt;= i; j++)
+            if (isPalin[j][i])
+                dp[i] = Math.min(dp[i], dp[j-1] + 1);
+    }
+    return dp[n-1];
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 647 — Palindromic Substrings walkthrough</div></div>
+<div class="code">// Count all palindromic substrings in "aaa"
+// Expand around center:
+// center=0 (a): expand → "a"(1); no even
+// center=1 (a): expand → "a"(1), then "aaa"(1); even: "aa"(1)
+// center=2 (a): expand → "a"(1), then "aaa" already counted from center 1?
+//   No — each expansion from each center is counted independently
+//   expand → "a", "aaa"
+// Total: a(0), a(1), a(2), aa(0-1), aa(1-2), aaa(0-2) = 6
+
+int countSubstrings(String s) {
+    int count = 0;
+    for (int c = 0; c &lt; s.length(); c++) {
+        count += expand(s, c, c);   // odd
+        count += expand(s, c, c+1); // even
+    }
+    return count;
+}
+int expand(String s, int l, int r) {
+    int cnt = 0;
+    while (l &gt;= 0 &amp;&amp; r &lt; s.length() &amp;&amp; s.charAt(l--) == s.charAt(r++))
+        cnt++;
+    return cnt;
+}</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 5 — Longest Palindromic Substring</div><div class="pmeta"><strong>Why:</strong> Expand around center. Must handle odd and even lengths.<br><strong>Key insight:</strong> 2n-1 possible centers (n odd + n-1 even).</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 647 — Palindromic Substrings</div><div class="pmeta"><strong>Why:</strong> Same expand technique, count instead of max length.<br><strong>Key insight:</strong> Each successful expansion = one palindromic substring.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 516 — Longest Palindromic Subsequence</div><div class="pmeta"><strong>Why:</strong> Subsequence (not substring). LCS of s and reverse(s).<br><strong>Key insight:</strong> Or: dp[i][j] = dp[i+1][j-1]+2 if match, else max(dp[i+1][j],dp[i][j-1]).</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 132 — Palindrome Partitioning II</div><div class="pmeta"><strong>Why:</strong> Combines palindrome precomputation with cut DP.<br><strong>Key insight:</strong> Precompute isPalin[i][j] first in O(n²), then cuts in O(n²).</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 214 — Shortest Palindrome</div><div class="pmeta"><strong>Why:</strong> Find longest palindrome prefix using KMP failure function.<br><strong>Key insight:</strong> Build s+"#"+reverse(s), run KMP, failure[last] = longest palindrome prefix.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Do you know both approaches (expand center vs DP table) and when to use each?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you handle both odd and even length palindromes?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you reduce LPS to LCS on the spot?</span></div>
+</div>
+<div class="hl"><strong>Choose expand over DP table when:</strong> only need one palindrome query (not multiple). DP table when you need to precompute all ranges for further DP (like min cuts). Expand = O(1) space; DP table = O(n²) space.</div>`
+]},
+
+{title:"DP on Trees",sub:"Diameter of binary tree · Max path sum",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Tree DP computes an optimal value for each node based on values computed from its children. The key insight: <strong>define what each recursive call returns</strong> (often the answer for the subtree rooted at this node), and <strong>separately track a global answer</strong> that can span across both children of a node.</div></div>
+<div class="hl">Tree DP pattern: post-order traversal. Compute answer for left child → right child → combine at current node. Update global max if path can cross the root.</div>
+<div class="card"><div class="lbl">Two-answer trick</div><div class="ct">For many tree DP problems, you track two things: (1) the value "going up" (returned from the recursive call, must go through root and one child only), and (2) the global best (can span both children via the current root). E.g., in max path sum: return max of root+left or root+right (can continue upward), but update global max with root+left+right (complete path through this node).</div></div>`,
+
+`<div class="card"><div class="lbl">Max Path Sum execution</div></div>
+<div class="code">// Tree:     -10
+//          /    \
+//         9      20
+//               /  \
+//              15    7
+//
+// postorder DFS:
+// node 9:  left=0, right=0. upward=max(9,0)=9. global=max(INT_MIN,9)=9
+// node 15: upward=15.  global=15
+// node 7:  upward=7.   global=15
+// node 20: left=15, right=7
+//   upward = 20 + max(15,7) = 35
+//   global = max(15, 20+15+7) = 42  ← path 15→20→7
+// node -10: left=9, right=35
+//   upward = -10 + max(9,35) = 25
+//   global = max(42, -10+9+35) = 42 ← unchanged
+// Answer: 42</div>
+<div class="card"><div class="lbl">Diameter pattern</div><div class="ct">Diameter = longest path between any two nodes (not necessarily through root). At each node: diameter through this node = left_depth + right_depth. Return max(left,right)+1 upward. Track global max diameter.</div></div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>Returns upward</th><th>Global update</th><th>Time</th></tr>
+<tr><td>Tree Diameter</td><td>max depth of subtree +1</td><td>left_depth + right_depth</td><td class="og">O(n)</td></tr>
+<tr><td>Max Path Sum</td><td>node + max(left,right,0)</td><td>node + left + right</td><td class="og">O(n)</td></tr>
+<tr><td>Longest Univalue Path</td><td>longest same-val path going up</td><td>left_path + right_path</td><td class="og">O(n)</td></tr>
+<tr><td>House Robber III</td><td>(rob_this, skip_this) pair</td><td>max of both options</td><td class="og">O(n)</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">Return-vs-global split</div><div class="pw">The function returns the best value that can extend UPWARD (single branch). The global answer tracks best complete path (can use both branches of current node). This split is the key insight for all tree path problems.</div></div>
+<div class="pc"><div class="pn">Tree DP with state pairs</div><div class="pw">House Robber III: each node returns a pair (rob_this_node, dont_rob_this_node). Parent computes its options using children's pairs. No global variable needed.</div></div>
+<div class="pc"><div class="pn">Subtree aggregation</div><div class="pw">Count nodes, sum values, find height — simple post-order with single return value. Build up from leaves.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Path through tree nodes</div><div class="trig">Mental trigger: "longest/best path between any two nodes"</div><div class="pw">Diameter or max path sum pattern. Post-order, two-answer trick. Global tracks cross-node paths.</div></div>
+<div class="pc"><div class="pn">2. DP on tree with include/exclude</div><div class="trig">Mental trigger: "select nodes with constraints (no adjacent parent-child)"</div><div class="pw">House Robber III. Return pair: (take this node, skip this node). O(n) one-pass.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"longest path between any two nodes"</span><span class="sw">→ Diameter: return depth, update global = left+right</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"maximum sum path in binary tree"</span><span class="sw">→ Max path sum: return node+max(l,r,0), global=node+l+r</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"rob houses (tree), no parent+child together"</span><span class="sw">→ House Robber III: return (rob, skip) pair from each node</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"optimal value using both subtrees of a node"</span><span class="sw">→ Post-order DP, update global at each node</span></div>
+</div>`,
+
+`<div class="code">// LC 543 — Diameter of Binary Tree
+int maxDiam = 0;
+int diameterOfBinaryTree(TreeNode root) {
+    depth(root);
+    return maxDiam;
+}
+int depth(TreeNode node) {
+    if (node == null) return 0;
+    int left = depth(node.left);
+    int right = depth(node.right);
+    maxDiam = Math.max(maxDiam, left + right); // path through this node
+    return 1 + Math.max(left, right);           // best depth going upward
+}
+
+// LC 124 — Binary Tree Maximum Path Sum
+int maxSum = Integer.MIN_VALUE;
+int maxPathSum(TreeNode root) {
+    gain(root);
+    return maxSum;
+}
+int gain(TreeNode node) {
+    if (node == null) return 0;
+    int left  = Math.max(0, gain(node.left));   // ignore negative branches
+    int right = Math.max(0, gain(node.right));
+    maxSum = Math.max(maxSum, node.val + left + right); // full path through node
+    return node.val + Math.max(left, right);            // best single branch upward
+}
+
+// LC 337 — House Robber III (return pair)
+int[] robTree(TreeNode node) {
+    if (node == null) return new int[]{0, 0};
+    int[] left  = robTree(node.left);
+    int[] right = robTree(node.right);
+    int rob  = node.val + left[1] + right[1]; // take node → skip children
+    int skip = Math.max(left[0],left[1]) + Math.max(right[0],right[1]); // skip node
+    return new int[]{rob, skip};
+}
+int rob(TreeNode root) {
+    int[] res = robTree(root);
+    return Math.max(res[0], res[1]);
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 124 — Max Path Sum walkthrough</div></div>
+<div class="hl"><strong>Two-answer trick:</strong> gain() returns the max sum of a path starting at this node going DOWN into one subtree (can extend upward). maxSum tracks the global best complete path (can go down both subtrees).</div>
+<div class="code">// Why Math.max(0, gain(child))?
+// If a subtree contributes negative value, it's better to
+// NOT include it. By clamping to 0, we effectively "cut off"
+// negative-sum subtrees.
+//
+// Why can't we return node.val + left + right?
+// Because a path going upward can only use ONE direction.
+// Returning both left+right would mean the path goes through
+// this node AND continues in two directions — invalid for an upward path.
+// → Return only the better of left/right, but UPDATE global with both.</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 543 — Diameter of Binary Tree</div><div class="pmeta"><strong>Why:</strong> Cleanest tree DP. Teaches the return-vs-global split.<br><strong>Key insight:</strong> Return depth; global updates with left+right at each node.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 124 — Binary Tree Maximum Path Sum</div><div class="pmeta"><strong>Why:</strong> Full tree DP with negative value handling.<br><strong>Key insight:</strong> Clamp negative branches to 0 before adding.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 337 — House Robber III</div><div class="pmeta"><strong>Why:</strong> Classic tree DP with include/exclude pair return.<br><strong>Key insight:</strong> Return [rob_this, skip_this] from each node. No global needed.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1372 — Longest ZigZag Path in Binary Tree</div><div class="pmeta"><strong>Why:</strong> Tree DP tracking direction and length.<br><strong>Key insight:</strong> Pass direction to child. Return max zigzag from current node.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 968 — Binary Tree Cameras</div><div class="pmeta"><strong>Why:</strong> Tree DP with 3 states: covered, has camera, not covered.<br><strong>Key insight:</strong> Greedy + post-order. Place cameras at leaves' parents.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Do you use a global variable correctly (or return a pair)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you clamp negative subtrees to 0 in max path sum?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you explain why you can't return both branches to the parent?</span></div>
+</div>
+<div class="hl"><strong>Key principle:</strong> The function return value must represent something the parent can USE (a single-branch contribution). The global variable tracks cross-node answers. Never mix these two in one return value.</div>`
+]},
+
+{title:"Bitmask DP",sub:"Travelling salesman · Covering all nodes",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Bitmask DP encodes the "set of elements visited/selected so far" as an integer bitmask. Bit j is 1 if element j is in the current set. This allows O(1) set operations (add, check, remove via bitwise ops) and enables DP over all 2ⁿ subsets. Used when n is small (n ≤ 20) and we need to track which elements have been processed.</div></div>
+<div class="hl">Bitmask DP recognition: n ≤ 20, need to track which elements are "done", optimal assignment/tour over all elements.</div>
+<div class="card"><div class="lbl">Bitwise operations</div><div class="ct">Set bit j: mask | (1&lt;&lt;j). Check bit j: (mask &gt;&gt; j) &amp; 1. Clear bit j: mask &amp; ~(1&lt;&lt;j). Is bit j set? (mask &amp; (1&lt;&lt;j)) != 0. Full set of n: (1&lt;&lt;n)-1.</div></div>`,
+
+`<div class="card"><div class="lbl">TSP mechanics</div></div>
+<div class="code">// TSP: visit all n cities, return to start, minimize total distance
+// State: dp[mask][i] = min cost to visit all cities in mask, currently at city i
+// mask is a bitmask of visited cities (bit j = 1 means city j visited)
+//
+// n=4 cities: 2^4 = 16 possible masks
+// dp[0001][0] = 0   (started at city 0, only city 0 visited)
+// dp[0011][1] = dist[0][1]  (visited 0 and 1, now at 1)
+// dp[0111][2] = min(dp[0011][0]+dist[0][2], dp[0101][1]+dist[1][2], ...)
+// dp[1111][0] = min over all cities i of dp[1110][i] + dist[i][0]
+//               ← return to city 0 from last city i
+//
+// Transition:
+// for each next city j NOT in mask:
+//   dp[mask|(1&lt;&lt;j)][j] = min(dp[mask|(1&lt;&lt;j)][j], dp[mask][i] + dist[i][j])</div>
+<div class="card"><div class="lbl">Covering all nodes / minimum spanning set</div><div class="ct">dp[mask] = minimum cost to cover all elements in mask. Iterate over all subsets of mask to find splits. Used in "minimum number of steps to cover all nodes" or assignment problems.</div></div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>State</th><th>Time</th><th>Space</th></tr>
+<tr><td>TSP</td><td>dp[mask][city]</td><td class="ob">O(2ⁿ · n²)</td><td class="om">O(2ⁿ · n)</td></tr>
+<tr><td>Shortest path visiting all nodes</td><td>dp[mask][node]</td><td class="ob">O(2ⁿ · n²)</td><td class="om">O(2ⁿ · n)</td></tr>
+<tr><td>Minimum cost to cover</td><td>dp[mask]</td><td class="ob">O(3ⁿ · n)</td><td class="om">O(2ⁿ)</td></tr>
+<tr><td>Assignment problem</td><td>dp[mask] = assign first popcount(mask) people</td><td class="ob">O(2ⁿ · n)</td><td class="om">O(2ⁿ)</td></tr>
+</table>
+<div class="hl" style="margin-top:10px">Bitmask DP is feasible for n ≤ 20. For n=20: 2²⁰ = 1M states, × n = 20M operations. Acceptable. For n=25+: too slow.</div>`,
+
+`<div class="pc"><div class="pn">Path-style bitmask DP</div><div class="pw">dp[mask][last] = optimal cost visiting exactly the nodes in mask, ending at last. Transition: extend to any unvisited node. TSP, shortest path visiting all nodes (LC 847).</div></div>
+<div class="pc"><div class="pn">Set-covering bitmask DP</div><div class="pw">dp[mask] = min cost to cover all elements in mask. Often involves iterating over subsets. Sticker problem, minimum cost to connect all nodes.</div></div>
+<div class="pc"><div class="pn">Assignment bitmask DP</div><div class="pw">dp[mask] = min cost assigning first popcount(mask) people to jobs indicated by mask. O(2ⁿ · n). Classic assignment problem.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Visit all nodes optimally</div><div class="trig">Mental trigger: "n ≤ 20, visit every node, minimize total cost"</div><div class="pw">TSP bitmask DP. dp[mask][i]. 2ⁿ × n states. O(2ⁿ·n²) time.</div></div>
+<div class="pc"><div class="pn">2. Assign items to slots</div><div class="trig">Mental trigger: "assign n workers to n tasks, minimize cost"</div><div class="pw">dp[mask] = min cost assigning people to jobs in mask. Person index = popcount(mask).</div></div>
+<div class="pc"><div class="pn">3. Cover all requirements</div><div class="trig">Mental trigger: "minimum X to cover all Y"</div><div class="pw">Iterate subsets. dp[full_mask] = answer. Combine dp[submask] with cost of covering the rest.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"visit all n nodes (n≤20), minimize cost/distance"</span><span class="sw">→ TSP bitmask DP: dp[mask][city], O(2ⁿ·n²)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"shortest path visiting all nodes (graph)"</span><span class="sw">→ BFS precompute pairwise distances + bitmask DP</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"assign n people to n tasks, min cost"</span><span class="sw">→ Assignment bitmask DP: dp[mask], person=popcount(mask)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"cover all items with minimum operations, n≤20"</span><span class="sw">→ Set-cover bitmask DP: dp[mask] over all 2ⁿ subsets</span></div>
+</div>`,
+
+`<div class="code">// LC 847 — Shortest Path Visiting All Nodes
+int shortestPathLength(int[][] graph) {
+    int n = graph.length;
+    int full = (1 &lt;&lt; n) - 1;
+    // BFS over (node, visited_mask) states
+    Queue&lt;int[]&gt; q = new LinkedList&lt;&gt;();
+    boolean[][] visited = new boolean[n][1 &lt;&lt; n];
+    for (int i = 0; i &lt; n; i++) {
+        q.offer(new int[]{i, 1 &lt;&lt; i, 0});  // {node, mask, dist}
+        visited[i][1 &lt;&lt; i] = true;
+    }
+    while (!q.isEmpty()) {
+        int[] curr = q.poll();
+        int node = curr[0], mask = curr[1], dist = curr[2];
+        if (mask == full) return dist;
+        for (int next : graph[node]) {
+            int newMask = mask | (1 &lt;&lt; next);
+            if (!visited[next][newMask]) {
+                visited[next][newMask] = true;
+                q.offer(new int[]{next, newMask, dist+1});
+            }
+        }
+    }
+    return -1;
+}
+
+// TSP — Classic Bitmask DP
+int tsp(int[][] dist, int n) {
+    int[][] dp = new int[1 &lt;&lt; n][n];
+    for (int[] row : dp) Arrays.fill(row, Integer.MAX_VALUE / 2);
+    dp[1][0] = 0;                  // start at city 0, mask=0001
+    for (int mask = 1; mask &lt; (1&lt;&lt;n); mask++) {
+        for (int i = 0; i &lt; n; i++) {
+            if ((mask &amp; (1&lt;&lt;i)) == 0) continue;    // i not in mask, skip
+            if (dp[mask][i] == Integer.MAX_VALUE/2) continue;
+            for (int j = 0; j &lt; n; j++) {
+                if ((mask &amp; (1&lt;&lt;j)) != 0) continue; // j already visited
+                int newMask = mask | (1&lt;&lt;j);
+                dp[newMask][j] = Math.min(dp[newMask][j], dp[mask][i]+dist[i][j]);
+            }
+        }
+    }
+    int full = (1&lt;&lt;n)-1;
+    int ans = Integer.MAX_VALUE;
+    for (int i = 1; i &lt; n; i++) // return to city 0
+        ans = Math.min(ans, dp[full][i] + dist[i][0]);
+    return ans;
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 847 vs TSP — key differences</div></div>
+<div class="hl"><strong>LC 847 uses BFS</strong> because it finds shortest path (unweighted). TSP uses DP because it minimizes total weighted distance. Both track (current_node, visited_mask) as state.</div>
+<div class="code">// Bitmask operations quick reference:
+// Add node j to mask:     newMask = mask | (1 &lt;&lt; j)
+// Check if j in mask:     (mask &amp; (1 &lt;&lt; j)) != 0
+// Remove j from mask:     mask &amp; ~(1 &lt;&lt; j)
+// Count nodes in mask:    Integer.bitCount(mask)
+// All n nodes visited:    mask == (1&lt;&lt;n) - 1
+// Iterate all submasks:   for(int sub=mask; sub&gt;0; sub=(sub-1)&amp;mask)
+// Lowest set bit:         mask &amp; (-mask)</div>`,
+
+`<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 847 — Shortest Path Visiting All Nodes</div><div class="pmeta"><strong>Why:</strong> Bitmask BFS. Visit all nodes in a graph with min steps.<br><strong>Key insight:</strong> State = (node, visited_mask). BFS for unweighted shortest path.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1986 — Minimum Number of Work Sessions</div><div class="pmeta"><strong>Why:</strong> Bitmask DP to assign tasks into sessions.<br><strong>Key insight:</strong> dp[mask] = min sessions to complete tasks in mask.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 691 — Stickers to Spell Word</div><div class="pmeta"><strong>Why:</strong> Cover all chars in target using stickers. Bitmask over target positions.<br><strong>Key insight:</strong> dp[mask] = min stickers to cover chars at positions indicated by mask.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1494 — Parallel Courses II</div><div class="pmeta"><strong>Why:</strong> Bitmask DP with prerequisite constraints. Min semesters to take all courses.<br><strong>Key insight:</strong> dp[mask] = min semesters. At each step, choose subset of available courses.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 2305 — Fair Distribution of Cookies</div><div class="pmeta"><strong>Why:</strong> Assign cookie bags to children, minimize max bag sum. Bitmask over bags.<br><strong>Key insight:</strong> dp[child][mask] = min unfairness distributing bags in mask to first child children.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you derive the state representation (mask + position) independently?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you know when bitmask DP is appropriate (n ≤ 20)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you write bitwise operations correctly under pressure?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you iterate over all subsets of a mask efficiently?</span></div>
+</div>
+<div class="hl"><strong>Block 6 master summary:</strong> <span class="tag tp">1D DP</span> single param state <span class="tag tt">2D DP</span> two params or grid <span class="tag ta">Knapsack</span> backward=0/1, forward=unbounded <span class="tag tp">LIS</span> O(n log n) patience sort <span class="tag tt">Interval</span> fill by length O(n³) <span class="tag ta">Tree DP</span> return-vs-global split <span class="tag tp">Bitmask</span> n≤20 visited-set tracking</div>`
+]}
+];
+
+let CT=0, CS=0;
+
+function renderTabs(){
+  document.getElementById('stabs').innerHTML=TABS.map((t,i)=>`<button class="stab${i===CS?' active':''}" onclick="selS(${i})">${t}</button>`).join('');
+}
+
+function renderContent(){
+  const topic=D[CT];
+  document.getElementById('cnt').innerHTML=`<div class="th">${topic.title}</div><div class="ts">${topic.sub}</div>${topic.s[CS]||'<div class="card"><div class="ct">Content coming soon.</div></div>'}`;
+}
+
+function sel(idx){
+  CT=idx; CS=0;
+  document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  renderTabs(); renderContent();
+  document.getElementById('main').scrollTop=0;
+}
+
+function selS(idx){
+  CS=idx; renderTabs(); renderContent();
+  document.getElementById('main').scrollTop=0;
+}
+
+renderTabs(); renderContent();
+</script>

@@ -1,0 +1,816 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--text-primary);background:transparent}
+.shell{display:flex;height:100vh;min-height:640px;overflow:hidden}
+.nav{width:230px;min-width:230px;border-right:0.5px solid var(--border);padding:12px 0;overflow-y:auto;background:var(--surface-1)}
+.nav-title{font-size:10px;font-weight:500;color:var(--text-muted);padding:6px 16px 4px;letter-spacing:.07em;text-transform:uppercase}
+.ni{display:block;padding:7px 16px;font-size:12.5px;color:var(--text-secondary);cursor:pointer;border-left:2px solid transparent;line-height:1.4;transition:all .12s}
+.ni:hover{color:var(--text-primary);background:var(--surface-2)}
+.ni.active{color:var(--text-primary);border-left-color:#1D9E75;background:var(--surface-2);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:26px 30px}
+.topic{display:none}.topic.visible{display:block}
+h1.ttl{font-size:20px;font-weight:500;margin-bottom:4px}
+.tnum{font-size:11px;color:var(--text-muted);margin-bottom:12px}
+.tags{margin-bottom:12px}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin:0 3px 3px 0}
+.tg{background:#E1F5EE;color:#085041}.tp{background:#EEEDFE;color:#3C3489}.tw{background:#FAEEDA;color:#633806}.td{background:#FCEBEB;color:#791F1F}.ti{background:#E6F1FB;color:#0C447C}.tc{background:#FAECE7;color:#712B13}
+.sl{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin:18px 0 6px;display:flex;align-items:center;gap:6px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--text-secondary)}
+.prose strong{font-weight:500;color:var(--text-primary)}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+.g3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:7px}
+.sb{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.sb h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.sb p{font-size:12px;color:var(--text-secondary);line-height:1.6}
+.cb{background:#1a1b26;border-radius:var(--radius);padding:13px 15px;margin:8px 0;overflow-x:auto}
+.cb pre{font-family:var(--font-mono);font-size:11.5px;line-height:1.75;color:#c0caf5;white-space:pre}
+.kw{color:#bb9af7}.fn{color:#7aa2f7}.cm{color:#565f89;font-style:italic}.str{color:#9ece6a}.num{color:#ff9e64}.vr{color:#f7768e}.cl{color:#e0af68}
+.mst{border-left:2px solid #E24B4A;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--text-secondary);line-height:1.6;border-radius:0}
+.tof{border-left:2px solid #EF9F27;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--text-secondary);line-height:1.6;border-radius:0}
+.good{border-left:2px solid #1D9E75;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--text-secondary);line-height:1.6;border-radius:0}
+.iq{font-size:12.5px;padding:8px 11px;background:var(--surface-1);border-radius:var(--radius);margin:5px 0;border:0.5px solid var(--border)}
+.iq .q{font-weight:500;margin-bottom:2px}
+.iq .d{font-size:11.5px;color:var(--text-muted);line-height:1.55}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pill{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
+.pq{background:var(--bg-accent);color:var(--text-accent)}
+.pc{background:#E1F5EE;color:#085041}
+.divline{border:none;border-top:0.5px solid var(--border);margin:26px 0}
+.divlabel{text-align:center;font-size:11px;color:var(--text-muted);margin:-10px 0 18px}
+.arch{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 13px;margin:5px 0}
+.arch h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.arch p{font-size:12.5px;color:var(--text-secondary);line-height:1.65}
+.flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:8px 0}
+.fbox{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:5px 10px;font-size:12px;font-weight:500;color:var(--text-primary)}
+.farr{font-size:13px;color:var(--text-muted)}
+.fbox.g{border-color:#1D9E75;background:#E1F5EE;color:#085041}
+.fbox.p{border-color:#534AB7;background:#EEEDFE;color:#3C3489}
+.fbox.a{border-color:#BA7517;background:#FAEEDA;color:#633806}
+.fbox.r{border-color:#A32D2D;background:#FCEBEB;color:#791F1F}
+.fbox.b{border-color:#185FA5;background:#E6F1FB;color:#0C447C}
+</style>
+
+<div class="shell">
+<nav class="nav">
+  <div class="nav-title">Block 8 — Architecture</div>
+  <div class="ni active" onclick="show(0,this)">1. Micro-frontends</div>
+  <div class="ni" onclick="show(1,this)">2. Monorepo frontend</div>
+  <div class="ni" onclick="show(2,this)">3. Design systems</div>
+  <div class="ni" onclick="show(3,this)">4. Accessibility (a11y)</div>
+  <div class="ni" onclick="show(4,this)">5. Internationalisation (i18n)</div>
+  <div class="ni" onclick="show(5,this)">6. Progressive enhancement</div>
+  <div class="ni" onclick="show(6,this)">7. Edge rendering</div>
+  <div class="ni" onclick="show(7,this)">8. Islands architecture</div>
+</nav>
+
+<main class="content">
+
+<div class="topic visible" id="t0">
+  <div class="tnum">Topic 1 of 8 — Block 8: Architecture</div>
+  <h1 class="ttl">Micro-frontends</h1>
+  <div class="tags"><span class="tag tp">Module federation</span><span class="tag tg">iframe isolation</span><span class="tag tw">Web components</span><span class="tag td">Trade-offs</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Micro-frontends extend the microservices concept to the frontend: decompose a large SPA into independently deployable, loosely coupled frontend applications, each owned by a separate team. Each MFE owns a vertical slice of the product — its own repository, build pipeline, deployment, and often its own React version. Teams can ship independently without coordinating releases. The architectural problem they solve: a monolithic frontend becomes a deployment bottleneck as team count grows. The cost: significant operational complexity, runtime integration challenges, and potential for duplicated dependencies inflating bundle size.</p>
+
+  <div class="sl">Integration approaches</div>
+  <div class="g3">
+    <div class="sb"><h4>Module Federation (Webpack 5 / Vite)</h4><p>Runtime JS sharing via dynamic remote imports. A "host" app loads "remote" modules from separately deployed URLs at runtime. Dependencies can be shared (one React instance across all MFEs). No iframe — full DOM sharing. Teams can use different versions of non-shared libraries.</p></div>
+    <div class="sb"><h4>iframe isolation</h4><p>Each MFE rendered in its own iframe. Maximum isolation — separate browsing context, separate DOM, separate JS heap. Cross-MFE communication via postMessage only. Cost: no shared state, no shared cookies by default, layout challenges, full-page iframe scrolling issues. Use for untrusted third-party embeds.</p></div>
+    <div class="sb"><h4>Web Components</h4><p>Framework-agnostic custom elements as the MFE boundary. A React MFE wraps itself in a Custom Element — any host page can <code>&lt;my-team-widget&gt;</code> it regardless of the host's framework. Shadow DOM provides style isolation. Natural interop layer between frameworks.</p></div>
+  </div>
+
+  <div class="sl">Module Federation internals</div>
+  <p class="prose">Module Federation gives each build a "container" — a runtime module registry. The host app, at bootstrap, fetches the remote's <code>remoteEntry.js</code> (the container manifest). This manifest describes what modules the remote exposes and what shared dependencies it uses. When the host imports a remote module (<code>import('remote/Button')</code>), Module Federation checks: does the host already have a compatible version of React in the shared scope? If yes, the remote uses the host's React instance. If no, the remote loads its own. This singleton-or-independent decision is made at runtime per dependency per version range. Shared modules are loaded only once, negotiated via the shared scope object.</p>
+
+  <div class="sl">MFE vs monorepo — the real trade-off</div>
+  <div class="g2">
+    <div class="sb"><h4>When MFE makes sense</h4><p>Large org (10+ frontend teams). Independent deployment is genuinely required. Teams have different release cadences. Different parts of the app have radically different tech requirements. Legacy systems that can't be refactored but need new UI on top.</p></div>
+    <div class="sb"><h4>When monorepo is better</h4><p>Shared component library needs consistent versioning. Teams need to refactor across the boundary frequently. Bundle optimization (deduplication) matters. Sub-10-team org — the operational overhead of MFE exceeds the coordination cost it solves. Monorepo with feature flags gives most benefits at lower cost.</p></div>
+    <div class="sb"><h4>Hidden MFE costs</h4><p>Cross-MFE routing becomes complex. Shared auth state requires synchronization. Each MFE has its own devops pipeline. Performance: multiple React instances, duplicated polyfills, multiple network waterfall points on page load. Error boundaries between MFEs need explicit design.</p></div>
+    <div class="sb"><h4>Communication patterns</h4><p>URL (navigate with state in params). Custom events (window.dispatchEvent). Shared event bus (window-level pub/sub). Props/callbacks (for iframe: postMessage). Shared server state (React Query with same cache keys across MFEs using same query client).</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// webpack.config.js — remote (the MFE being exposed)</span>
+<span class="kw">new</span> <span class="cl">ModuleFederationPlugin</span>({
+  name: <span class="str">'cartMFE'</span>,
+  filename: <span class="str">'remoteEntry.js'</span>,          <span class="cm">// Loaded by host at runtime</span>
+  exposes: {
+    <span class="str">'./CartWidget'</span>: <span class="str">'./src/CartWidget'</span>, <span class="cm">// What we share</span>
+    <span class="str">'./CheckoutFlow'</span>: <span class="str">'./src/checkout/index'</span>,
+  },
+  shared: {
+    react: { singleton: <span class="kw">true</span>, requiredVersion: <span class="str">'^18'</span> },
+    <span class="str">'react-dom'</span>: { singleton: <span class="kw">true</span>, requiredVersion: <span class="str">'^18'</span> },
+    <span class="cm">// singleton: true — only one React instance across ALL MFEs</span>
+    <span class="cm">// Version mismatch: federation falls back to separate instance</span>
+  },
+})
+
+<span class="cm">// webpack.config.js — host (shell that composes MFEs)</span>
+<span class="kw">new</span> <span class="cl">ModuleFederationPlugin</span>({
+  name: <span class="str">'shell'</span>,
+  remotes: {
+    cartMFE: <span class="str">'cartMFE@https://cart.myapp.com/remoteEntry.js'</span>,
+    searchMFE: <span class="str">'searchMFE@https://search.myapp.com/remoteEntry.js'</span>,
+  },
+  shared: { react: { singleton: <span class="kw">true</span> }, <span class="str">'react-dom'</span>: { singleton: <span class="kw">true</span> } },
+})
+
+<span class="cm">// Host app — lazy loads the remote MFE component</span>
+<span class="kw">const</span> <span class="cl">CartWidget</span> = <span class="fn">lazy</span>(() => <span class="kw">import</span>(<span class="str">'cartMFE/CartWidget'</span>));
+<span class="cm">// At runtime: fetches https://cart.myapp.com/remoteEntry.js</span>
+<span class="cm">// Negotiates shared React singleton</span>
+<span class="cm">// Loads the CartWidget chunk from cart.myapp.com</span>
+
+<span class="kw">function</span> <span class="fn">App</span>() {
+  <span class="kw">return</span> (
+    &lt;<span class="cl">Suspense</span> fallback={&lt;<span class="cl">Spinner</span> /&gt;}&gt;
+      &lt;<span class="cl">CartWidget</span> userId={currentUserId} /&gt;
+    &lt;/<span class="cl">Suspense</span>&gt;
+  );
+}
+
+<span class="cm">// Cross-MFE communication via custom events</span>
+<span class="cm">// Cart MFE dispatches:</span>
+window.<span class="fn">dispatchEvent</span>(<span class="kw">new</span> <span class="cl">CustomEvent</span>(<span class="str">'mfe:cart:updated'</span>, {
+  detail: { itemCount: <span class="num">3</span>, total: <span class="num">89.97</span> }
+}));
+<span class="cm">// Header MFE listens:</span>
+window.<span class="fn">addEventListener</span>(<span class="str">'mfe:cart:updated'</span>, ({ detail }) => {
+  <span class="fn">setCartCount</span>(detail.itemCount);
+});</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Running multiple React instances due to mismatched version ranges in shared config — components from different React trees can't share context, portals don't work across boundaries, and hooks that depend on React internals (useContext) silently fail. Always use <code>singleton: true</code> for React/ReactDOM.</div>
+  <div class="mst">Decomposing too early — teams of fewer than 5-6 dedicated frontend engineers rarely benefit from MFE's independent deployment advantage over a well-organized monorepo with clear module boundaries. The coordination overhead of shared types, design systems, and auth integration often exceeds the release-speed benefit.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does Module Federation work under the hood?"</div><div class="d">Each build outputs a remoteEntry.js manifest describing exposed modules and shared dependencies. The host loads this at runtime, negotiates shared dependency versions via a shared scope object, and dynamically imports remote modules on demand. Singleton React ensures hooks work across the boundary. The remote's chunk files live on a different origin and are loaded via dynamic import at runtime — independent of the host's deployment.</div></div>
+  <div class="iq"><div class="q">"When would you choose micro-frontends over a monorepo?"</div><div class="d">MFE when: multiple large teams need truly independent deployments, teams have fundamentally different release cadences or tech stacks, or you're integrating legacy systems. Monorepo when: teams need to refactor across boundaries, bundle deduplication matters significantly, or the org is small enough that release coordination is cheap. MFE adds significant operational complexity — it must solve a real deployment problem to justify the cost.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Monorepo (next topic — the alternative architecture)</span>
+    <span class="pill pc">Code splitting (Module Federation is dynamic splitting at org scale)</span>
+    <span class="pill pc">Web Components (framework-agnostic MFE boundary)</span>
+    <span class="pill pq">CORS (cross-origin remoteEntry.js loads)</span>
+  </div>
+</div>
+
+<div class="topic" id="t1">
+  <div class="tnum">Topic 2 of 8 — Block 8: Architecture</div>
+  <h1 class="ttl">Monorepo frontend</h1>
+  <div class="tags"><span class="tag tg">Turborepo</span><span class="tag tp">Nx</span><span class="tag tw">Build caching</span><span class="tag ti">Shared packages</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">A monorepo is a single version-controlled repository containing multiple related packages — multiple apps, shared UI libraries, utility packages, and configuration packages — that are developed and versioned together. The monorepo model enables: atomic changes across package boundaries (change a component and its consumers in one commit), consistent tooling configuration, easy cross-package refactoring, and shared CI infrastructure. Turborepo and Nx are the two dominant build orchestration tools that make large frontend monorepos tractable by adding caching, parallelism, and dependency-graph-aware task scheduling.</p>
+
+  <div class="sl">How Turborepo works internally</div>
+  <p class="prose">Turborepo builds a <strong>task dependency graph</strong> from your <code>turbo.json</code> configuration. Each task (build, test, lint) has declared dependencies: <code>"dependsOn": ["^build"]</code> means "run after upstream packages' build tasks complete." Turborepo hashes the inputs to each task (source files, env vars, package.json, lockfile) and stores task outputs (build artifacts, test results) in a <strong>content-addressed cache</strong>. On subsequent runs, if the hash matches, the cached output is restored rather than re-running. This cache can be remote (Vercel Remote Cache, self-hosted S3) — teammates share the same cache, so CI never re-runs a task whose inputs haven't changed since any previous run, anywhere.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Workspace structure</h4><p>Packages are symlinked together via npm/yarn/pnpm workspaces. <code>apps/</code>: deployable applications. <code>packages/</code>: shared code (UI library, config, utilities, types). Each package has its own package.json. Internal cross-references use workspace protocol: <code>"@myco/ui": "workspace:*"</code>.</p></div>
+    <div class="sb"><h4>Build caching</h4><p>Turborepo: hash-based, file-output cache (dist/ directories, test results). Local + remote (Vercel). Nx: computation cache with sophisticated task graph. Key insight: unchanged package = zero build time. A 10-minute CI pipeline becomes seconds when only one of 20 packages changed.</p></div>
+    <div class="sb"><h4>Affected-only runs</h4><p><code>nx affected --target=test</code> or <code>turbo run test --filter=[HEAD^1]</code>: only run tasks for packages that have changed (based on git diff against a base ref). PRs that touch <code>packages/ui</code> rebuild all apps that depend on it; PRs that only touch one app skip unrelated packages entirely.</p></div>
+    <div class="sb"><h4>Shared configuration</h4><p>ESLint configs, TypeScript configs, Vite configs as packages: <code>@myco/eslint-config</code>, <code>@myco/tsconfig</code>. Apps extend from these. One change to the shared ESLint config propagates everywhere. Turborepo treats config package changes as affecting all dependents.</p></div>
+    <div class="sb"><h4>Nx vs Turborepo</h4><p>Turborepo: simpler, file-output caching, great DX, Vercel Remote Cache. Nx: more powerful dependency graph, code generators, sophisticated plugin system, affected detection via TypeScript analysis (not just file hash). Nx scales better for very large codebases; Turborepo is easier to adopt.</p></div>
+    <div class="sb"><h4>Internal package publishing</h4><p>Packages can be consumed internally via workspace symlinks (no publish needed) or published to npm/private registry for external use. Changesets manages versioning across packages in a monorepo — tracks which packages changed and bumps versions appropriately on publish.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Repository structure</span>
+<span class="cm">├── apps/</span>
+<span class="cm">│   ├── web/          # Next.js app</span>
+<span class="cm">│   └── admin/        # Vite SPA</span>
+<span class="cm">├── packages/</span>
+<span class="cm">│   ├── ui/           # Shared component library</span>
+<span class="cm">│   ├── config/       # ESLint, TS, Vite configs</span>
+<span class="cm">│   └── utils/        # Shared utilities</span>
+<span class="cm">└── turbo.json</span>
+
+<span class="cm">// turbo.json — task pipeline</span>
+{
+  <span class="str">"pipeline"</span>: {
+    <span class="str">"build"</span>: {
+      <span class="str">"dependsOn"</span>: [<span class="str">"^build"</span>],   <span class="cm">// Wait for upstream packages to build first</span>
+      <span class="str">"outputs"</span>: [<span class="str">"dist/**"</span>, <span class="str">".next/**"</span>], <span class="cm">// Cached outputs</span>
+      <span class="str">"inputs"</span>: [<span class="str">"src/**"</span>, <span class="str">"package.json"</span>] <span class="cm">// Cache key inputs</span>
+    },
+    <span class="str">"test"</span>: {
+      <span class="str">"dependsOn"</span>: [<span class="str">"^build"</span>],
+      <span class="str">"outputs"</span>: [<span class="str">"coverage/**"</span>]
+    },
+    <span class="str">"lint"</span>: { <span class="str">"outputs"</span>: [] },  <span class="cm">// No file outputs — cached by exit code</span>
+    <span class="str">"dev"</span>: { <span class="str">"cache"</span>: <span class="kw">false</span>, <span class="str">"persistent"</span>: <span class="kw">true</span> } <span class="cm">// Never cache dev server</span>
+  }
+}
+
+<span class="cm">// packages/ui/package.json</span>
+{
+  <span class="str">"name"</span>: <span class="str">"@myco/ui"</span>,
+  <span class="str">"main"</span>: <span class="str">"./dist/index.js"</span>,
+  <span class="str">"exports"</span>: { <span class="str">"."</span>: { <span class="str">"import"</span>: <span class="str">"./dist/index.mjs"</span> } }
+}
+
+<span class="cm">// apps/web/package.json</span>
+{
+  <span class="str">"dependencies"</span>: {
+    <span class="str">"@myco/ui"</span>: <span class="str">"workspace:*"</span>  <span class="cm">// Resolved to local symlink, not npm</span>
+  }
+}
+
+<span class="cm">// CI — only build/test what changed</span>
+<span class="cm">$ turbo run build test --filter=[origin/main]</span>
+<span class="cm"># Compares current HEAD against origin/main</span>
+<span class="cm"># Builds only changed packages + their dependents</span>
+<span class="cm"># Cache hit: restored from Vercel Remote Cache in ~1s</span>
+<span class="cm"># Cache miss: runs the task, uploads output to cache</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Not declaring all cache inputs in turbo.json — if an environment variable affects the build output but isn't listed in <code>globalEnv</code>, Turborepo will serve a stale cache hit with the wrong env var baked in. Always declare all variables that affect build output in <code>globalEnv</code> or task-level <code>env</code>.</div>
+  <div class="mst">Building shared packages with TypeScript source directly imported (skipping the build step) — works in dev with ts-node/tsx but production builds need the compiled output. Inconsistency between dev and prod environments. Always build packages before apps: <code>dependsOn: ["^build"]</code>.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does Turborepo's caching work?"</div><div class="d">Turborepo hashes all inputs to a task (source files, env vars, package.json, lockfile). The hash is the cache key. If a matching entry exists in local or remote cache, the task is skipped and cached outputs (dist/ files, test coverage) are restored. Cache misses run the task and upload outputs. Remote cache shares hits across all team members and CI runs — so a build that passed on one engineer's machine is never re-run for the same input hash.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Micro-frontends (vs monorepo architecture choice)</span>
+    <span class="pill pq">Design systems (shared packages in monorepo)</span>
+    <span class="pill pc">CI/CD optimization (cache is the key lever)</span>
+    <span class="pill pc">Changesets (versioning in monorepos)</span>
+  </div>
+</div>
+
+<div class="topic" id="t2">
+  <div class="tnum">Topic 3 of 8 — Block 8: Architecture</div>
+  <h1 class="ttl">Design systems</h1>
+  <div class="tags"><span class="tag tp">Component API</span><span class="tag tg">Compound components</span><span class="tag tw">Polymorphic</span><span class="tag ti">Headless</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">A design system is the single source of truth for UI — a shared library of components, design tokens (colours, spacing, typography), patterns, and guidelines that ensures consistent UI across a product. At the engineering level, a design system is a versioned package that teams import rather than reimplementing UI primitives. The quality of a design system is determined by the quality of its component APIs: how easy it is to compose components for new use cases without forking them, how flexible they are without being un-opinionated, and how well they handle accessibility without requiring consumers to think about it.</p>
+
+  <div class="sl">Component API design principles</div>
+  <div class="g2">
+    <div class="sb"><h4>Controlled vs uncontrolled</h4><p>Uncontrolled: component manages its own state, optionally calls back via onChange. Controlled: state is owned by the consumer (value + onChange). Design system components should support both — use the "controlled when value provided, uncontrolled otherwise" pattern. Radix UI primitives model this well.</p></div>
+    <div class="sb"><h4>Composition over configuration</h4><p>Avoid boolean prop explosion: <code>hasIcon hasAvatar isRounded isCompact</code>. Instead, compose: <code>&lt;Button&gt;&lt;Icon /&gt; Label&lt;/Button&gt;</code>. The children API handles infinite variation without new props. The compound component pattern formalises this.</p></div>
+    <div class="sb"><h4>Escape hatches</h4><p>No design system handles every case. Provide: <code>className</code> for CSS overrides, <code>style</code> for inline overrides, <code>as</code> prop for polymorphism, <code>ref</code> forwarding for DOM access, and <code>data-*</code> passthrough. Components that block these force consumers to fork.</p></div>
+    <div class="sb"><h4>Accessibility by default</h4><p>Keyboard navigation, ARIA attributes, focus management — bake them in. Consumers shouldn't need to know ARIA to use your Select. Radix UI's primitive layer handles the ARIA contract; your design system layer handles visual styling on top.</p></div>
+  </div>
+
+  <div class="sl">Compound components pattern</div>
+  <p class="prose">Compound components are a set of related components that share implicit state via React Context. Instead of configuring a complex <code>&lt;Select options={[...]} renderOption={...}&gt;</code>, you compose: <code>&lt;Select.Root&gt;&lt;Select.Trigger&gt;...&lt;Select.Content&gt;&lt;Select.Item&gt;</code>. Each sub-component reads shared state from the context set up by the Root. This gives consumers full control over layout and composition while the Root handles the stateful logic. React's Context + forwardRef enable this pattern cleanly.</p>
+
+  <div class="sl">Polymorphic components</div>
+  <p class="prose">A polymorphic component renders as different HTML elements based on an <code>as</code> prop while maintaining its styling contract: <code>&lt;Text as="h1"&gt;</code>, <code>&lt;Button as="a" href="/link"&gt;</code>, <code>&lt;Box as="section"&gt;</code>. The challenge is TypeScript: the component's prop types must merge the design system's own props with the HTML attributes of the target element. The correct type: <code>ComponentProps&lt;T&gt; & OwnProps</code> where T is the <code>as</code> prop value. Libraries like Radix UI and Chakra implement this with the <code>asChild</code> prop + Slot pattern (avoids type complexity while achieving polymorphism).</p>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Compound component pattern — Select</span>
+<span class="kw">const</span> SelectContext = <span class="fn">createContext</span>&lt;{ value: <span class="cl">string</span>; <span class="fn">onSelect</span>: (v: <span class="cl">string</span>) => <span class="kw">void</span> }&gt;(<span class="kw">null</span>!);
+
+<span class="kw">function</span> <span class="fn">SelectRoot</span>({ children, defaultValue = <span class="str">''</span>, onChange }: SelectRootProps) {
+  <span class="kw">const</span> [value, setValue] = <span class="fn">useState</span>(defaultValue);
+  <span class="kw">const</span> <span class="fn">onSelect</span> = (v: <span class="cl">string</span>) => { <span class="fn">setValue</span>(v); <span class="fn">onChange</span>?.(v); };
+  <span class="kw">return</span> &lt;<span class="cl">SelectContext</span>.Provider value={{ value, onSelect }}&gt;{children}&lt;/<span class="cl">SelectContext</span>.Provider&gt;;
+}
+
+<span class="kw">function</span> <span class="fn">SelectItem</span>({ value, children }: { value: <span class="cl">string</span>; children: <span class="cl">React</span>.ReactNode }) {
+  <span class="kw">const</span> { value: selected, onSelect } = <span class="fn">useContext</span>(SelectContext);
+  <span class="kw">return</span> (
+    &lt;div
+      role=<span class="str">"option"</span>
+      aria-selected={selected === value}
+      onClick={() => <span class="fn">onSelect</span>(value)}
+      onKeyDown={e => e.key === <span class="str">'Enter'</span> && <span class="fn">onSelect</span>(value)}
+      tabIndex={<span class="num">0</span>}
+    &gt;{children}&lt;/div&gt;
+  );
+}
+
+<span class="cm">// Namespace export</span>
+<span class="kw">export const</span> Select = { Root: SelectRoot, Item: SelectItem, Trigger: SelectTrigger };
+
+<span class="cm">// Consumer — full control, no prop explosion</span>
+&lt;<span class="cl">Select</span>.Root onChange={setCountry}&gt;
+  &lt;<span class="cl">Select</span>.Trigger&gt;Choose country&lt;/<span class="cl">Select</span>.Trigger&gt;
+  &lt;<span class="cl">Select</span>.Content&gt;
+    &lt;<span class="cl">Select</span>.Item value=<span class="str">"in"</span>&gt;India&lt;/<span class="cl">Select</span>.Item&gt;
+    &lt;<span class="cl">Select</span>.Item value=<span class="str">"us"</span>&gt;United States&lt;/<span class="cl">Select</span>.Item&gt;
+  &lt;/<span class="cl">Select</span>.Content&gt;
+&lt;/<span class="cl">Select</span>.Root&gt;
+
+<span class="cm">// Polymorphic component — type-safe `as` prop</span>
+<span class="kw">type</span> BoxProps&lt;T <span class="kw">extends</span> ElementType = <span class="str">'div'</span>&gt; = {
+  as?: T;
+  children: ReactNode;
+} & ComponentPropsWithoutRef&lt;T&gt;;
+
+<span class="kw">function</span> <span class="fn">Box</span>&lt;T <span class="kw">extends</span> ElementType = <span class="str">'div'</span>&gt;({ as, children, ...rest }: BoxProps&lt;T&gt;) {
+  <span class="kw">const</span> Component = as ?? <span class="str">'div'</span>;
+  <span class="kw">return</span> &lt;Component {...rest}&gt;{children}&lt;/Component&gt;;
+}
+
+&lt;<span class="cl">Box</span> as=<span class="str">"section"</span> aria-label=<span class="str">"main content"</span>&gt;...&lt;/<span class="cl">Box</span>&gt; <span class="cm">// Renders &lt;section&gt;</span>
+&lt;<span class="cl">Box</span> as=<span class="str">"a"</span> href=<span class="str">"/home"</span>&gt;Go home&lt;/<span class="cl">Box</span>&gt;            <span class="cm">// Renders &lt;a href&gt;</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Prop explosion for variation — adding <code>hasIcon</code>, <code>iconPosition</code>, <code>iconSize</code>, <code>hasAvatar</code>, <code>avatarVariant</code> as boolean/string props. The API becomes unmaintainable and undiscoverable. Use children composition instead. The test: if you need more than 4-5 props to configure a single component's appearance, the API is wrong.</div>
+  <div class="mst">Not forwarding refs — design system components that don't forward refs force consumers to wrap them in DOM-accessing code. Always use <code>React.forwardRef</code> on any component that renders a DOM element. Without it, you can't use the component with Floating UI, form libraries, or any code that needs a DOM reference.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the compound component pattern and why is it better than prop-based configuration?"</div><div class="d">Compound components share implicit state via Context between a Root and its sub-components. Consumers compose the layout themselves using structured sub-components rather than passing all configuration as props. Benefits: consumers control layout, infinite variation without new props, each part is independently styleable, and the API is self-documenting through the component hierarchy. The alternative — a single component with 20 props — is rigid and can't anticipate every layout need.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Monorepo (shared packages)</span>
+    <span class="pill pq">Accessibility (design systems should bake in a11y)</span>
+    <span class="pill pc">Radix UI / Headless UI (industry reference implementations)</span>
+    <span class="pill pc">React Context (compound component mechanism)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 1–3 complete ───</div>
+
+<div class="topic" id="t3">
+  <div class="tnum">Topic 4 of 8 — Block 8: Architecture</div>
+  <h1 class="ttl">Accessibility (a11y)</h1>
+  <div class="tags"><span class="tag tg">ARIA roles</span><span class="tag tp">Focus management</span><span class="tag tw">Keyboard nav</span><span class="tag ti">Screen reader</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Accessibility (a11y) ensures that web applications are usable by people with disabilities — visual, motor, auditory, cognitive. In practice for frontend engineers, this means: the page has correct semantic HTML structure, interactive elements are keyboard-operable, screen readers receive meaningful descriptions of UI state via ARIA, focus is managed correctly during dynamic content changes (modals, routes, notifications), and colour contrast meets WCAG standards. Accessibility is not a separate concern — it is a quality attribute of the code, like performance. Inaccessible code is incorrect code.</p>
+
+  <div class="sl">Semantic HTML first</div>
+  <p class="prose">The first rule of ARIA: don't use ARIA if native HTML does it correctly. <code>&lt;button&gt;</code> is keyboard-focusable, fires on Enter/Space, has role=button, and has a name from its text content — for free. <code>&lt;div onClick&gt;</code> requires: <code>role="button"</code>, <code>tabIndex={0}</code>, keyboard handler for Enter/Space, and an <code>aria-label</code> if the content is an icon. Use the right element and get accessibility for free.</p>
+
+  <div class="sl">ARIA fundamentals</div>
+  <div class="g2">
+    <div class="sb"><h4>Roles</h4><p>Define what an element is: <code>role="dialog"</code>, <code>role="alert"</code>, <code>role="combobox"</code>, <code>role="listbox"</code>. Roles communicate element semantics to assistive technology when HTML semantics are insufficient. Never override a native element's role unless the element is purely presentational.</p></div>
+    <div class="sb"><h4>Properties</h4><p>Describe element characteristics: <code>aria-label="Close dialog"</code>, <code>aria-labelledby="heading-id"</code>, <code>aria-describedby="desc-id"</code>, <code>aria-required</code>, <code>aria-invalid</code>. Static attributes that don't change based on state.</p></div>
+    <div class="sb"><h4>States</h4><p>Describe element condition: <code>aria-expanded</code>, <code>aria-checked</code>, <code>aria-selected</code>, <code>aria-disabled</code>, <code>aria-hidden</code>. Must be updated dynamically as UI state changes. A collapsed accordion without <code>aria-expanded="false"</code> is invisible to screen readers.</p></div>
+    <div class="sb"><h4>Live regions</h4><p><code>aria-live="polite"</code>: screen reader announces content updates when idle. <code>aria-live="assertive"</code>: announces immediately, interrupts current reading. Use assertive sparingly (errors only). <code>role="status"</code> is live=polite. <code>role="alert"</code> is live=assertive. Dynamic notifications need live regions.</p></div>
+  </div>
+
+  <div class="sl">Focus management patterns</div>
+  <div class="g2">
+    <div class="sb"><h4>Modal/dialog focus</h4><p>When a modal opens: move focus to the first interactive element inside (or the dialog element itself). Trap focus: Tab cycles only within the modal. When modal closes: return focus to the element that triggered it. Without return: keyboard user loses their place in the document.</p></div>
+    <div class="sb"><h4>Route change focus</h4><p>SPAs don't reload the page — screen readers don't know the content changed. On route change: move focus to the main heading of the new page, or to the main landmark. React Router + a live region announcing the page title is the common pattern.</p></div>
+    <div class="sb"><h4>Skip links</h4><p><code>&lt;a href="#main" class="sr-only focus-visible:not-sr-only"&gt;Skip to main content&lt;/a&gt;</code> as the first focusable element. Keyboard users skip the navbar on every page. Required for WCAG compliance on sites with repetitive navigation.</p></div>
+    <div class="sb"><h4>Focus visible</h4><p>Never <code>outline: none</code> without replacement. Focus must be visible. <code>:focus-visible</code> (keyboard focus only, not mouse) is the modern selector. Browsers now respect this by default — don't suppress the focus ring for mouse users and then wonder why keyboard users have no focus indicator.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ❌ Inaccessible custom button</span>
+&lt;div onClick={handleClick} style={{ cursor: <span class="str">'pointer'</span> }}&gt;Submit&lt;/div&gt;
+<span class="cm">// No role, no tabIndex, no keyboard handler, not focusable</span>
+
+<span class="cm">// ✅ Accessible: use &lt;button&gt;</span>
+&lt;button type=<span class="str">"button"</span> onClick={handleClick}&gt;Submit&lt;/button&gt;
+<span class="cm">// Free: role=button, tabIndex=0, Enter/Space activation, focus management</span>
+
+<span class="cm">// Accessible modal with focus trap</span>
+<span class="kw">function</span> <span class="fn">Modal</span>({ open, onClose, children }) {
+  <span class="kw">const</span> dialogRef = <span class="fn">useRef</span>&lt;HTMLDivElement&gt;(<span class="kw">null</span>);
+  <span class="kw">const</span> triggerRef = <span class="fn">useRef</span>&lt;HTMLElement&gt;(<span class="kw">null</span>);
+
+  <span class="fn">useEffect</span>(() => {
+    <span class="kw">if</span> (open) {
+      triggerRef.current = document.activeElement <span class="kw">as</span> HTMLElement; <span class="cm">// Remember trigger</span>
+      dialogRef.current?.<span class="fn">focus</span>();  <span class="cm">// Move focus into dialog</span>
+    } <span class="kw">else</span> {
+      triggerRef.current?.<span class="fn">focus</span>(); <span class="cm">// Return focus on close</span>
+    }
+  }, [open]);
+
+  <span class="kw">const</span> <span class="fn">trapFocus</span> = (e: KeyboardEvent) => {
+    <span class="kw">if</span> (e.key !== <span class="str">'Tab'</span>) <span class="kw">return</span>;
+    <span class="kw">const</span> focusable = dialogRef.current?.<span class="fn">querySelectorAll</span>(
+      <span class="str">'button, [href], input, [tabindex]:not([tabindex="-1"])'</span>
+    );
+    <span class="kw">const</span> [first, last] = [focusable?.[<span class="num">0</span>], focusable?.[focusable.length - <span class="num">1</span>]] <span class="kw">as</span> HTMLElement[];
+    <span class="kw">if</span> (e.shiftKey && document.activeElement === first) { last.<span class="fn">focus</span>(); e.<span class="fn">preventDefault</span>(); }
+    <span class="kw">else if</span> (!e.shiftKey && document.activeElement === last) { first.<span class="fn">focus</span>(); e.<span class="fn">preventDefault</span>(); }
+  };
+
+  <span class="kw">if</span> (!open) <span class="kw">return null</span>;
+  <span class="kw">return</span> (
+    &lt;div role=<span class="str">"dialog"</span> aria-modal=<span class="str">"true"</span> aria-labelledby=<span class="str">"modal-title"</span>
+      ref={dialogRef} tabIndex={<span class="num">-1</span>} onKeyDown={<span class="fn">trapFocus</span>}&gt;
+      &lt;h2 id=<span class="str">"modal-title"</span>&gt;Confirm deletion&lt;/h2&gt;
+      {children}
+      &lt;button onClick={onClose}&gt;Cancel&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+<span class="cm">// Live region for async notifications</span>
+<span class="kw">function</span> <span class="fn">StatusAnnouncer</span>({ message }) {
+  <span class="kw">return</span> (
+    &lt;div
+      role=<span class="str">"status"</span>     <span class="cm">// aria-live="polite" equivalent</span>
+      aria-live=<span class="str">"polite"</span>
+      aria-atomic=<span class="str">"true"</span>
+      className=<span class="str">"sr-only"</span> <span class="cm">// Visually hidden, screen reader visible</span>
+    &gt;{message}&lt;/div&gt;
+  );
+}
+<span class="cm">// When message changes: screen reader announces it when idle</span>
+<span class="cm">// Use for: form validation success, item saved, cart updated</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using <code>aria-label</code> on elements that already have visible text — <code>&lt;button aria-label="Close"&gt;Close&lt;/button&gt;</code> is redundant. Worse: <code>&lt;button aria-label="Close"&gt;✕&lt;/button&gt;</code> where the label and content differ confuses screen readers. Use <code>aria-label</code> only on elements without visible text, or where the visual text is meaningless.</div>
+  <div class="mst">Setting <code>aria-hidden="true"</code> on elements with focusable children — screen readers skip <code>aria-hidden</code> elements, but keyboard focus can still reach children. A focused element inside an <code>aria-hidden</code> container creates a ghost focus state the user can't perceive or understand. Remove focusable children or use <code>inert</code> attribute instead.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How do you manage focus when a modal opens and closes?"</div><div class="d">On open: save a reference to the triggering element (document.activeElement), move focus to the dialog element or first interactive child. Trap focus: Tab cycles within the dialog (check first/last focusable, loop around). On close: restore focus to the triggering element. Without restoration, keyboard users lose their document position — their cursor is now at the top of the page with no indication of where they were.</div></div>
+  <div class="iq"><div class="q">"What is an aria-live region and when do you use it?"</div><div class="d">A container with aria-live="polite" (announces when screen reader is idle) or "assertive" (interrupts immediately). Use for dynamic content that updates without a page reload: form validation messages, async operation results, real-time notifications, cart updates. Without a live region, screen readers have no way to know the content changed and users miss the update.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Design systems (a11y baked into component primitives)</span>
+    <span class="pill pc">WCAG 2.1 (the compliance standard)</span>
+    <span class="pill pc">Radix UI / Headless UI (a11y-complete primitives)</span>
+    <span class="pill pc">axe-core / jest-axe (automated a11y testing)</span>
+  </div>
+</div>
+
+<div class="topic" id="t4">
+  <div class="tnum">Topic 5 of 8 — Block 8: Architecture</div>
+  <h1 class="ttl">Internationalisation (i18n)</h1>
+  <div class="tags"><span class="tag tg">Locale detection</span><span class="tag tp">RTL layout</span><span class="tag tw">Intl API</span><span class="tag ti">Translation loading</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Internationalisation (i18n) is the architecture for making an application adaptable to multiple languages, regions, and cultural conventions without code changes per locale. This is distinct from localisation (l10n) — the actual work of translating content for a specific locale. A well-architected i18n system handles: language detection and switching, string externalisation and namespace loading, plural forms and gender agreement, date/time/number/currency formatting per locale, right-to-left (RTL) layout for Arabic/Hebrew/Persian, and content negotiation with the server.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Locale detection order</h4><p>URL path prefix (<code>/en/</code>, <code>/ar/</code>) → subdomain (<code>ar.site.com</code>) → query param (<code>?lang=ar</code>) → <code>Accept-Language</code> header (server) → <code>navigator.language</code> (browser). URL-based is SEO-friendly and shareable. Persist user preference in a cookie/localStorage override.</p></div>
+    <div class="sb"><h4>Plural forms</h4><p>English: singular/plural. Arabic: 6 forms (zero, one, two, few, many, other). Russian: 3 forms by last digit. <code>Intl.PluralRules</code> returns the category for a number. i18next/react-intl handle this automatically when translations include plural keys (<code>item_one</code>, <code>item_other</code>, <code>item_zero</code>).</p></div>
+    <div class="sb"><h4>Intl API</h4><p>Built-in browser/Node.js API for locale-sensitive formatting. <code>Intl.DateTimeFormat</code>, <code>Intl.NumberFormat</code>, <code>Intl.RelativeTimeFormat</code>, <code>Intl.Collator</code> (locale-aware sorting). No library needed for formatting — the Intl API is comprehensive and supported everywhere.</p></div>
+    <div class="sb"><h4>RTL layout</h4><p>Arabic/Hebrew/Persian are right-to-left. CSS logical properties (<code>margin-inline-start</code> instead of <code>margin-left</code>) automatically flip in RTL. Set <code>dir="rtl"</code> on the html element. Tailwind CSS supports RTL via the <code>rtl:</code> variant. Text alignment, flexbox direction, absolute positioning, and icon placement all need audit.</p></div>
+    <div class="sb"><h4>Translation loading strategy</h4><p>Load only the active locale's translations (not all 20 languages). Code-split by namespace: <code>common.json</code> always loaded, <code>checkout.json</code> loaded on checkout route. React Suspense for translation loading: component suspends until translations are ready (no flash of untranslated strings).</p></div>
+    <div class="sb"><h4>ICU message format</h4><p>Standardised syntax for complex translations: <code>{count, plural, =0{No items} one{# item} other{# items}}</code>. Handles plurals, gender, select, and number formatting within a single translation key. Used by FormatJS (react-intl), i18next, and LinguiJS.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Intl API — no library, built into the browser</span>
+<span class="kw">const</span> locale = <span class="str">'hi-IN'</span>; <span class="cm">// Hindi India</span>
+
+<span class="cm">// Numbers</span>
+<span class="kw">new</span> <span class="cl">Intl</span>.<span class="cl">NumberFormat</span>(locale, { style: <span class="str">'currency'</span>, currency: <span class="str">'INR'</span> })
+  .<span class="fn">format</span>(<span class="num">1234567.89</span>); <span class="cm">// "₹12,34,567.89" — Indian lakh format</span>
+
+<span class="cm">// Dates</span>
+<span class="kw">new</span> <span class="cl">Intl</span>.<span class="cl">DateTimeFormat</span>(locale, { dateStyle: <span class="str">'long'</span> })
+  .<span class="fn">format</span>(<span class="kw">new</span> <span class="cl">Date</span>()); <span class="cm">// "10 जनवरी 2025" — Hindi month name</span>
+
+<span class="cm">// Relative time</span>
+<span class="kw">new</span> <span class="cl">Intl</span>.<span class="cl">RelativeTimeFormat</span>(<span class="str">'ar'</span>, { numeric: <span class="str">'auto'</span> })
+  .<span class="fn">format</span>(-<span class="num">2</span>, <span class="str">'day'</span>); <span class="cm">// "أول أمس" (day before yesterday in Arabic)</span>
+
+<span class="cm">// Plural rules</span>
+<span class="kw">const</span> pr = <span class="kw">new</span> <span class="cl">Intl</span>.<span class="cl">PluralRules</span>(<span class="str">'ar'</span>);
+pr.<span class="fn">select</span>(<span class="num">0</span>);  <span class="cm">// 'zero'</span>
+pr.<span class="fn">select</span>(<span class="num">1</span>);  <span class="cm">// 'one'</span>
+pr.<span class="fn">select</span>(<span class="num">2</span>);  <span class="cm">// 'two'</span>
+pr.<span class="fn">select</span>(<span class="num">5</span>);  <span class="cm">// 'few'</span>
+pr.<span class="fn">select</span>(<span class="num">11</span>); <span class="cm">// 'many'</span>
+pr.<span class="fn">select</span>(<span class="num">100</span>);<span class="cm">// 'other'</span>
+<span class="cm">// Arabic has 6 plural forms — handle all in translations</span>
+
+<span class="cm">// RTL layout — CSS logical properties</span>
+<span class="cm">/* ❌ Physical — wrong in RTL */</span>
+.card { margin-left: <span class="num">1</span>rem; padding-right: <span class="num">16</span>px; text-align: left; }
+
+<span class="cm">/* ✅ Logical — correct in LTR and RTL */</span>
+.card {
+  margin-inline-start: <span class="num">1</span>rem;    <span class="cm">/* left in LTR, right in RTL */</span>
+  padding-inline-end: <span class="num">16</span>px;     <span class="cm">/* right in LTR, left in RTL */</span>
+  text-align: start;             <span class="cm">/* left in LTR, right in RTL */</span>
+}
+
+<span class="cm">// i18next with namespace lazy loading</span>
+<span class="kw">import</span> i18n <span class="kw">from</span> <span class="str">'i18next'</span>;
+<span class="kw">import</span> { initReactI18next } <span class="kw">from</span> <span class="str">'react-i18next'</span>;
+<span class="kw">import</span> <span class="cl">HttpBackend</span> <span class="kw">from</span> <span class="str">'i18next-http-backend'</span>;
+
+i18n.<span class="fn">use</span>(<span class="cl">HttpBackend</span>).<span class="fn">use</span>(initReactI18next).<span class="fn">init</span>({
+  lng: <span class="str">'en'</span>,
+  ns: [<span class="str">'common'</span>],              <span class="cm">// Always-loaded namespaces</span>
+  defaultNS: <span class="str">'common'</span>,
+  backend: {
+    loadPath: <span class="str">'/locales/{{lng}}/{{ns}}.json'</span>, <span class="cm">// Lazy loaded per route</span>
+  },
+});
+
+<span class="cm">// React component</span>
+<span class="kw">function</span> <span class="fn">CheckoutPage</span>() {
+  <span class="kw">const</span> { t, ready } = <span class="fn">useTranslation</span>([<span class="str">'checkout'</span>]); <span class="cm">// Loads checkout.json</span>
+  <span class="kw">if</span> (!ready) <span class="kw">return</span> &lt;<span class="cl">Spinner</span> /&gt;;  <span class="cm">// Or use Suspense</span>
+  <span class="kw">return</span> &lt;h1&gt;{<span class="fn">t</span>(<span class="str">'checkout:title'</span>)}&lt;/h1&gt;;
+}</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Concatenating translated strings: <code>"Your order " + t('status') + " was confirmed"</code> — word order differs between languages. Use ICU message format with interpolation: <code>t('orderConfirmed', { status })</code> → <code>"Your {status} order was confirmed"</code>. Some languages need the status at the beginning or end of the sentence.</div>
+  <div class="mst">Using <code>text-align: left</code> and <code>margin-left</code> for layout — breaks completely in RTL. Audit all physical CSS properties and replace with logical equivalents. Tailwind's <code>ms-</code> (margin-start) and <code>me-</code> (margin-end) utilities handle this cleanly.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How would you add Arabic language support to an existing app?"</div><div class="d">Multiple layers: (1) Extract all strings to translation keys (audit hardcoded text). (2) Add Arabic translation file with ICU plural forms (Arabic has 6). (3) Set html dir="rtl" for Arabic locale. (4) Audit CSS — replace physical properties (margin-left, text-align: left) with logical equivalents. (5) Test icon orientation — some icons are directional (arrows) and should mirror in RTL. (6) Test number/date formatting with Intl API for locale. (7) Test font — Arabic requires a different font, often heavier weight for readability.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pc">Intl API (built-in, no library needed for formatting)</span>
+    <span class="pill pc">CSS logical properties (RTL-safe layout)</span>
+    <span class="pill pq">Next.js i18n routing (URL-based locale)</span>
+    <span class="pill pc">HTTP Accept-Language header (server locale detection)</span>
+  </div>
+</div>
+
+<div class="topic" id="t5">
+  <div class="tnum">Topic 6 of 8 — Block 8: Architecture</div>
+  <h1 class="ttl">Progressive enhancement vs graceful degradation</h1>
+  <div class="tags"><span class="tag tg">Bottom-up approach</span><span class="tag tp">Top-down approach</span><span class="tag tw">Core experience</span><span class="tag ti">Feature detection</span></div>
+
+  <div class="sl">Definition — they are NOT the same thing</div>
+  <p class="prose"><strong>Progressive enhancement (PE)</strong> is a bottom-up design philosophy: start with the simplest possible working experience (semantic HTML, no JS), then layer enhancements (CSS styling, JS interactivity, advanced APIs) for capable environments. Every user gets a functional baseline; capable environments get more. PE is the correct approach for the web's inherently uncertain runtime environment.</p>
+  <p class="prose" style="margin-top:8px"><strong>Graceful degradation (GD)</strong> is a top-down approach: build the full-featured experience first, then add fallbacks so that when features are unavailable, the experience degrades rather than breaks completely. You start at the top and plan for failure. GD is more common in native app development and is what most developers actually practice when they say "progressive enhancement."</p>
+
+  <div class="sl">The practical differences</div>
+  <div class="g2">
+    <div class="sb"><h4>Progressive enhancement in practice</h4><p>A form works without JavaScript (native HTML form submission). Then JS enhances it with client-side validation, async submission, and better UX. Core use case: the form submits to the server, a user gets a confirmation. Enhanced use case: no page reload, instant feedback. Even if JS fails to load, the form works.</p></div>
+    <div class="sb"><h4>Graceful degradation in practice</h4><p>A complex data visualisation is built with WebGL. A fallback SVG chart is shown when WebGL isn't available. The primary experience is the full-featured one; the degraded experience is acceptable but less capable. GD acknowledges the gap between primary and fallback.</p></div>
+    <div class="sb"><h4>Feature detection (not user-agent sniffing)</h4><p>Correct approach: detect the capability, not the browser. <code>if ('IntersectionObserver' in window)</code>, <code>if (CSS.supports('display', 'grid'))</code>. Never <code>if (navigator.userAgent.includes('Chrome'))</code> — browser features don't track user agent strings reliably. Use Modernizr, or write feature tests directly.</p></div>
+    <div class="sb"><h4>When each applies</h4><p>PE: content-driven sites, forms, navigation, server-rendered pages. GD: complex interactive applications where the core value IS the rich experience (video editors, CAD tools, games). Most modern SPAs practice GD (assume JS), then add offline fallbacks (service worker) — not true PE.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Progressive enhancement — form that works without JS</span>
+&lt;form action=<span class="str">"/api/subscribe"</span> method=<span class="str">"POST"</span>&gt;  {<span class="cm">/* Works without JS */</span>}
+  &lt;input type=<span class="str">"email"</span> name=<span class="str">"email"</span> required /&gt;
+  &lt;button type=<span class="str">"submit"</span>&gt;Subscribe&lt;/button&gt;
+&lt;/form&gt;
+
+<span class="cm">// JS layer enhances it — only if JS is available</span>
+<span class="kw">if</span> (<span class="kw">typeof</span> window !== <span class="str">'undefined'</span>) {
+  document.<span class="fn">querySelector</span>(<span class="str">'form'</span>)?.addEventListener(<span class="str">'submit'</span>, <span class="kw">async</span> (e) => {
+    e.<span class="fn">preventDefault</span>();               <span class="cm">// Override native submission</span>
+    <span class="kw">const</span> email = e.target.email.value;
+    <span class="kw">const</span> result = <span class="kw">await</span> <span class="fn">subscribeUser</span>(email);
+    <span class="fn">showInlineSuccess</span>(result);         <span class="cm">// Enhanced UX</span>
+  });
+}
+
+<span class="cm">// Feature detection — not browser detection</span>
+<span class="cm">// ❌ Never do this:</span>
+<span class="kw">if</span> (navigator.userAgent.<span class="fn">includes</span>(<span class="str">'Safari'</span>)) { <span class="fn">useFallback</span>(); }
+
+<span class="cm">// ✅ Test the capability itself:</span>
+<span class="kw">const</span> supportsContainerQueries = <span class="cl">CSS</span>.<span class="fn">supports</span>(<span class="str">'container-type: inline-size'</span>);
+<span class="kw">const</span> supportsWebP = <span class="kw">await</span> <span class="fn">testWebP</span>(); <span class="cm">// createImageBitmap test</span>
+<span class="kw">const</span> supportsIntersectionObserver = <span class="str">'IntersectionObserver'</span> <span class="kw">in</span> window;
+
+<span class="cm">// CSS progressive enhancement</span>
+.grid {
+  display: flex;               <span class="cm">/* Baseline: all browsers */</span>
+  flex-wrap: wrap;
+}
+
+@supports (display: grid) {
+  .grid {
+    display: grid;             <span class="cm">/* Enhancement: grid-capable browsers */</span>
+    grid-template-columns: repeat(auto-fit, minmax(<span class="num">200</span>px, <span class="num">1</span>fr));
+  }
+}</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Confusing the two terms — interviewers notice. PE starts from the bottom with a working baseline; GD starts from the top with the rich experience and degrades. Most teams practice GD (build for modern browsers, add fallbacks). Saying "we use progressive enhancement" when you mean GD is a credibility issue.</div>
+  <div class="mst">Using <code>@supports not</code> for progressive enhancement — the common mistake is writing fallback CSS after the enhanced CSS. CSS cascade order is the natural progressive enhancement mechanism: write the baseline rule first, then override with <code>@supports</code>. The unsupporting browser ignores the <code>@supports</code> block and keeps the baseline.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between progressive enhancement and graceful degradation?"</div><div class="d">PE is bottom-up: build a working baseline (semantic HTML, no JS), add enhancements for capable environments. Every user gets something functional. GD is top-down: build the full experience, add fallbacks for incapable environments. PE is philosophically the web's native model; GD is closer to native app development. Modern SPAs are mostly GD — they require JS and then add offline fallbacks. PE is most natural for content sites and server-rendered apps.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Islands architecture (topic 8 — PE in action: HTML-first, JS as enhancement)</span>
+    <span class="pill pq">Service workers (offline fallback = graceful degradation)</span>
+    <span class="pill pc">CSS @supports (feature-based enhancement in stylesheets)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 4–6 complete ───</div>
+
+<div class="topic" id="t6">
+  <div class="tnum">Topic 7 of 8 — Block 8: Architecture</div>
+  <h1 class="ttl">Edge rendering</h1>
+  <div class="tags"><span class="tag tg">Edge Functions</span><span class="tag tp">Cloudflare Workers</span><span class="tag tw">Streaming SSR</span><span class="tag ti">Partial hydration</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Edge rendering moves the rendering compute from a centralised origin server to geographically distributed edge nodes — the same infrastructure that CDNs use to serve static assets. Instead of a user in Mumbai waiting 200ms for a response from a US-East server, their request is handled by an edge node that is <50ms away. Edge Functions (Vercel) and Cloudflare Workers run JavaScript at the network edge, enabling dynamic personalised pages, A/B testing, authentication, and full SSR at CDN-level latency. The constraint: edge runtimes are stripped-down environments — no Node.js native modules, no filesystem access, limited runtime APIs. Code must run in a V8 isolate, not a full Node.js process.</p>
+
+  <div class="sl">How edge runtimes work</div>
+  <p class="prose">Cloudflare Workers use V8 isolates — not Node.js processes. Each request gets its own V8 isolate (extremely lightweight, ~5ms startup vs ~100ms for a container). Isolates share the V8 engine process but have separate heaps. Workers run globally: code is distributed to 300+ PoPs (Points of Presence), and the nearest one handles each request. The programming model uses the Service Worker API: a <code>fetch</code> event handler. The Fetch API, Cache API, KV storage, and Durable Objects are available. Node.js-specific modules (fs, path, crypto, http) are not — or have polyfills. Vercel Edge Functions wrap this in a Next.js-compatible API: <code>export const runtime = 'edge'</code> on a route converts it from a Node.js serverless function to a Cloudflare Worker-like deployment.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Use cases for edge</h4><p>Personalisation without latency: choose locale, A/B variant, or auth-gated content at the edge before sending HTML. Middleware: auth checks, redirects, bot filtering. Streaming SSR for globally distributed users. Edge-side includes (ESI): compose fragments from different origins.</p></div>
+    <div class="sb"><h4>Streaming SSR at edge</h4><p>React's <code>renderToPipeableStream</code> (Node) / <code>renderToReadableStream</code> (edge) starts sending HTML before all async data resolves. Suspense boundaries flush as their data arrives. First byte reaches the user in ~50ms from edge; page streams in progressively. TTFB is edge-latency, not origin-latency.</p></div>
+    <div class="sb"><h4>Partial hydration</h4><p>Ship less JS by only hydrating interactive components. Static components (headers, footers, text content) never get JS. Interactive islands get their JS. Astro pioneered this; Next.js RSC implements it via server vs client component split. Reduces TTI for content-heavy pages.</p></div>
+    <div class="sb"><h4>Edge KV and Durable Objects</h4><p>Cloudflare KV: globally replicated key-value store, eventually consistent, for session data, feature flags, config. Durable Objects: single-location stateful objects with consistent storage — for real-time collaboration, game state, WebSocket coordination. Session state without a central database.</p></div>
+    <div class="sb"><h4>Limitations</h4><p>No Node.js native modules. Cold start constraints (isolate startup faster than container but still exists). No persistent filesystem. Some libraries don't work in edge runtimes (Prisma, bcrypt, sharp). Execution time limits (50ms CPU time on Cloudflare free tier). Must check library edge compatibility.</p></div>
+    <div class="sb"><h4>Vercel Edge Config</h4><p>Ultra-low latency key-value reads at edge nodes (sub-millisecond). For feature flags, A/B test config, allowlists — data that must be read on every request without a database round trip. Replicated to all PoPs; reads are local to the edge node handling the request.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Next.js Edge Middleware — runs at edge before any page</span>
+<span class="kw">import</span> { NextResponse } <span class="kw">from</span> <span class="str">'next/server'</span>;
+<span class="kw">import type</span> { NextRequest } <span class="kw">from</span> <span class="str">'next/server'</span>;
+
+<span class="kw">export const</span> config = { matcher: [<span class="str">'/((?!_next|favicon).*)']</span> };
+<span class="kw">export const</span> runtime = <span class="str">'edge'</span>; <span class="cm">// Runs in V8 isolate at 300+ PoPs</span>
+
+<span class="kw">export function</span> <span class="fn">middleware</span>(req: NextRequest) {
+  <span class="kw">const</span> country = req.geo?.country ?? <span class="str">'US'</span>;          <span class="cm">// Edge-detected, no DB</span>
+  <span class="kw">const</span> locale = req.headers.<span class="fn">get</span>(<span class="str">'accept-language'</span>)?.<span class="fn">split</span>(<span class="str">','</span>)[<span class="num">0</span>] ?? <span class="str">'en'</span>;
+
+  <span class="cm">// A/B test — split traffic at edge, zero origin hit for the decision</span>
+  <span class="kw">const</span> bucket = <span class="cl">Math</span>.<span class="fn">random</span>() > <span class="num">0.5</span> ? <span class="str">'control'</span> : <span class="str">'variant'</span>;
+  <span class="kw">const</span> res = <span class="cl">NextResponse</span>.<span class="fn">next</span>();
+  res.cookies.<span class="fn">set</span>(<span class="str">'ab-bucket'</span>, bucket, { maxAge: <span class="num">60</span> * <span class="num">60</span> * <span class="num">24</span> });
+
+  <span class="cm">// Personalised redirect without origin round trip</span>
+  <span class="kw">if</span> (country === <span class="str">'IN'</span> && req.nextUrl.pathname === <span class="str">'/'</span>) {
+    <span class="kw">return</span> <span class="cl">NextResponse</span>.<span class="fn">redirect</span>(<span class="kw">new</span> <span class="cl">URL</span>(<span class="str">'/in'</span>, req.url));
+  }
+  <span class="kw">return</span> res;
+}
+
+<span class="cm">// Edge SSR route</span>
+<span class="kw">export const</span> runtime = <span class="str">'edge'</span>; <span class="cm">// app/products/[id]/page.tsx</span>
+<span class="kw">export default async function</span> <span class="fn">ProductPage</span>({ params }) {
+  <span class="kw">const</span> product = <span class="kw">await</span> <span class="fn">getProduct</span>(params.id); <span class="cm">// Fetch from edge-proxied DB</span>
+  <span class="kw">return</span> &lt;<span class="cl">ProductView</span> product={product} /&gt;;
+  <span class="cm">// HTML streams from nearest edge PoP — TTFB ~30ms globally</span>
+  <span class="cm">// vs ~200ms from origin in US-East</span>
+}
+
+<span class="cm">// Cloudflare Worker — streaming response from edge</span>
+<span class="kw">export default</span> {
+  <span class="kw">async</span> <span class="fn">fetch</span>(request: Request) {
+    <span class="kw">const</span> { readable, writable } = <span class="kw">new</span> <span class="cl">TransformStream</span>();
+    <span class="kw">const</span> writer = writable.<span class="fn">getWriter</span>();
+    <span class="kw">const</span> encoder = <span class="kw">new</span> <span class="cl">TextEncoder</span>();
+
+    (<span class="kw">async</span> () => {
+      writer.<span class="fn">write</span>(encoder.<span class="fn">encode</span>(<span class="str">'&lt;html&gt;&lt;body&gt;&lt;h1&gt;'</span>));
+      <span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">fetchFromDB</span>(); <span class="cm">// Runs while shell streams to browser</span>
+      writer.<span class="fn">write</span>(encoder.<span class="fn">encode</span>(data.title + <span class="str">'&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;'</span>));
+      writer.<span class="fn">close</span>();
+    })();
+
+    <span class="kw">return new</span> <span class="cl">Response</span>(readable, { headers: { <span class="str">'content-type'</span>: <span class="str">'text/html'</span> } });
+  }
+};</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using Node.js-only packages in edge routes — Prisma (uses native binary), bcrypt (C++ binding), and sharp (libvips) don't work in V8 isolates. Use edge-compatible alternatives: Kysely + Neon HTTP for Postgres at edge, Web Crypto API instead of bcrypt, Cloudflare Images instead of sharp. Always test with <code>export const runtime = 'edge'</code> locally before deploying.</div>
+  <div class="mst">Treating edge functions as always-on servers — V8 isolates terminate after the request. No in-memory caching persists between requests (use KV or Cache API instead). Writing to a global variable and expecting it to be there on the next request is a silent bug.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between a Cloudflare Worker and a traditional serverless function?"</div><div class="d">Traditional serverless (Lambda): Node.js process, full runtime, ~100ms cold start, runs in one region. Cloudflare Workers: V8 isolate, stripped runtime (no Node.js native modules), ~5ms cold start, runs at 300+ global PoPs nearest to the user. Workers trade capability for global low-latency. The tradeoff: many libraries that work in Node.js don't work at the edge — you must use edge-compatible alternatives.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Islands architecture (partial hydration at edge)</span>
+    <span class="pill pq">React streaming SSR (renderToReadableStream at edge)</span>
+    <span class="pill pc">V8 isolates (same engine, different runtime constraints)</span>
+    <span class="pill pc">CDN caching (edge rendering + cache = fastest possible response)</span>
+  </div>
+</div>
+
+<div class="topic" id="t7">
+  <div class="tnum">Topic 8 of 8 — Block 8: Architecture</div>
+  <h1 class="ttl">Islands architecture</h1>
+  <div class="tags"><span class="tag tg">Astro model</span><span class="tag tp">Selective hydration</span><span class="tag tw">Zero JS default</span><span class="tag ti">Bundle reduction</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Islands architecture (coined by Jason Miller, Preact co-creator) is a rendering approach where a page is predominantly static HTML generated at build time or on the server, with discrete "islands" of interactivity that are selectively hydrated with JavaScript. The key inversion from SPAs: the default is no JavaScript — each interactive component "opts in" to hydration. A product page with a static header, static product description, and an interactive "Add to Cart" button ships zero JS for the header and description, and only the Add-to-Cart JS for the button island. Astro is the primary implementation; React's RSC + Server Components is a different implementation of the same architectural principle.</p>
+
+  <div class="sl">How Astro implements islands</div>
+  <p class="prose">In Astro, <code>.astro</code> components render to pure HTML at build time (or on the server) with zero client-side JavaScript. To make a component interactive, you import it from any framework (React, Vue, Svelte, Solid) and use a <strong>client directive</strong>: <code>&lt;ReactButton client:load /&gt;</code>, <code>&lt;Counter client:visible /&gt;</code>. The directive controls <em>when</em> the island's JavaScript is loaded and the component is hydrated. Non-interactive components ship only their HTML output — no framework JS, no component JS, no hydration. The result: a page that is 90% static HTML with islands of interactivity loads far less JavaScript than an equivalent SPA.</p>
+
+  <div class="sl">Client directives (hydration strategies)</div>
+  <div class="g2">
+    <div class="sb"><h4>client:load</h4><p>Hydrate immediately on page load. Use for above-fold interactive components that the user needs immediately: navigation menus, hero CTAs. Equivalent to standard React hydration.</p></div>
+    <div class="sb"><h4>client:idle</h4><p>Hydrate when the browser is idle (requestIdleCallback). Use for below-fold components that aren't immediately critical: comment sections, related articles. Doesn't block the main thread during initial load.</p></div>
+    <div class="sb"><h4>client:visible</h4><p>Hydrate when the component enters the viewport (IntersectionObserver). Use for far-below-fold islands: footer widgets, deeply nested interactive components. JS loads only when the user scrolls to it.</p></div>
+    <div class="sb"><h4>client:media</h4><p>Hydrate only when a CSS media query matches: <code>client:media="(max-width: 768px)"</code>. Use for mobile-only interactive components. Desktop users never download the JS; mobile users get it on load.</p></div>
+  </div>
+
+  <div class="sl">Islands vs SPA vs RSC comparison</div>
+  <div class="g3">
+    <div class="sb"><h4>SPA (React default)</h4><p>All JS downloaded on first visit. Full hydration of every component. JS is the runtime. SSR is optional add-on. Rich interactivity everywhere. Best for: app-like UIs, dashboards, highly interactive tools.</p></div>
+    <div class="sb"><h4>Islands (Astro)</h4><p>HTML-first. JS only for interactive islands. Directives control hydration timing. Mix frameworks per island. Best for: content sites with pockets of interactivity — blogs, documentation, marketing, e-commerce PDPs.</p></div>
+    <div class="sb"><h4>RSC (React)</h4><p>Component-level server/client split. Server components ship no JS. Client components hydrate. Fine-grained control within React. Best for: React apps needing server-state colocation and granular bundle control with React's DX.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Astro page — zero JS default, islands opt in</span>
+<span class="cm">---</span>
+<span class="cm">// Server-side only — runs at build time or request time</span>
+<span class="kw">import</span> { <span class="fn">getProduct</span> } <span class="kw">from</span> <span class="str">'../db'</span>;
+<span class="kw">import</span> <span class="cl">ProductGallery</span> <span class="kw">from</span> <span class="str">'../components/ProductGallery.astro'</span>;
+<span class="kw">import</span> <span class="cl">AddToCartButton</span> <span class="kw">from</span> <span class="str">'../components/AddToCartButton.tsx'</span>;
+<span class="kw">import</span> <span class="cl">ReviewSlider</span>   <span class="kw">from</span> <span class="str">'../components/ReviewSlider.svelte'</span>;
+
+<span class="kw">const</span> product = <span class="kw">await</span> <span class="fn">getProduct</span>(Astro.params.id);
+<span class="cm">---</span>
+
+&lt;html&gt;
+  &lt;body&gt;
+    &lt;header&gt;...&lt;/header&gt;  {<span class="cm">/* Pure HTML — zero JS */</span>}
+
+    &lt;<span class="cl">ProductGallery</span> images={product.images} /&gt;  {<span class="cm">/* .astro = pure HTML */</span>}
+    &lt;h1&gt;{product.name}&lt;/h1&gt;                     {<span class="cm">/* Static text — zero JS */</span>}
+    &lt;p&gt;{product.description}&lt;/p&gt;
+
+    &lt;<span class="cm">!-- ISLAND: React component, hydrates on load --&gt;</span>
+    &lt;<span class="cl">AddToCartButton</span>
+      client:load
+      productId={product.id}
+      price={product.price}
+    /&gt;
+
+    &lt;<span class="cm">!-- ISLAND: Svelte component, hydrates when scrolled into view --&gt;</span>
+    &lt;<span class="cl">ReviewSlider</span>
+      client:visible
+      reviews={product.reviews}
+    /&gt;
+
+    &lt;footer&gt;...&lt;/footer&gt;  {<span class="cm">/* Pure HTML — zero JS */</span>}
+  &lt;/body&gt;
+&lt;/html&gt;
+
+<span class="cm">// What ships to the browser:</span>
+<span class="cm">// HTML: the full page, pre-rendered ✓</span>
+<span class="cm">// JS: React runtime + AddToCartButton bundle (loads immediately)</span>
+<span class="cm">// JS: Svelte runtime + ReviewSlider bundle (loads on scroll)</span>
+<span class="cm">// JS for header, description, gallery, footer: 0 bytes</span>
+
+<span class="cm">// React RSC equivalent — same principle, different mechanism</span>
+<span class="cm">// app/products/[id]/page.tsx — Server Component (default)</span>
+<span class="kw">async function</span> <span class="fn">ProductPage</span>({ params }) {
+  <span class="kw">const</span> product = <span class="kw">await</span> <span class="fn">getProduct</span>(params.id); <span class="cm">// Server-only</span>
+  <span class="kw">return</span> (
+    &lt;&gt;
+      &lt;h1&gt;{product.name}&lt;/h1&gt;     {<span class="cm">/* Server: 0 JS */</span>}
+      &lt;p&gt;{product.description}&lt;/p&gt; {<span class="cm">/* Server: 0 JS */</span>}
+      &lt;<span class="cl">AddToCartButton</span> productId={product.id} /&gt; {<span class="cm">/* Client: has JS */</span>}
+      &lt;<span class="cl">ReviewSlider</span> reviews={product.reviews} /&gt;  {<span class="cm">/* Client: has JS */</span>}
+    &lt;/&gt;
+  );
+}
+<span class="cm">// 'use client' in AddToCartButton.tsx and ReviewSlider.tsx</span>
+<span class="cm">// marks them as islands that get JavaScript</span></pre></div>
+
+  <div class="sl">Performance implications</div>
+  <p class="prose">A typical Astro e-commerce page ships ~50-100KB of JavaScript (only the interactive islands' bundles). An equivalent Next.js pages-router SPA ships ~150-300KB (React runtime + all component hydration). The difference is dramatic on mobile. <strong>TTI improvement</strong>: the main thread isn't busy parsing and executing JS for components that are purely visual. <strong>LCP improvement</strong>: HTML arrives pre-rendered, no JS needed before the LCP element renders. <strong>INP improvement</strong>: less JS competing for the main thread during user interactions.</p>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Making too many islands — if 80% of your page components are <code>client:load</code>, you've recreated an SPA with extra steps. Islands architecture's benefit comes from restraint: the majority of the page should be static HTML. Audit each interactive use case — can it be handled with CSS or native HTML instead of JS?</div>
+  <div class="mst">Islands sharing state — Astro islands are isolated by default. An <code>AddToCart</code> island and a <code>CartCount</code> island in the header can't share React state (separate React trees). Use a shared store (nanostores, for framework-agnostic atoms) or URL/custom events for cross-island communication.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is islands architecture and how does it differ from an SPA?"</div><div class="d">Islands: HTML-first rendering, with selective JavaScript hydration only for interactive components. The default is zero JS; each island opts in. SPAs: JavaScript-first, full hydration of every component. Islands ship dramatically less JS — only the interactive islands' bundles. Best for content-heavy pages with pockets of interactivity. The RSC model is React's implementation of the same principle: server components ship no JS, client components are the islands.</div></div>
+  <div class="iq"><div class="q">"How does Astro's client:visible directive work?"</div><div class="d">Uses IntersectionObserver to watch the island's placeholder element. When the element enters the viewport, Astro dynamically loads the island's JavaScript bundle and hydrates the component in place. Until then, the server-rendered HTML shows a static version (or nothing, depending on the component). The JS never loads if the user never scrolls to the island — pure bandwidth savings.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Progressive enhancement (topic 6 — islands are PE in action)</span>
+    <span class="pill pq">RSC (React's island implementation)</span>
+    <span class="pill pq">Edge rendering (islands + edge = fast, low-JS, global)</span>
+    <span class="pill pc">Core Web Vitals (LCP/TTI/INP all improve with less JS)</span>
+    <span class="pill pc">Partial hydration (the mechanism islands use)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── All 8 topics complete · Block 8 done ───</div>
+
+</main>
+</div>
+
+<script>
+function show(idx,el){
+  document.querySelectorAll('.topic').forEach(t=>t.classList.remove('visible'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('t'+idx).classList.add('visible');
+  el.classList.add('active');
+  document.querySelector('.content').scrollTop=0;
+}
+</script>

@@ -1,0 +1,783 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,system-ui);background:transparent;color:var(--color-text-primary)}
+.wrap{padding:0.5rem 0 2.5rem}
+.nav-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem}
+.nb{padding:6px 13px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12.5px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.nb:hover{background:var(--color-background-secondary)}
+.nb.on{background:#EEEDFE;border-color:#534AB7;color:#3C3489;font-weight:500}
+.tp{display:none}.tp.vis{display:block}
+.ttl{font-size:20px;font-weight:500;margin-bottom:3px}
+.sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.25rem}
+.stabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.25rem;padding-bottom:10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.st{padding:5px 12px;font-size:12px;border-radius:16px;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.st:hover{background:var(--color-background-secondary)}
+.st.on{background:#EEEDFE;color:#3C3489;font-weight:500}
+.sc{display:none}.sc.vis{display:block}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.def{font-size:15px;line-height:1.7}
+code{font-family:var(--font-mono,monospace);font-size:.9em;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px}
+.cb{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;font-size:12px;line-height:1.8;margin-bottom:1rem;white-space:pre;font-family:var(--font-mono,monospace)}
+.kw{color:#534AB7;font-weight:500}.cm{color:var(--color-text-secondary)}.str{color:#085041}.nm{color:#993C1D}
+.flow{display:flex;flex-direction:column;gap:8px}
+.fs{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:8px;background:var(--color-background-secondary);border-left:3px solid #AFA9EC}
+.fs.teal{border-left-color:#5DCAA5}
+.fs.coral{border-left-color:#F0997B}
+.fs.amber{border-left-color:#EF9F27}
+.fs.red{border-left-color:#E24B4A}
+.fn{min-width:22px;height:22px;border-radius:50%;background:#EEEDFE;color:#3C3489;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.fn.t{background:#E1F5EE;color:#085041}
+.fn.c{background:#FAECE7;color:#712B13}
+.fn.a{background:#FAEEDA;color:#633806}
+.ft{font-size:13.5px;line-height:1.6}
+.mi{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.mi:last-child{border-bottom:none}
+.mico{width:22px;height:22px;border-radius:50%;background:#FCEBEB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:13px}
+.mt{font-size:13.5px;line-height:1.6}
+.mt strong{font-weight:500;color:#A32D2D}
+.qi{padding:10px 12px;border-radius:8px;background:var(--color-background-secondary);margin-bottom:8px;font-size:13.5px;line-height:1.6;cursor:pointer;border:.5px solid var(--color-border-tertiary);transition:all .15s}
+.qi:hover{border-color:#AFA9EC;background:#EEEDFE}
+.ql{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.qa{font-size:13px;color:var(--color-text-secondary);margin-top:6px;padding-top:6px;border-top:.5px solid var(--color-border-tertiary);display:none;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:5px 13px;border-radius:16px;font-size:13px;background:#EEEDFE;color:#3C3489;border:.5px solid #AFA9EC;cursor:pointer}
+.chip:hover{background:#CECBF6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.hl{border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.6;border:.5px solid}
+.hl-p{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.hl-t{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.hl-a{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.hl-c{background:#FAECE7;border-color:#F0997B;color:#712B13}
+.hl-b{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.hl-r{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.hl-g{background:#EAF3DE;border-color:#97C459;color:#3B6D11}
+.hn{font-weight:500;font-size:12px;margin-bottom:4px}
+.vis-wrap{background:var(--color-background-secondary);border-radius:10px;padding:1rem;margin-bottom:1rem}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;margin-right:3px;vertical-align:middle}
+.bp{background:#EEEDFE;color:#3C3489}
+.bt{background:#E1F5EE;color:#085041}
+.ba{background:#FAEEDA;color:#633806}
+.br{background:#FCEBEB;color:#A32D2D}
+.bg{background:#EAF3DE;color:#3B6D11}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:7px 10px;background:var(--color-background-secondary);color:var(--color-text-secondary);font-weight:500;border-bottom:.5px solid var(--color-border-tertiary)}
+.tbl td{padding:7px 10px;border-bottom:.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5}
+.tbl tr:last-child td{border-bottom:none}
+/* JVM Architecture visual */
+.jvm-layer{border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:13px;line-height:1.5}
+.mem-seg{border-radius:6px;padding:8px 12px;margin-bottom:5px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.gc-bar-wrap{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:6px;overflow:hidden;height:28px;position:relative;margin-bottom:6px}
+.gc-bar{height:100%;display:flex;align-items:center;padding-left:8px;font-size:12px;font-weight:500;border-radius:0;transition:width .3s}
+.ref-row{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.ref-row:last-child{border-bottom:none}
+.ref-badge{min-width:90px;text-align:center}
+</style>
+
+<div class="wrap">
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Java JVM & Memory Visual Bible — 7 topics with interactive sections</h2>
+
+<div style="margin-bottom:1.25rem"><p style="font-size:13px;color:var(--color-text-secondary)">Block 3 · Java Memory & JVM · 7 topics · pick a topic, then a section — interview answers hidden until clicked</p></div>
+
+<div class="nav-bar">
+  <button class="nb on" onclick="T(0)">1 · JVM Architecture</button>
+  <button class="nb" onclick="T(1)">2 · Heap vs Stack</button>
+  <button class="nb" onclick="T(2)">3 · Garbage Collection</button>
+  <button class="nb" onclick="T(3)">4 · GC Algorithms</button>
+  <button class="nb" onclick="T(4)">5 · Memory Leaks</button>
+  <button class="nb" onclick="T(5)">6 · String Pool</button>
+  <button class="nb" onclick="T(6)">7 · Java References</button>
+</div>
+
+<!-- ═══════════════ TOPIC 0 — JVM ARCHITECTURE ═══════════════ -->
+<div class="tp vis" id="t0">
+  <div class="ttl">JVM Architecture</div>
+  <div class="sub">ClassLoader subsystem · Runtime data areas · Execution Engine · JIT compiler</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t0','s0')">Definition</button>
+    <button class="st" onclick="S('t0','s1')">Internals</button>
+    <button class="st" onclick="S('t0','s2')">Visual</button>
+    <button class="st" onclick="S('t0','s3')">JIT deep dive</button>
+    <button class="st" onclick="S('t0','s4')">Mistakes</button>
+    <button class="st" onclick="S('t0','s5')">Interview</button>
+    <button class="st" onclick="S('t0','s6')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t0-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">The JVM is a runtime engine that executes Java bytecode on any OS. It abstracts away the hardware. Its three major subsystems are: the <strong>ClassLoader</strong> (loads .class files), the <strong>Runtime Data Areas</strong> (memory regions), and the <strong>Execution Engine</strong> (interprets/JIT-compiles bytecode to native machine code).</p>
+    </div>
+    <div class="three" style="margin-top:.5rem">
+      <div class="hl hl-p"><div class="hn">ClassLoader</div>Finds, loads, links, and initialises .class files into the runtime. Hierarchical — Bootstrap → Extension → Application.</div>
+      <div class="hl hl-t"><div class="hn">Runtime Data Areas</div>Memory regions: Method Area, Heap, JVM Stacks, PC Registers, Native Method Stacks.</div>
+      <div class="hl hl-a"><div class="hn">Execution Engine</div>Interpreter for cold code + JIT compiler for hot code (HotSpot). Also drives the GC.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s1">
+    <div class="card"><div class="ct">Internals — step by step</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>ClassLoader delegation model</strong> — Bootstrap ClassLoader (JVM native, loads rt.jar/java.base). Extension ClassLoader (loads ext/*.jar). Application ClassLoader (loads your classpath). Each delegates to parent first — ensures core JDK classes are never overridden by user code. You can write custom ClassLoaders (OSGi, app servers, hot-reload).</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Linking phases</strong> — Verification: bytecode safety check (no stack overflows, valid types). Preparation: static fields get default zero values. Resolution: symbolic references (class names) resolved to direct memory references.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>Method Area / Metaspace</strong> — stores class metadata (field/method descriptors, bytecode, constant pool, static variables). In Java 7 it lived on the heap (PermGen — fixed size, notorious for <code>OutOfMemoryError: PermGen</code>). Java 8 moved it to native memory as Metaspace — grows dynamically, capped with <code>-XX:MaxMetaspaceSize</code>.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>PC Register</strong> — one per thread, holds the address of the currently executing bytecode instruction. For native methods the PC is undefined.</div></div>
+        <div class="fs"><div class="fn">5</div><div class="ft"><strong>Native Method Stack</strong> — supports native (C/C++) method calls via JNI. Separate from JVM stacks.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s2">
+    <div class="card"><div class="ct">Visual — full JVM architecture</div>
+      <div class="vis-wrap">
+        <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">ClassLoader subsystem</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+          <div class="hl hl-p" style="flex:1;min-width:130px;padding:7px 10px"><div class="hn">Bootstrap CL</div>Loads java.lang, java.util from JDK modules</div>
+          <div style="display:flex;align-items:center;font-size:16px;color:var(--color-text-secondary)">→</div>
+          <div class="hl hl-b" style="flex:1;min-width:130px;padding:7px 10px"><div class="hn">Extension CL</div>Loads javax.*, ext jars</div>
+          <div style="display:flex;align-items:center;font-size:16px;color:var(--color-text-secondary)">→</div>
+          <div class="hl hl-t" style="flex:1;min-width:130px;padding:7px 10px"><div class="hn">App CL</div>Loads your classpath classes</div>
+        </div>
+        <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Runtime data areas</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+          <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">Shared across all threads</div>
+            <div class="mem-seg" style="background:#EEEDFE;border:.5px solid #AFA9EC;color:#3C3489">Metaspace (class metadata, static fields)</div>
+            <div class="mem-seg" style="background:#E1F5EE;border:.5px solid #5DCAA5;color:#085041">Heap — Young Gen + Old Gen</div>
+          </div>
+          <div><div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">Per-thread (each thread gets its own)</div>
+            <div class="mem-seg" style="background:#FAEEDA;border:.5px solid #EF9F27;color:#633806">JVM Stack (frames: locals, operand stack)</div>
+            <div class="mem-seg" style="background:#FAECE7;border:.5px solid #F0997B;color:#712B13">PC Register · Native Method Stack</div>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Execution engine</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div class="hl hl-c" style="flex:1;min-width:130px;padding:7px 10px"><div class="hn">Interpreter</div>Executes bytecode instruction-by-instruction. Fast startup, slow steady-state.</div>
+          <div style="display:flex;align-items:center;font-size:16px;color:var(--color-text-secondary)">+</div>
+          <div class="hl hl-a" style="flex:1;min-width:130px;padding:7px 10px"><div class="hn">JIT Compiler (C1/C2)</div>Profiles hot methods → compiles to native. C1 = fast compile, C2 = deep optimise.</div>
+          <div style="display:flex;align-items:center;font-size:16px;color:var(--color-text-secondary)">+</div>
+          <div class="hl hl-r" style="flex:1;min-width:130px;padding:7px 10px"><div class="hn">GC</div>Manages heap lifecycle. Multiple algorithms selectable at startup.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s3">
+    <div class="card"><div class="ct">JIT compiler — how HotSpot makes Java fast</div>
+      <div class="flow">
+        <div class="fs amber"><div class="fn a">1</div><div class="ft"><strong>Profiling phase</strong> — JVM starts in interpreted mode, counting method invocations and loop back-edges. A method is "hot" after ~10,000 invocations (tunable via <code>-XX:CompileThreshold</code>).</div></div>
+        <div class="fs amber"><div class="fn a">2</div><div class="ft"><strong>C1 (client compiler)</strong> — fast, simple compilation with basic optimisations (inlining, dead code elimination). Used for methods that become warm quickly. Produces fast-but-not-optimal native code.</div></div>
+        <div class="fs amber"><div class="fn a">3</div><div class="ft"><strong>C2 (server compiler)</strong> — deep profiling-guided optimisations. Loop unrolling, scalar replacement, escape analysis (objects that don't escape a method may be stack-allocated, skipping GC). This is why Java can match or beat C++ in long-running server workloads.</div></div>
+        <div class="fs amber"><div class="fn a">4</div><div class="ft"><strong>Inline caches</strong> — JIT remembers which concrete type is passed to a polymorphic call site. If always the same type (monomorphic), the virtual dispatch is replaced with a direct call. If 2–3 types (bimorphic/polymorphic), it checks an inline cache. 4+ types = megamorphic = back to vtable = slower.</div></div>
+        <div class="fs amber"><div class="fn a">5</div><div class="ft"><strong>Deoptimisation</strong> — if an optimistic assumption breaks (a new subclass is loaded), JVM deoptimises the compiled code back to the interpreter. This is why loading many subclasses at runtime can cause performance hiccups.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Assuming JVM startup performance = steady-state performance</strong> — JVM starts slow (cold), speeds up as JIT kicks in. Benchmarks that measure only first-run performance are meaningless for production throughput. Use JMH (Java Microbenchmark Harness).</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Thinking PermGen = Metaspace</strong> — they're not. PermGen was fixed-size on heap (Java ≤7). Metaspace is unbounded native memory (Java 8+). <code>OutOfMemoryError: PermGen space</code> = old JVM. <code>OutOfMemoryError: Metaspace</code> = modern JVM with <code>MaxMetaspaceSize</code> set or class loader leak.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Writing micro-benchmarks without JMH</strong> — JIT will dead-code-eliminate your benchmark loop if the result is unused. JMH prevents this with Blackhole consumers. Ad-hoc <code>System.currentTimeMillis()</code> benchmarks are always unreliable.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Architecture</div>Explain the JVM ClassLoader delegation model. Why does it exist?<div class="qa">Parent-delegation: when a class is requested, the ClassLoader asks its parent first. Bootstrap → Platform (Extension) → App. If parent finds it, done. If not, the current CL loads it. Purpose: (1) security — user code can't shadow java.lang.String with a malicious version because Bootstrap always wins, (2) consistency — same class won't be loaded twice by different loaders. Custom CL violates delegation deliberately for isolation (OSGi, hot-deploy, Java EE context isolation).</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">JIT</div>How does the JIT compiler make Java competitive with C in throughput?<div class="qa">Runtime profiling gives JIT information a static compiler (gcc/clang) can't have: which branch is taken 99% of the time, which type is passed to a virtual call. JIT can inline virtual methods (impossible statically due to polymorphism), unroll loops, eliminate dead branches, do escape analysis to stack-allocate short-lived objects. The trade-off is warmup time — C starts fast and stays flat; Java starts slow then surpasses it. This is why Java dominates long-running server workloads.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Metaspace</div>What is Metaspace and what causes OutOfMemoryError: Metaspace?<div class="qa">Metaspace stores class metadata (bytecode, field descriptors, constant pool, static field references) in native memory, outside the heap. Common causes of OOM: (1) class loader leak — frameworks that create new ClassLoaders without unloading old ones (hot redeploy in Tomcat, dynamic proxies, CGLib), (2) too many generated classes (Groovy closures, Jackson serializers per class, heavy reflection). Diagnose with heap dump + class histogram. Fix: -XX:MaxMetaspaceSize, find the leaking ClassLoader chain.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain JVM escape analysis and stack allocation of objects')">Escape analysis</span>
+      <span class="chip" onclick="sendPrompt('What is GraalVM and how does it differ from HotSpot JIT?')">GraalVM / AOT</span>
+      <span class="chip" onclick="sendPrompt('Explain Java class loading in OSGi and application servers')">Custom ClassLoaders</span>
+      <span class="chip" onclick="sendPrompt('How do I use JMH for Java microbenchmarks?')">JMH benchmarks</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOPIC 1 — HEAP vs STACK ═══════════════ -->
+<div class="tp" id="t1">
+  <div class="ttl">Heap vs Stack memory</div>
+  <div class="sub">What lives where · stack frames · object lifecycle · escape analysis</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t1','s0')">Definition</button>
+    <button class="st" onclick="S('t1','s1')">Internals</button>
+    <button class="st" onclick="S('t1','s2')">Visual</button>
+    <button class="st" onclick="S('t1','s3')">Code</button>
+    <button class="st" onclick="S('t1','s4')">Mistakes</button>
+    <button class="st" onclick="S('t1','s5')">Interview</button>
+    <button class="st" onclick="S('t1','s6')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t1-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">The <strong>stack</strong> is a per-thread, fixed-size LIFO structure that stores method call frames (local variables, operand stack, frame metadata). The <strong>heap</strong> is a single shared region where all objects live and where the GC operates. Primitives live on the stack when declared as local variables; objects always live on the heap (unless JIT escape-analysis stack-allocates them).</p>
+    </div>
+    <div class="two" style="margin-top:.5rem">
+      <div class="hl hl-a"><div class="hn">Stack — per thread</div>Method frames (locals + return address). Fixed size. Grows down. Freed when method returns. Very fast (just move a pointer). Stack overflow = too deep recursion. Default ~512KB–1MB per thread.</div>
+      <div class="hl hl-t"><div class="hn">Heap — shared</div>All objects. Managed by GC. Young gen (Eden + Survivors) → Old gen. Slow relative to stack. Shared = thread-safety required. OOM = heap exhausted.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s1">
+    <div class="card"><div class="ct">What lives where — complete rules</div>
+      <div class="flow">
+        <div class="fs teal"><div class="fn t">S</div><div class="ft"><strong>On stack</strong> — primitive local variables (<code>int x = 5</code>). Object references (the pointer itself, not the object). Method parameters. Return address. Operand stack for bytecode evaluation.</div></div>
+        <div class="fs"><div class="fn">H</div><div class="ft"><strong>On heap</strong> — every object created with <code>new</code>. Arrays (even <code>int[]</code> — the array object is on heap, the ints are inline within it). Instance fields of any type. Static fields (their references; from Java 8 static field values are in heap-adjacent Metaspace). Interned strings (String pool).</div></div>
+        <div class="fs amber"><div class="fn a">!</div><div class="ft"><strong>Stack frame anatomy</strong> — each method call pushes a frame: (1) local variable array — indexed slots for parameters + locals, (2) operand stack — where bytecode pushes/pops values, (3) frame data — reference to runtime constant pool, return address. Frame is popped on method return or exception propagation.</div></div>
+        <div class="fs coral"><div class="fn c">E</div><div class="ft"><strong>Escape analysis</strong> — JIT analyses whether an object reference "escapes" the method (returned, stored in field, passed to another thread). If it doesn't escape, the JVM may allocate it on the stack — zero GC pressure. This is a hidden performance boost; you don't control it directly but write code that helps: short-lived objects, local scope, avoid unnecessary field storage.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s2">
+    <div class="card"><div class="ct">Visual — memory layout for a running method</div>
+      <div class="vis-wrap">
+        <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:12px">
+          <div>
+            <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Thread Stack (per-thread)</div>
+            <div class="mem-seg" style="background:#EEEDFE;border:.5px solid #AFA9EC;color:#3C3489;flex-direction:column;align-items:flex-start;gap:2px">
+              <span style="font-size:11px;font-weight:500">Frame: main()</span>
+              <span style="font-size:12px">ref person → 0x7fa4</span>
+            </div>
+            <div class="mem-seg" style="background:#E1F5EE;border:.5px solid #5DCAA5;color:#085041;flex-direction:column;align-items:flex-start;gap:2px">
+              <span style="font-size:11px;font-weight:500">Frame: greet(person)</span>
+              <span style="font-size:12px">ref p → 0x7fa4</span>
+              <span style="font-size:12px">int len = 5 ← on stack</span>
+            </div>
+            <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px">← grows downward<br>freed when method returns</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Heap (shared)</div>
+            <div class="mem-seg" style="background:#FAEEDA;border:.5px solid #EF9F27;color:#633806;flex-direction:column;align-items:flex-start;gap:3px">
+              <span style="font-size:11px;font-weight:500">Person @ 0x7fa4</span>
+              <span style="font-size:12px">name → 0x8bc1 (String ref)</span>
+              <span style="font-size:12px">age = 30</span>
+            </div>
+            <div class="mem-seg" style="background:#FAECE7;border:.5px solid #F0997B;color:#712B13;flex-direction:column;align-items:flex-start;gap:3px">
+              <span style="font-size:11px;font-weight:500">String @ 0x8bc1</span>
+              <span style="font-size:12px">value = "Somesh"</span>
+            </div>
+            <div class="mem-seg" style="background:var(--color-background-secondary);border:.5px dashed var(--color-border-tertiary);color:var(--color-text-secondary);font-size:12px">... more objects ... GC manages this</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s3">
+    <div class="card"><div class="ct">Code — annotated stack vs heap</div>
+<div class="cb"><span class="kw">public class</span> <span class="nm">Demo</span> {
+    <span class="kw">static</span> <span class="nm">String</span> SERVICE = <span class="str">"API"</span>; <span class="cm">// Static ref in Metaspace; String on heap/pool</span>
+    <span class="nm">String</span> name;              <span class="cm">// Instance field — on heap inside the object</span>
+
+    <span class="kw">void</span> run() {
+        <span class="kw">int</span> count = 0;         <span class="cm">// Primitive local — ON STACK</span>
+        <span class="nm">Demo</span> d = <span class="kw">new</span> <span class="nm">Demo</span>();  <span class="cm">// 'd' reference ON STACK; object ON HEAP</span>
+        d.name = <span class="str">"test"</span>;      <span class="cm">// field written to heap object</span>
+        helper(d);             <span class="cm">// 'd' passes reference copy to new frame</span>
+    }                          <span class="cm">// frame popped; 'd' ref gone; object still on heap</span>
+
+    <span class="kw">void</span> helper(<span class="nm">Demo</span> d) {
+        <span class="kw">int</span> len = d.name.length(); <span class="cm">// 'len' ON STACK; traverses heap to get it</span>
+        <span class="cm">// 'd' escapes if stored in a field or returned
+        // JIT may stack-allocate if it provably doesn't escape</span>
+    }
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Thinking "primitives always live on the stack"</strong> — only when they're local variables. A primitive field inside an object lives on the heap, inside the object's memory layout. An <code>int[]</code> array body lives on the heap.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Confusing StackOverflowError with OutOfMemoryError</strong> — StackOverflow is infinite/deep recursion filling the per-thread call stack. OOM is heap (or Metaspace) exhaustion. They have completely different causes and fixes.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Creating too many threads thinking they're free</strong> — each thread has its own stack (default 512KB–1MB). 1000 threads = ~500MB–1GB of stack memory alone, before any heap objects. Use thread pools (ExecutorService) — always.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Where does a local variable int x = 5 live?<div class="qa">On the thread's JVM stack, in the local variable array of the current method's frame. When the method returns, the frame is popped and x ceases to exist — no GC needed. If x were an instance field inside an object, it would live on the heap inline within the object's memory block.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Deep</div>Can objects ever be allocated on the stack?<div class="qa">Yes, via JIT escape analysis. If the JIT can prove an object doesn't escape the current method (not returned, not stored to a field, not passed to another thread), it may allocate it on the stack. This is called stack allocation or scalar replacement (the object's fields become independent stack variables). Zero GC pressure. You can't force it, but you help it by keeping objects in local scope and short-lived.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Scenario</div>You see StackOverflowError in production. What caused it and how do you fix it?<div class="qa">Infinite or extremely deep recursion. Each recursive call adds a stack frame; the stack has a fixed size (typically 512KB–1MB). Causes: (1) recursive method without base case, (2) circular object graphs in toString/hashCode/equals, (3) mutually recursive calls. Fix: (1) convert recursion to iteration with explicit stack (ArrayDeque), (2) increase stack size -Xss (last resort, not scalable), (3) fix the logic. In production systems I've seen it from circular Jackson serialization — two objects referencing each other.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain Java Virtual Threads (Project Loom) and how they handle stack memory differently')">Virtual Threads</span>
+      <span class="chip" onclick="sendPrompt('Explain Java memory model happens-before and visibility')">Java Memory Model</span>
+      <span class="chip" onclick="sendPrompt('How does JVM escape analysis work and what is scalar replacement?')">Escape analysis</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOPIC 2 — GARBAGE COLLECTION ═══════════════ -->
+<div class="tp" id="t2">
+  <div class="ttl">Garbage Collection</div>
+  <div class="sub">GC roots · reachability · mark-and-sweep · generational hypothesis · heap regions</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t2','s0')">Definition</button>
+    <button class="st" onclick="S('t2','s1')">Internals</button>
+    <button class="st" onclick="S('t2','s2')">Visual — heap</button>
+    <button class="st" onclick="S('t2','s3')">GC roots</button>
+    <button class="st" onclick="S('t2','s4')">Mistakes</button>
+    <button class="st" onclick="S('t2','s5')">Interview</button>
+    <button class="st" onclick="S('t2','s6')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t2-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">GC automatically reclaims memory occupied by objects that are no longer reachable from any live thread. Java uses <strong>reachability</strong> (not reference counting) — an object is alive if and only if there exists a chain of references from a GC root to it. The GC traces this graph (mark phase) and reclaims unmarked objects (sweep/compact phase).</p>
+    </div>
+    <div class="card"><div class="ct">Generational hypothesis — why the heap is split</div>
+      <p style="font-size:14px;line-height:1.7">Empirically, <strong>most objects die young</strong> — 90%+ of objects become unreachable within milliseconds of creation (think: intermediate String in a web request, DTO parsed from JSON, temp loop variable). This means it's very efficient to collect the young generation frequently (minor GC) and only occasionally collect the long-lived old generation (major/full GC).</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s1">
+    <div class="card"><div class="ct">Mark-and-sweep-compact — full algorithm</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Mark phase</strong> — start from GC roots (thread stacks, static fields, JNI refs). BFS/DFS traverse the object graph. Every reachable object gets a "live" mark bit set. Cost proportional to live set size.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Sweep phase</strong> — scan the heap linearly. Any object without the mark bit = garbage = reclaimed. Memory is returned to a free list.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>Compact phase</strong> — slide all live objects to the start of the heap, eliminating fragmentation. Updates all references. Cost proportional to live set. Not all GCs compact (CMS didn't, which caused fragmentation OOM).</div></div>
+        <div class="fs teal"><div class="fn t">Y</div><div class="ft"><strong>Young gen (minor GC)</strong> — most frequent, stop-the-world but very short. Eden fills up → trigger minor GC. Live objects promoted to Survivor S0, garbage cleared. After N GCs in survivors, objects promoted to Old Gen. Eden is cleared entirely — cheap because most of it is dead.</div></div>
+        <div class="fs amber"><div class="fn a">O</div><div class="ft"><strong>Old gen (major/full GC)</strong> — less frequent, much longer pause. Triggered when old gen fills. Full GC = collect everything including young gen and Metaspace. The dreaded "stop the world" pause that causes request timeouts in production.</div></div>
+        <div class="fs coral"><div class="fn c">M</div><div class="ft"><strong>Metaspace GC</strong> — triggered when Metaspace fills or -XX:MaxMetaspaceSize is hit. Cleans dead ClassLoaders and their associated metadata. If classes are constantly loaded (dynamic proxies, code generation) without being unloaded, Metaspace grows without bound.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s2">
+    <div class="card"><div class="ct">Visual — generational heap layout</div>
+      <div class="vis-wrap">
+        <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">Heap memory layout (traditional HotSpot — used by Serial, Parallel, G1 varies)</div>
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:4px;margin-bottom:12px">
+          <div style="background:#EEEDFE;border:.5px solid #AFA9EC;border-radius:8px;padding:8px;color:#3C3489">
+            <div style="font-size:11px;font-weight:500;margin-bottom:4px">Eden</div>
+            <div style="font-size:11px">New objects born here. Filled quickly. ~70-80% of young gen.</div>
+          </div>
+          <div style="background:#E1F5EE;border:.5px solid #5DCAA5;border-radius:8px;padding:8px;color:#085041">
+            <div style="font-size:11px;font-weight:500;margin-bottom:4px">Survivor S0</div>
+            <div style="font-size:11px">Objects that survived 1+ minor GCs</div>
+          </div>
+          <div style="background:#E6F1FB;border:.5px solid #85B7EB;border-radius:8px;padding:8px;color:#0C447C">
+            <div style="font-size:11px;font-weight:500;margin-bottom:4px">Survivor S1</div>
+            <div style="font-size:11px">S0 and S1 alternate each minor GC</div>
+          </div>
+          <div style="background:#FAEEDA;border:.5px solid #EF9F27;border-radius:8px;padding:8px;color:#633806">
+            <div style="font-size:11px;font-weight:500;margin-bottom:4px">Old Gen (Tenured)</div>
+            <div style="font-size:11px">Long-lived objects (survived 15 GCs by default). Large objects may go here directly.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="background:#FAECE7;border:.5px solid #F0997B;border-radius:8px;padding:8px;color:#712B13;flex:1;min-width:180px">
+            <div style="font-size:11px;font-weight:500;margin-bottom:3px">Metaspace (native memory)</div>
+            <div style="font-size:11px">Class metadata, bytecode, constant pool, static field refs</div>
+          </div>
+          <div style="background:var(--color-background-secondary);border:.5px dashed var(--color-border-tertiary);border-radius:8px;padding:8px;color:var(--color-text-secondary);flex:1;min-width:180px">
+            <div style="font-size:11px;font-weight:500;margin-bottom:3px">Code cache (native memory)</div>
+            <div style="font-size:11px">JIT-compiled native machine code</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--color-text-secondary)">Typical sizing flags: <code>-Xms512m -Xmx2g -XX:NewRatio=3 -XX:MaxMetaspaceSize=256m</code></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s3">
+    <div class="card"><div class="ct">GC roots — the starting points of reachability</div>
+      <p style="font-size:14px;line-height:1.7;margin-bottom:12px">An object is reachable if and only if there is a path from at least one GC root to it. GC roots are the objects the JVM guarantees are live — everything they transitively reference is also live.</p>
+      <div class="flow">
+        <div class="fs teal"><div class="fn t">1</div><div class="ft"><strong>Thread stacks</strong> — every local variable and parameter in every active stack frame on every thread. The most common GC roots in a running application.</div></div>
+        <div class="fs teal"><div class="fn t">2</div><div class="ft"><strong>Static fields</strong> — class-level static references. As long as the class is loaded, its static fields are roots. Static fields holding large collections are a common source of memory leaks.</div></div>
+        <div class="fs teal"><div class="fn t">3</div><div class="ft"><strong>JNI references</strong> — objects referenced by native code via JNI. JVM can't collect these — if native code leaks a reference, the Java object is never collected.</div></div>
+        <div class="fs teal"><div class="fn t">4</div><div class="ft"><strong>Class objects of loaded classes</strong> — the Class object itself is a root while its ClassLoader is alive. When a ClassLoader is collected (all its loaded classes unreachable), their Class objects can be collected from Metaspace.</div></div>
+        <div class="fs teal"><div class="fn t">5</div><div class="ft"><strong>Synchronisation monitors</strong> — objects currently held under a <code>synchronized</code> lock are pinned as roots for the duration of the lock.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Assuming null = immediately collected</strong> — setting a reference to null makes the object eligible for collection but the GC decides when. Calling <code>System.gc()</code> is a hint the JVM is free to ignore.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Not understanding that full GC = stop-the-world</strong> — in a full GC, all application threads are paused. For a 4GB heap with lots of live objects, this can be seconds. In production APIs this appears as request timeouts. Solution: tune GC, reduce allocation rate, or use low-pause collectors (G1, ZGC).</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Large objects bypassing young gen</strong> — objects larger than -XX:PretenureSizeThreshold go directly to old gen, bypassing the fast Eden path. Frequent large object allocation (large byte arrays, strings) causes premature old gen filling and frequent full GCs.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>How does Java GC know which objects to collect?<div class="qa">Via reachability analysis from GC roots (thread stacks, static fields, JNI references). The GC marks every object reachable from any root as live. Anything not marked is garbage. Java does NOT use reference counting (which suffers from circular reference leaks — Python does, Java doesn't). So circular references are NOT a problem in Java — if two objects reference each other but neither is reachable from any GC root, both are collected.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Generational</div>Why is Eden cleared entirely in a minor GC? Doesn't that waste work?<div class="qa">It's actually the opposite — it's why minor GC is so fast. Eden is cleared by copying the ~10% live objects to a Survivor space, then logically zeroing Eden in bulk. No marking-and-sweeping individual dead objects — the entire region is assumed dead except what was copied out. This is the "copying collector" strategy for young gen. It's only efficient because of the generational hypothesis: ~90%+ of Eden is dead by the time minor GC runs.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Production</div>You see frequent full GCs in production causing latency spikes. What's your approach?<div class="qa">(1) Capture GC logs: -Xlog:gc* in Java 9+. (2) Analyse with GCViewer or GCEasy — identify allocation rate, promotion rate, GC frequency, pause duration. (3) Common culprits: high allocation rate filling old gen (reduce object creation, pool objects), premature promotion (resize survivors), memory leak (heap dump + MAT). (4) If the algorithm is fundamentally stop-the-world, migrate to G1 or ZGC for sub-millisecond pauses without changing code.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How do I analyse Java heap dumps with Eclipse MAT?')">Heap dump analysis</span>
+      <span class="chip" onclick="sendPrompt('Explain Java GC logging and how to interpret GC logs')">GC logging</span>
+      <span class="chip" onclick="sendPrompt('What are finalizers and Cleaner in Java and why are finalizers dangerous?')">Finalizers vs Cleaner</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOPIC 3 — GC ALGORITHMS ═══════════════ -->
+<div class="tp" id="t3">
+  <div class="ttl">GC Algorithms</div>
+  <div class="sub">Serial · Parallel · CMS · G1 · ZGC · Shenandoah — trade-offs for FAANG interviews</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t3','s0')">Overview</button>
+    <button class="st" onclick="S('t3','s1')">G1 deep dive</button>
+    <button class="st" onclick="S('t3','s2')">ZGC deep dive</button>
+    <button class="st" onclick="S('t3','s3')">Comparison</button>
+    <button class="st" onclick="S('t3','s4')">Interview</button>
+    <button class="st" onclick="S('t3','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t3-s0">
+    <div class="card"><div class="ct">Four major GC algorithms</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">S</div><div class="ft"><strong>Serial GC</strong> (<code>-XX:+UseSerialGC</code>) — single-threaded, stop-the-world for all phases. Tiny footprint. Use only for small heap (<100MB), CLI tools, embedded systems. Never in production servers.</div></div>
+        <div class="fs"><div class="fn">P</div><div class="ft"><strong>Parallel GC</strong> (<code>-XX:+UseParallelGC</code>, Java 8 default) — multi-threaded GC threads, still stop-the-world. Maximises throughput (total work/time) at the cost of longer pauses. Good for batch jobs where latency doesn't matter but total CPU efficiency does.</div></div>
+        <div class="fs teal"><div class="fn t">G1</div><div class="ft"><strong>G1 GC</strong> (<code>-XX:+UseG1GC</code>, Java 9+ default) — divides heap into equal-size regions (~1–32MB). Collects regions with most garbage first ("Garbage First"). Most phases concurrent (running alongside application). Targets a user-defined pause-time goal (<code>-XX:MaxGCPauseMillis=200</code> default). Best balance of throughput and latency for heaps 4GB–32GB.</div></div>
+        <div class="fs amber"><div class="fn a">Z</div><div class="ft"><strong>ZGC</strong> (<code>-XX:+UseZGC</code>, Java 15+ production-ready) — almost entirely concurrent. Pause times under 1ms regardless of heap size (tested to 16TB). Uses load barriers and coloured pointers. Lower throughput than G1/Parallel (~5–10% overhead) but sub-millisecond latency. Use for latency-critical APIs, real-time systems.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s1">
+    <div class="card"><div class="ct">G1 GC — how it actually works</div>
+      <div class="flow">
+        <div class="fs teal"><div class="fn t">1</div><div class="ft"><strong>Region-based heap</strong> — heap divided into 2048 equal-size regions. Each region is dynamically assigned a role: Eden, Survivor, Old, or Humongous (for objects > 50% of region size). No fixed young/old boundary — flexible allocation.</div></div>
+        <div class="fs teal"><div class="fn t">2</div><div class="ft"><strong>Remembered sets (RSets)</strong> — each region tracks which other regions have references into it. This allows G1 to collect a subset of regions without scanning the whole heap — key to meeting pause targets.</div></div>
+        <div class="fs teal"><div class="fn t">3</div><div class="ft"><strong>Mixed GC cycle</strong> — (a) Initial Mark (STW, piggybacks on minor GC) → (b) Concurrent Mark (runs with app, marks live objects) → (c) Remark (STW, finalises marking) → (d) Cleanup (STW, reclaims empty regions, selects candidates) → (e) Mixed GC (collects young + selected old regions with most garbage).</div></div>
+        <div class="fs teal"><div class="fn t">4</div><div class="ft"><strong>Humongous objects</strong> — objects larger than half a region go to Humongous regions directly (old gen). They're collected only during full GC or concurrent mark. Lots of large objects = poor G1 performance. Use <code>-XX:G1HeapRegionSize</code> to tune region size so large objects fit in normal regions.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s2">
+    <div class="card"><div class="ct">ZGC — the sub-millisecond GC</div>
+      <div class="flow">
+        <div class="fs amber"><div class="fn a">1</div><div class="ft"><strong>Coloured pointers</strong> — ZGC stores metadata (GC phase bits, remapped/marked flags) in the upper unused bits of 64-bit pointers (Java objects are 64-bit). This allows GC to track object state without extra data structures and enables concurrent relocation.</div></div>
+        <div class="fs amber"><div class="fn a">2</div><div class="ft"><strong>Load barriers</strong> — code inserted at every object reference read. When you load a reference, a small barrier checks the colour bits. If the object was relocated, the barrier remaps the reference to the new location transparently. This is why ZGC can relocate objects concurrently while the app runs.</div></div>
+        <div class="fs amber"><div class="fn a">3</div><div class="ft"><strong>Why pauses are <1ms</strong> — the only stop-the-world phases are initial mark and final remark (each a few milliseconds for tiny root scanning). All heavy work (marking, relocation, remapping) runs concurrently. Heap size doesn't affect pause time — only the number of GC roots does (which is small and bounded).</div></div>
+        <div class="fs amber"><div class="fn a">4</div><div class="ft"><strong>When NOT to use ZGC</strong> — lower overall throughput than G1 (load barriers add ~5–10% overhead on every reference read). If your workload is batch/throughput-focused (not latency-sensitive), Parallel or G1 will process more total work per second.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s3">
+    <div class="card"><div class="ct">GC algorithm comparison</div>
+      <table class="tbl">
+        <thead><tr><th>GC</th><th>Pause type</th><th>Throughput</th><th>Latency</th><th>Use case</th></tr></thead>
+        <tbody>
+          <tr><td>Serial</td><td>STW, single thread</td><td><span class="badge br">Low</span></td><td><span class="badge br">High pause</span></td><td>CLI, embedded, tiny heaps</td></tr>
+          <tr><td>Parallel</td><td>STW, multi-thread</td><td><span class="badge bt">Highest</span></td><td><span class="badge ba">High pause</span></td><td>Batch jobs, throughput-critical</td></tr>
+          <tr><td>G1</td><td>Mostly concurrent + short STW</td><td><span class="badge bt">Good</span></td><td><span class="badge bp">Low (~200ms goal)</span></td><td>General servers, 4–32GB heap</td></tr>
+          <tr><td>ZGC</td><td>Concurrent, <1ms STW</td><td><span class="badge ba">~5-10% less</span></td><td><span class="badge bt">Sub-millisecond</span></td><td>Latency-critical APIs, large heaps</td></tr>
+          <tr><td>Shenandoah</td><td>Concurrent, <10ms STW</td><td><span class="badge ba">Similar to ZGC</span></td><td><span class="badge bt">Very low</span></td><td>Red Hat/OpenJDK alternative to ZGC</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Choose</div>Which GC would you use for a high-traffic Spring Boot REST API serving 10k req/s with p99 latency requirement < 50ms?<div class="qa">G1 with -XX:MaxGCPauseMillis=50 as the starting point. If that's not meeting the target after tuning (increase heap, adjust region size, monitor promotion rate), move to ZGC which guarantees sub-millisecond pauses regardless of heap size. I'd instrument with Micrometer/Prometheus and alert on GC pause duration before deciding. Parallel GC is out — its pauses will blow the latency budget.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Depth</div>How does ZGC achieve concurrent relocation? Why can't older GCs do this?<div class="qa">ZGC uses load barriers — every object reference read goes through a thin code stub that checks coloured pointer bits. If the object was relocated, the barrier transparently returns the new address and heals the reference. Older GCs (CMS, Parallel) can't do this because they don't instrument every reference read — adding load barriers would require significant JIT cooperation (which ZGC and Shenandoah have). The cost is ~5-10% barrier overhead on every read, which is the throughput trade-off.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How do I tune G1 GC for a Spring Boot microservice?')">G1 tuning</span>
+      <span class="chip" onclick="sendPrompt('What GC algorithm does Kubernetes/container Java use and how to configure it?')">GC in containers</span>
+      <span class="chip" onclick="sendPrompt('Explain GC overhead and how to measure allocation rate with async-profiler')">async-profiler</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOPIC 4 — MEMORY LEAKS ═══════════════ -->
+<div class="tp" id="t4">
+  <div class="ttl">Memory leaks in Java</div>
+  <div class="sub">How they happen · 5 common patterns · detection tools · heap dump analysis</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t4','s0')">Definition</button>
+    <button class="st" onclick="S('t4','s1')">5 Leak patterns</button>
+    <button class="st" onclick="S('t4','s2')">Code examples</button>
+    <button class="st" onclick="S('t4','s3')">Detection</button>
+    <button class="st" onclick="S('t4','s4')">Interview</button>
+    <button class="st" onclick="S('t4','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t4-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A memory leak in Java is not a dangling pointer (Java has none) — it's an <strong>unintentional reachability chain</strong>: objects you no longer logically need are still reachable from a GC root, so the GC can't collect them. The heap grows over time, eventually causing <code>OutOfMemoryError</code>. Java's GC eliminates C-style leaks but introduces a new class: logical leaks through unintended references.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s1">
+    <div class="card"><div class="ct">5 most common leak patterns in production Java</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Static field accumulation</strong> — a static <code>List</code>, <code>Map</code>, or cache that grows without bound. Since static fields are GC roots, everything in them lives forever. Very common in singletons that accumulate state: event listeners, caches, session stores.</div></div>
+        <div class="fs coral"><div class="fn c">2</div><div class="ft"><strong>Listener / callback not deregistered</strong> — register an event listener on a publisher (Guava EventBus, Spring ApplicationEventPublisher, Swing component). Forget to deregister. Publisher holds a reference → listener lives → listener holds its closure/fields live. Classic in Android (Activity registered on Application-scoped object).</div></div>
+        <div class="fs amber"><div class="fn a">3</div><div class="ft"><strong>ThreadLocal leak</strong> — <code>ThreadLocal</code> values stored in thread-local maps keyed by Thread. In a thread pool (fixed threads that never die), ThreadLocal values accumulate per-task and are never cleared unless you call <code>remove()</code>. In app servers, this is catastrophic — every HTTP request leaks a value into the reused thread.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>ClassLoader leak</strong> — in hot-deploy scenarios (Tomcat WAR redeploy, OSGI), the old ClassLoader should be garbage collected when the app is stopped. If anything in the new or global scope holds a reference to a class from the old loader (static field, ThreadLocal, cached Class object), the entire old ClassLoader and all its classes are kept alive. Metaspace grows with each redeploy.</div></div>
+        <div class="fs teal"><div class="fn t">5</div><div class="ft"><strong>HashMap with mutable keys or equals/hashCode broken</strong> — entries can't be found (wrong bucket) but still consume memory. The map grows without bound as "new" entries keep being added because lookups fail to find the "existing" one.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s2">
+    <div class="card"><div class="ct">Code — leaks and fixes</div>
+<div class="cb"><span class="cm">// LEAK 1: Static cache grows without bound</span>
+<span class="kw">static</span> <span class="nm">Map</span>&lt;<span class="nm">String</span>, <span class="nm">Report</span>&gt; cache = <span class="kw">new</span> <span class="nm">HashMap</span>&lt;&gt;(); <span class="cm">// never evicts!</span>
+<span class="cm">// FIX: use bounded cache with eviction</span>
+<span class="kw">static</span> <span class="nm">Map</span>&lt;<span class="nm">String</span>, <span class="nm">Report</span>&gt; cache =
+    <span class="nm">Collections</span>.synchronizedMap(
+        <span class="kw">new</span> <span class="nm">LinkedHashMap</span>&lt;&gt;(100, 0.75f, <span class="kw">true</span>) { <span class="cm">// LRU</span>
+            <span class="kw">protected boolean</span> removeEldestEntry(<span class="nm">Map.Entry</span> e) {
+                <span class="kw">return</span> size() &gt; 100;
+            }
+        });
+
+<span class="cm">// LEAK 2: ThreadLocal — classic app server leak</span>
+<span class="kw">private static</span> <span class="nm">ThreadLocal</span>&lt;<span class="nm">UserContext</span>&gt; ctx = <span class="kw">new</span> <span class="nm">ThreadLocal</span>&lt;&gt;();
+<span class="kw">void</span> handleRequest(<span class="nm">Request</span> req) {
+    ctx.set(<span class="kw">new</span> <span class="nm">UserContext</span>(req));
+    <span class="kw">try</span> {
+        process();
+    } <span class="kw">finally</span> {
+        ctx.remove(); <span class="cm">// CRITICAL — always remove in finally block</span>
+    }
+}
+
+<span class="cm">// LEAK 3: Inner class holds outer class reference</span>
+<span class="kw">class</span> <span class="nm">Service</span> {
+    <span class="nm">List</span>&lt;<span class="nm">byte</span>[]&gt; bigData = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;();
+    <span class="kw">class</span> <span class="nm">Task</span> <span class="kw">implements</span> <span class="nm">Runnable</span> { <span class="cm">// non-static inner class!</span>
+        <span class="kw">public void</span> run() { <span class="cm">/* Task holds implicit ref to Service.this */</span> }
+    }
+    <span class="cm">// FIX: make Task a static class or a lambda that doesn't capture 'this'</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s3">
+    <div class="card"><div class="ct">Detection workflow</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Observe symptoms</strong> — heap usage grows over time (never flattens), full GC frequency increases, eventually OOM. Monitor with JVM metrics in Micrometer/Prometheus: <code>jvm.memory.used</code>, <code>jvm.gc.pause</code>.</div></div>
+        <div class="fs teal"><div class="fn t">2</div><div class="ft"><strong>Enable heap dump on OOM</strong> — <code>-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/dumps/</code>. Production-safe — dump only happens on crash, zero overhead otherwise. Do this for every production service.</div></div>
+        <div class="fs amber"><div class="fn a">3</div><div class="ft"><strong>Analyse with Eclipse MAT</strong> — open the .hprof dump. Run "Leak Suspects" report. Look at "Dominator Tree" — the objects retaining the most memory. Find the reference chain (shortest path to GC root) to understand WHY the object is alive.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>VisualVM / JProfiler / async-profiler</strong> — live attach to a running JVM. Monitor heap in real-time. Take two heap snapshots minutes apart and compare object counts — the class that keeps growing is the leak.</div></div>
+        <div class="fs coral"><div class="fn c">5</div><div class="ft"><strong>JVM flight recorder (JFR)</strong> — <code>-XX:+FlightRecorder</code>, zero overhead production profiler. Records allocation sites, GC events, thread activity. Use with JDK Mission Control to find the stack trace that allocated the leaked objects.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Conceptual</div>Can you have memory leaks in Java? Explain how.<div class="qa">Yes — Java prevents C-style dangling pointer leaks (no manual free) but not logical leaks. A memory leak in Java is when you hold a reference to an object longer than needed, preventing GC from collecting it. Common patterns: unbounded static caches, underegistered listeners, ThreadLocal without remove(), ClassLoader leaks in hot-deploy. The GC collects everything unreachable — your job is to make sure things you're done with become unreachable.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Production</div>Walk me through how you'd diagnose and fix a memory leak in a Spring Boot service that OOMs after 48 hours.<div class="qa">(1) Add -XX:+HeapDumpOnOutOfMemoryError before next OOM. (2) Reproduce (or wait). (3) Open heap dump in Eclipse MAT — Leak Suspects report. (4) Dominator Tree shows largest retained objects. (5) Follow reference chain to find who's holding them. Common Spring findings: static ApplicationContext reference, @Bean singleton holding growing collections, @EventListener not cleaned up, Hibernate first-level cache in long-running thread. Fix based on findings. Add metric to alert before next OOM.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain weak references and WeakHashMap for cache implementation in Java')">WeakHashMap cache</span>
+      <span class="chip" onclick="sendPrompt('How does Spring handle bean lifecycle and prevent memory leaks?')">Spring bean lifecycle</span>
+      <span class="chip" onclick="sendPrompt('Explain Java Flight Recorder and JDK Mission Control for production profiling')">JFR / JMC</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOPIC 5 — STRING POOL ═══════════════ -->
+<div class="tp" id="t5">
+  <div class="ttl">String interning and the String pool</div>
+  <div class="sub">Pool location · intern() · compile-time vs runtime strings · when to use</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t5','s0')">Definition</button>
+    <button class="st" onclick="S('t5','s1')">Internals</button>
+    <button class="st" onclick="S('t5','s2')">Code</button>
+    <button class="st" onclick="S('t5','s3')">Interview</button>
+    <button class="st" onclick="S('t5','s4')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t5-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">The String pool (interning pool) is a cache of String literals maintained by the JVM. When you write <code>"hello"</code> in source code, the JVM places it in the pool and reuses the same object for every subsequent <code>"hello"</code> literal. <code>String.intern()</code> lets you manually add runtime strings to the pool and get a canonical reference back.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s1">
+    <div class="card"><div class="ct">Internals — pool mechanics</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Pool location</strong> — Java 6 and earlier: PermGen (fixed-size, could cause <code>OOM: PermGen</code> with millions of interned strings). Java 7+: moved to main heap. Java 8+: heap, managed by GC like regular objects. This matters: in Java 7+ pooled strings can be collected if they become unreachable (no live literal reference and the classloader is gone).</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Compile-time interning</strong> — string literals and constant expressions (<code>"hello" + "world"</code> where both are compile-time constants) are automatically interned by the compiler. The class file's constant pool entry is resolved to a shared String instance at class load time.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>Runtime interning via intern()</strong> — <code>"hello".intern()</code> checks if the pool contains a string equal to "hello". If yes, returns the pooled reference. If no, adds this string to the pool and returns it. Comparing interned strings with <code>==</code> is safe (and faster than <code>equals</code>) — but fragile and rarely justified in application code.</div></div>
+        <div class="fs coral"><div class="fn c">!</div><div class="ft"><strong>new String("hello")</strong> — explicitly bypasses the pool. Creates a new heap object even if "hello" is already pooled. The literal "hello" arg is still pooled; the resulting new String() is not. <code>new String("x").intern()</code> gets back the pooled reference.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s2">
+    <div class="card"><div class="ct">Code — the canonical == vs equals trap</div>
+<div class="cb"><span class="nm">String</span> s1 = <span class="str">"hello"</span>;         <span class="cm">// pooled literal</span>
+<span class="nm">String</span> s2 = <span class="str">"hello"</span>;         <span class="cm">// same pool ref</span>
+<span class="nm">String</span> s3 = <span class="kw">new</span> <span class="nm">String</span>(<span class="str">"hello"</span>); <span class="cm">// new heap object — NOT pool</span>
+<span class="nm">String</span> s4 = <span class="str">"hel"</span> + <span class="str">"lo"</span>;   <span class="cm">// compile-time constant → pooled</span>
+<span class="nm">String</span> part = <span class="str">"lo"</span>;
+<span class="nm">String</span> s5 = <span class="str">"hel"</span> + part;    <span class="cm">// runtime concat → NOT pooled</span>
+
+s1 == s2;           <span class="cm">// true  — same pool ref</span>
+s1 == s3;           <span class="cm">// false — different object</span>
+s1 == s4;           <span class="cm">// true  — compile-time constant folded to pool</span>
+s1 == s5;           <span class="cm">// false — runtime concat, new object</span>
+s1.equals(s3);      <span class="cm">// true  — value equal ALWAYS use equals!</span>
+s3.intern() == s1;  <span class="cm">// true  — intern() returns pool ref</span>
+
+<span class="cm">// When intern() is justified: massive datasets with repeated strings</span>
+<span class="cm">// e.g. parsing CSV with 10M rows all having same country codes</span>
+<span class="nm">String</span> country = row.getCountry().intern(); <span class="cm">// deduplicate in RAM</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s3">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What does String.intern() do and when would you use it?<div class="qa">intern() returns the canonical pooled version of a string — if the pool already has an equal string, return that reference; otherwise add this string to the pool and return it. Use when: parsing large datasets with many repeated string values (country codes, enum-like strings) — interning converts O(n) string objects to O(unique values) strings, significant memory saving. Avoid for general code — pool lookup has synchronisation overhead in Java 6, and relying on == for string comparison is dangerous and confusing.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Trap</div>What is the output of: new String("hello") == "hello"?<div class="qa">false. new String("hello") bypasses the pool and creates a new heap object. The literal "hello" on the right is the pooled reference. They are different objects even though their values are equal. Always use .equals() for String comparison in production code. The only safe use of == on Strings is after explicit intern().</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">History</div>Why did String pool move from PermGen to heap in Java 7?<div class="qa">PermGen had a fixed size (-XX:MaxPermSize, default 64–256MB). Applications that intern many strings (large codebases, XML parsers, frameworks generating class names) would hit OutOfMemoryError: PermGen space. Moving to heap means the pool benefits from heap resizing (-Xmx) and GC can collect unused interned strings when their class is unloaded. It eliminated a whole category of PermGen OOM errors.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s4">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Why is String immutable in Java — 5 reasons with deep explanations')">String immutability</span>
+      <span class="chip" onclick="sendPrompt('How does Java compact strings optimization work in Java 9?')">Compact strings</span>
+      <span class="chip" onclick="sendPrompt('Explain Java text blocks and string formatting in modern Java')">Text blocks</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOPIC 6 — JAVA REFERENCES ═══════════════ -->
+<div class="tp" id="t6">
+  <div class="ttl">Java References</div>
+  <div class="sub">Strong · Soft · Weak · Phantom — reachability hierarchy and real-world use cases</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t6','s0')">Definition</button>
+    <button class="st" onclick="S('t6','s1')">All 4 types</button>
+    <button class="st" onclick="S('t6','s2')">Code</button>
+    <button class="st" onclick="S('t6','s3')">ReferenceQueue</button>
+    <button class="st" onclick="S('t6','s4')">Interview</button>
+    <button class="st" onclick="S('t6','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t6-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Java provides four reference strengths that let you influence (not control) when the GC collects objects. The normal Java reference is "strong" — prevents collection entirely. Weaker references allow the GC to collect the referent when memory pressure demands it, enabling caches and listener registries that automatically clean up without manual intervention.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s1">
+    <div class="card"><div class="ct">Four reference types — reachability hierarchy</div>
+      <div class="flow">
+        <div class="fs"><div class="fn" style="background:#AFA9EC;color:#26215C">St</div><div class="ft"><strong>Strong reference</strong> — the default. <code>Object obj = new Object()</code>. Object is never collected while any strong reference to it exists. Must be explicitly nulled or go out of scope. All your normal variables are strong references.</div></div>
+        <div class="fs teal"><div class="fn t">So</div><div class="ft"><strong>SoftReference&lt;T&gt;</strong> — GC collects the referent only when it needs memory (i.e., before throwing OOM). Perfect for memory-sensitive caches: the cache auto-shrinks under memory pressure instead of causing OOM. <code>SoftReference&lt;Image&gt; imgRef = new SoftReference&lt;&gt;(img)</code>. Always check <code>get() != null</code> before use.</div></div>
+        <div class="fs amber"><div class="fn a">W</div><div class="ft"><strong>WeakReference&lt;T&gt;</strong> — GC collects the referent at the next GC cycle once no strong references remain, regardless of memory state. Use for canonicalising mappings (<code>WeakHashMap</code>) and listener registries where the listener's lifetime should be tied to the listener object, not the registry.</div></div>
+        <div class="fs coral"><div class="fn c">Ph</div><div class="ft"><strong>PhantomReference&lt;T&gt;</strong> — the weakest. <code>get()</code> always returns null — you can never access the referent through it. Use solely for post-mortem cleanup notification. When the referent is about to be collected, its PhantomReference is enqueued in a ReferenceQueue. You process the queue to free native resources. Replaced <code>finalize()</code> as the safe cleanup mechanism. Java 9 <code>Cleaner</code> wraps this pattern.</div></div>
+      </div>
+      <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:13px;color:var(--color-text-secondary)">
+        Reachability order: <strong>Strongly reachable</strong> → <strong>Softly reachable</strong> (no strong ref, but soft ref exists) → <strong>Weakly reachable</strong> → <strong>Phantom reachable</strong> → <strong>Unreachable</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s2">
+    <div class="card"><div class="ct">Code — all reference types</div>
+<div class="cb"><span class="kw">import</span> java.lang.ref.*;
+
+<span class="cm">// SoftReference — memory-sensitive cache</span>
+<span class="nm">SoftReference</span>&lt;<span class="nm">byte</span>[]&gt; cache = <span class="kw">new</span> <span class="nm">SoftReference</span>&lt;&gt;(<span class="kw">new byte</span>[1024 * 1024]);
+<span class="kw">byte</span>[] data = cache.get(); <span class="cm">// null if GC collected it under memory pressure</span>
+<span class="kw">if</span> (data == <span class="kw">null</span>) data = loadFromDisk(); <span class="cm">// reload if evicted</span>
+
+<span class="cm">// WeakReference — listener registry that auto-cleans</span>
+<span class="nm">WeakReference</span>&lt;<span class="nm">UserSession</span>&gt; weakSession = <span class="kw">new</span> <span class="nm">WeakReference</span>&lt;&gt;(session);
+<span class="nm">UserSession</span> s = weakSession.get(); <span class="cm">// null if session was GC'd</span>
+<span class="kw">if</span> (s != <span class="kw">null</span>) s.notifyEvent(event);
+
+<span class="cm">// WeakHashMap — cache that auto-evicts when key has no other refs</span>
+<span class="nm">Map</span>&lt;<span class="nm">Widget</span>, <span class="nm">WidgetState</span>&gt; stateMap = <span class="kw">new</span> <span class="nm">WeakHashMap</span>&lt;&gt;();
+<span class="cm">// When Widget is no longer used elsewhere, entry auto-removed</span>
+
+<span class="cm">// PhantomReference + ReferenceQueue — native cleanup</span>
+<span class="nm">ReferenceQueue</span>&lt;<span class="nm">Resource</span>&gt; queue = <span class="kw">new</span> <span class="nm">ReferenceQueue</span>&lt;&gt;();
+<span class="nm">PhantomReference</span>&lt;<span class="nm">Resource</span>&gt; phantom = <span class="kw">new</span> <span class="nm">PhantomReference</span>&lt;&gt;(res, queue);
+<span class="cm">// In cleanup thread:</span>
+<span class="nm">Reference</span>&lt;?&gt; ref = queue.poll(); <span class="cm">// non-null when res is phantom-reachable</span>
+<span class="kw">if</span> (ref != <span class="kw">null</span>) closeNativeHandle();
+
+<span class="cm">// Java 9+ Cleaner — wraps PhantomReference nicely</span>
+<span class="nm">Cleaner</span> cleaner = <span class="nm">Cleaner</span>.create();
+cleaner.register(resource, () -&gt; closeNativeHandle()); <span class="cm">// runs when resource GC'd</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s3">
+    <div class="card"><div class="ct">ReferenceQueue — how cleanup notification works</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Registration</strong> — create a Soft/Weak/PhantomReference with a ReferenceQueue as the second argument. When GC determines the referent's reachability crosses the threshold, the Reference object is enqueued into the queue.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Processing</strong> — a background thread polls/blocks on the queue. When it dequeues a Reference, it knows the referent was collected (or is about to be for Phantom) and performs cleanup: close file handles, release off-heap memory, remove from cache.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>Why not finalizers?</strong> — <code>finalize()</code> runs on the finalizer thread (single thread — bottleneck), can delay GC (object needs two GC cycles to collect), can resurrect the object (dangerous), and cannot guarantee timely execution. PhantomReference + Cleaner are deterministic, thread-safe, and can't resurrect. Java 18 deprecated <code>finalize()</code>.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Compare</div>When would you use SoftReference vs WeakReference?<div class="qa">SoftReference: memory-sensitive caches where you want to keep data in memory as long as possible but yield under pressure (image caches, computed result caches). GC only clears them before OOM. WeakReference: canonicalising maps and listener registries where the lifetime should track the natural reachability of the key — you don't WANT the reference to keep the object alive. WeakHashMap is the canonical use case. If no one else holds the key, the entry is automatically removed.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Depth</div>Why was finalize() deprecated and what replaced it?<div class="qa">Problems with finalize: (1) runs on a single finalizer thread — all objects with finalizers queue up, causing GC lag, (2) delays collection by one extra GC cycle (needs two cycles to collect a finalizable object), (3) can accidentally resurrect the object by storing 'this' somewhere in finalize(), (4) no execution guarantee — JVM may exit before finalizers run. Replacement: java.lang.ref.Cleaner (Java 9) uses PhantomReference + daemon thread internally. try-with-resources / AutoCloseable is the right answer for deterministic cleanup. Cleaner handles non-Java resources where you can't guarantee close() will be called.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Design</div>How would you implement a cache that automatically evicts entries when memory is low?<div class="qa">Use SoftReference values in a HashMap. When you get() a SoftReference and it returns null, the GC evicted that entry under memory pressure — reload from source and re-cache. For proper key cleanup use ReferenceQueue: when the SoftReference is enqueued, remove its key from the map. Or use Guava CacheBuilder with softValues() which does all this for you. This pattern gives you cache eviction without an explicit LRU mechanism — GC does the eviction based on actual memory conditions.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How does Guava Cache use SoftReference and WeakReference internally?')">Guava Cache</span>
+      <span class="chip" onclick="sendPrompt('Explain WeakHashMap internals and when it leaks despite weak keys')">WeakHashMap internals</span>
+      <span class="chip" onclick="sendPrompt('Explain Java Cleaner API and how to replace finalize() with it')">Cleaner API</span>
+    </div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function T(i){
+  document.querySelectorAll('.tp').forEach((p,j)=>p.classList.toggle('vis',j===i));
+  document.querySelectorAll('.nb').forEach((b,j)=>b.classList.toggle('on',j===i));
+  var firstSt=document.querySelectorAll('.tp')[i].querySelector('.st');
+  if(firstSt)firstSt.click();
+}
+function S(tid,sid){
+  var tp=document.getElementById(tid);
+  tp.querySelectorAll('.sc').forEach(s=>s.classList.remove('vis'));
+  var sc=document.getElementById(tid+'-'+sid);
+  if(sc)sc.classList.add('vis');
+  var stabs=tp.querySelectorAll('.st');
+  var sids=['s0','s1','s2','s3','s4','s5','s6'];
+  stabs.forEach((b,i)=>b.classList.toggle('on',sids[i]===sid));
+}
+function A(el){
+  var a=el.querySelector('.qa');
+  if(a)a.style.display=a.style.display==='block'?'none':'block';
+}
+</script>

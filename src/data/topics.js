@@ -1,12 +1,13 @@
 export const CATEGORIES = [
-  { id: "DSA", name: "Data Structures & Algorithms", icon: "󱃔" },
-  { id: "System Design", name: "System Design & Architecture", icon: "󱗿" },
-  { id: "Full Stack", name: "Full Stack Development", icon: "󰜎" },
-  { id: "Cloud & DevOps", name: "Cloud & DevOps", icon: "󰅟" },
-  { id: "Databases", name: "Databases & Storage Systems", icon: "󰆼" },
-  { id: "Security", name: "Security & Cryptography", icon: "󰦃" },
-  { id: "CS Fundamentals", name: "CS Fundamentals", icon: "󰓙" },
-  { id: "Soft Skills", name: "Soft Skills & Leadership", icon: "󰭹" }
+  { id: "DSA",            name: "Data Structures & Algorithms", icon: "󱃔" },
+  { id: "Java",           name: "Java",                         icon: "☕" },
+  { id: "System Design",  name: "System Design & Architecture", icon: "󱗿" },
+  { id: "Full Stack",     name: "Full Stack Development",       icon: "󰜎" },
+  { id: "Cloud & DevOps", name: "Cloud & DevOps",               icon: "󰅟" },
+  { id: "Databases",      name: "Databases & Storage Systems",  icon: "󰆼" },
+  { id: "Security",       name: "Security & Cryptography",      icon: "󰦃" },
+  { id: "CS Fundamentals",name: "CS Fundamentals",              icon: "󰓙" },
+  { id: "Soft Skills",    name: "Soft Skills & Leadership",     icon: "󰭹" }
 ];
 
 export const CHAPTERS = [

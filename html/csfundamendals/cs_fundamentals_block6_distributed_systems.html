@@ -1,0 +1,519 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+.shell{display:flex;height:700px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:230px;min-width:230px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 8px;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 10px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin-bottom:2px;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-secondary)}
+.nav-num{font-size:11px;color:var(--color-text-tertiary);min-width:16px}
+.nav-item.active .nav-num{color:var(--color-text-secondary)}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic-tag{display:inline-block;font-size:11px;font-weight:500;color:var(--color-text-info);background:var(--color-background-info);padding:3px 10px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.topic-title{font-size:22px;font-weight:500;margin-bottom:8px}
+.topic-oneliner{font-size:15px;color:var(--color-text-secondary);line-height:1.6;border-left:2px solid var(--color-border-secondary);padding-left:12px;margin-bottom:24px}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.sec{margin-bottom:28px}
+.body{font-size:14px;line-height:1.75}
+.body p{margin-bottom:10px}
+.body p:last-child{margin-bottom:0}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.steps li::before{content:counter(s);min-width:22px;height:22px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-top:2px;flex-shrink:0}
+.card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px;background:var(--color-background-primary)}
+.card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.card-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;margin-top:6px;white-space:pre}
+.analogy{background:var(--color-background-secondary);border-left:2px solid var(--color-border-info);border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:12px 16px;font-size:14px;color:var(--color-text-secondary);line-height:1.7;font-style:italic}
+.iq{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:6px}
+.iq .q{font-size:13px;font-weight:500;margin-bottom:4px}
+.iq .a{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.bad{display:flex;gap:10px;margin-bottom:8px;font-size:13px;line-height:1.6}
+.bad .ic{color:var(--color-text-danger);font-size:15px;margin-top:1px;flex-shrink:0}
+.connects{display:flex;flex-wrap:wrap;gap:6px}
+.cp{font-size:12px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+table.ct{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.ct th{text-align:left;font-weight:500;padding:6px 10px;border-bottom:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+table.ct td{padding:6px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5;font-size:12px}
+table.ct tr:last-child td{border-bottom:none}
+</style>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sidebar-title">Block 6 — Distributed Systems</div>
+  <div class="nav-item active" onclick="show(0,this)"><span class="nav-num">01</span>Fallacies of Dist. Computing</div>
+  <div class="nav-item" onclick="show(1,this)"><span class="nav-num">02</span>Time in Dist. Systems</div>
+  <div class="nav-item" onclick="show(2,this)"><span class="nav-num">03</span>Consistency Models</div>
+  <div class="nav-item" onclick="show(3,this)"><span class="nav-num">04</span>Consensus Problem & FLP</div>
+  <div class="nav-item" onclick="show(4,this)"><span class="nav-num">05</span>Raft Consensus</div>
+  <div class="nav-item" onclick="show(5,this)"><span class="nav-num">06</span>CRDTs</div>
+  <div class="nav-item" onclick="show(6,this)"><span class="nav-num">07</span>Two Generals Problem</div>
+  <div class="nav-item" onclick="show(7,this)"><span class="nav-num">08</span>Microservices Patterns</div>
+</nav>
+<main class="content" id="content"></main>
+</div>
+
+<script>
+const T=[
+
+// 01
+{tag:"Distributed Systems Foundations",title:"Fallacies of Distributed Computing",
+oneliner:"The 8 fallacies are false assumptions that developers new to distributed systems routinely make — each one leads to a specific class of production failure when reality contradicts the assumption.",
+secs:[
+{l:"Why they matter",b:`<p>Coined by L. Peter Deutsch (and extended by James Gosling) at Sun Microsystems in the 1990s. Engineers who had built reliable single-machine systems made implicit assumptions when extending those systems to networks. When those assumptions broke in production, the failures were catastrophic, subtle, and hard to diagnose. Every distributed system design should be stress-tested against all 8 fallacies.</p>`},
+{l:"All 8 fallacies",b:`<div class="card"><div class="card-name">1. The network is reliable</div><div class="card-desc">Networks drop packets, timeout, and partition. TCP retransmits but adds latency. A request can be received and processed by the server but the response can be lost — the client retries and causes a duplicate. Mitigation: idempotency keys, retry with exponential backoff, circuit breakers.</div></div>
+<div class="card"><div class="card-name">2. Latency is zero</div><div class="card-desc">A local function call takes nanoseconds. A cross-datacenter RPC takes 50-150ms. Designs that treat network calls like in-process calls create chatty interfaces that collapse under load. Mitigation: batch operations, async communication, co-locate services that call each other frequently.</div></div>
+<div class="card"><div class="card-name">3. Bandwidth is infinite</div><div class="card-desc">Serialising large objects and sending them over the network has real cost. A monolith can pass a pointer in nanoseconds; a microservice must serialise, transmit, and deserialise. Mitigation: Protobuf over JSON for high-frequency calls, pagination, field projection, compression.</div></div>
+<div class="card"><div class="card-name">4. The network is secure</div><div class="card-desc">Packets traverse untrusted infrastructure. Man-in-the-middle, eavesdropping, and injection attacks are real. Mitigation: mTLS between services, TLS everywhere, zero-trust networking (don't trust the internal network by default).</div></div>
+<div class="card"><div class="card-name">5. Topology doesn't change</div><div class="card-desc">Servers are added, removed, scaled up and down. Kubernetes pods are ephemeral. Hardcoded IP addresses and DNS-lookup-once patterns break. Mitigation: service discovery (Consul, Kubernetes DNS), client-side load balancing, health checks.</div></div>
+<div class="card"><div class="card-name">6. There is one administrator</div><div class="card-desc">Different teams own different services. Deployment schedules differ. A schema change in Service A breaks Service B owned by a different team. Mitigation: API versioning, backward-compatible changes, consumer-driven contract testing.</div></div>
+<div class="card"><div class="card-name">7. Transport cost is zero</div><div class="card-desc">Network calls have real financial and compute costs. Serialisation/deserialisation CPU, network egress charges (AWS charges per GB out of a region), TLS handshake overhead. Mitigation: protocol selection (gRPC vs REST), connection pooling, keep-alive, caching.</div></div>
+<div class="card"><div class="card-name">8. The network is homogeneous</div><div class="card-desc">Different services run different languages, serialisation formats, OS versions, and network stacks. A Java service calling a Python service via JSON may silently lose precision on floating-point numbers. Mitigation: explicitly specify wire formats, use schema registries (Avro, Protobuf), integration tests across service boundaries.</div></div>`},
+{l:"Production failures each fallacy causes",b:`<div class="code">Fallacy 1 (reliable network):
+  Payment service sends charge request. Network drops response (not the request).
+  Client retries → customer charged twice.
+  Fix: idempotency key in payment request. Server stores processed keys in DB.
+  On retry: "already processed" → return original result, no double charge.
+
+Fallacy 2 (zero latency):
+  Microservice makes 20 synchronous API calls to render one page.
+  Each: 10ms. Total: 200ms minimum. Under load, tail latency → 2s page load.
+  Fix: fan-out async (parallel calls), aggregate in gateway, pre-compute.
+
+Fallacy 4 (secure network):
+  Internal service assumes requests from internal IP are trusted → no auth.
+  Attacker gains foothold on one compromised internal service → lateral movement.
+  Fix: mTLS, zero-trust (authenticate every request even internal).</div>`},
+{l:"Mental model",b:`<div class="analogy">The 8 fallacies are the assumptions a naive newcomer makes when moving from a one-person office (single machine) to a multinational corporation (distributed system). "Memos arrive instantly" (zero latency), "the building is secure" (secure network), "there's always a working phone line" (reliable network), "the org chart never changes" (fixed topology), "one person is in charge" (one admin). Each assumption is comfortably true in the office — and shattered the moment you're operating across cities, time zones, and ownership boundaries.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">You're designing a payment API. How does fallacy #1 affect your design?</div><div class="a">The network is unreliable — a request can be received and processed by the server but the response can be lost. The client, seeing a timeout, retries. Without protection: customer charged twice. Solution: idempotency keys. Client generates a unique UUID per payment attempt and sends it in a header. Server stores the key with the result. On retry with the same key: return the stored result without re-processing. Safe retries = idempotent operations.</div></div>
+<div class="iq"><div class="q">What is a chatty interface and which fallacy does it violate?</div><div class="a">Fallacy 2 (latency is zero). A chatty interface makes many fine-grained network calls where a coarse-grained call or local call would do — e.g. fetching user profile, then preferences, then permissions in three sequential calls instead of one aggregated call. At 10ms per call, 30 calls = 300ms minimum latency. Design: aggregate at the API gateway (Backend for Frontend pattern), use batch endpoints, or move frequently co-called data to a single service boundary.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">CAP Theorem (network partition = fallacy 1 manifested)</span><span class="cp">Two Generals Problem (fallacy 1 formally proved)</span><span class="cp">Microservices Patterns (mitigations)</span><span class="cp">gRPC vs REST (bandwidth fallacy)</span><span class="cp">TLS (security fallacy)</span></div>`}
+]},
+
+// 02
+{tag:"Distributed Systems Foundations",title:"Time in Distributed Systems",
+oneliner:"Wall clocks across distributed nodes are never perfectly synchronised — so distributed systems use logical clocks (Lamport) and vector clocks to establish causal ordering of events without relying on physical time.",
+secs:[
+{l:"Why wall clocks fail",b:`<p>Every machine has a physical clock that drifts — quartz oscillators are imprecise, and even GPS-synchronised clocks (like Google's TrueTime) have bounded uncertainty (±7ms). NTP (Network Time Protocol) corrects drift but introduces its own uncertainty. Two nodes can never be certain which event happened "first" by comparing their local clocks if those clocks disagree by even milliseconds. Worse: a clock can jump backwards after NTP correction, breaking timestamp-based ordering.</p>
+<div class="code">Example of the problem:
+  Node A at t=100ms: writes x=1
+  Node B at t=99ms:  writes x=2  ← B's clock is 1ms behind
+  
+  If we order by timestamp: A's write (t=100) appears AFTER B's (t=99)
+  But causal order may be: A wrote first, B read A's value and responded
+  
+  Timestamp ordering is wrong here. The causal order is: A→B, not B→A.
+  
+  Google Spanner's TrueTime: returns [earliest, latest] interval, not a point.
+  Transactions must wait for the uncertainty window to expire before committing.
+  Cost: adds commit latency = ~14ms. Benefit: true global ordering.</div>`},
+{l:"Lamport clocks",b:`<p>Leslie Lamport (1978) formalised the "happens-before" (→) relation without needing synchronised clocks. Rule: if event A causally precedes event B (A→B), then L(A) < L(B). The converse is NOT guaranteed — L(A) < L(B) doesn't mean A happened before B.</p>
+<div class="code">Algorithm:
+  Every process maintains a counter C, initialised to 0.
+
+  Rule 1 (local event): before executing any event, increment C.
+    C = C + 1; record event with timestamp C.
+
+  Rule 2 (send message): include current C in the message.
+    C = C + 1; send(message, timestamp=C)
+
+  Rule 3 (receive message): update C = max(local_C, msg_timestamp) + 1
+
+Example:
+  Process A:    1        2             3
+  Event:       [e1]     [e2] ─────→  [e5]
+                                  ↑
+  Process B:    1        2      3     4
+  Event:       [e3]     [e4] ──┘     [e6]
+
+  A sends message after e2 (timestamp=2) to B
+  B receives: C_B = max(2, 2) + 1 = 3, so receive event gets timestamp 3
+  e5 (A's ack) gets timestamp max(2,3)+1 = 4... etc.
+
+  Lamport gives: if A→B then L(A) < L(B)
+  But L(A) < L(B) does NOT imply A→B (concurrent events can have any order)</div>`},
+{l:"Vector clocks",b:`<p>Vector clocks (Fidge/Mattern, 1988) capture causality precisely — both directions. Each process maintains a vector of counters, one per process. By comparing two vector clocks you can determine: A happened before B, B happened before A, or A and B are concurrent (no causal relationship).</p>
+<div class="code">N processes: vector V = [V[0], V[1], ..., V[N-1]]
+
+Rules:
+  Local event: V[self] += 1
+  Send:        V[self] += 1; send message with V
+  Receive:     V[self] = max(V[self], msg.V[self]) for each i; V[self] += 1
+
+Comparison:
+  V_A < V_B (A happened-before B):   ALL V_A[i] ≤ V_B[i], at least one strictly <
+  V_A = V_B: identical clocks
+  V_A || V_B (concurrent):            V_A[0] > V_B[0] AND V_A[1] < V_B[1]  ← neither dominates
+
+Example — 3 processes: A, B, C
+  A: [1,0,0] sends to B
+  B: receives → [1,1,0]; then sends to C → [1,2,0]
+  C: receives → [1,2,1]
+  
+  Now A does a local event: [2,0,0]
+  Is [2,0,0] concurrent with [1,2,1]? 
+    2 > 1 (A wins), 0 < 2 (B wins) → CONCURRENT. Neither happened-before the other.
+
+Used by: Amazon DynamoDB (conflict detection), Riak, CouchDB (revision tracking)</div>`},
+{l:"Hybrid Logical Clocks (HLC)",b:`<p>Used by CockroachDB and YugabyteDB. Combines physical time (for human-readable timestamps and bounded uncertainty) with logical time (for ordering within the same physical millisecond). Format: {physical_ms, logical_counter}. Advances like NTP time but never goes backwards, and logical component handles within-millisecond ordering. Maintains: HLC(A) < HLC(B) iff A → B, while keeping clocks close to wall time.</p>`},
+{l:"Mental model",b:`<div class="analogy">Lamport clocks are like chapter numbers in a book passed between authors. Before writing anything, increment your chapter number. When you receive another author's draft, set your counter to max(yours, theirs) + 1. You know Chapter 5 came before Chapter 8 — but you can't tell if two chapters with different numbers were written independently (concurrently) or one was caused by reading the other. Vector clocks are each author keeping a list of everyone's chapter counts — now you can tell if Author A had read Author B's work before writing (causally related) or if both were writing simultaneously without reading each other's work (concurrent).</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why can't we just use wall clock timestamps to order events in a distributed system?</div><div class="a">Clocks drift and can't be perfectly synchronised across nodes. NTP corrections can jump the clock backwards. Two nodes may disagree by milliseconds — enough for an event that causally happened "before" to have a larger timestamp. Google's Spanner uses GPS + atomic clocks and still reports a time uncertainty window, requiring transactions to wait it out. For most systems: logical clocks (Lamport or vector) are the correct solution for causal ordering without physical clock dependency.</div></div>
+<div class="iq"><div class="q">When would you use vector clocks over Lamport clocks?</div><div class="a">When you need to detect concurrency, not just order. Lamport clocks tell you "if A → B then L(A) < L(B)" — but two events with different Lamport timestamps might be concurrent. Vector clocks detect whether two events are causally related or concurrent, which matters for: conflict detection in replicated databases (DynamoDB uses this to surface conflicting writes), collaborative editing (concurrent edits need to be merged), and distributed debugging (trace which events could have influenced which).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Consistency Models (causality = causal consistency)</span><span class="cp">CRDTs (vector clocks for conflict detection)</span><span class="cp">Raft Consensus (term numbers as logical clocks)</span><span class="cp">CAP Theorem (partition forces clock divergence)</span><span class="cp">Databases (MVCC timestamps, CockroachDB HLC)</span></div>`}
+]},
+
+// 03
+{tag:"Distributed Systems Theory",title:"Consistency Models",
+oneliner:"Consistency models define the rules about what values a read can return after a write in a distributed system — from linearisability (every operation appears instantaneous and globally ordered) down to eventual consistency (replicas converge given time and no new writes).",
+secs:[
+{l:"Why a spectrum exists",b:`<p>Strong consistency requires coordination between nodes (lock acquisition, quorum agreement) — this takes time and is blocked by network partitions. Weak consistency sacrifices guarantees for availability and speed. Every distributed system chooses a position on this spectrum based on its access patterns, failure tolerance, and latency requirements. Understanding the model is critical because it determines what bugs your application must guard against.</p>`},
+{l:"Linearisability — the gold standard",b:`<div class="card"><div class="card-name">Linearisability (Strong Consistency)</div><div class="card-desc">Every operation appears to execute atomically at a single point in real time between its invocation and response. Once a write completes, every subsequent read (by any client, anywhere) sees that write. The system behaves as if there is exactly one copy of the data and all operations are serialised. Implementation: leader-based consensus (Raft, Paxos), 2PL. Cost: high latency (must coordinate across replicas), unavailable during partition (CP in CAP). Examples: ZooKeeper, etcd, Google Spanner.</div></div>
+<div class="code">Linearisable execution:
+  Client A: WRITE x=1 ─────────────────────── done
+  Client B:                    READ x → must return 1 (always)
+  Client C:         READ x → may return 0 or 1 (write not yet complete)
+                              but once A's write completes: ALL reads return 1
+
+Non-linearisable (violation):
+  Client A: WRITE x=1 ─── done
+  Client B: READ x → 0   ← VIOLATION if this happens AFTER A's write completes</div>`},
+{l:"Sequential consistency",b:`<div class="card"><div class="card-name">Sequential Consistency</div><div class="card-desc">All operations appear in some total order that is consistent with each process's program order — but this order doesn't need to match real time. A read can return a stale value, as long as the global ordering is consistent per process. Weaker than linearisability: "the system agrees on an ordering, but it may not match the real-world clock." Used in: some CPU memory models (x86 TSO), early database systems.</div></div>`},
+{l:"Causal consistency",b:`<div class="card"><div class="card-name">Causal Consistency</div><div class="card-desc">If event A causally precedes event B (A → B, via vector clocks), then all processes see A before B. Concurrent operations (no causal relationship) may be seen in different orders by different processes. Stronger than eventual, weaker than sequential. Implementation: vector clocks track causal dependencies; messages are only delivered once all causal predecessors are delivered. Used by: Facebook's TAO, some Cassandra configurations.</div></div>
+<div class="code">Causal consistency example:
+  Alice: posts photo (write W1)
+  Bob:   comments on photo (write W2 — causally depends on W1)
+  Carol: must see W1 before W2. She can't see the comment without the photo.
+  Dave:  was reading something unrelated (concurrent) — no ordering guarantee with W1/W2
+  
+  Violation: Carol sees Bob's comment before Alice's photo. Comment refers to photo
+  that doesn't exist in Carol's view. Causal consistency prevents this.</div>`},
+{l:"Read-your-writes / Monotonic reads",b:`<div class="card"><div class="card-name">Read-your-writes (Session consistency)</div><div class="card-desc">After a client writes a value, any subsequent reads by the SAME client will see that write. Other clients may still see stale values. Common implementation: route all reads from a session to the same replica, or use the write's version number as a lower bound for reads. Important for: user profile updates, settings changes — you changed your name and immediately see the old one.</div></div>
+<div class="card"><div class="card-name">Monotonic reads</div><div class="card-desc">Once a client reads a value at time T, subsequent reads will return a value at least as new as T. A client never reads "backwards" in time — seeing x=5, then x=3 on the next read. Implementation: track the last read version number, require replicas to catch up to that version before serving subsequent reads.</div></div>`},
+{l:"Eventual consistency",b:`<div class="card"><div class="card-name">Eventual Consistency</div><div class="card-desc">If no new writes occur, all replicas will eventually converge to the same value. No guarantees about how long "eventually" takes or what readers see in the interim. Easiest to implement (no coordination), highest availability. Used by: Cassandra, DynamoDB (default), DNS, S3. Requires: application-level conflict resolution, idempotent operations, tolerance for stale reads.</div></div>`},
+{l:"Consistency spectrum",b:`<table class="ct"><tr><th>Model</th><th>Reads see</th><th>Coordination</th><th>Availability</th><th>Examples</th></tr>
+<tr><td>Linearisable</td><td>Latest write always</td><td>Full quorum</td><td>Low (CP)</td><td>etcd, Spanner, ZooKeeper</td></tr>
+<tr><td>Sequential</td><td>Consistent order per process</td><td>Partial</td><td>Medium</td><td>Some CPU models</td></tr>
+<tr><td>Causal</td><td>Causal order preserved</td><td>Vector clocks</td><td>Higher</td><td>Facebook TAO, COPS</td></tr>
+<tr><td>Read-your-writes</td><td>Own writes always</td><td>Per-session</td><td>High</td><td>Most web apps (sticky sessions)</td></tr>
+<tr><td>Eventual</td><td>Possibly stale</td><td>None</td><td>Highest (AP)</td><td>Cassandra, DynamoDB, DNS</td></tr></table>`},
+{l:"Mental model",b:`<div class="analogy">Imagine a Google Doc (collaborative editor) with synchronisation delays. Linearisability: everyone sees every character instantly — one shared cursor. Sequential: everyone's changes appear in the same order, but with delay — like a single shared queue. Causal: if you type a reply to someone's sentence, your reply always appears after their sentence on everyone's screen — but two independent edits might appear in different orders for different readers. Read-your-writes: you always see your own changes immediately, even if others haven't seen them yet. Eventual: all copies will match eventually — but right now your co-author might be looking at a version from 30 seconds ago.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is the difference between linearisability and eventual consistency? When would you choose each?</div><div class="a">Linearisability: reads always return the most recent write; the system behaves as a single copy. Cost: high latency, unavailable during partition. Use for: bank balances, inventory counts, distributed locks, leader election — anything where a stale read causes incorrect behaviour. Eventual consistency: replicas converge over time; reads may be stale. Cost: must handle conflicts and stale reads in application code. Use for: social media like counts, DNS records, shopping cart (Amazon's famous Dynamo paper example), anywhere eventual correctness is acceptable and availability is paramount.</div></div>
+<div class="iq"><div class="q">What is causal consistency and why is it stronger than eventual but weaker than sequential?</div><div class="a">Causal: operations that have a causal relationship (one depends on the result of another) are seen in causal order by all nodes. Concurrent operations (no dependency) can be seen in any order. Stronger than eventual: stale reads that violate causality are prevented (you can't see a comment before the post it references). Weaker than sequential: there's no single total order of all operations — concurrent operations can be ordered differently by different nodes. Practical sweet spot for social applications and collaborative tools.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">CAP Theorem (CP=linearisable, AP=eventual)</span><span class="cp">Time in Dist. Systems (causal = vector clocks)</span><span class="cp">Raft (provides linearisability)</span><span class="cp">CRDTs (eventual + conflict-free)</span><span class="cp">MVCC / Isolation Levels (database consistency)</span></div>`}
+]},
+
+// 04
+{tag:"Distributed Systems Theory",title:"Consensus Problem & FLP Impossibility",
+oneliner:"The consensus problem asks: can N nodes agree on a single value despite failures? FLP (Fischer-Lynch-Paterson, 1985) proves that in a fully asynchronous system with even one faulty node, deterministic consensus is impossible.",
+secs:[
+{l:"What consensus means formally",b:`<p>Consensus requires three properties — all must hold simultaneously:</p>
+<div class="card"><div class="card-name">Agreement</div><div class="card-desc">All non-faulty processes decide on the same value. No two correct nodes can decide differently.</div></div>
+<div class="card"><div class="card-name">Validity</div><div class="card-desc">The decided value must have been proposed by some process. You can't decide a value nobody proposed.</div></div>
+<div class="card"><div class="card-name">Termination</div><div class="card-desc">Every non-faulty process eventually decides. The algorithm doesn't run forever.</div></div>
+<p>Real-world needs consensus for: electing a leader, committing a distributed transaction (all-or-nothing), replicating a log (all replicas agree on the next entry), distributed lock acquisition.</p>`},
+{l:"FLP Impossibility — the result",b:`<p>Fischer, Lynch, and Paterson (1985) proved: <strong>No deterministic consensus algorithm can simultaneously guarantee Safety + Liveness in a purely asynchronous system with even one process crash failure.</strong></p>
+<div class="code">The model:
+  Asynchronous: no bound on message delay, no bound on process speed.
+                You cannot distinguish a slow node from a crashed node.
+  Single failure: even one process may crash (stop sending messages forever).
+  
+The impossibility:
+  In a purely asynchronous system, you cannot tell the difference between:
+    - A node that is slow (will respond eventually)
+    - A node that has crashed (will never respond)
+  
+  This ambiguity means: waiting for a response from a potentially-crashed node
+  means you might wait forever (violating Termination/Liveness).
+  Not waiting means you might make a decision that the slow node
+  disagrees with after it recovers (violating Agreement/Safety).
+  
+  No deterministic algorithm can resolve this dilemma in the general case.
+
+What FLP does NOT say:
+  ✗ Consensus is impossible in practice
+  ✗ Consensus is impossible in all models
+  ✓ Deterministic consensus is impossible in a purely ASYNCHRONOUS model
+  ✓ Real systems escape FLP by adding: timeouts (partial synchrony), randomisation</div>`},
+{l:"How real systems escape FLP",b:`<div class="card"><div class="card-name">Partial synchrony (Paxos, Raft)</div><div class="card-desc">Assume the network is eventually synchronous: message delays are bounded but the bound is unknown in advance. Use timeouts to detect suspected failures — not proof of failure, but a practical trigger for re-election. If the timeout is wrong (slow node mistaken for crashed): re-election, some delay, eventual convergence. Safety is maintained; liveness is probabilistic (works as long as the network is "well-behaved enough").</div></div>
+<div class="card"><div class="card-name">Randomisation (Ben-Or, randomised Paxos)</div><div class="card-desc">Add random choices to the algorithm. An adversary who wants to prevent termination must get lucky repeatedly — with exponentially decreasing probability, the algorithm terminates. Safety always holds; liveness holds with probability 1. Used in: Byzantine fault tolerant consensus (PBFT).</div></div>
+<div class="card"><div class="card-name">Failure detectors</div><div class="card-desc">An oracle that tells you which nodes have failed (possibly incorrectly). Even with an unreliable failure detector (one that makes mistakes), consensus becomes solvable. Chandra-Toueg (1996): the weakest failure detector needed for consensus is called ◇W (Eventually Weak). Raft's heartbeat mechanism IS a failure detector.</div></div>`},
+{l:"Byzantine fault tolerance (BFT)",b:`<p>FLP assumes crash faults (a node fails by stopping). Byzantine faults: a node can behave arbitrarily — lie, send conflicting messages to different peers, delay selectively. PBFT (Practical Byzantine Fault Tolerance) and modern HotStuff (used in Libra/Diem blockchain) handle Byzantine nodes. Requirement: more than 2/3 of nodes must be honest. Cost: quadratic message complexity (O(n²)). Used in: blockchain consensus (Tendermint, HotStuff), safety-critical systems.</p>`},
+{l:"Mental model",b:`<div class="analogy">The consensus problem is a group of generals trying to vote on a battle plan over unreliable radios. FLP says: if even one general's radio might have permanently broken (crash failure) and you can't distinguish a broken radio from a slow one, no deterministic voting procedure can guarantee everyone agrees AND that the vote always completes. Real systems (Raft/Paxos) escape this by saying "if we haven't heard from a general in 150ms, we assume they're out — we vote without them." This is wrong sometimes (radio was just slow), but correctable — and it gives us termination in practice at the cost of occasional re-elections.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What does FLP impossibility actually mean for a system designer?</div><div class="a">It means no consensus algorithm can be perfectly safe AND always terminate in a system where node failures and message delays are indistinguishable. The practical implication: we must choose whether to sacrifice safety (allow split-brain, allow divergent decisions) or liveness (block indefinitely waiting for a crashed node) under adverse conditions. Raft chooses liveness sacrifice: it blocks if it can't get a quorum majority, rather than allow split-brain. That's why Raft clusters become unavailable when more than half the nodes fail.</div></div>
+<div class="iq"><div class="q">How does Raft escape FLP in practice?</div><div class="a">Raft assumes partial synchrony — that the network will eventually stabilise. It uses election timeouts: if a follower doesn't hear from the leader within 150-300ms, it assumes the leader is dead and starts a new election. This "failure detector" is wrong sometimes (slow leader mistaken for crashed → unnecessary election), but eventually a stable leader emerges. Safety is always maintained (at most one leader per term, log entries only committed when replicated to majority). FLP says this can't be guaranteed; Raft says "it works in practice on typical networks."</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Two Generals Problem (impossibility cousin)</span><span class="cp">Raft Consensus (practical solution)</span><span class="cp">CAP Theorem (CP systems block for consensus)</span><span class="cp">Time in Dist. Systems (async = no timeouts)</span></div>`}
+]},
+
+// 05
+{tag:"Consensus Algorithms",title:"Raft Consensus",
+oneliner:"Raft is a consensus algorithm designed for understandability — it achieves the same safety as Paxos but decomposes the problem into three relatively independent sub-problems: leader election, log replication, and safety.",
+secs:[
+{l:"Why Raft, not Paxos",b:`<p>Paxos (Lamport, 1989) is famously correct but famously hard to understand and implement. The Paxos paper describes single-decree consensus (agree on one value); real systems need multi-Paxos (agree on a sequence of values) which required significant undescribed extensions. Raft (Ongaro & Ousterhout, 2014) was explicitly designed for understandability: every design choice prioritised clarity, and it was validated by showing computer science students understood Raft better than Paxos in studies. Raft is now the dominant consensus algorithm in production: etcd (Kubernetes), CockroachDB, TiKV, Consul.</p>`},
+{l:"Node roles and terms",b:`<div class="code">At any time, each node is in one of three roles:
+
+  LEADER:    exactly one per term (if one exists)
+             - receives all client requests
+             - replicates log entries to followers
+             - sends heartbeats to maintain authority
+
+  FOLLOWER:  passive — responds to leader and candidates
+             - if no heartbeat in election timeout → become Candidate
+
+  CANDIDATE: trying to become leader
+             - sends RequestVote RPCs to all nodes
+             - if receives majority votes → becomes Leader
+
+TERM: a monotonically increasing integer (Raft's logical clock)
+  - Each election attempt starts a new term
+  - A node with a higher term number is more up-to-date
+  - Node seeing a higher term → immediately reverts to Follower
+  - Terms without a leader (failed election) are just term numbers with no leader</div>`},
+{l:"Leader election",b:`<ol class="steps">
+<li>Follower's election timeout fires (150-300ms, random — randomness prevents split votes). Follower becomes Candidate.</li>
+<li>Candidate increments its term, votes for itself, sends RequestVote(term, candidateId, lastLogIndex, lastLogTerm) to all nodes.</li>
+<li>Each node grants a vote if: it hasn't voted in this term yet AND the candidate's log is at least as up-to-date as its own (log completeness check — ensures no data loss).</li>
+<li>Candidate receives votes from majority (N/2 + 1 of N nodes) → becomes Leader for this term.</li>
+<li>New Leader immediately sends heartbeats (empty AppendEntries RPCs) to all followers to assert authority and reset their election timeouts.</li>
+<li>If split vote (two candidates, neither gets majority) → timeout → new election with incremented term.</li>
+</ol>
+<div class="code">Why random timeouts?
+  If all followers had the same timeout, they'd all start elections simultaneously → split vote → repeat.
+  Random [150ms, 300ms]: one follower times out first, sends votes, gets majority
+  before others even start → clean election in the common case.</div>`},
+{l:"Log replication",b:`<ol class="steps">
+<li>Client sends command to Leader.</li>
+<li>Leader appends entry to its log (not yet committed): {term, index, command}.</li>
+<li>Leader sends AppendEntries(term, prevLogIndex, prevLogTerm, entries[], leaderCommitIndex) to all followers in parallel.</li>
+<li>Each follower checks: does my log match at prevLogIndex with prevLogTerm? If yes: append the new entries, reply success.</li>
+<li>Once Leader receives success from a majority of nodes (including itself): entry is committed. Leader applies command to state machine, responds to client.</li>
+<li>On next AppendEntries, leader includes updated leaderCommitIndex → followers apply committed entries to their state machines.</li>
+</ol>
+<div class="code">Log consistency check (the genius of Raft):
+  Each AppendEntries includes (prevLogIndex, prevLogTerm) — the index and term
+  of the entry immediately before the new entries.
+  
+  Follower REJECTS if its log doesn't have an entry at prevLogIndex with prevLogTerm.
+  Leader then decrements nextIndex[follower] and retries with older entries.
+  Eventually finds a matching point and sends all entries from there.
+  
+  This guarantees: if two logs agree at index i and term t,
+  ALL entries before index i are identical in both logs.
+  (Log Matching Property)</div>`},
+{l:"Safety — why Raft never loses committed data",b:`<div class="code">Key invariant: a leader is elected ONLY if its log is at least as complete
+as any committed entry in the cluster.
+
+Vote grant condition:
+  Requester's (lastLogTerm, lastLogIndex) ≥ voter's (lastLogTerm, lastLogIndex)
+  (compare term first, then index)
+
+Why this guarantees safety:
+  An entry is committed when it's on a majority of nodes.
+  For a new leader to win election, it must get votes from a majority.
+  At least one node in the new-leader's majority overlaps with the committed-entry majority.
+  That overlapping node refuses to vote for a candidate whose log is less complete.
+  → New leader must have all committed entries. Committed data is never lost.
+
+Compare to Paxos: same guarantee, but Raft's log structure makes this intuitive
+and implementable without undocumented extensions.</div>`},
+{l:"What Raft does NOT cover",b:`<p>Raft handles leader election and log replication, but production systems need: cluster membership changes (adding/removing nodes — Raft's joint consensus protocol), log compaction (logs grow forever — Raft uses snapshots: state machine saves current state, log entries before snapshot index are discarded), and read-only query optimisation (follower reads need lease mechanism to avoid stale reads). These are specified in the extended Raft paper and implemented differently by etcd, CockroachDB, etc.</p>`},
+{l:"Mental model",b:`<div class="analogy">Raft is a company with a strict policy: one CEO at a time, and every decision must be documented in a shared logbook before taking effect. If the CEO goes silent for too long (election timeout), one of the VPs calls a vote — the VP with the most complete company history wins (log completeness = vote grant condition). Decisions are only official when a majority of executives have written them in their logbooks (majority replication = committed). The term number is the "fiscal year" — a higher number means more authority, and any executive seeing a higher-numbered memo immediately defers to whoever issued it.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How does Raft ensure that a newly elected leader has all committed log entries?</div><div class="a">Vote grant condition: a candidate only receives a vote if its log is at least as up-to-date as the voter's log (compare lastLogTerm first, then lastLogIndex). A committed entry has been replicated to a majority. For a candidate to win an election, it needs votes from a majority. At least one node in its voting majority also has the committed entry (two majorities in an N-node cluster always overlap by at least one node). That overlapping node won't vote for a candidate with a less complete log. Therefore, any elected leader has all committed entries.</div></div>
+<div class="iq"><div class="q">What happens in Raft when there's a network partition?</div><div class="a">If the partition isolates the leader from a minority of nodes: leader continues serving (still has majority contact). Minority followers eventually timeout and start elections — but they can't get majority votes, so no new leader elected. When partition heals, they see the real leader's higher term and revert to follower, receiving log updates. If the partition isolates the leader from the majority: leader can't commit new entries (no majority ACK). Majority partition elects a new leader. Old leader can't replicate entries (can't get majority ACK). On heal: old leader sees higher term from new leader, reverts to follower, its uncommitted entries are overwritten. Committed entries are always safe.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Consensus Problem & FLP (Raft solves via partial synchrony)</span><span class="cp">WAL (Raft log IS a WAL)</span><span class="cp">etcd / ZooKeeper (Raft implementations)</span><span class="cp">CAP Theorem (Raft is CP)</span><span class="cp">Kubernetes (etcd uses Raft for control plane)</span></div>`}
+]},
+
+// 06
+{tag:"Distributed Data Structures",title:"CRDTs — Conflict-free Replicated Data Types",
+oneliner:"CRDTs are data structures designed so that concurrent updates on different replicas can always be merged automatically and deterministically — enabling eventual consistency without conflict resolution logic.",
+secs:[
+{l:"The conflict problem they solve",b:`<p>In eventually-consistent systems, two replicas can receive the same update at different times or receive conflicting updates. Traditional approaches: last-write-wins (LWW — silently drops data), manual merge logic (error-prone), or coordination (defeats the purpose of eventual consistency). CRDTs solve this mathematically: the data structure's merge operation is designed to be commutative, associative, and idempotent (the join of a mathematical semilattice) so that merging in any order always produces the same result.</p>`},
+{l:"The three merge properties",b:`<div class="code">For CRDT merge to be conflict-free, it must be a join-semilattice:
+
+Commutative:  merge(A, B) = merge(B, A)
+              (order of merging doesn't matter)
+
+Associative:  merge(merge(A, B), C) = merge(A, merge(B, C))
+              (grouping of merges doesn't matter)
+
+Idempotent:   merge(A, A) = A
+              (merging the same state twice has no extra effect)
+
+If all three hold: no matter which order replicas exchange states,
+convergence to the same final value is guaranteed.
+No coordinator, no locks, no conflict resolution code needed.</div>`},
+{l:"G-Counter (Grow-only Counter)",b:`<div class="code">Problem: distributed like counter. Every node can increment. Simple int: node A increments to 3, node B increments to 3 — merge: who wins? You can't just take max.
+
+G-Counter solution:
+  State: vector of N counters, one per node [V[0], V[1], ..., V[N-1]]
+  
+  Increment (on node i): V[i] += 1        (only node i can increment its slot)
+  Value (global count):  SUM(V)
+  Merge(A, B):           max(A[i], B[i]) for each i  ← idempotent, commutative, associative
+
+Example — 3 nodes:
+  Node 0: [5, 0, 0]   (incremented 5 times locally)
+  Node 1: [0, 3, 0]
+  Node 2: [0, 0, 2]
+  
+  Merge all:  [5, 3, 2]  → global value = 10
+  
+  Node 0 receives Node 1's state twice: max([5,0,0], [0,3,0]) = [5,3,0] — idempotent ✓
+  Merge in any order: same result ✓
+
+Used by: Cassandra counter columns (internally)</div>`},
+{l:"PN-Counter (Positive-Negative Counter)",b:`<div class="code">Need: a counter that can increment AND decrement (G-Counter is grow-only).
+
+PN-Counter: two G-Counters — one for increments (P), one for decrements (N)
+  Value = SUM(P) - SUM(N)
+  Increment: add to P[node_id]
+  Decrement: add to N[node_id]
+  Merge: merge P-vectors, merge N-vectors separately
+
+Used for: inventory counts (decrement on purchase), like/dislike counters</div>`},
+{l:"LWW-Element-Set and 2P-Set",b:`<div class="card"><div class="card-name">G-Set (Grow-only Set)</div><div class="card-desc">Elements can only be added, never removed. Merge = union. Used for: append-only logs, event sets, membership that never shrinks.</div></div>
+<div class="card"><div class="card-name">2P-Set (Two-Phase Set)</div><div class="card-desc">Two G-Sets: Add-set and Remove-set. An element is in the set if it's in Add-set and NOT in Remove-set. Once removed, can never be re-added. Merge = union both sets. Limitation: tombstones accumulate forever (can't re-add removed elements).</div></div>
+<div class="card"><div class="card-name">OR-Set (Observed-Remove Set)</div><div class="card-desc">Add and remove with unique tags per addition. When you remove, you remove the specific "addition" that was observed. A concurrent add with a new tag isn't removed. Handles: add X concurrently with remove X → X stays (the concurrent add used a new tag). Used by: Riak, Redis CRDTs, collaborative editing frameworks.</div></div>`},
+{l:"CRDT in collaborative editing",b:`<p>Google Docs and similar tools face the hardest CRDT problem: concurrent text edits that must maintain intent. If Alice deletes character at position 5 while Bob inserts at position 5, simple position-based approaches produce incorrect results. Solutions:</p>
+<div class="card"><div class="card-name">LOGOOT / LSEQ</div><div class="card-desc">Assign each character a globally unique, fractional position identifier between its neighbours. Positions are totally ordered. Concurrent inserts get unique positions that can be merged by sorting. Deletion is tombstoning the unique ID. Used by: ShareDB, some Operational Transform alternatives.</div></div>
+<div class="card"><div class="card-name">Yjs / Automerge</div><div class="card-desc">Production-ready CRDT libraries for collaborative editing. Yjs powers VS Code Live Share, Notion clones, many web editors. Automerge is used by Ink & Switch research tools. Both handle text, JSON trees, and arbitrary data structures with CRDT semantics.</div></div>`},
+{l:"Mental model",b:`<div class="analogy">A G-Counter is like vote tallying where each polling station counts its own ballots independently. Station A: 500 votes. Station B: 300 votes. Station C: 200 votes. Total = 1000. You can receive the reports in any order, receive duplicates (idempotent — same station total counted twice = no change), and merge them however you like — the result is always 1000. The key design insight: never let two stations increment the same counter slot. Each station owns its slot, owns its data, and the global result is always just a sum.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why can't you just use last-write-wins for a distributed counter?</div><div class="a">LWW silently drops updates. If Node A and Node B both increment a counter from 5 to 6 simultaneously, LWW picks one and discards the other — the counter ends up at 6 instead of 7. For counts (likes, inventory, view counts), data loss is unacceptable. G-Counter gives every node its own slot — concurrent increments on different slots are merged by summing, not by picking a winner. No data loss, no coordination needed.</div></div>
+<div class="iq"><div class="q">How does a collaborative text editor handle two users inserting at the same position simultaneously?</div><div class="a">Operational Transform (OT, used by Google Docs) transforms operations relative to concurrent ops — complex to implement correctly. CRDTs (Yjs, Automerge) assign each character a globally unique fractional position identifier. Two concurrent inserts at the same position get different unique IDs and sort deterministically based on those IDs. No coordination needed — both insertions survive, and all replicas converge to the same result by merging position-sorted character lists.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Consistency Models (eventual + CRDT = convergent)</span><span class="cp">CAP/BASE (AP systems + CRDT)</span><span class="cp">Time in Dist. Systems (vector clocks inside CRDTs)</span><span class="cp">Zombie Hunt (real-time collaborative = CRDT candidate)</span><span class="cp">Redis (CRDT-based data types)</span></div>`}
+]},
+
+// 07
+{tag:"Distributed Systems Theory",title:"Two Generals Problem",
+oneliner:"The Two Generals Problem proves that it is impossible to achieve guaranteed agreement over an unreliable communication channel — the fundamental impossibility that underlies TCP's three-way handshake, distributed transactions, and the limits of consensus.",
+secs:[
+{l:"The setup",b:`<div class="code">Two armies (White and Blue) want to coordinate an attack on a city.
+  White army: on the east hill
+  Blue army:  on the west hill
+  The city:   in the valley between them
+  
+  They can only communicate by sending messengers THROUGH the city (unreliable!).
+  Messengers can be captured at any time (lost message).
+  
+  Rule: if only ONE army attacks, it is defeated. They must attack SIMULTANEOUSLY.
+  Goal: reach guaranteed agreement on a time to attack.
+  
+  White sends: "Attack at dawn!" → messenger captured. No attack.
+  White sends: "Attack at dawn!" → message received. Blue needs to confirm.
+  Blue replies: "Confirmed! Attack at dawn!" → messenger captured. Blue attacks alone. Disaster.
+  Blue replies: "Confirmed!" → message received. White needs to confirm the confirmation.
+  ... ad infinitum.
+  
+  Every confirmation message is itself subject to being lost.
+  No finite number of messages can guarantee both generals are certain.</div>`},
+{l:"Formal proof sketch",b:`<div class="code">Claim: no protocol can guarantee agreement over an unreliable channel.
+
+Proof by contradiction:
+  Assume protocol P achieves guaranteed agreement.
+  P consists of a finite sequence of messages M1, M2, ..., Mn.
+  P succeeds even when any individual message is lost... 
+  ...which means P must succeed even if the LAST message Mn is lost.
+  But then: the sender of Mn doesn't know if it arrived.
+    - If Mn is: "I will attack" → sender attacks, receiver hasn't decided (lost Mn)
+    - Receiver: never received final message → still uncertain → may not attack
+  P has a state where one attacks and one doesn't. Contradiction with Agreement.
+  
+  Inductively: remove Mn, repeat for Mn-1... all the way to M1.
+  No finite message sequence achieves guaranteed agreement.
+  QED.</div>`},
+{l:"What TCP's 3-way handshake actually achieves",b:`<p>TCP's SYN → SYN-ACK → ACK does NOT solve the Two Generals Problem. It cannot guarantee both sides know the connection is established. What it does: achieves a "good enough" agreement with high probability. If the final ACK is lost, the server times out and retransmits SYN-ACK; the client ignores it (already considers itself connected) or retries; eventually both sides are connected or both give up. TCP manages this with timeouts and retries — a practical heuristic, not a mathematical guarantee.</p>`},
+{l:"Real-world implications",b:`<div class="card"><div class="card-name">Distributed transactions (2PC)</div><div class="card-desc">Two-Phase Commit tries to achieve atomic commit across distributed nodes. Phase 1 (Prepare): coordinator asks all participants if they can commit. Phase 2 (Commit/Abort): if all say yes, coordinator sends Commit. The Two Generals problem means: if coordinator crashes after sending some Commit messages but before others → some nodes commit, some abort → permanent inconsistency. The coordinator is the single point of failure — 2PC is a practical approximation that blocks on coordinator failure.</div></div>
+<div class="card"><div class="card-name">Exactly-once delivery</div><div class="card-desc">You can't guarantee exactly-once delivery over an unreliable network — only at-least-once or at-most-once. Kafka delivers at-least-once by default. Idempotency (see: fallacies) + at-least-once = effectively-exactly-once. True exactly-once (Kafka transactions) adds a transaction coordinator which itself can fail — shifting, not eliminating, the problem.</div></div>
+<div class="card"><div class="card-name">Payment confirmation</div><div class="card-desc">You charge a credit card via an API. Network drops the response. Did the charge succeed? You must query the payment provider's status endpoint (idempotency key lookup). You cannot know from the failed response alone. This is the Two Generals Problem in your payment integration.</div></div>`},
+{l:"Mental model",b:`<div class="analogy">Two business partners want to sign a contract simultaneously. They communicate only by post (unreliable). Partner A sends the signed contract. Partner B receives it, signs their copy, and posts it back. But A doesn't know if their original letter arrived until B's confirmation arrives. And B doesn't know if A received their confirmation. Even with 100 letters back and forth, the last letter's arrival is uncertain. In the real world: we use escrow agents (trusted third parties), legal deadlines, and registered mail (delivery confirmation) — all practical heuristics that shift the problem rather than solving it mathematically.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What does the Two Generals Problem tell us about distributed system design?</div><div class="a">Perfect guaranteed agreement over an unreliable network is mathematically impossible — no protocol can be certain both sides agree on an action. Practical implications: (1) design for idempotency so retries are safe; (2) use timeouts + optimistic acknowledgment; (3) query-on-uncertainty rather than infer from silence; (4) accept that distributed transactions (2PC) have failure modes (coordinator crash after partial commit) and design compensating transactions or sagas instead. The lesson is not despair — it's: design systems that are correct despite uncertainty, not systems that eliminate uncertainty.</div></div>
+<div class="iq"><div class="q">How does the Two Generals problem relate to the FLP impossibility theorem?</div><div class="a">Two Generals is a special case of the consensus problem on a fully asynchronous (unreliable) network. FLP generalises this: even with more than two processes and crash failures (rather than fully adversarial message loss), deterministic consensus is impossible in a purely asynchronous system. Two Generals proves consensus impossible with 2 processes and message loss. FLP proves it impossible with N processes and crash failures. Both highlight the same fundamental tension: you cannot distinguish a slow node/message from a dead one.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Consensus Problem & FLP (formal generalisation)</span><span class="cp">Raft (practical solution with timeouts)</span><span class="cp">TCP 3-way handshake (practical heuristic)</span><span class="cp">Distributed Transactions (2PC failure modes)</span><span class="cp">Fallacies (reliable network = Two Generals solved?)</span></div>`}
+]},
+
+// 08
+{tag:"System Architecture",title:"Microservices Patterns",
+oneliner:"Microservices patterns are proven architectural solutions to the operational, communication, and reliability challenges that emerge when a monolith is decomposed into independently deployable services.",
+secs:[
+{l:"Why patterns are needed",b:`<p>A monolith has one deployment, one process, direct function calls, one database. Microservices trade these for independent deployability and scalability — at the cost of: distributed system complexity (fallacies 1-8), service discovery, cross-service communication failures, data consistency across service boundaries, and observability across dozens of processes. Each pattern below addresses one or more of these costs.</p>`},
+{l:"Service Discovery",b:`<div class="card"><div class="card-name">Server-side discovery (AWS ALB, Nginx)</div><div class="card-desc">Client calls a load balancer or router. Router queries the service registry (which services are available and where) and forwards the request. Client is unaware of discovery. Simple for clients. Router is a potential bottleneck.</div></div>
+<div class="card"><div class="card-name">Client-side discovery (Ribbon, Eureka)</div><div class="card-desc">Client queries the service registry directly, gets a list of available instances, and selects one using its own load balancing logic (round robin, least connections). More control for client (e.g. route by geographic proximity). Registry must be highly available. Used by: Spring Cloud Netflix stack.</div></div>
+<div class="card"><div class="card-name">DNS-based discovery (Kubernetes)</div><div class="card-desc">Kubernetes assigns each Service a stable DNS name (my-service.namespace.svc.cluster.local). DNS returns the ClusterIP (a virtual IP). kube-proxy implements the actual load balancing to pods via iptables/IPVS. Services scale in/out transparently — DNS always resolves to healthy pods. The standard for containerised environments.</div></div>`},
+{l:"Sidecar pattern",b:`<div class="card"><div class="card-name">Sidecar (Service Mesh)</div><div class="card-desc">A secondary container deployed alongside each service container in the same pod. The sidecar handles cross-cutting concerns: mTLS, retries, circuit breaking, distributed tracing, metrics collection — without any code changes to the service itself. The service only talks to localhost; the sidecar handles all network concerns. Implementation: Envoy proxy (used by Istio, Linkerd, AWS App Mesh). The service mesh is the sidecar pattern at scale.</div></div>
+<div class="code">Pod (Kubernetes):
+  ┌─────────────────────────────────────────┐
+  │  [Service Container]  [Envoy Sidecar]  │
+  │   your Java app    ←→  handles:         │
+  │   talks to :8080       mTLS             │
+  │                        retries          │
+  │                        circuit break    │
+  │                        trace headers    │
+  └─────────────────────────────────────────┘
+  
+  All traffic IN and OUT goes through Envoy.
+  Service code: zero networking boilerplate.</div>`},
+{l:"API Gateway",b:`<div class="card"><div class="card-name">API Gateway</div><div class="card-desc">Single entry point for all external client requests. Responsibilities: routing (request to correct service), authentication & authorisation (validate JWT, OAuth), rate limiting, SSL termination, request/response transformation, aggregation (fan-out to multiple services and merge), protocol translation (REST → gRPC). Examples: AWS API Gateway, Kong, Nginx, Traefik, Spring Cloud Gateway. Separates external-facing API concerns from internal service concerns. Pattern variant: Backend for Frontend (BFF) — one gateway per client type (mobile, web, third-party) to serve client-specific needs.</div></div>
+<div class="code">External Client → [API Gateway]
+                      │ authenticate
+                      │ rate limit
+                      │ route
+                      ├→ User Service (gRPC)
+                      ├→ Product Service (REST)
+                      └→ Order Service (REST)
+                      merge responses → return to client</div>`},
+{l:"Bulkhead pattern",b:`<div class="card"><div class="card-name">Bulkhead</div><div class="card-desc">Isolate resources (thread pools, connection pools, circuit breakers) per downstream dependency. If Dependency A is slow and exhausts its thread pool, requests to Dependency B continue using their own thread pool — the failure doesn't cascade. Named after ship bulkheads that prevent one flooded compartment from sinking the whole ship. Implementation: separate ExecutorService per downstream in Java (Hystrix, Resilience4j). Combined with circuit breaker: if A's bulkhead fills up → open circuit → fast-fail requests to A → protect B.</div></div>
+<div class="code">// Resilience4j bulkhead
+Bulkhead bulkheadA = Bulkhead.of("serviceA", BulkheadConfig.custom()
+    .maxConcurrentCalls(10)      // only 10 concurrent calls to A allowed
+    .maxWaitDuration(Duration.ofMs(100))
+    .build());
+
+// serviceB has its own bulkhead — A's saturation doesn't affect B
+Bulkhead bulkheadB = Bulkhead.of("serviceB", BulkheadConfig.custom()
+    .maxConcurrentCalls(20).build());</div>`},
+{l:"Circuit breaker",b:`<div class="card"><div class="card-name">Circuit Breaker (Closed → Open → Half-Open)</div><div class="card-desc">Wraps calls to a remote service. CLOSED: normal operation, counts failures. OPEN: when failure rate exceeds threshold (e.g. 50% over 10 seconds) → stop calling the service, fast-fail immediately (return error/fallback). HALF-OPEN: after a timeout, allow a probe request through. Success → back to CLOSED. Failure → back to OPEN. Purpose: prevent cascading failures, give failing service time to recover, reduce load on already-struggling service. Implementations: Netflix Hystrix (deprecated), Resilience4j (modern Java), Envoy sidecar.</div></div>`},
+{l:"Strangler Fig pattern",b:`<div class="card"><div class="card-name">Strangler Fig (migration pattern)</div><div class="card-desc">Incrementally migrate a monolith to microservices without a big-bang rewrite. Named after the fig tree that grows around an existing tree, eventually replacing it. Mechanism: add an API gateway/facade in front of the monolith. New features built as microservices behind the gateway. Existing monolith functionality migrated feature-by-feature: extract a service, redirect gateway routing for that endpoint to the new service. Old monolith routes shrink; new services grow. Eventually: monolith retired. Zero downtime, reversible at any step. Used by: Amazon (migrated from monolith to services over years).</div></div>
+<div class="code">Phase 1: Facade routes all traffic to Monolith
+  Client → [Facade] → [Monolith]
+
+Phase 2: User service extracted
+  Client → [Facade] → /users → [User Service]
+                    → /orders → [Monolith]
+
+Phase 3: Order service extracted
+  Client → [Facade] → /users  → [User Service]
+                    → /orders → [Order Service]
+                    → /legacy → [Monolith] (shrinking)
+
+Phase N: Monolith retired</div>`},
+{l:"Saga pattern — distributed transactions without 2PC",b:`<div class="card"><div class="card-name">Saga</div><div class="card-desc">A sequence of local transactions, each publishing events/messages that trigger the next step. If any step fails, compensating transactions undo the previous steps. Two variants: Choreography (services react to events, no central coordinator) and Orchestration (a saga orchestrator commands each step). Avoids the coordinator-crash problem of 2PC. Used by: Uber (trip booking), e-commerce order processing (payment → inventory → shipping). Trade-off: eventual consistency between steps, complex compensating logic, no rollback isolation.</div></div>`},
+{l:"Mental model",b:`<div class="analogy">A microservices system is an airport. API Gateway is the check-in desk — one entry point for all passengers (clients), routing them to the right gate (service). Service discovery is the departure board — always up-to-date with which gate is active. Sidecar is the airport shuttle — passengers (service) don't drive themselves to the gate; the shuttle (Envoy) handles navigation, security checks, and logging transparently. Bulkhead is separate security queues for First Class and Economy — one queue backing up doesn't block the other. Circuit breaker is a closed gate: if Gate B has a problem, the system stops sending passengers there rather than piling them up indefinitely. Strangler Fig is renovating the airport one terminal at a time while flights continue operating.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How would you migrate a monolith to microservices without downtime?</div><div class="a">Strangler Fig pattern. Step 1: add an API gateway/reverse proxy in front of the monolith — all traffic still routes to monolith, zero behaviour change. Step 2: identify a bounded context (e.g. user management) to extract first — prefer high-autonomy, low-coupling areas. Step 3: build the new User Service, test in parallel. Step 4: redirect /users/* routing in the gateway to the new service. Monolith still handles everything else. Step 5: repeat for the next service. Rollback is always possible by changing gateway routing back. No big-bang, no downtime.</div></div>
+<div class="iq"><div class="q">What is a saga and when would you use it instead of a distributed transaction?</div><div class="a">A saga is a sequence of local ACID transactions coordinated via events or an orchestrator, with compensating transactions for failures. Use instead of 2PC when: services have different databases (2PC requires a global transaction coordinator touching all databases), long-running transactions (2PC holds locks — sagas release locks at each step), high availability required (2PC blocks if coordinator crashes). Trade-off: no isolation between saga steps (another transaction can read intermediate state), complex compensation logic. Standard for e-commerce: reserve inventory → process payment → confirm order — each step is a local transaction, each has a compensation (unreserve, refund, cancel).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Fallacies (patterns address each fallacy)</span><span class="cp">CAP Theorem (saga = eventual consistency)</span><span class="cp">WAL (saga log for recovery)</span><span class="cp">Kafka (choreography saga via events)</span><span class="cp">System Design (Uber, Netflix architecture)</span><span class="cp">EngineX (API gateway, service discovery)</span></div>`}
+]},
+];
+
+function show(idx,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');render(idx);
+}
+function render(idx){
+  const t=T[idx];
+  let h=`<span class="topic-tag">${t.tag}</span><div class="topic-title">${t.title}</div><div class="topic-oneliner">${t.oneliner}</div>`;
+  for(const s of t.secs)h+=`<div class="sec"><div class="sec-label">${s.l}</div><div class="body">${s.b}</div></div>`;
+  const c=document.getElementById('content');
+  c.innerHTML=h;c.scrollTop=0;
+}
+render(0);
+</script>

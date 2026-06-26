@@ -1,0 +1,906 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,system-ui);background:transparent;color:var(--color-text-primary)}
+.w{padding:.5rem 0 2.5rem}
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem}
+.nb{padding:6px 12px;border:.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.nb:hover{background:var(--color-background-secondary)}
+.nb.on{background:#EEEDFE;border-color:#534AB7;color:#3C3489;font-weight:500}
+.tp{display:none}.tp.vis{display:block}
+.ttl{font-size:20px;font-weight:500;margin-bottom:3px}
+.sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.25rem}
+.stabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.25rem;padding-bottom:10px;border-bottom:.5px solid var(--color-border-tertiary)}
+.st{padding:5px 12px;font-size:12px;border-radius:16px;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.st:hover{background:var(--color-background-secondary)}
+.st.on{background:#EEEDFE;color:#3C3489;font-weight:500}
+.sc{display:none}.sc.vis{display:block}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.def{font-size:15px;line-height:1.7}
+code{font-family:var(--font-mono,monospace);font-size:.9em;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px}
+.cb{background:var(--color-background-secondary);border:.5px solid var(--color-border-tertiary);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;font-size:12px;line-height:1.8;margin-bottom:1rem;white-space:pre;font-family:var(--font-mono,monospace)}
+.kw{color:#534AB7;font-weight:500}.cm{color:var(--color-text-secondary)}.str{color:#085041}.nm{color:#993C1D}
+.flow{display:flex;flex-direction:column;gap:8px}
+.fs{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:8px;background:var(--color-background-secondary);border-left:3px solid #AFA9EC}
+.fs.t{border-left-color:#5DCAA5}.fs.a{border-left-color:#EF9F27}.fs.r{border-left-color:#E24B4A}.fs.c{border-left-color:#F0997B}
+.fn{min-width:22px;height:22px;border-radius:50%;background:#EEEDFE;color:#3C3489;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.fn.t{background:#E1F5EE;color:#085041}.fn.a{background:#FAEEDA;color:#633806}.fn.r{background:#FCEBEB;color:#A32D2D}
+.ft{font-size:13.5px;line-height:1.6}
+.mi{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.mi:last-child{border-bottom:none}
+.mico{width:22px;height:22px;border-radius:50%;background:#FCEBEB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:13px}
+.mt{font-size:13.5px;line-height:1.6}.mt strong{font-weight:500;color:#A32D2D}
+.qi{padding:10px 12px;border-radius:8px;background:var(--color-background-secondary);margin-bottom:8px;font-size:13.5px;cursor:pointer;border:.5px solid var(--color-border-tertiary);transition:all .15s;line-height:1.5}
+.qi:hover{border-color:#AFA9EC;background:#EEEDFE}
+.ql{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.qa{font-size:13px;color:var(--color-text-secondary);margin-top:6px;padding-top:6px;border-top:.5px solid var(--color-border-tertiary);display:none;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:5px 13px;border-radius:16px;font-size:13px;background:#EEEDFE;color:#3C3489;border:.5px solid #AFA9EC;cursor:pointer}
+.chip:hover{background:#CECBF6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.hl{border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.6;border:.5px solid}
+.hlp{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.hlt{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.hla{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.hlc{background:#FAECE7;border-color:#F0997B;color:#712B13}
+.hlb{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.hlr{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.hlg{background:#EAF3DE;border-color:#97C459;color:#3B6D11}
+.hn{font-weight:500;font-size:12px;margin-bottom:4px}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;margin-right:3px;vertical-align:middle}
+.bp{background:#EEEDFE;color:#3C3489}.bt{background:#E1F5EE;color:#085041}.ba{background:#FAEEDA;color:#633806}
+.br{background:#FCEBEB;color:#A32D2D}.bg{background:#EAF3DE;color:#3B6D11}
+.sort-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:5px;font-size:13px;border:.5px solid var(--color-border-tertiary)}
+.sort-name{font-weight:500;width:100px;flex-shrink:0}
+.sort-best{width:70px;flex-shrink:0;text-align:center}
+.sort-avg{width:70px;flex-shrink:0;text-align:center}
+.sort-worst{width:70px;flex-shrink:0;text-align:center}
+.sort-space{width:60px;flex-shrink:0;text-align:center}
+.sort-stable{width:55px;flex-shrink:0;text-align:center}
+.sort-when{flex:1;color:var(--color-text-secondary);font-size:12px}
+.sort-hdr{background:var(--color-background-secondary);font-weight:500;font-size:11px;color:var(--color-text-secondary)}
+.bit-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.bit-trick{border-radius:8px;padding:8px 12px;border:.5px solid var(--color-border-tertiary);flex:1;min-width:190px;background:var(--color-background-secondary)}
+.bt-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:4px}
+.bt-code{font-family:var(--font-mono,monospace);font-size:12px;color:#3C3489;margin-bottom:3px}
+.bt-desc{font-size:12px;color:var(--color-text-secondary)}
+.vis-arr{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}
+.arr-el{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font-size:13px;font-weight:500;border:.5px solid}
+.ae-p{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.ae-t{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.ae-a{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.ae-g{background:var(--color-background-secondary);border-color:var(--color-border-tertiary);color:var(--color-text-secondary)}
+.ae-r{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.prune-box{border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.6;border:.5px solid;margin-bottom:8px}
+.pb-try{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.pb-prune{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.pb-done{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+</style>
+
+<div class="w">
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Java Algorithms Visual Bible — 7 topics with interactive sections</h2>
+<div style="margin-bottom:1.25rem"><p style="font-size:13px;color:var(--color-text-secondary)">Block 8 · Algorithms in Java · 7 topics · pick topic → section → click questions to reveal answers</p></div>
+
+<div class="nav">
+  <button class="nb on" onclick="T(0)">1 · Sorting</button>
+  <button class="nb" onclick="T(1)">2 · Searching</button>
+  <button class="nb" onclick="T(2)">3 · Recursion vs iteration</button>
+  <button class="nb" onclick="T(3)">4 · Divide & conquer</button>
+  <button class="nb" onclick="T(4)">5 · Greedy</button>
+  <button class="nb" onclick="T(5)">6 · Backtracking</button>
+  <button class="nb" onclick="T(6)">7 · Bit manipulation</button>
+</div>
+
+<!-- ════ T0: SORTING ════ -->
+<div class="tp vis" id="t0">
+  <div class="ttl">Sorting algorithms</div>
+  <div class="sub">Bubble · selection · insertion · merge · quick · heap — complexity + when to use each</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t0','s0')">Complexity table</button>
+    <button class="st" onclick="S('t0','s1')">Each algorithm</button>
+    <button class="st" onclick="S('t0','s2')">Code</button>
+    <button class="st" onclick="S('t0','s3')">Java's sort</button>
+    <button class="st" onclick="S('t0','s4')">Interview</button>
+    <button class="st" onclick="S('t0','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t0-s0">
+    <div class="card"><div class="ct">Complexity at a glance</div>
+      <div class="sort-row sort-hdr">
+        <span class="sort-name">Algorithm</span>
+        <span class="sort-best">Best</span>
+        <span class="sort-avg">Average</span>
+        <span class="sort-worst">Worst</span>
+        <span class="sort-space">Space</span>
+        <span class="sort-stable">Stable</span>
+        <span class="sort-when">When to use</span>
+      </div>
+      <div class="sort-row"><span class="sort-name">Bubble</span><span class="sort-best"><span class="badge bt">O(n)</span></span><span class="sort-avg"><span class="badge ba">O(n²)</span></span><span class="sort-worst"><span class="badge br">O(n²)</span></span><span class="sort-space"><span class="badge bp">O(1)</span></span><span class="sort-stable"><span class="badge bt">Yes</span></span><span class="sort-when">Teaching only. Never production.</span></div>
+      <div class="sort-row"><span class="sort-name">Selection</span><span class="sort-best"><span class="badge ba">O(n²)</span></span><span class="sort-avg"><span class="badge ba">O(n²)</span></span><span class="sort-worst"><span class="badge br">O(n²)</span></span><span class="sort-space"><span class="badge bp">O(1)</span></span><span class="sort-stable"><span class="badge br">No</span></span><span class="sort-when">Min writes needed (flash memory).</span></div>
+      <div class="sort-row"><span class="sort-name">Insertion</span><span class="sort-best"><span class="badge bt">O(n)</span></span><span class="sort-avg"><span class="badge ba">O(n²)</span></span><span class="sort-worst"><span class="badge br">O(n²)</span></span><span class="sort-space"><span class="badge bp">O(1)</span></span><span class="sort-stable"><span class="badge bt">Yes</span></span><span class="sort-when">Small n (&lt;20) or nearly sorted. Used by TimSort.</span></div>
+      <div class="sort-row"><span class="sort-name">Merge</span><span class="sort-best"><span class="badge bt">O(n log n)</span></span><span class="sort-avg"><span class="badge bt">O(n log n)</span></span><span class="sort-worst"><span class="badge bt">O(n log n)</span></span><span class="sort-space"><span class="badge ba">O(n)</span></span><span class="sort-stable"><span class="badge bt">Yes</span></span><span class="sort-when">Linked lists, stable sort required, external sort.</span></div>
+      <div class="sort-row"><span class="sort-name">Quick</span><span class="sort-best"><span class="badge bt">O(n log n)</span></span><span class="sort-avg"><span class="badge bt">O(n log n)</span></span><span class="sort-worst"><span class="badge br">O(n²)*</span></span><span class="sort-space"><span class="badge bp">O(log n)</span></span><span class="sort-stable"><span class="badge br">No</span></span><span class="sort-when">General purpose. Cache-friendly. *Rare with random pivot.</span></div>
+      <div class="sort-row"><span class="sort-name">Heap</span><span class="sort-best"><span class="badge bt">O(n log n)</span></span><span class="sort-avg"><span class="badge bt">O(n log n)</span></span><span class="sort-worst"><span class="badge bt">O(n log n)</span></span><span class="sort-space"><span class="badge bp">O(1)</span></span><span class="sort-stable"><span class="badge br">No</span></span><span class="sort-when">Guaranteed O(n log n) in-place. K largest/smallest.</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s1">
+    <div class="card"><div class="ct">Each algorithm — what makes it tick</div>
+      <div class="flow">
+        <div class="fs r"><div class="fn r">B</div><div class="ft"><strong>Bubble sort</strong> — repeatedly compare adjacent elements, swap if out of order. The largest element "bubbles" to the end each pass. Optimised: early exit if no swap happened (O(n) best case for sorted). Never use. Exists to teach the concept of passes and comparisons.</div></div>
+        <div class="fs r"><div class="fn r">S</div><div class="ft"><strong>Selection sort</strong> — find the minimum in the unsorted portion, swap it to the correct position. Always exactly n-1 swaps — useful when write operations are expensive (e.g. flash storage). Never stable by default.</div></div>
+        <div class="fs a"><div class="fn a">I</div><div class="ft"><strong>Insertion sort</strong> — build the sorted array one element at a time by inserting each element into its correct position. Excellent for nearly-sorted data and small arrays. TimSort (Java's Arrays.sort for objects) uses insertion sort for runs under 32 elements because cache behaviour and small-n performance beat merge sort's overhead.</div></div>
+        <div class="fs t"><div class="fn t">M</div><div class="ft"><strong>Merge sort</strong> — divide in half recursively until base case (size 1), then merge pairs in sorted order. Guaranteed O(n log n). Stable. Requires O(n) auxiliary space. Ideal for linked lists (no random access needed for merging). Used by Java's <code>Arrays.sort</code> for object arrays (TimSort).</div></div>
+        <div class="fs t"><div class="fn t">Q</div><div class="ft"><strong>Quick sort</strong> — choose a pivot, partition into "less" and "greater", recurse. Average O(n log n) with great cache locality (in-place). Worst case O(n²) with bad pivot (sorted array + always pick first element). Fix: random pivot or median-of-three. Java's <code>Arrays.sort</code> for primitives uses dual-pivot Quicksort (Yaroslavskiy, 2009).</div></div>
+        <div class="fs"><div class="fn">H</div><div class="ft"><strong>Heap sort</strong> — build a max-heap (O(n)), then repeatedly extract the maximum to build the sorted array in-place. Guaranteed O(n log n) worst case with O(1) space. Not cache-friendly (heap accesses jump around memory). Not stable. Use when you need guaranteed performance and O(1) space.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s2">
+    <div class="card"><div class="ct">Code — merge sort + quick sort (interview-ready)</div>
+<div class="cb"><span class="cm">// MERGE SORT — stable, O(n log n) guaranteed</span>
+<span class="kw">void</span> mergeSort(<span class="kw">int</span>[] arr, <span class="kw">int</span> lo, <span class="kw">int</span> hi) {
+    <span class="kw">if</span> (lo >= hi) <span class="kw">return</span>;         <span class="cm">// base case: 0 or 1 element</span>
+    <span class="kw">int</span> mid = lo + (hi - lo) / 2;   <span class="cm">// avoid integer overflow</span>
+    mergeSort(arr, lo, mid);
+    mergeSort(arr, mid + 1, hi);
+    merge(arr, lo, mid, hi);
+}
+
+<span class="kw">void</span> merge(<span class="kw">int</span>[] arr, <span class="kw">int</span> lo, <span class="kw">int</span> mid, <span class="kw">int</span> hi) {
+    <span class="kw">int</span>[] tmp = <span class="nm">Arrays</span>.copyOfRange(arr, lo, hi + 1);
+    <span class="kw">int</span> i = 0, j = mid - lo + 1, k = lo;
+    <span class="kw">while</span> (i <= mid - lo && j <= hi - lo)
+        arr[k++] = (tmp[i] <= tmp[j]) ? tmp[i++] : tmp[j++]; <span class="cm">// <= for stability</span>
+    <span class="kw">while</span> (i <= mid - lo) arr[k++] = tmp[i++];
+    <span class="kw">while</span> (j <= hi - lo)  arr[k++] = tmp[j++];
+}
+
+<span class="cm">// QUICK SORT — average O(n log n), in-place</span>
+<span class="kw">void</span> quickSort(<span class="kw">int</span>[] arr, <span class="kw">int</span> lo, <span class="kw">int</span> hi) {
+    <span class="kw">if</span> (lo >= hi) <span class="kw">return</span>;
+    <span class="kw">int</span> p = partition(arr, lo, hi);
+    quickSort(arr, lo, p - 1);
+    quickSort(arr, p + 1, hi);
+}
+
+<span class="kw">int</span> partition(<span class="kw">int</span>[] arr, <span class="kw">int</span> lo, <span class="kw">int</span> hi) {
+    <span class="cm">// Random pivot — prevents O(n²) on sorted input</span>
+    <span class="kw">int</span> pivotIdx = lo + (<span class="kw">int</span>)(<span class="nm">Math</span>.random() * (hi - lo + 1));
+    swap(arr, pivotIdx, hi);       <span class="cm">// move pivot to end</span>
+    <span class="kw">int</span> pivot = arr[hi], i = lo;
+    <span class="kw">for</span> (<span class="kw">int</span> j = lo; j < hi; j++)
+        <span class="kw">if</span> (arr[j] <= pivot) swap(arr, i++, j);
+    swap(arr, i, hi);              <span class="cm">// place pivot in final position</span>
+    <span class="kw">return</span> i;
+}
+
+<span class="cm">// Java's built-in sorts (know these for interviews)</span>
+<span class="nm">Arrays</span>.sort(intArr);           <span class="cm">// dual-pivot Quicksort — O(n log n) avg</span>
+<span class="nm">Arrays</span>.sort(objArr);           <span class="cm">// TimSort — stable O(n log n)</span>
+<span class="nm">Arrays</span>.sort(arr, <span class="nm">Comparator</span>.reverseOrder()); <span class="cm">// with comparator</span>
+<span class="nm">List</span>.sort(<span class="nm">Comparator</span>.comparing(<span class="nm">Person</span>::getName));</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s3">
+    <div class="card"><div class="ct">Java's sort internals — what actually runs when you call Arrays.sort</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">P</div><div class="ft"><strong>Primitives — Dual-Pivot Quicksort</strong>: uses two pivots (p1 &lt; p2) to partition into three regions: less than p1, between p1 and p2, greater than p2. Empirically faster than single-pivot on real data. Falls back to insertion sort for tiny sub-arrays (&lt;47 elements). NOT stable — safe because primitive equality is value equality (no observable ordering).</div></div>
+        <div class="fs t"><div class="fn t">O</div><div class="ft"><strong>Objects — TimSort</strong>: hybrid of merge sort + insertion sort. Finds "natural runs" (already sorted sequences) in the data. Merges pairs of runs. Best case O(n) for already-sorted data. Stable — required because object equality can be partial (two different objects with the same key must maintain their input order). Minimum run size is 32 elements.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft">Why different? Stability matters for objects (sort by name, then by age — the name sort must preserve age ordering among same-name entries). For primitives there's no observable distinction between "equal" values — stability is irrelevant, so the faster Quicksort wins.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What is the worst case of Quick Sort and how do you avoid it?<div class="qa">Worst case O(n²) occurs when the pivot is always the minimum or maximum element — every partition produces one sub-array of size n-1 and one empty. Classic trigger: sorted or reverse-sorted input with always-first-element pivot. Prevention: (1) random pivot — shuffle the input or pick a random element, reduces O(n²) probability to negligibly small. (2) Median-of-three — pick the median of first, middle, last elements as pivot. (3) 3-way partition (Dutch National Flag) — handles duplicate elements efficiently by creating three regions: less, equal, greater. Java's dual-pivot Quicksort uses two pivots and is empirically very fast in practice.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Choose</div>When do you use merge sort over quick sort?<div class="qa">Merge sort when: (1) stability required — equal elements must maintain relative order (sorting objects by one key when already sorted by another). (2) Linked lists — merging linked lists is O(1) extra space, no random access needed. (3) External sort — data too large for RAM; merge sort naturally divides work into chunks that fit in memory. Quick sort when: (1) in-place sorting needed (O(log n) stack vs O(n) for merge). (2) Cache performance matters — quick sort accesses memory sequentially in partitioning. (3) Average case matters more than worst case. Java uses merge sort (TimSort) for objects, dual-pivot quicksort for primitives — for exactly these reasons.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Depth</div>What is TimSort and why does Java use it for Arrays.sort on objects?<div class="qa">TimSort is a hybrid sort invented by Tim Peters for Python (2002), adopted by Java 7+ for object arrays. It exploits the fact that real-world data contains natural sorted runs. Algorithm: (1) scan left-to-right detecting natural ascending or descending runs. (2) If a run is too short (&lt;32 elements), extend it using insertion sort. (3) Push runs onto a stack and merge adjacent runs when size ratios trigger a merge (maintains invariants to ensure O(n log n)). Result: O(n) on sorted/reverse-sorted data, O(n log n) in general. Stable. Java requires stability for objects because the contract of Comparable and Comparator says equal elements must maintain relative order.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain the Dutch National Flag problem and 3-way partitioning in quicksort')">3-way quicksort</span>
+      <span class="chip" onclick="sendPrompt('Explain counting sort, radix sort, and bucket sort — when to beat O(n log n)')">Non-comparison sorts</span>
+      <span class="chip" onclick="sendPrompt('Explain the merge k sorted arrays problem using a min-heap')">Merge k sorted arrays</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T1: SEARCHING ════ -->
+<div class="tp" id="t1">
+  <div class="ttl">Searching algorithms</div>
+  <div class="sub">Linear · binary · interpolation — and every binary search variant</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t1','s0')">Three types</button>
+    <button class="st" onclick="S('t1','s1')">Binary search deep</button>
+    <button class="st" onclick="S('t1','s2')">Code</button>
+    <button class="st" onclick="S('t1','s3')">Variants</button>
+    <button class="st" onclick="S('t1','s4')">Interview</button>
+    <button class="st" onclick="S('t1','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t1-s0">
+    <div class="card"><div class="ct">Three search algorithms</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">L</div><div class="ft"><strong>Linear search</strong> — scan each element one by one. O(n) time, O(1) space. Use when: unsorted data, very small n, or searching a linked list (no random access). No prerequisites. Always correct.</div></div>
+        <div class="fs t"><div class="fn t">B</div><div class="ft"><strong>Binary search</strong> — requires sorted array. Eliminate half the search space each step by comparing mid element to target. O(log n) time, O(1) space (iterative). The most important search algorithm. Masters: finding a value, finding first/last occurrence, finding insertion point, searching on answer space ("find minimum k such that condition(k) is true").</div></div>
+        <div class="fs a"><div class="fn a">I</div><div class="ft"><strong>Interpolation search</strong> — like binary search but uses a formula to estimate the probe position based on value distribution: <code>pos = lo + ((target - arr[lo]) * (hi - lo)) / (arr[hi] - arr[lo])</code>. O(log log n) average for uniformly distributed data, O(n) worst case (exponential skew). Use for: large sorted arrays with uniform distribution (e.g. phone numbers, IDs). Rarely seen in interviews outside Google.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s1">
+    <div class="card"><div class="ct">Binary search — the right template (no bugs)</div>
+      <div class="flow">
+        <div class="fs r"><div class="fn r">!</div><div class="ft"><strong>The one bug that kills candidates</strong>: <code>mid = (lo + hi) / 2</code> overflows when lo + hi exceeds Integer.MAX_VALUE. Always use: <code>mid = lo + (hi - lo) / 2</code>. This is a real production bug (found in Java's original Arrays.binarySearch in 2006 by Joshua Bloch).</div></div>
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Invariant-based thinking</strong> — the key to bug-free binary search is maintaining a clear loop invariant. Decide what <code>[lo, hi]</code> means: does it include both endpoints? Is hi exclusive? Then every update must maintain that invariant. The most robust template: lo = 0, hi = n-1, both inclusive, loop while lo &lt;= hi.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>When mid lands on answer</strong> — if you want the exact value: return mid. If you want first occurrence: save mid as candidate, search left (hi = mid - 1). If you want last occurrence: save mid, search right (lo = mid + 1). If searching on answer space: when condition(mid) is satisfied, save and narrow the range.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Binary search on answer space</strong> — the pattern: "find the minimum/maximum value that satisfies a condition." Instead of searching for a value in an array, search for the answer itself. Example: "minimum capacity to ship packages in D days" — binary search on capacity from max(weight) to sum(weights). For each candidate capacity, check if packages can be shipped in ≤ D days (O(n)). Total: O(n log(range)).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s2">
+    <div class="card"><div class="ct">Code — the bulletproof binary search template + variants</div>
+<div class="cb"><span class="cm">// STANDARD — find exact value, return -1 if not found</span>
+<span class="kw">int</span> binarySearch(<span class="kw">int</span>[] arr, <span class="kw">int</span> target) {
+    <span class="kw">int</span> lo = 0, hi = arr.length - 1;
+    <span class="kw">while</span> (lo <= hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / 2;   <span class="cm">// no overflow</span>
+        <span class="kw">if</span>      (arr[mid] == target) <span class="kw">return</span> mid;
+        <span class="kw">else if</span> (arr[mid] < target)  lo = mid + 1;
+        <span class="kw">else</span>                         hi = mid - 1;
+    }
+    <span class="kw">return</span> -1;
+}
+
+<span class="cm">// FIRST OCCURRENCE — leftmost index where arr[i] == target</span>
+<span class="kw">int</span> firstOccurrence(<span class="kw">int</span>[] arr, <span class="kw">int</span> target) {
+    <span class="kw">int</span> lo = 0, hi = arr.length - 1, result = -1;
+    <span class="kw">while</span> (lo <= hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / 2;
+        <span class="kw">if</span> (arr[mid] == target) { result = mid; hi = mid - 1; } <span class="cm">// save, go left</span>
+        <span class="kw">else if</span> (arr[mid] < target) lo = mid + 1;
+        <span class="kw">else</span> hi = mid - 1;
+    }
+    <span class="kw">return</span> result;
+}
+
+<span class="cm">// LOWER BOUND — first index where arr[i] >= target (insertion point)</span>
+<span class="kw">int</span> lowerBound(<span class="kw">int</span>[] arr, <span class="kw">int</span> target) {
+    <span class="kw">int</span> lo = 0, hi = arr.length; <span class="cm">// hi = length (exclusive right)</span>
+    <span class="kw">while</span> (lo < hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / 2;
+        <span class="kw">if</span> (arr[mid] < target) lo = mid + 1;
+        <span class="kw">else</span>                   hi = mid;    <span class="cm">// include mid as candidate</span>
+    }
+    <span class="kw">return</span> lo; <span class="cm">// lo == hi == insertion point</span>
+}
+
+<span class="cm">// BINARY SEARCH ON ANSWER — min capacity to ship in D days</span>
+<span class="kw">int</span> shipInDays(<span class="kw">int</span>[] weights, <span class="kw">int</span> D) {
+    <span class="kw">int</span> lo = <span class="nm">Arrays</span>.stream(weights).max().getAsInt(); <span class="cm">// must carry heaviest</span>
+    <span class="kw">int</span> hi = <span class="nm">Arrays</span>.stream(weights).sum();            <span class="cm">// ship all in 1 day</span>
+    <span class="kw">while</span> (lo < hi) {
+        <span class="kw">int</span> mid = lo + (hi - lo) / 2;
+        <span class="kw">if</span> (canShip(weights, D, mid)) hi = mid;  <span class="cm">// feasible — try smaller</span>
+        <span class="kw">else</span>                           lo = mid + 1;
+    }
+    <span class="kw">return</span> lo;
+}
+<span class="kw">boolean</span> canShip(<span class="kw">int</span>[] w, <span class="kw">int</span> D, <span class="kw">int</span> cap) {
+    <span class="kw">int</span> days = 1, cur = 0;
+    <span class="kw">for</span> (<span class="kw">int</span> wt : w) { <span class="kw">if</span> (cur + wt > cap) { days++; cur = 0; } cur += wt; }
+    <span class="kw">return</span> days <= D;
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s3">
+    <div class="card"><div class="ct">Binary search variants — which template for which problem</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">1</div><div class="ft"><strong>Find exact value</strong> — standard template. Return mid when found, -1 if not. lo &lt;= hi loop.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>First/last occurrence of target</strong> — save result when found, then continue narrowing. <code>hi = mid - 1</code> for first; <code>lo = mid + 1</code> for last.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Lower/upper bound (insertion point)</strong> — lo = 0, hi = n (exclusive). Loop while lo &lt; hi. Lower bound: <code>arr[mid] &lt; target → lo = mid + 1</code> else hi = mid. Returns first index &gt;= target.</div></div>
+        <div class="fs t"><div class="fn t">4</div><div class="ft"><strong>Answer space binary search</strong> — search on the range of possible answers, not on the array indices. Template: lo = min_possible, hi = max_possible. condition(mid) = is this answer feasible? If yes: hi = mid (try smaller). If no: lo = mid + 1. Return lo when loop ends.</div></div>
+        <div class="fs t"><div class="fn t">5</div><div class="ft"><strong>Peak finding / rotated array</strong> — binary search by comparing mid with neighbours to decide which half to search. No explicit target — the property being searched is structural.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Bug</div>What is the integer overflow bug in binary search and how did it affect Java's standard library?<div class="qa">The bug: mid = (lo + hi) / 2. When lo and hi are both large (near Integer.MAX_VALUE = 2^31 - 1), their sum overflows to a negative number. mid becomes negative, causing ArrayIndexOutOfBoundsException. The fix: mid = lo + (hi - lo) / 2. Joshua Bloch documented this in 2006 — the bug existed in Java's Arrays.binarySearch for nearly a decade since JDK 1.0. It was considered a theoretical problem until binary search on arrays larger than 2^30 elements became realistic with modern hardware. This is why interviewers ask about it — it shows you read Bloch's Effective Java and think about edge cases.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Pattern</div>Explain binary search on the answer space with an example.<div class="qa">Instead of searching for a value in an array, you search for the answer itself. The pattern: identify what you're minimising or maximising, determine the feasible range [lo, hi], define a monotonic condition (if capacity=k is feasible, then capacity=k+1 is also feasible), binary search on [lo, hi]. Example: "minimum days to finish books reading at most pages/day" — binary search on pages_per_day from max(pages[i]) to sum(all pages). For each candidate, greedily simulate whether you can finish in D days. This converts an O(n * range) brute force into O(n log range). Common problems: capacity to ship packages, minimum days to make m bouquets, find kth smallest in matrix.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain binary search on a rotated sorted array — LeetCode 33')">Rotated array search</span>
+      <span class="chip" onclick="sendPrompt('Explain peak finding in an array using binary search')">Peak element</span>
+      <span class="chip" onclick="sendPrompt('Explain binary search problems where you search on the answer space — list 5 problems')">Answer space problems</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T2: RECURSION VS ITERATION ════ -->
+<div class="tp" id="t2">
+  <div class="ttl">Recursion vs iteration</div>
+  <div class="sub">Call stack mechanics · tail recursion · when to convert · memoisation</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t2','s0')">Definition</button>
+    <button class="st" onclick="S('t2','s1')">Call stack internals</button>
+    <button class="st" onclick="S('t2','s2')">Code</button>
+    <button class="st" onclick="S('t2','s3')">Tail recursion</button>
+    <button class="st" onclick="S('t2','s4')">Interview</button>
+    <button class="st" onclick="S('t2','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t2-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Recursion: a function calls itself to solve a smaller sub-problem until reaching a base case. Iteration: a loop repeats a block of code. Both can solve the same problems but with different memory behaviour, readability trade-offs, and stack risk.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlp"><div class="hn">Recursion — use when</div>Problem naturally decomposes into identical sub-problems (trees, graphs, D&C). Code is cleaner and matches the mental model. Stack depth is bounded (not exceeding ~10k calls in Java by default).</div>
+      <div class="hl hlt"><div class="hn">Iteration — use when</div>Stack overflow risk (deep recursion). Performance-critical (function call overhead matters). Tail-recursive problems where the compiler won't optimise (Java doesn't do TCO). Simulating recursion with an explicit stack is the workaround.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s1">
+    <div class="card"><div class="ct">Call stack internals — what happens when you recurse</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Each call pushes a frame</strong> — every recursive call pushes a new stack frame containing: parameters, local variables, return address. For <code>fibonacci(50)</code>, that's 50 frames deep. Java's default stack size is ~512KB–1MB per thread. Each frame costs ~50–500 bytes depending on local variables.</div></div>
+        <div class="fs r"><div class="fn r">2</div><div class="ft"><strong>StackOverflowError</strong> — when the call stack exceeds the thread's stack size limit. Fibonacci(10000) or any deeply recursive algorithm on large input will blow the stack. Detection: deep recursion without a proper base case, or n > ~5000–10000 for most recursive functions. Fix: convert to iterative with an explicit stack, or use memoisation to limit recursion depth.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>The two parts of a recursive call</strong> — (1) the call: push frame, jump to function start. (2) the return: pop frame, resume at return address with the return value. Understanding this makes it clear why recursion uses O(depth) space on the stack, and why iterating from bottom-up often uses O(1) space.</div></div>
+        <div class="fs a"><div class="fn a">4</div><div class="ft"><strong>Recursion tree analysis</strong> — to find the time complexity of recursion, draw the tree. Each node is one function call. Count total nodes (time) and maximum depth (space). Fibonacci recursion tree has 2^n nodes = O(2^n) without memoisation, O(n) with it. Merge sort's tree has n log n nodes total = O(n log n).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s2">
+    <div class="card"><div class="ct">Code — convert recursion to iteration (explicit stack)</div>
+<div class="cb"><span class="cm">// RECURSIVE fibonacci — clean but O(2^n) without memo</span>
+<span class="kw">int</span> fib(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n <= 1) <span class="kw">return</span> n;
+    <span class="kw">return</span> fib(n - 1) + fib(n - 2); <span class="cm">// two recursive branches</span>
+}
+
+<span class="cm">// MEMOISED recursion — O(n) time, O(n) space</span>
+<span class="kw">int</span>[] memo = <span class="kw">new int</span>[n + 1];
+<span class="nm">Arrays</span>.fill(memo, -1);
+<span class="kw">int</span> fibMemo(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n <= 1) <span class="kw">return</span> n;
+    <span class="kw">if</span> (memo[n] != -1) <span class="kw">return</span> memo[n];
+    <span class="kw">return</span> memo[n] = fibMemo(n-1) + fibMemo(n-2);
+}
+
+<span class="cm">// ITERATIVE (bottom-up DP) — O(n) time, O(1) space, no stack risk</span>
+<span class="kw">int</span> fibIter(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n <= 1) <span class="kw">return</span> n;
+    <span class="kw">int</span> prev2 = 0, prev1 = 1;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 2; i <= n; i++) {
+        <span class="kw">int</span> cur = prev1 + prev2;
+        prev2 = prev1; prev1 = cur;
+    }
+    <span class="kw">return</span> prev1;
+}
+
+<span class="cm">// Converting tree traversal: recursive → iterative with explicit stack</span>
+<span class="cm">// RECURSIVE DFS</span>
+<span class="kw">void</span> dfs(<span class="nm">TreeNode</span> node) {
+    <span class="kw">if</span> (node == <span class="kw">null</span>) <span class="kw">return</span>;
+    process(node.val);
+    dfs(node.left); dfs(node.right);
+}
+
+<span class="cm">// ITERATIVE DFS — explicit stack replaces call stack</span>
+<span class="kw">void</span> dfsIterative(<span class="nm">TreeNode</span> root) {
+    <span class="nm">Deque</span>&lt;<span class="nm">TreeNode</span>&gt; stack = <span class="kw">new</span> <span class="nm">ArrayDeque</span>&lt;&gt;();
+    <span class="kw">if</span> (root != <span class="kw">null</span>) stack.push(root);
+    <span class="kw">while</span> (!stack.isEmpty()) {
+        <span class="nm">TreeNode</span> node = stack.pop();
+        process(node.val);
+        <span class="kw">if</span> (node.right != <span class="kw">null</span>) stack.push(node.right); <span class="cm">// right first (LIFO)</span>
+        <span class="kw">if</span> (node.left  != <span class="kw">null</span>) stack.push(node.left);
+    }
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s3">
+    <div class="card"><div class="ct">Tail recursion — and why Java doesn't optimise it</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">T</div><div class="ft"><strong>Tail recursion</strong> — a recursive call is "in tail position" if it's the very last operation before the function returns, with no computation after it. <code>return f(n-1, acc + n)</code> is tail-recursive. <code>return n + f(n-1)</code> is NOT — there's addition after the recursive call.</div></div>
+        <div class="fs t"><div class="fn t">TCO</div><div class="ft"><strong>Tail call optimisation (TCO)</strong> — compilers that support TCO reuse the current stack frame for tail calls instead of pushing a new one, converting recursion to an O(1) space loop. Scala (on JVM), Kotlin (via trampolining), Haskell — all support TCO.</div></div>
+        <div class="fs r"><div class="fn r">!</div><div class="ft"><strong>Java does NOT do TCO</strong> — by design. Each recursive call in Java always pushes a new stack frame. The JVM specification doesn't guarantee stack frame reuse. This is why tail-recursive Java code can still throw StackOverflowError. For tail-recursive Java code: convert it to an iterative loop manually. The compiler won't do it for you.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>When would you convert a recursive solution to iterative?<div class="qa">Convert to iterative when: (1) stack overflow risk — recursion depth exceeds ~5000-10000 calls. (2) Performance — function call overhead matters in tight loops. (3) The recursive solution uses O(n) stack space unnecessarily — e.g. a simple linear scan written recursively. Conversion strategy: replace the call stack with an explicit ArrayDeque (stack). Push the "next state" instead of making a recursive call. Pop and process in the loop. This is exactly how DFS tree traversal converts to iterative. Keep recursion when it's cleaner and stack depth is bounded (tree depth = O(log n) for balanced trees).</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Java</div>Why doesn't Java support tail call optimisation?<div class="qa">Primarily a design and JVM spec decision. (1) JVM security model depends on stack traces being complete — TCO would remove frames from stack traces, breaking stack-based access control checks (SecurityManager). (2) Reflection and stack inspection APIs (Thread.getStackTrace()) would behave differently. (3) JVM spec doesn't require TCO, so JVM implementations don't implement it for portability. (4) The JVM team has discussed it but it remains unimplemented. Workaround: trampolining (return a thunk instead of calling recursively, driver loop invokes thunks until done). In practice: just convert to iteration in Java.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain memoisation vs tabulation in dynamic programming with examples')">Memoisation vs tabulation</span>
+      <span class="chip" onclick="sendPrompt('Explain the recursion tree method for time complexity analysis')">Recursion tree analysis</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T3: DIVIDE & CONQUER ════ -->
+<div class="tp" id="t3">
+  <div class="ttl">Divide & conquer</div>
+  <div class="sub">Merge sort · quick sort · binary search · Master theorem</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t3','s0')">Definition</button>
+    <button class="st" onclick="S('t3','s1')">Master theorem</button>
+    <button class="st" onclick="S('t3','s2')">Code patterns</button>
+    <button class="st" onclick="S('t3','s3')">Interview</button>
+    <button class="st" onclick="S('t3','s4')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t3-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Divide and conquer breaks a problem into two or more sub-problems of the same type, solves them recursively, then combines the results. Three phases: <strong>divide</strong> (split the problem), <strong>conquer</strong> (recursively solve), <strong>combine</strong> (merge results). The combine step is what distinguishes D&C from simple recursion.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlp"><div class="hn">D&C pattern recognition</div>Problem decomposes into identical smaller versions. Sub-problems are independent (no overlap — overlapping means DP instead). A combine step produces the final answer from sub-answers.</div>
+      <div class="hl hlt"><div class="hn">Classic D&C problems</div>Merge sort (divide array, sort halves, merge). Quick sort (partition, sort sub-arrays). Binary search (discard half). Closest pair of points. Strassen matrix multiplication. Karatsuba multiplication.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s1">
+    <div class="card"><div class="ct">Master theorem — solving T(n) = aT(n/b) + f(n)</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">!</div><div class="ft">The recurrence <code>T(n) = aT(n/b) + f(n)</code> means: problem of size n splits into <code>a</code> sub-problems of size <code>n/b</code>, and the combine step costs <code>f(n)</code>. The critical exponent is <code>c_crit = log_b(a)</code>.</div></div>
+        <div class="fs t"><div class="fn t">1</div><div class="ft"><strong>Case 1: f(n) = O(n^c) where c &lt; c_crit</strong> — sub-problems dominate. <code>T(n) = Θ(n^c_crit)</code>. Example: Strassen matrix mult T(n) = 7T(n/2) + O(n²), c_crit = log₂7 ≈ 2.81 &gt; 2, so T(n) = O(n^2.81).</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>Case 2: f(n) = Θ(n^c_crit)</strong> — work at each level is equal. <code>T(n) = Θ(n^c_crit log n)</code>. Example: Merge sort T(n) = 2T(n/2) + O(n), c_crit = log₂2 = 1 = exponent of f(n). T(n) = O(n log n).</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Case 3: f(n) = Ω(n^c) where c &gt; c_crit</strong> — combine step dominates. <code>T(n) = Θ(f(n))</code>. Example: Binary search T(n) = 1·T(n/2) + O(1), c_crit = log₂1 = 0 &lt; exponent 0 of f(n)... actually case 2: T(n) = O(log n).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s2">
+    <div class="card"><div class="ct">Code — count inversions (classic D&C interview problem)</div>
+<div class="cb"><span class="cm">// Count inversions — pairs (i,j) where i &lt; j but arr[i] &gt; arr[j]
+// D&C approach: inversions = left_inversions + right_inversions + split_inversions
+// Split inversions are counted DURING the merge step of merge sort</span>
+
+<span class="kw">long</span> countInversions(<span class="kw">int</span>[] arr, <span class="kw">int</span> lo, <span class="kw">int</span> hi) {
+    <span class="kw">if</span> (lo >= hi) <span class="kw">return</span> 0;                    <span class="cm">// base case</span>
+    <span class="kw">int</span> mid = lo + (hi - lo) / 2;
+    <span class="kw">long</span> left  = countInversions(arr, lo, mid);   <span class="cm">// DIVIDE & CONQUER left</span>
+    <span class="kw">long</span> right = countInversions(arr, mid+1, hi); <span class="cm">// DIVIDE & CONQUER right</span>
+    <span class="kw">return</span> left + right + mergeCount(arr, lo, mid, hi); <span class="cm">// COMBINE</span>
+}
+
+<span class="kw">long</span> mergeCount(<span class="kw">int</span>[] arr, <span class="kw">int</span> lo, <span class="kw">int</span> mid, <span class="kw">int</span> hi) {
+    <span class="kw">int</span>[] L = <span class="nm">Arrays</span>.copyOfRange(arr, lo, mid+1);
+    <span class="kw">int</span>[] R = <span class="nm">Arrays</span>.copyOfRange(arr, mid+1, hi+1);
+    <span class="kw">int</span> i = 0, j = 0, k = lo; <span class="kw">long</span> inv = 0;
+    <span class="kw">while</span> (i < L.length && j < R.length) {
+        <span class="kw">if</span> (L[i] <= R[j]) arr[k++] = L[i++];
+        <span class="kw">else</span> {
+            arr[k++] = R[j++];
+            inv += L.length - i; <span class="cm">// all remaining L elements form inversions with R[j]</span>
+        }
+    }
+    <span class="kw">while</span> (i < L.length) arr[k++] = L[i++];
+    <span class="kw">while</span> (j < R.length) arr[k++] = R[j++];
+    <span class="kw">return</span> inv;
+}
+<span class="cm">// Time: O(n log n) — master theorem case 2: T(n)=2T(n/2)+O(n)</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s3">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What distinguishes Divide & Conquer from Dynamic Programming?<div class="qa">Both break problems into sub-problems. Key distinction: in D&C, sub-problems are INDEPENDENT — solving the left half of a merge sort doesn't depend on the right half. In DP, sub-problems OVERLAP — computing fibonacci(5) requires fibonacci(4) which requires fibonacci(3)... and fibonacci(3) is computed multiple times without memoisation. D&C just recurse. DP memoises or tabulates to avoid recomputing. Signal: draw the recursion tree. If the same sub-problem appears multiple times = DP. If each sub-problem is unique = D&C. Merge sort recursion tree: each node is a unique sub-array. Fibonacci recursion tree: fib(3) appears in multiple branches = DP.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Apply</div>How would you find the closest pair of points using D&C?<div class="qa">Brute force: O(n²) — check all pairs. D&C: (1) Sort points by x-coordinate. (2) Divide: split into left and right halves. (3) Conquer: find closest pair in each half recursively — gives d = min(d_left, d_right). (4) Combine: check the strip of width 2d around the dividing line. Sort strip points by y and check each against at most 7 subsequent points (geometric argument — at most 8 points fit in a 2d×d rectangle). Time: T(n) = 2T(n/2) + O(n log n) for strip sort = O(n log² n). With a pre-sorted y-list: O(n log n). This shows the combine step is the tricky part in D&C and often determines the overall complexity.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s4">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain the Master Theorem with 3 cases and worked examples for each')">Master theorem depth</span>
+      <span class="chip" onclick="sendPrompt('Explain Karatsuba multiplication as a divide and conquer algorithm')">Karatsuba multiplication</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T4: GREEDY ════ -->
+<div class="tp" id="t4">
+  <div class="ttl">Greedy algorithms</div>
+  <div class="sub">Activity selection · interval scheduling · coin change — when greedy works vs fails</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t4','s0')">Definition</button>
+    <button class="st" onclick="S('t4','s1')">Greedy choice property</button>
+    <button class="st" onclick="S('t4','s2')">Code</button>
+    <button class="st" onclick="S('t4','s3')">When greedy fails</button>
+    <button class="st" onclick="S('t4','s4')">Interview</button>
+    <button class="st" onclick="S('t4','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t4-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A greedy algorithm makes the locally optimal choice at each step, hoping to arrive at the globally optimal solution. No backtracking. No consideration of future consequences. Fast (usually O(n log n) due to sorting), but only correct when the problem has the "greedy choice property."</p>
+    </div>
+    <div class="two">
+      <div class="hl hlt"><div class="hn">Greedy works when</div>The problem has the greedy choice property: a locally optimal choice is always part of a globally optimal solution. Proof: exchange argument — show any optimal solution can be transformed to include the greedy choice without getting worse.</div>
+      <div class="hl hlr"><div class="hn">Greedy fails when</div>Local optimum doesn't lead to global optimum. Counter-example kills it. Use DP instead. Classic failure: coin change with non-standard denominations (coins = [1,3,4], target = 6: greedy picks 4+1+1 = 3 coins, DP finds 3+3 = 2 coins).</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s1">
+    <div class="card"><div class="ct">The two conditions for greedy correctness</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">1</div><div class="ft"><strong>Greedy choice property</strong> — there exists an optimal solution that includes the greedy choice. Proof technique: exchange argument. Assume there's an optimal solution that doesn't include our greedy pick. Show you can swap in the greedy choice without making things worse. Therefore, greedy choice is safe.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>Optimal substructure</strong> — once you make the greedy choice, the remaining sub-problem has the same structure and can be solved optimally independently. This is the same condition DP requires — greedy just exploits it more aggressively by never revisiting choices.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft"><strong>The interview test</strong>: when asked if greedy works, always try to find a counter-example first. If you can't find one after trying a few cases, attempt an exchange argument proof. If you can find a counter-example: that's your signal to use DP.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s2">
+    <div class="card"><div class="ct">Code — activity selection + interval scheduling + coin change comparison</div>
+<div class="cb"><span class="cm">// ACTIVITY SELECTION — max non-overlapping activities
+// Greedy: always pick the activity that ends earliest (leaves most room)</span>
+<span class="kw">int</span> maxActivities(<span class="kw">int</span>[][] activities) { <span class="cm">// activities[i] = {start, end}</span>
+    <span class="nm">Arrays</span>.sort(activities, (a, b) -> a[1] - b[1]); <span class="cm">// sort by END time</span>
+    <span class="kw">int</span> count = 1, lastEnd = activities[0][1];
+    <span class="kw">for</span> (<span class="kw">int</span> i = 1; i < activities.length; i++) {
+        <span class="kw">if</span> (activities[i][0] >= lastEnd) { <span class="cm">// starts after last ends</span>
+            count++; lastEnd = activities[i][1];
+        }
+    }
+    <span class="kw">return</span> count; <span class="cm">// O(n log n) sort + O(n) scan</span>
+}
+
+<span class="cm">// INTERVAL SCHEDULING — min meeting rooms (min platforms)
+// Greedy: track ongoing meetings with a min-heap of end times</span>
+<span class="kw">int</span> minRooms(<span class="kw">int</span>[][] intervals) {
+    <span class="nm">Arrays</span>.sort(intervals, (a, b) -> a[0] - b[0]);
+    <span class="nm">PriorityQueue</span>&lt;<span class="nm">Integer</span>&gt; heap = <span class="kw">new</span> <span class="nm">PriorityQueue</span>&lt;&gt;(); <span class="cm">// min-heap of end times</span>
+    <span class="kw">for</span> (<span class="kw">int</span>[] inv : intervals) {
+        <span class="kw">if</span> (!heap.isEmpty() && heap.peek() <= inv[0])
+            heap.poll(); <span class="cm">// room freed — reuse it</span>
+        heap.offer(inv[1]);
+    }
+    <span class="kw">return</span> heap.size();
+}
+
+<span class="cm">// COIN CHANGE — greedy FAILS for non-canonical denominations
+// Greedy works for [1,5,10,25] (US coins) but NOT for [1,3,4]</span>
+<span class="kw">int</span> coinChangeGreedy(<span class="kw">int</span>[] coins, <span class="kw">int</span> amount) {  <span class="cm">// WRONG in general</span>
+    <span class="nm">Arrays</span>.sort(coins);
+    <span class="kw">int</span> count = 0;
+    <span class="kw">for</span> (<span class="kw">int</span> i = coins.length - 1; i >= 0; i--) {
+        count += amount / coins[i];
+        amount %= coins[i];
+    }
+    <span class="kw">return</span> (amount == 0) ? count : -1;
+}
+<span class="cm">// Use DP instead for general coin change:
+// dp[i] = min coins to make i; dp[0]=0, dp[i]=min(dp[i-c]+1) for each coin c</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s3">
+    <div class="card"><div class="ct">When greedy fails — the counter-examples</div>
+      <div class="flow">
+        <div class="fs r"><div class="fn r">1</div><div class="ft"><strong>Coin change (non-canonical denominations)</strong> — Coins [1, 3, 4], target = 6. Greedy picks 4 + 1 + 1 = 3 coins. Optimal: 3 + 3 = 2 coins. Greedy is wrong. Rule: greedy works for US coins because each coin "dominates" smaller combinations. For arbitrary denominations, use DP.</div></div>
+        <div class="fs r"><div class="fn r">2</div><div class="ft"><strong>Fractional knapsack vs 0/1 knapsack</strong> — fractional: can take fraction of item → greedy by value/weight ratio works perfectly. 0/1 knapsack: must take whole item → greedy fails. Example: capacity 10, items {6:6, 5:5, 5:5}. Greedy picks {6:6} + part... but 0/1 optimal is {5:5} + {5:5} = 10 value. Use DP for 0/1.</div></div>
+        <div class="fs r"><div class="fn r">3</div><div class="ft"><strong>Shortest path (negative edges)</strong> — Dijkstra is greedy and correct for non-negative edges. With negative edges, the greedy choice (smallest current distance) can be wrong. Use Bellman-Ford instead.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Why does the activity selection greedy algorithm sort by end time rather than start time or duration?<div class="qa">The goal is to maximise the number of non-overlapping activities. Sorting by end time and always picking the earliest-finishing activity maximises the remaining time window for future activities. Proof by exchange argument: suppose the optimal solution picks activity A_opt as its first activity instead of A_greedy (the earliest-finishing). Since A_greedy ends no later than A_opt, we can replace A_opt with A_greedy and the solution remains valid — activities after A_opt still don't overlap since A_greedy ends earlier. So any optimal solution can be transformed to include the greedy choice. Sorting by start time fails because a long early-starting activity blocks many shorter ones.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Vs DP</div>How do you decide between greedy and dynamic programming?<div class="qa">Greedy when: the problem has the greedy choice property (a local optimum is always part of a global optimum) provable by an exchange argument. Usually recognisable by: maximise/minimise non-overlapping intervals, fractional resource allocation, Huffman coding. DP when: greedy fails (coin change with arbitrary coins), or the sub-problems overlap (fibonacci, LCS, LIS). Practical approach: (1) Try greedy, find a counter-example with 3-4 items. (2) If you find one: DP. (3) If you can't: try exchange argument. (4) If the exchange argument holds: greedy is safe. The greedy-or-DP decision is one of the most important pattern recognitions in DSA.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain Huffman coding as a greedy algorithm with example')">Huffman coding</span>
+      <span class="chip" onclick="sendPrompt('Explain Dijkstra algorithm as a greedy algorithm and why it fails with negative edges')">Dijkstra greedy</span>
+      <span class="chip" onclick="sendPrompt('Explain the jump game II greedy solution')">Jump game II</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T5: BACKTRACKING ════ -->
+<div class="tp" id="t5">
+  <div class="ttl">Backtracking</div>
+  <div class="sub">N-Queens · sudoku · permutations · the prune-early imperative</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t5','s0')">Definition</button>
+    <button class="st" onclick="S('t5','s1')">The template</button>
+    <button class="st" onclick="S('t5','s2')">Code</button>
+    <button class="st" onclick="S('t5','s3')">Pruning strategies</button>
+    <button class="st" onclick="S('t5','s4')">Interview</button>
+    <button class="st" onclick="S('t5','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t5-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Backtracking is a systematic method for generating all configurations of a search space by incrementally building candidates and <strong>abandoning ("pruning") a candidate as soon as it's determined it cannot lead to a valid solution</strong>. It's depth-first search with constraint checking. The key insight: fail fast.</p>
+    </div>
+    <div class="card" style="background:var(--color-background-secondary)">
+      <div class="ct">Decision tree — what backtracking does</div>
+      <div style="font-size:13px;line-height:1.9;font-family:var(--font-mono,monospace);color:var(--color-text-secondary)">
+        try choice A → try A1 → try A1a → <span style="color:#A32D2D">INVALID → backtrack</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; → try A1b → <span style="color:#3B6D11">VALID → add to result</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; → try A2 → <span style="color:#A32D2D">PRUNED (constraint violated) → backtrack</span><br>
+        try choice B → ...
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s1">
+    <div class="card"><div class="ct">The universal backtracking template</div>
+<div class="cb"><span class="cm">// TEMPLATE — memorise this structure</span>
+<span class="kw">void</span> backtrack(<span class="nm">State</span> current, <span class="nm">List</span>&lt;<span class="nm">Result</span>&gt; results) {
+    <span class="cm">// BASE CASE — found a valid complete solution</span>
+    <span class="kw">if</span> (isSolution(current)) {
+        results.add(current.copy()); <span class="cm">// COPY the state — don't store the reference</span>
+        <span class="kw">return</span>;
+    }
+    <span class="cm">// TRY each possible next choice</span>
+    <span class="kw">for</span> (<span class="nm">Choice</span> c : getPossibleChoices(current)) {
+        <span class="kw">if</span> (!isValid(current, c)) <span class="kw">continue</span>; <span class="cm">// PRUNE — fail fast</span>
+        makeChoice(current, c);          <span class="cm">// modify state</span>
+        backtrack(current, results);     <span class="cm">// recurse</span>
+        undoChoice(current, c);          <span class="cm">// UNDO (backtrack) — restore state</span>
+    }
+}
+<span class="cm">// The make/undo pair is the heart of backtracking.
+// State must be fully restored so the next branch starts clean.</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s2">
+    <div class="card"><div class="ct">Code — N-Queens + permutations</div>
+<div class="cb"><span class="cm">// N-QUEENS — place n queens so no two attack each other</span>
+<span class="kw">int</span> n;
+<span class="nm">List</span>&lt;<span class="nm">List</span>&lt;<span class="nm">String</span>&gt;&gt; solveNQueens(<span class="kw">int</span> n) {
+    <span class="kw">this</span>.n = n;
+    <span class="nm">List</span>&lt;<span class="nm">List</span>&lt;<span class="nm">String</span>&gt;&gt; res = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;();
+    <span class="kw">int</span>[] queens = <span class="kw">new int</span>[n]; <span class="cm">// queens[row] = col of queen in that row</span>
+    <span class="nm">Arrays</span>.fill(queens, -1);
+    placeQueen(0, queens, res);
+    <span class="kw">return</span> res;
+}
+<span class="kw">void</span> placeQueen(<span class="kw">int</span> row, <span class="kw">int</span>[] queens, <span class="nm">List</span>&lt;<span class="nm">List</span>&lt;<span class="nm">String</span>&gt;&gt; res) {
+    <span class="kw">if</span> (row == n) { res.add(buildBoard(queens)); <span class="kw">return</span>; } <span class="cm">// base case</span>
+    <span class="kw">for</span> (<span class="kw">int</span> col = 0; col < n; col++) {
+        <span class="kw">if</span> (isValid(queens, row, col)) {  <span class="cm">// PRUNE early</span>
+            queens[row] = col;             <span class="cm">// make choice</span>
+            placeQueen(row + 1, queens, res); <span class="cm">// recurse</span>
+            queens[row] = -1;             <span class="cm">// undo choice</span>
+        }
+    }
+}
+<span class="kw">boolean</span> isValid(<span class="kw">int</span>[] queens, <span class="kw">int</span> row, <span class="kw">int</span> col) {
+    <span class="kw">for</span> (<span class="kw">int</span> r = 0; r < row; r++) {
+        <span class="kw">int</span> c = queens[r];
+        <span class="kw">if</span> (c == col) <span class="kw">return false</span>; <span class="cm">// same column</span>
+        <span class="kw">if</span> (<span class="nm">Math</span>.abs(r - row) == <span class="nm">Math</span>.abs(c - col)) <span class="kw">return false</span>; <span class="cm">// same diagonal</span>
+    }
+    <span class="kw">return true</span>;
+}
+
+<span class="cm">// PERMUTATIONS — all orderings of an array</span>
+<span class="kw">void</span> permute(<span class="kw">int</span>[] nums, <span class="kw">int</span> start, <span class="nm">List</span>&lt;<span class="kw">int</span>[]&gt; res) {
+    <span class="kw">if</span> (start == nums.length) { res.add(nums.clone()); <span class="kw">return</span>; }
+    <span class="kw">for</span> (<span class="kw">int</span> i = start; i < nums.length; i++) {
+        swap(nums, start, i);           <span class="cm">// make choice: put nums[i] at position start</span>
+        permute(nums, start + 1, res);  <span class="cm">// recurse on remaining</span>
+        swap(nums, start, i);           <span class="cm">// undo — restore array</span>
+    }
+}
+<span class="cm">// n! permutations × n to build each = O(n × n!) time</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s3">
+    <div class="card"><div class="ct">Pruning strategies — how to make backtracking fast</div>
+      <div class="prune-box pb-try"><strong>Constraint check before recursing</strong> — don't recurse then validate. Validate first. If the current partial state already violates a constraint, prune immediately without going deeper.</div>
+      <div class="prune-box pb-try"><strong>Forward-looking pruning</strong> — check not just whether the current state is valid, but whether it CAN possibly lead to a solution given the remaining choices. Sudoku: if a cell has no valid digits, prune the entire branch immediately.</div>
+      <div class="prune-box pb-try"><strong>Ordering choices by most-constrained first</strong> — try the choice most likely to fail early. In N-Queens, try columns that cause fewer conflicts. In Sudoku, fill the cell with fewest valid digits first. Reduces the branching factor at the top of the tree.</div>
+      <div class="prune-box pb-done"><strong>Bit masking for O(1) constraint checking</strong> — in N-Queens, maintain three bitsets: columns used, left-diagonals used, right-diagonals used. Checking all three is O(1) with bitwise AND instead of O(n) linear scan. Reduces constant factor dramatically.</div>
+      <div class="prune-box pb-prune"><strong>What pruning is NOT</strong> — returning early in the base case is not pruning. Pruning happens before a recursive call — you prevent an entire subtree from being explored, not just skip one leaf.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Explain the N-Queens backtracking solution and its time complexity.<div class="qa">Place queens one row at a time. For each row, try each column. Before placing, check: (1) no queen in the same column in any previous row, (2) no queen on the same diagonal. If valid: place the queen (queens[row] = col) and recurse to the next row. If we complete all n rows: add the board to results. Undo after each recursive call (queens[row] = -1). Time complexity: O(n!) in the worst case — the first queen has n choices, second has at most n-2 choices (columns on either side of first), etc. With pruning, empirically much better. For N=8: 8! / ~reduction ≈ 92 solutions found efficiently. Space: O(n) for the queens array + O(n) recursive stack depth.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Optimise</div>How would you use bit manipulation to speed up N-Queens?<div class="qa">Maintain three integers as bitmasks: cols (columns occupied), diag1 (left diagonals, row-col constant), diag2 (right diagonals, row+col constant). When placing queen at (row, col): cols |= (1 &lt;&lt; col); diag1 |= (1 &lt;&lt; (row-col+n)); diag2 |= (1 &lt;&lt; (row+col)). Check validity: (cols &amp; (1&lt;&lt;col)) == 0 &amp;&amp; (diag1 &amp; ...) == 0 &amp;&amp; (diag2 &amp; ...) == 0. All checks are O(1) bit operations vs O(n) linear scan. Available columns for the next row = ~(cols|diag1|diag2) &amp; ((1&lt;&lt;n)-1). This classic optimisation appears in interviews at Google/Meta levels.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain combination sum backtracking with deduplication strategies')">Combination sum</span>
+      <span class="chip" onclick="sendPrompt('Explain Sudoku solver backtracking with constraint propagation')">Sudoku solver</span>
+      <span class="chip" onclick="sendPrompt('Explain subsets and power set generation using backtracking')">Subsets / power set</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T6: BIT MANIPULATION ════ -->
+<div class="tp" id="t6">
+  <div class="ttl">Bit manipulation</div>
+  <div class="sub">AND · OR · XOR · shifts · 15 essential tricks for interviews</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t6','s0')">Operators</button>
+    <button class="st" onclick="S('t6','s1')">Essential tricks</button>
+    <button class="st" onclick="S('t6','s2')">Code</button>
+    <button class="st" onclick="S('t6','s3')">XOR magic</button>
+    <button class="st" onclick="S('t6','s4')">Interview</button>
+    <button class="st" onclick="S('t6','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t6-s0">
+    <div class="card"><div class="ct">Bitwise operators — what each does</div>
+      <div class="two">
+        <div>
+          <div class="flow" style="gap:6px">
+            <div class="fs" style="padding:7px 10px"><div class="ft" style="font-size:13px"><code>a & b</code> — AND: 1 only where both are 1. Used to mask / check bits.</div></div>
+            <div class="fs" style="padding:7px 10px"><div class="ft" style="font-size:13px"><code>a | b</code> — OR: 1 where either is 1. Used to set bits.</div></div>
+            <div class="fs t" style="padding:7px 10px"><div class="ft" style="font-size:13px"><code>a ^ b</code> — XOR: 1 where exactly one is 1. The magic operator — cancels same values.</div></div>
+            <div class="fs a" style="padding:7px 10px"><div class="ft" style="font-size:13px"><code>~a</code> — NOT: flips all bits. ~0 = -1 (all 1s in two's complement).</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="flow" style="gap:6px">
+            <div class="fs" style="padding:7px 10px"><div class="ft" style="font-size:13px"><code>a &lt;&lt; k</code> — left shift: multiply by 2^k. Fills with 0s from right.</div></div>
+            <div class="fs" style="padding:7px 10px"><div class="ft" style="font-size:13px"><code>a &gt;&gt; k</code> — arithmetic right shift: divide by 2^k. Preserves sign bit.</div></div>
+            <div class="fs" style="padding:7px 10px"><div class="ft" style="font-size:13px"><code>a &gt;&gt;&gt; k</code> — logical right shift: fills with 0s (Java-specific). Use for unsigned right shift.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s1">
+    <div class="card"><div class="ct">15 essential bit tricks — commit these to muscle memory</div>
+      <div class="bit-row">
+        <div class="bit-trick"><div class="bt-label">Check bit i</div><div class="bt-code">(n >> i) & 1</div><div class="bt-desc">1 if bit i is set, 0 if not</div></div>
+        <div class="bit-trick"><div class="bt-label">Set bit i</div><div class="bt-code">n | (1 << i)</div><div class="bt-desc">Turn bit i ON</div></div>
+        <div class="bit-trick"><div class="bt-label">Clear bit i</div><div class="bt-code">n & ~(1 << i)</div><div class="bt-desc">Turn bit i OFF</div></div>
+      </div>
+      <div class="bit-row">
+        <div class="bit-trick"><div class="bt-label">Toggle bit i</div><div class="bt-code">n ^ (1 << i)</div><div class="bt-desc">Flip bit i</div></div>
+        <div class="bit-trick"><div class="bt-label">Is power of 2?</div><div class="bt-code">n > 0 && (n & (n-1)) == 0</div><div class="bt-desc">Powers of 2 have exactly 1 bit set</div></div>
+        <div class="bit-trick"><div class="bt-label">Remove lowest set bit</div><div class="bt-code">n & (n - 1)</div><div class="bt-desc">Clears rightmost 1-bit</div></div>
+      </div>
+      <div class="bit-row">
+        <div class="bit-trick"><div class="bt-label">Isolate lowest set bit</div><div class="bt-code">n & (-n)</div><div class="bt-desc">-n = ~n+1 (two's complement)</div></div>
+        <div class="bit-trick"><div class="bt-label">Count set bits</div><div class="bt-code">Integer.bitCount(n)</div><div class="bt-desc">Brian Kernighan: loop n &= (n-1)</div></div>
+        <div class="bit-trick"><div class="bt-label">Multiply by 2^k</div><div class="bt-code">n << k</div><div class="bt-desc">Left shift = fast multiply</div></div>
+      </div>
+      <div class="bit-row">
+        <div class="bit-trick"><div class="bt-label">Divide by 2 (floor)</div><div class="bt-code">n >> 1</div><div class="bt-desc">Arithmetic right shift preserves sign</div></div>
+        <div class="bit-trick"><div class="bt-label">XOR swap</div><div class="bt-code">a^=b; b^=a; a^=b;</div><div class="bt-desc">No temp variable (don't use in practice)</div></div>
+        <div class="bit-trick"><div class="bt-label">Get all 1s mask</div><div class="bt-code">~0 or -1</div><div class="bt-desc">All 32 bits set to 1</div></div>
+      </div>
+      <div class="bit-row">
+        <div class="bit-trick"><div class="bt-label">Get lowest k bits</div><div class="bt-code">n & ((1 << k) - 1)</div><div class="bt-desc">Mask with k ones</div></div>
+        <div class="bit-trick"><div class="bt-label">Is even/odd?</div><div class="bt-code">(n & 1) == 0</div><div class="bt-desc">0 = even, 1 = odd (faster than %2)</div></div>
+        <div class="bit-trick"><div class="bt-label">Absolute value</div><div class="bt-code">mask=n>>31; (n+mask)^mask</div><div class="bt-desc">Branchless abs (no conditional)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s2">
+    <div class="card"><div class="ct">Code — Kernighan's bit count + single number + subsets</div>
+<div class="cb"><span class="cm">// COUNT SET BITS — Brian Kernighan's algorithm</span>
+<span class="kw">int</span> countBits(<span class="kw">int</span> n) {
+    <span class="kw">int</span> count = 0;
+    <span class="kw">while</span> (n != 0) {
+        n &= (n - 1);  <span class="cm">// removes lowest set bit each iteration</span>
+        count++;
+    }
+    <span class="kw">return</span> count;  <span class="cm">// O(number of set bits) — faster than O(32)</span>
+}
+<span class="cm">// Java shortcut: Integer.bitCount(n)</span>
+
+<span class="cm">// SINGLE NUMBER — find the one non-duplicate (XOR cancels pairs)</span>
+<span class="kw">int</span> singleNumber(<span class="kw">int</span>[] nums) {
+    <span class="kw">int</span> xor = 0;
+    <span class="kw">for</span> (<span class="kw">int</span> n : nums) xor ^= n;  <span class="cm">// a ^ a = 0, a ^ 0 = a</span>
+    <span class="kw">return</span> xor;                    <span class="cm">// only the unique element survives</span>
+}
+
+<span class="cm">// GENERATE ALL SUBSETS using bit mask</span>
+<span class="nm">List</span>&lt;<span class="nm">List</span>&lt;<span class="nm">Integer</span>&gt;&gt; subsets(<span class="kw">int</span>[] nums) {
+    <span class="nm">List</span>&lt;<span class="nm">List</span>&lt;<span class="nm">Integer</span>&gt;&gt; res = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;();
+    <span class="kw">int</span> n = nums.length;
+    <span class="kw">for</span> (<span class="kw">int</span> mask = 0; mask < (1 << n); mask++) { <span class="cm">// 2^n subsets</span>
+        <span class="nm">List</span>&lt;<span class="nm">Integer</span>&gt; subset = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;();
+        <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < n; i++)
+            <span class="kw">if</span> ((mask >> i & 1) == 1) subset.add(nums[i]); <span class="cm">// bit i set = include</span>
+        res.add(subset);
+    }
+    <span class="kw">return</span> res; <span class="cm">// O(n × 2^n)</span>
+}
+
+<span class="cm">// REVERSE BITS (32-bit integer)</span>
+<span class="kw">int</span> reverseBits(<span class="kw">int</span> n) {
+    <span class="kw">int</span> result = 0;
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i < 32; i++) {
+        result = (result << 1) | (n & 1); <span class="cm">// take LSB, shift result left</span>
+        n >>>= 1;                          <span class="cm">// unsigned right shift</span>
+    }
+    <span class="kw">return</span> result;
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s3">
+    <div class="card"><div class="ct">XOR — the magic operator and why it works</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">P</div><div class="ft"><strong>XOR properties to memorise</strong>: <code>a ^ 0 = a</code> (identity), <code>a ^ a = 0</code> (self-inverse), <code>a ^ b = b ^ a</code> (commutative), <code>(a ^ b) ^ c = a ^ (b ^ c)</code> (associative). The self-inverse property is the key: XOR-ing a value twice cancels it out.</div></div>
+        <div class="fs t"><div class="fn t">1</div><div class="ft"><strong>Single number (XOR all)</strong> — if every number appears twice except one, XOR all elements. Duplicate pairs cancel (a^a=0). The unique number remains. This is O(n) time, O(1) space — the classic bit trick that blows away O(n) HashMap solutions.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>Two numbers appearing once</strong> — XOR all: result = a^b (two different numbers). Find any set bit in result (they differ in that bit). Use that bit to partition all numbers into two groups and XOR each group separately — each group cancels to one number.</div></div>
+        <div class="fs a"><div class="fn a">3</div><div class="ft"><strong>Find missing number</strong> — in array [0..n] with one missing: XOR all indices 0..n with all array values. Duplicates cancel, leaving the missing number. <code>int miss = n; for(int i=0;i&lt;n;i++) miss ^= i ^ nums[i];</code></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>How do you check if a number is a power of 2 using bits?<div class="qa">n > 0 && (n & (n-1)) == 0. Powers of 2 in binary are exactly one 1-bit: 1=0001, 2=0010, 4=0100, 8=1000. n-1 flips all bits from the rightmost 1 bit: 4=0100, 3=0011. AND gives 0000 — zero. For non-powers: n=6=0110, n-1=5=0101, n&(n-1)=0100 ≠ 0. The n > 0 check handles n=0 (which is not a power of 2 but 0 & -1 = 0 would pass without it). Variant: use this in a loop to count set bits — each iteration of n &= (n-1) removes exactly one 1-bit.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">XOR</div>Find the single non-duplicate number in an array where every other number appears twice.<div class="qa">XOR all elements. XOR is commutative and associative, a^a=0, a^0=a. So XOR of all elements: pairs cancel to 0, the unique element XOR-s with 0 and survives. Code: int xor = 0; for(int n : nums) xor ^= n; return xor. O(n) time, O(1) space. Why better than HashMap: no memory allocation, single pass, works even with overflow concerns since XOR doesn't overflow. Follow-up: if two elements appear once and all others twice — XOR all to get a^b, find any set bit (where a and b differ), partition array by that bit and XOR each partition separately to get a and b individually.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Trick</div>How do you use bit manipulation to generate all subsets of a set?<div class="qa">For a set of n elements, there are 2^n subsets (each element is either included or not — binary choice). Iterate mask from 0 to 2^n - 1. For each mask, bit i set means include element i. Check: (mask >> i) & 1 == 1. This is the direct encoding of the subset selection as a binary number. Example: n=3, elements=[a,b,c]. mask=5=101 means include a and c (skip b). O(n × 2^n) total. More elegant than recursive backtracking for small n (&lt;=20), and gives indices into the original array for free.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain the Fenwick Tree (Binary Indexed Tree) which uses bit tricks for prefix sums')">Fenwick tree</span>
+      <span class="chip" onclick="sendPrompt('Explain bitmask DP with the travelling salesman problem as example')">Bitmask DP</span>
+      <span class="chip" onclick="sendPrompt('Explain N-Queens bit manipulation optimisation in detail')">N-Queens bitmask</span>
+    </div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function T(i){
+  document.querySelectorAll('.tp').forEach((p,j)=>p.classList.toggle('vis',j===i));
+  document.querySelectorAll('.nb').forEach((b,j)=>b.classList.toggle('on',j===i));
+  var tp=document.querySelectorAll('.tp')[i];
+  if(tp){var st=tp.querySelector('.st');if(st)st.click();}
+}
+function S(tid,sid){
+  var tp=document.getElementById(tid);
+  if(!tp)return;
+  tp.querySelectorAll('.sc').forEach(s=>s.classList.remove('vis'));
+  var sc=document.getElementById(tid+'-'+sid);
+  if(sc)sc.classList.add('vis');
+  var sids=['s0','s1','s2','s3','s4','s5','s6'];
+  tp.querySelectorAll('.st').forEach((b,i)=>b.classList.toggle('on',sids[i]===sid));
+}
+function A(el){
+  var a=el.querySelector('.qa');
+  if(a)a.style.display=a.style.display==='block'?'none':'block';
+}
+</script>

@@ -1,0 +1,1071 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.app{display:flex;height:100vh;min-height:600px;overflow:hidden}
+.sidebar{width:220px;min-width:220px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 0;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 14px 8px}
+.topic-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 14px;border:none;background:transparent;text-align:left;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s}
+.topic-btn:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.topic-btn.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left:2px solid #7F77DD;font-weight:500}
+.topic-num{font-size:11px;color:var(--color-text-tertiary);min-width:18px}
+.main{flex:1;overflow-y:auto;padding:0}
+.section-tabs{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);padding:0 20px;position:sticky;top:0;background:var(--color-background-primary);z-index:10;overflow-x:auto}
+.tab{padding:10px 14px;font-size:12px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.tab:hover{color:var(--color-text-primary)}
+.tab.active{color:#7F77DD;border-bottom:2px solid #7F77DD}
+.content{padding:20px}
+.topic-header{margin-bottom:20px}
+.topic-title{font-size:20px;font-weight:500;margin-bottom:4px}
+.topic-subtitle{font-size:13px;color:var(--color-text-secondary)}
+.section{display:none}
+.section.active{display:block}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:12px}
+.card-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-tertiary);margin-bottom:8px}
+.card-text{font-size:14px;color:var(--color-text-secondary);line-height:1.7}
+.highlight{background:var(--color-background-secondary);border-left:3px solid #7F77DD;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:10px 14px;margin:8px 0;font-size:13px;color:var(--color-text-primary);line-height:1.6}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--border-radius-md);margin:3px 2px}
+.tag-purple{background:#EEEDFE;color:#3C3489}
+.tag-teal{background:#E1F5EE;color:#085041}
+.tag-amber{background:#FAEEDA;color:#633806}
+.tag-coral{background:#FAECE7;color:#712B13}
+.tag-green{background:#EAF3DE;color:#27500A}
+.smell-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px}
+.smell-row:last-child{border-bottom:none}
+.smell-if{color:var(--color-text-tertiary);min-width:60px;font-size:11px;font-weight:500;text-transform:uppercase;padding-top:2px}
+.smell-then{color:#533AB7;font-weight:500;min-width:140px}
+.smell-why{color:var(--color-text-secondary)}
+.code-block{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px;font-family:var(--font-mono);font-size:12px;line-height:1.6;color:var(--color-text-primary);overflow-x:auto;white-space:pre;margin:8px 0}
+.complexity-table{width:100%;font-size:13px;border-collapse:collapse}
+.complexity-table th{text-align:left;padding:6px 8px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.complexity-table td{padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);vertical-align:top}
+.complexity-table td:first-child{font-weight:500;color:var(--color-text-primary)}
+.o-good{color:#3B6D11;font-weight:500}
+.o-mid{color:#854F0B;font-weight:500}
+.o-bad{color:#A32D2D;font-weight:500}
+.pattern-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.pattern-name{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.trigger{font-size:12px;color:#533AB7;background:#EEEDFE;padding:4px 10px;border-radius:var(--border-radius-md);display:inline-block;margin:4px 0}
+.pattern-when{font-size:13px;color:var(--color-text-secondary);margin-top:6px;line-height:1.6}
+.problem-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;margin-bottom:8px}
+.problem-diff{font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);display:inline-block;margin-bottom:6px}
+.easy{background:#EAF3DE;color:#27500A}
+.medium{background:#FAEEDA;color:#633806}
+.hard{background:#FAECE7;color:#712B13}
+.problem-name{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.problem-meta{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.interview-pill{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.pill-dot{width:6px;height:6px;border-radius:50%;background:#7F77DD;margin-top:7px;flex-shrink:0}
+</style>
+
+<h2 class="sr-only">Block 5: Recursion & Backtracking — interactive DSA study bible with 8 topics</h2>
+
+<div class="app">
+<div class="sidebar">
+  <div class="sidebar-title">Block 5</div>
+  <button class="topic-btn active" onclick="selectTopic(0)"><span class="topic-num">1</span>Recursion Fundamentals</button>
+  <button class="topic-btn" onclick="selectTopic(1)"><span class="topic-num">2</span>Divide & Conquer</button>
+  <button class="topic-btn" onclick="selectTopic(2)"><span class="topic-num">3</span>Backtracking Template</button>
+  <button class="topic-btn" onclick="selectTopic(3)"><span class="topic-num">4</span>Subsets</button>
+  <button class="topic-btn" onclick="selectTopic(4)"><span class="topic-num">5</span>Permutations</button>
+  <button class="topic-btn" onclick="selectTopic(5)"><span class="topic-num">6</span>Combinations</button>
+  <button class="topic-btn" onclick="selectTopic(6)"><span class="topic-num">7</span>N-Queens</button>
+  <button class="topic-btn" onclick="selectTopic(7)"><span class="topic-num">8</span>Sudoku Solver</button>
+</div>
+
+<div class="main" id="main">
+  <div class="section-tabs" id="tabs"></div>
+  <div class="content" id="content"></div>
+</div>
+</div>
+
+<script>
+const TABS = ["Definition","Mechanics","Complexity","Variants","Patterns","Smell→Pattern","Java Code","Worked Example","Practice","Interview"];
+
+const DATA = [
+{
+  title:"Recursion Fundamentals",
+  subtitle:"Base case · Recursive case · Call stack depth",
+  sections:[
+    // 0 Definition
+    `<div class="card"><div class="card-label">What it is</div><div class="card-text">Recursion is a technique where a function solves a problem by calling itself on a smaller version of the same input, until it reaches a base case it can answer directly. Think of it as a <strong>delegation chain</strong>: each call delegates the hard part to a smaller self, and the answers bubble back up.</div></div>
+    <div class="highlight">Three pillars: <strong>Base case</strong> (when to stop) · <strong>Recursive case</strong> (how to shrink the problem) · <strong>Trust the recursion</strong> (assume the smaller call works correctly)</div>
+    <div class="card"><div class="card-label">Call stack intuition</div><div class="card-text">Every recursive call pushes a stack frame (local vars + return address). The stack unwinds as base cases return. Stack depth = recursion depth. Each frame is O(1) space, so total space = O(depth).</div></div>`,
+
+    // 1 Mechanics
+    `<div class="card"><div class="card-label">How it works under the hood</div><div class="card-text">The JVM maintains a call stack in a dedicated memory region (stack segment). Each method invocation creates a <strong>stack frame</strong> containing: local variables, parameters, return address, and operand stack. Recursive calls stack frames on top of each other. When a base case returns, the frame is popped and the previous frame resumes execution.</div></div>
+    <div class="code-block">factorial(4)
+  └─ factorial(3)
+       └─ factorial(2)
+            └─ factorial(1)  ← BASE CASE returns 1
+         returns 1*2 = 2
+    returns 2*3 = 6
+  returns 6*4 = 24</div>
+    <div class="highlight"><strong>StackOverflowError</strong> in Java = call stack exhausted. Default JVM stack: ~500–1000 frames. Deep recursion on large inputs must use iterative approach or tail-call optimization (Java doesn't do TCO natively).</div>
+    <div class="card"><div class="card-label">Tail recursion note</div><div class="card-text">Java does NOT optimize tail calls. Even if the recursive call is the last statement, a new frame is still pushed. To avoid stack overflow on large n, convert to iteration or use trampolining.</div></div>`,
+
+    // 2 Complexity
+    `<table class="complexity-table"><tr><th>Operation</th><th>Time</th><th>Space (stack)</th><th>Why</th></tr>
+    <tr><td>factorial(n)</td><td class="o-good">O(n)</td><td class="o-good">O(n)</td><td>n frames, each O(1) work</td></tr>
+    <tr><td>fibonacci(n) naive</td><td class="o-bad">O(2ⁿ)</td><td class="o-good">O(n)</td><td>Binary tree of calls, exponential nodes; depth is n</td></tr>
+    <tr><td>fibonacci(n) memo</td><td class="o-good">O(n)</td><td class="o-good">O(n)</td><td>Each subproblem computed once</td></tr>
+    <tr><td>binary search recursive</td><td class="o-good">O(log n)</td><td class="o-good">O(log n)</td><td>Halving input each call; log n frames</td></tr>
+    <tr><td>tree traversal</td><td class="o-good">O(n)</td><td class="o-good">O(h)</td><td>Visit each node once; stack depth = tree height h</td></tr>
+    </table>
+    <div class="highlight" style="margin-top:12px"><strong>Recurrence relation tip:</strong> T(n) = T(n-1) + O(1) → O(n). T(n) = 2T(n/2) + O(n) → O(n log n). T(n) = T(n-1) + O(n) → O(n²).</div>`,
+
+    // 3 Variants
+    `<div class="pattern-card"><div class="pattern-name">Linear Recursion</div><div class="pattern-when">One recursive call per invocation. Problem shrinks linearly. E.g., factorial, linked list traversal.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Binary Recursion</div><div class="pattern-when">Two recursive calls per invocation. Tree-like expansion. E.g., fibonacci, tree traversal, merge sort.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Tail Recursion</div><div class="pattern-when">Recursive call is the very last operation. No work done on return. Can be converted to loop. Java doesn't auto-optimize but useful to recognize.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Mutual Recursion</div><div class="pattern-when">Function A calls B, B calls A. Used in parsers, state machines. E.g., isEven/isOdd recursive definition.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Tree Recursion (Multi-branching)</div><div class="pattern-when">Each call spawns 2+ recursive calls. Exponential without memoization. Core of backtracking exploration.</div></div>`,
+
+    // 4 Patterns
+    `<div class="pattern-card"><div class="pattern-name">1. Reduce & Delegate</div><div class="trigger">Mental trigger: "solve for n-1, then handle the nth element"</div><div class="pattern-when">Shrink the problem by one unit, trust the recursive result, combine. Classic: factorial, sum of array, reverse a string.</div></div>
+    <div class="pattern-card"><div class="pattern-name">2. Tree of Choices</div><div class="trigger">Mental trigger: "at each step I have multiple choices, explore all"</div><div class="pattern-when">Every recursive call branches on a decision. Foundation of backtracking. Used for subsets, permutations.</div></div>
+    <div class="pattern-card"><div class="pattern-name">3. Divide in Half</div><div class="trigger">Mental trigger: "split at midpoint, recurse both halves"</div><div class="pattern-when">Binary search, merge sort, quick sort. Achieves O(log n) or O(n log n).</div></div>
+    <div class="pattern-card"><div class="pattern-name">4. Memoized Recursion (Top-down DP)</div><div class="trigger">Mental trigger: "I'm computing the same subproblem repeatedly"</div><div class="pattern-when">Cache return values in a HashMap keyed by parameters. Converts O(2ⁿ) to O(n). Fibonacci, coin change, LCS.</div></div>`,
+
+    // 5 Smell → Pattern
+    `<div class="card"><div class="card-label">Problem smell → pattern map</div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">compute f(n) using f(n-1)</span><span class="smell-why">→ Linear recursion / Reduce & delegate</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">same subproblem appears in different branches</span><span class="smell-why">→ Memoization (top-down DP)</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">tree/graph traversal without a loop</span><span class="smell-why">→ DFS recursive with implicit stack</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">process each half independently</span><span class="smell-why">→ Divide & conquer</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">enumerate all valid configurations</span><span class="smell-why">→ Backtracking / tree of choices</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">StackOverflowError on large input</span><span class="smell-why">→ Convert to iterative or memoize</span></div>
+    </div>`,
+
+    // 6 Java
+    `<div class="code-block">// 1. Factorial — classic linear recursion
+int factorial(int n) {
+    if (n <= 1) return 1;         // base case
+    return n * factorial(n - 1);  // recursive case
+}
+
+// 2. Fibonacci — memoized to avoid O(2^n)
+Map&lt;Integer,Integer&gt; memo = new HashMap&lt;&gt;();
+int fib(int n) {
+    if (n <= 1) return n;
+    if (memo.containsKey(n)) return memo.get(n);
+    int result = fib(n-1) + fib(n-2);
+    memo.put(n, result);
+    return result;
+}
+
+// 3. Power of x — reduce & delegate
+double myPow(double x, int n) {
+    if (n == 0) return 1;
+    if (n < 0) return 1.0 / myPow(x, -n);
+    if (n % 2 == 0) {             // even: square the half-power
+        double half = myPow(x, n/2);
+        return half * half;
+    }
+    return x * myPow(x, n-1);    // odd: peel one
+}
+
+// 4. Sum of digits recursively
+int digitSum(int n) {
+    if (n < 10) return n;         // base: single digit
+    return (n % 10) + digitSum(n / 10);
+}</div>`,
+
+    // 7 Worked Example
+    `<div class="card"><div class="card-label">LeetCode 50 — Pow(x, n)</div>
+    <div class="card-text">Given x and n, compute xⁿ efficiently.</div></div>
+    <div class="highlight"><strong>Brute force:</strong> multiply x by itself n times → O(n). Too slow for n up to 2³¹.</div>
+    <div class="code-block">// BRUTE FORCE — O(n)
+double bruteForce(double x, int n) {
+    double result = 1;
+    for (int i = 0; i &lt; Math.abs(n); i++) result *= x;
+    return n &lt; 0 ? 1.0 / result : result;
+}
+
+// OPTIMAL — Fast Exponentiation O(log n)
+// Pattern: if n is even, xⁿ = (x²)^(n/2) — halve the problem!
+double myPow(double x, long n) {
+    if (n == 0) return 1;
+    if (n &lt; 0) { x = 1/x; n = -n; }
+    if (n % 2 == 0) return myPow(x * x, n / 2); // even: square base
+    return x * myPow(x * x, n / 2);             // odd: peel one factor
+}
+// Why log n? Each call halves n → log₂(n) levels deep.</div>
+    <div class="highlight"><strong>Why recursion?</strong> The problem has optimal substructure: xⁿ is defined perfectly in terms of x^(n/2). Recursion makes this natural to express.</div>`,
+
+    // 8 Practice
+    `<div class="problem-card"><div class="problem-diff easy">Easy</div><div class="problem-name">LC 509 — Fibonacci Number</div><div class="problem-meta"><strong>Why:</strong> Purest recursive definition. Forces you to see memoization need.<br><strong>Key insight:</strong> fib(n) = fib(n-1) + fib(n-2), cache to avoid recomputation.</div></div>
+    <div class="problem-card"><div class="problem-diff easy">Easy</div><div class="problem-name">LC 206 — Reverse Linked List (recursive)</div><div class="problem-meta"><strong>Why:</strong> Trains "delegate to n-1, then fix the last step".<br><strong>Key insight:</strong> Reverse tail first, then repoint current node.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 50 — Pow(x, n)</div><div class="problem-meta"><strong>Why:</strong> Teaches divide-in-half recursion pattern.<br><strong>Key insight:</strong> Even/odd split halves the depth to O(log n).</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 779 — K-th Symbol in Grammar</div><div class="problem-meta"><strong>Why:</strong> Pure recursive structure with no obvious loop form.<br><strong>Key insight:</strong> Position in row n depends on position in row n-1.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 761 — Special Binary Strings</div><div class="problem-meta"><strong>Why:</strong> Recursive decomposition of structure within structure.<br><strong>Key insight:</strong> Identify balanced substrings, recurse inside each, sort.</div></div>`,
+
+    // 9 Interview
+    `<div class="card"><div class="card-label">What interviewers test</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you identify the base case correctly? (Most bugs live here)</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you spontaneously spot memoization opportunities?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you trace the call stack verbally for small input?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you mention StackOverflow risk and iterative conversion?</span></div>
+    </div>
+    <div class="card"><div class="card-label">Common follow-up questions</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>"What's the space complexity?" → they want stack depth, not just output space</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>"Can you do this iteratively?" → always know how to convert</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>"What happens if n = 0 or negative?" → edge case handling</span></div>
+    </div>
+    <div class="highlight"><strong>Think-aloud script:</strong> "I'll define the base case as [X]. For the recursive case, I'll assume the function correctly handles [n-1] and then [combine]. Let me trace through a small example to verify..."</div>`
+  ]
+},
+
+{
+  title:"Divide & Conquer",
+  subtitle:"Merge sort · Quick sort · Master theorem",
+  sections:[
+    `<div class="card"><div class="card-label">What it is</div><div class="card-text">Divide & Conquer is a paradigm that solves a problem by: (1) <strong>Dividing</strong> it into independent subproblems of the same type, (2) <strong>Conquering</strong> each subproblem recursively, and (3) <strong>Combining</strong> their results. Unlike simple recursion, D&C subproblems are truly independent — no overlap. If they do overlap, it becomes Dynamic Programming.</div></div>
+    <div class="highlight">D&C vs DP: D&C subproblems don't share state. DP subproblems overlap. Merge sort = D&C. Fibonacci = DP.</div>
+    <div class="card"><div class="card-label">The Master Theorem</div><div class="card-text">For recurrence T(n) = aT(n/b) + f(n): compare f(n) with n^(log_b a). If f(n) is smaller → T = O(n^log_b a). If equal → T = O(n^log_b a · log n). If f(n) is larger → T = O(f(n)).</div></div>`,
+
+    `<div class="card"><div class="card-label">Merge sort mechanics</div><div class="card-text">Recursively split array in half until single elements (sorted by definition). Merge pairs back in sorted order using a temp array. Every element participates in O(log n) merge passes, each pass is O(n) → O(n log n) total.</div></div>
+    <div class="code-block">mergeSort([5,2,4,1,3]):
+  split → [5,2] and [4,1,3]
+    split → [5] [2]   and   [4] [1,3]
+                                split → [1] [3]
+                                merge → [1,3]
+              merge → [2,5]    merge → [1,3,4]
+  merge → [1,2,3,4,5]</div>
+    <div class="card"><div class="card-label">Quick sort mechanics</div><div class="card-text">Choose a pivot. Partition array so all elements &lt; pivot go left, all &gt; pivot go right. Pivot is in its final sorted position. Recurse on both sides. No merge step needed — partitioning does the work.</div></div>`,
+
+    `<table class="complexity-table"><tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable?</th></tr>
+    <tr><td>Merge Sort</td><td class="o-good">O(n log n)</td><td class="o-good">O(n log n)</td><td class="o-good">O(n log n)</td><td class="o-mid">O(n)</td><td>Yes</td></tr>
+    <tr><td>Quick Sort</td><td class="o-good">O(n log n)</td><td class="o-good">O(n log n)</td><td class="o-bad">O(n²)</td><td class="o-good">O(log n)</td><td>No</td></tr>
+    <tr><td>Binary Search</td><td class="o-good">O(1)</td><td class="o-good">O(log n)</td><td class="o-good">O(log n)</td><td class="o-good">O(1)</td><td>N/A</td></tr>
+    </table>
+    <div class="highlight" style="margin-top:12px"><strong>Quick sort worst case:</strong> occurs when pivot always lands at end (already sorted input + bad pivot choice). Fix: random pivot or median-of-3.</div>
+    <div class="highlight"><strong>Master theorem applied:</strong> Merge sort T(n)=2T(n/2)+O(n). a=2, b=2, f(n)=n. n^log₂2 = n¹ = n = f(n). Equal → O(n log n). ✓</div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">Stable Merge Sort</div><div class="pattern-when">When order of equal elements matters. Java's Arrays.sort() for objects uses TimSort (merge-based) for this reason. Use when: sorting objects, external sort.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Quick Sort (in-place)</div><div class="pattern-when">O(log n) space. Cache-friendly. Faster in practice than merge sort despite same average complexity. Use when: in-memory sort, don't need stability.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Quick Select</div><div class="pattern-when">Find kth smallest element in O(n) average. Only recurse on ONE side after partitioning. Essential for "Kth Largest Element" problems.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Binary Search Variants</div><div class="pattern-when">D&C where only one half is explored. Leftmost/rightmost target, search in rotated array, search on answer space (binary search the answer).</div></div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">1. Split & Merge</div><div class="trigger">Mental trigger: "sorting, or combining independently-sorted halves"</div><div class="pattern-when">Merge sort template. Also: merge k sorted lists, sort linked list.</div></div>
+    <div class="pattern-card"><div class="pattern-name">2. Partition Around Pivot</div><div class="trigger">Mental trigger: "find kth element / everything left of X, right of X"</div><div class="pattern-when">Quick sort, quick select, Dutch National Flag (3-way partition).</div></div>
+    <div class="pattern-card"><div class="pattern-name">3. Binary Search on Answer</div><div class="trigger">Mental trigger: "find the minimum/maximum value satisfying a condition"</div><div class="pattern-when">Guess and check: binary search the answer space. E.g., min days to ship, capacity problem.</div></div>
+    <div class="pattern-card"><div class="pattern-name">4. Count While Merging</div><div class="trigger">Mental trigger: "count inversions / count pairs across two halves"</div><div class="pattern-when">During merge step, count how many pairs (i from left, j from right) satisfy a condition. O(n log n) instead of O(n²).</div></div>`,
+
+    `<div class="card"><div class="card-label">Problem smell → pattern map</div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">sort array / objects with custom order</span><span class="smell-why">→ Merge sort / Arrays.sort with Comparator</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">find kth largest/smallest</span><span class="smell-why">→ Quick Select O(n) average</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">count inversions in array</span><span class="smell-why">→ Modified merge sort, count during merge</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">search in sorted (possibly rotated) array</span><span class="smell-why">→ Binary search variant</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">find minimum X such that f(X) is true</span><span class="smell-why">→ Binary search on answer space</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">array or subarray problems with O(n²) brute force</span><span class="smell-why">→ Try D&C merge approach for O(n log n)</span></div>
+    </div>`,
+
+    `<div class="code-block">// MERGE SORT
+void mergeSort(int[] arr, int l, int r) {
+    if (l >= r) return;                    // base case: single element
+    int mid = l + (r - l) / 2;
+    mergeSort(arr, l, mid);               // conquer left
+    mergeSort(arr, mid+1, r);             // conquer right
+    merge(arr, l, mid, r);                // combine
+}
+
+void merge(int[] arr, int l, int mid, int r) {
+    int[] temp = new int[r - l + 1];
+    int i = l, j = mid+1, k = 0;
+    while (i &lt;= mid &amp;&amp; j &lt;= r)
+        temp[k++] = arr[i] &lt;= arr[j] ? arr[i++] : arr[j++];
+    while (i &lt;= mid) temp[k++] = arr[i++];
+    while (j &lt;= r)   temp[k++] = arr[j++];
+    for (int x = 0; x &lt; temp.length; x++) arr[l+x] = temp[x];
+}
+
+// QUICK SELECT — Kth Largest
+int quickSelect(int[] nums, int l, int r, int k) {
+    int pivot = nums[r], p = l;
+    for (int i = l; i &lt; r; i++)
+        if (nums[i] &lt;= pivot) swap(nums, i, p++);
+    swap(nums, p, r);                     // pivot in final position
+    if (p == k) return nums[p];
+    return p &lt; k ? quickSelect(nums, p+1, r, k)
+                  : quickSelect(nums, l, p-1, k);
+}</div>`,
+
+    `<div class="card"><div class="card-label">LC 215 — Kth Largest Element in an Array</div><div class="card-text">Find the kth largest element without full sort.</div></div>
+    <div class="highlight"><strong>Brute force:</strong> Sort array, return index [n-k]. O(n log n). Works but doesn't use D&C insight.</div>
+    <div class="code-block">// OPTIMAL: Quick Select — O(n) average
+// Pattern: after partition, pivot is in its final sorted position.
+// Only recurse on the side that contains index (n-k).
+int findKthLargest(int[] nums, int k) {
+    return quickSelect(nums, 0, nums.length-1, nums.length-k);
+}
+int quickSelect(int[] nums, int l, int r, int target) {
+    int pivot = nums[r], p = l;
+    for (int i = l; i &lt; r; i++)
+        if (nums[i] &lt;= pivot) swap(nums, i, p++);
+    swap(nums, p, r);
+    if (p == target) return nums[p];
+    return p &lt; target ? quickSelect(nums, p+1, r, target)
+                       : quickSelect(nums, l, p-1, target);
+}
+// Why not sort? We only need ONE position, not the full order.
+// Partitioning eliminates half the search space each time.</div>`,
+
+    `<div class="problem-card"><div class="problem-diff easy">Easy</div><div class="problem-name">LC 704 — Binary Search</div><div class="problem-meta"><strong>Why:</strong> Purest D&C — divide search space in half.<br><strong>Key insight:</strong> mid = left + (right-left)/2 avoids overflow.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 148 — Sort List</div><div class="problem-meta"><strong>Why:</strong> Merge sort on linked list. No random access forces merge sort (not quick sort).<br><strong>Key insight:</strong> Find middle with slow/fast pointers, split, merge.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 215 — Kth Largest Element</div><div class="problem-meta"><strong>Why:</strong> Quick select pattern. O(n) vs O(n log n) insight impresses interviewers.<br><strong>Key insight:</strong> Random pivot to avoid worst case.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 33 — Search in Rotated Sorted Array</div><div class="problem-meta"><strong>Why:</strong> Binary search variant — one half always sorted.<br><strong>Key insight:</strong> Check which half is sorted, then decide which to recurse.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 493 — Reverse Pairs</div><div class="problem-meta"><strong>Why:</strong> Count pairs across halves during merge. Classic D&C counting trick.<br><strong>Key insight:</strong> Count before merging, using sorted order of both halves.</div></div>`,
+
+    `<div class="card"><div class="card-label">What interviewers test</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you know when to use merge sort vs quick sort?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you apply the Master Theorem to derive complexity?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you implement the partition step correctly (off-by-one errors are common)?</span></div>
+    </div>
+    <div class="highlight"><strong>Key talking point:</strong> "Java's Arrays.sort() uses dual-pivot quicksort for primitives (cache-friendly, in-place) but TimSort for objects (stable). Knowing this shows depth."</div>`
+  ]
+},
+
+{
+  title:"Backtracking Template",
+  subtitle:"Choose · Explore · Unchoose (state reset)",
+  sections:[
+    `<div class="card"><div class="card-label">What it is</div><div class="card-text">Backtracking is a systematic way to explore all possible configurations by building a solution incrementally, <strong>abandoning a partial solution</strong> (backtracking) as soon as it's determined that it cannot lead to a valid complete solution. It's DFS on a decision tree with pruning.</div></div>
+    <div class="highlight">Three-step mantra: <strong>Choose</strong> (make a decision) → <strong>Explore</strong> (recurse with that choice) → <strong>Unchoose</strong> (undo the choice, restore state)</div>
+    <div class="card"><div class="card-label">When to use</div><div class="card-text">Enumerate all solutions (subsets, permutations, combinations). Constraint satisfaction (N-Queens, Sudoku). Find one valid solution among many candidates. "Find all ways to..." or "Find any valid arrangement of..."</div></div>`,
+
+    `<div class="card"><div class="card-label">Decision tree model</div><div class="card-text">Backtracking explores a tree where: each node = partial solution, each edge = one choice made, leaves = complete solutions or dead ends. DFS traverses this tree. The "unchoose" step is what lets you reuse the same data structure (path list, board, visited array) across branches — you restore it to what it was before making a choice.</div></div>
+    <div class="code-block">            ROOT (empty)
+           /    |    \
+         [1]   [2]   [3]       ← choose first element
+        / \    / \    / \
+      [1,2][1,3][2,1][2,3]... ← choose second
+      ...                      ← prune invalid branches early</div>
+    <div class="highlight"><strong>State reset is critical.</strong> If you use list.add() to explore, you MUST call list.remove(list.size()-1) after the recursive call returns. Forgetting this is the #1 bug in backtracking solutions.</div>`,
+
+    `<table class="complexity-table"><tr><th>Problem Type</th><th>Time</th><th>Space</th><th>Why</th></tr>
+    <tr><td>Subsets of n elements</td><td class="o-mid">O(2ⁿ · n)</td><td class="o-mid">O(n)</td><td>2ⁿ subsets, each takes O(n) to copy</td></tr>
+    <tr><td>Permutations of n</td><td class="o-bad">O(n! · n)</td><td class="o-mid">O(n)</td><td>n! permutations, O(n) stack depth</td></tr>
+    <tr><td>Combinations C(n,k)</td><td class="o-mid">O(C(n,k) · k)</td><td class="o-mid">O(k)</td><td>C(n,k) results, depth k</td></tr>
+    <tr><td>N-Queens</td><td class="o-bad">O(n!)</td><td class="o-good">O(n)</td><td>Roughly n! placements explored, pruning reduces it</td></tr>
+    </table>
+    <div class="highlight" style="margin-top:12px">Backtracking is inherently exponential. Pruning (constraint checking early) is the only way to make it fast enough in practice.</div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">Pure Backtracking</div><div class="pattern-when">Explore all paths, collect all valid complete solutions. No pruning possible. E.g., power set.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Backtracking with Constraint Pruning</div><div class="pattern-when">Check validity at each step, skip entire subtrees that can't lead to solution. E.g., N-Queens (can't place attacking queens), Sudoku.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Backtracking on Partitioned Input</div><div class="pattern-when">Each recursive call moves a start index forward, ensuring elements aren't reused. E.g., combination sum, subsets.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Backtracking with Visited Array</div><div class="pattern-when">Track which elements are in current path. Allows using same element pool but not revisiting. E.g., permutations.</div></div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">1. Enumerate All Solutions</div><div class="trigger">Mental trigger: "find ALL valid X" or "generate all possible Y"</div><div class="pattern-when">Build partial solution, add to results at leaf (or at every node for subsets). Core template for all backtracking problems.</div></div>
+    <div class="pattern-card"><div class="pattern-name">2. Prune Early</div><div class="trigger">Mental trigger: "this partial solution already violates constraint — skip subtree"</div><div class="pattern-when">Before recursing, check if current state is already invalid. Return immediately. Transforms exponential to manageable.</div></div>
+    <div class="pattern-card"><div class="pattern-name">3. Start-Index Trick</div><div class="trigger">Mental trigger: "combinations (order doesn't matter, no repeats)"</div><div class="pattern-when">Pass a 'start' index to each recursive call. Only iterate from 'start' forward. Avoids duplicate combinations.</div></div>`,
+
+    `<div class="card"><div class="card-label">Problem smell → pattern map</div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"find all" or "generate all" or "enumerate"</span><span class="smell-why">→ Backtracking — build incrementally, collect at leaves</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">solutions must satisfy hard constraints at each step</span><span class="smell-why">→ Backtracking with pruning (check before recursing)</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">order matters in output</span><span class="smell-why">→ Permutation-style backtracking with visited[]</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">order doesn't matter in output</span><span class="smell-why">→ Combination-style backtracking with start index</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">grid/board placement problem</span><span class="smell-why">→ Backtracking with 2D state (N-Queens, Sudoku)</span></div>
+    </div>`,
+
+    `<div class="code-block">// THE UNIVERSAL BACKTRACKING TEMPLATE
+void backtrack(State current, List&lt;State&gt; results, ...) {
+    // BASE CASE: solution is complete
+    if (isComplete(current)) {
+        results.add(new ArrayList&lt;&gt;(current)); // copy! not reference
+        return;
+    }
+
+    for (Choice c : getChoices(current)) {
+        if (!isValid(current, c)) continue;  // PRUNE
+
+        // CHOOSE
+        current.add(c);
+        markUsed(c);
+
+        // EXPLORE
+        backtrack(current, results, ...);
+
+        // UNCHOOSE (state reset — critical!)
+        current.remove(current.size()-1);
+        markUnused(c);
+    }
+}
+
+// CONCRETE: Subsets template
+void subsets(int[] nums, int start, List&lt;Integer&gt; path,
+             List&lt;List&lt;Integer&gt;&gt; res) {
+    res.add(new ArrayList&lt;&gt;(path));  // every node is a valid subset
+    for (int i = start; i &lt; nums.length; i++) {
+        path.add(nums[i]);           // choose
+        subsets(nums, i+1, path, res); // explore (i+1: no reuse)
+        path.remove(path.size()-1);  // unchoose
+    }
+}</div>`,
+
+    `<div class="card"><div class="card-label">LC 78 — Subsets</div><div class="card-text">Given an integer array with unique elements, return all possible subsets.</div></div>
+    <div class="highlight"><strong>Brute force:</strong> iterate through all 2ⁿ bitmask combinations. Works but obscures the pattern.</div>
+    <div class="code-block">// BACKTRACKING APPROACH — clean, extendable
+List&lt;List&lt;Integer&gt;&gt; subsets(int[] nums) {
+    List&lt;List&lt;Integer&gt;&gt; res = new ArrayList&lt;&gt;();
+    backtrack(nums, 0, new ArrayList&lt;&gt;(), res);
+    return res;
+}
+void backtrack(int[] nums, int start, List&lt;Integer&gt; path,
+               List&lt;List&lt;Integer&gt;&gt; res) {
+    res.add(new ArrayList&lt;&gt;(path)); // snapshot current path
+
+    for (int i = start; i &lt; nums.length; i++) {
+        path.add(nums[i]);          // CHOOSE: include nums[i]
+        backtrack(nums, i+1, path, res); // EXPLORE: next elements
+        path.remove(path.size()-1); // UNCHOOSE: remove nums[i]
+    }
+}
+// Key insight: collect result at EVERY node, not just leaves.
+// start index prevents backward selections (ensures no duplicates).</div>`,
+
+    `<div class="problem-card"><div class="problem-diff easy">Easy</div><div class="problem-name">LC 78 — Subsets</div><div class="problem-meta"><strong>Why:</strong> Purest backtracking template with no constraints.<br><strong>Key insight:</strong> Collect path at every node, use start index.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 46 — Permutations</div><div class="problem-meta"><strong>Why:</strong> Backtracking with visited array instead of start index.<br><strong>Key insight:</strong> Order matters → no start index. Track what's used.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 39 — Combination Sum</div><div class="problem-meta"><strong>Why:</strong> Elements can be reused. Adjust start index to allow re-selection.<br><strong>Key insight:</strong> Pass i (not i+1) to allow reusing same element.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 131 — Palindrome Partitioning</div><div class="problem-meta"><strong>Why:</strong> Backtracking with validity check (isPalindrome) before recursing.<br><strong>Key insight:</strong> Prune non-palindrome partitions early.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 140 — Word Break II</div><div class="problem-meta"><strong>Why:</strong> Backtracking + memoization. Exponential paths, many repeated substrings.<br><strong>Key insight:</strong> Cache results for each start index to avoid recomputation.</div></div>`,
+
+    `<div class="card"><div class="card-label">What interviewers test</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you deep-copy the path before adding to results? (list.add(new ArrayList<>(path)))</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you correctly undo state after recursion (unchoose step)?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you articulate pruning conditions clearly?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you know the difference between combination (start index) and permutation (visited array) structure?</span></div>
+    </div>
+    <div class="highlight"><strong>Think-aloud:</strong> "I'll use backtracking — build the solution incrementally, and at each step, I'll [make a choice], recurse, then undo that choice. I'll prune when [condition] to avoid exploring invalid subtrees."</div>`
+  ]
+},
+
+{
+  title:"Subsets",
+  subtitle:"Power set · With/without duplicates",
+  sections:[
+    `<div class="card"><div class="card-label">What it is</div><div class="card-text">Generating all subsets (the power set) of a given set. For n elements, there are exactly 2ⁿ subsets including the empty set and the full set. Two variants: unique elements (straightforward) and arrays with duplicate elements (need deduplication strategy).</div></div>
+    <div class="highlight">Power set of {1,2,3} = { {}, {1}, {2}, {3}, {1,2}, {1,3}, {2,3}, {1,2,3} } — 8 = 2³ subsets</div>
+    <div class="card"><div class="card-label">Two approaches</div><div class="card-text"><strong>Backtracking:</strong> natural, extensible, easy to add constraints. <strong>Bitmask:</strong> compact, O(2ⁿ · n), elegant for small n (&lt; 20). Both produce same result.</div></div>`,
+
+    `<div class="card"><div class="card-label">Backtracking tree for [1,2,3]</div></div>
+    <div class="code-block">                   []
+          /         |         \
+        [1]        [2]        [3]
+       /   \         \
+    [1,2] [1,3]    [2,3]
+      |
+   [1,2,3]
+
+At each level we decide: include element at index i or skip it.
+start index moves forward → no backward selections → no duplicates.</div>
+    <div class="card"><div class="card-label">Handling duplicates (LC 90)</div><div class="card-text">Sort the array first. At each recursion level, if we see nums[i] == nums[i-1] AND i > start, skip it. This prevents picking the same value twice at the same decision level, eliminating duplicate subsets.</div></div>
+    <div class="code-block">// Duplicate skip rule:
+if (i > start && nums[i] == nums[i-1]) continue;
+// "i > start" ensures we only skip SIBLINGS, not first occurrence.</div>`,
+
+    `<table class="complexity-table"><tr><th>Approach</th><th>Time</th><th>Space</th><th>Note</th></tr>
+    <tr><td>Backtracking (unique)</td><td class="o-mid">O(2ⁿ · n)</td><td class="o-mid">O(n)</td><td>2ⁿ subsets, each costs O(n) to copy</td></tr>
+    <tr><td>Backtracking (duplicates)</td><td class="o-mid">O(2ⁿ · n)</td><td class="o-mid">O(n)</td><td>Sort first O(n log n), still 2ⁿ worst case</td></tr>
+    <tr><td>Bitmask iteration</td><td class="o-mid">O(2ⁿ · n)</td><td class="o-good">O(1)</td><td>No recursion stack, but needs n &lt; 64</td></tr>
+    </table>`,
+
+    `<div class="pattern-card"><div class="pattern-name">Subsets of Unique Elements (LC 78)</div><div class="pattern-when">Standard backtracking. Collect path at every node. Start index prevents backward lookups.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Subsets with Duplicates (LC 90)</div><div class="pattern-when">Sort first. Skip nums[i] == nums[i-1] when i > start at each level. This prunes duplicate branches.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Bitmask Subsets</div><div class="pattern-when">Iterate 0 to 2ⁿ-1. For each mask, bit j set = include nums[j]. Elegant but limited to n &lt; 20 (int) or n &lt; 64 (long).</div></div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">1. Include/Exclude Decision</div><div class="trigger">Mental trigger: "for each element, decide: in or out"</div><div class="pattern-when">Binary decision at each element. Clean alternative formulation of the same backtracking.</div></div>
+    <div class="pattern-card"><div class="pattern-name">2. Sort + Skip Siblings</div><div class="trigger">Mental trigger: "array has duplicates, avoid duplicate results"</div><div class="pattern-when">Sort → deduplicate at same recursion level. Same logic applies to Combination Sum II, Permutations II.</div></div>
+    <div class="pattern-card"><div class="pattern-name">3. Iterative Expansion</div><div class="trigger">Mental trigger: "add each element to all existing subsets"</div><div class="pattern-when">Start with [[]], for each element, duplicate all existing subsets and append element. Builds power set bottom-up.</div></div>`,
+
+    `<div class="card"><div class="card-label">Problem smell → pattern map</div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"all subsets" or "power set"</span><span class="smell-why">→ Backtracking collect at every node, start index</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">input has duplicates, want unique subsets</span><span class="smell-why">→ Sort first + skip siblings (i > start && nums[i]==nums[i-1])</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">n is small (&lt; 20)</span><span class="smell-why">→ Bitmask approach for clean O(2ⁿ) code</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">count total subsets</span><span class="smell-why">→ Answer is always 2ⁿ (no enumeration needed)</span></div>
+    </div>`,
+
+    `<div class="code-block">// LC 78 — Subsets (unique elements)
+List&lt;List&lt;Integer&gt;&gt; subsets(int[] nums) {
+    List&lt;List&lt;Integer&gt;&gt; res = new ArrayList&lt;&gt;();
+    backtrack(nums, 0, new ArrayList&lt;&gt;(), res);
+    return res;
+}
+void backtrack(int[] nums, int start, List&lt;Integer&gt; path,
+               List&lt;List&lt;Integer&gt;&gt; res) {
+    res.add(new ArrayList&lt;&gt;(path));    // collect at EVERY node
+    for (int i = start; i &lt; nums.length; i++) {
+        path.add(nums[i]);
+        backtrack(nums, i + 1, path, res);
+        path.remove(path.size() - 1);
+    }
+}
+
+// LC 90 — Subsets II (with duplicates)
+List&lt;List&lt;Integer&gt;&gt; subsetsWithDup(int[] nums) {
+    Arrays.sort(nums);                 // MUST sort first
+    List&lt;List&lt;Integer&gt;&gt; res = new ArrayList&lt;&gt;();
+    backtrack(nums, 0, new ArrayList&lt;&gt;(), res);
+    return res;
+}
+void backtrack(int[] nums, int start, List&lt;Integer&gt; path,
+               List&lt;List&lt;Integer&gt;&gt; res) {
+    res.add(new ArrayList&lt;&gt;(path));
+    for (int i = start; i &lt; nums.length; i++) {
+        // skip duplicate at same level (not first occurrence)
+        if (i > start &amp;&amp; nums[i] == nums[i-1]) continue;
+        path.add(nums[i]);
+        backtrack(nums, i + 1, path, res);
+        path.remove(path.size() - 1);
+    }
+}</div>`,
+
+    `<div class="card"><div class="card-label">LC 78 — Subsets</div></div>
+    <div class="highlight"><strong>Key insight:</strong> Collect at every node (not just leaves) because every partial selection is a valid subset.</div>
+    <div class="code-block">// Trace for nums=[1,2,3]:
+// backtrack(0, []):   res=[[]]
+//   i=0: path=[1]
+//     backtrack(1,[1]): res=[[],[1]]
+//       i=1: path=[1,2]
+//         backtrack(2,[1,2]): res=[...,[1,2]]
+//           i=2: path=[1,2,3] → res=[...,[1,2,3]]; backtrack(done)
+//         path=[1,2]→remove→[1]
+//       i=2: path=[1,3]
+//         backtrack(3,[1,3]): res=[...,[1,3]]; done
+//         path=[1]
+//   i=1: path=[2]...
+// Result: [[],[1],[1,2],[1,2,3],[1,3],[2],[2,3],[3]]</div>`,
+
+    `<div class="problem-card"><div class="problem-diff easy">Easy</div><div class="problem-name">LC 78 — Subsets</div><div class="problem-meta"><strong>Why:</strong> Template problem. Must do first.<br><strong>Key insight:</strong> Collect path at every node (not just leaves).</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 90 — Subsets II</div><div class="problem-meta"><strong>Why:</strong> Adds duplicate handling — sort + sibling skip.<br><strong>Key insight:</strong> i > start condition is crucial — allows first occurrence but skips copies.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 698 — Partition to K Equal Sum Subsets</div><div class="problem-meta"><strong>Why:</strong> Subset enumeration with a sum constraint.<br><strong>Key insight:</strong> Try assigning each element to one of k buckets, prune when bucket exceeds target.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 416 — Partition Equal Subset Sum</div><div class="problem-meta"><strong>Why:</strong> "Does subset exist with sum = total/2?" — DP, but good to see the backtracking root.<br><strong>Key insight:</strong> Transition to DP for efficiency.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 1255 — Maximum Score Words</div><div class="problem-meta"><strong>Why:</strong> Score subsets of words against letter constraints. Enumerate all word subsets.<br><strong>Key insight:</strong> Use bitmask over words (n &lt; 15), check letter frequency constraint.</div></div>`,
+
+    `<div class="card"><div class="card-label">What interviewers test</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you copy path into results, not add the reference?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you handle duplicates without using a HashSet on results?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you explain WHY i > start catches sibling duplicates but not parent-child ones?</span></div>
+    </div>
+    <div class="highlight"><strong>Common mistake:</strong> results.add(path) instead of results.add(new ArrayList<>(path)). This adds a reference to the same list object, which gets cleared later. Always deep copy.</div>`
+  ]
+},
+
+{
+  title:"Permutations",
+  subtitle:"With/without duplicates · Swap-based vs visited array",
+  sections:[
+    `<div class="card"><div class="card-label">What it is</div><div class="card-text">A permutation is an arrangement of all elements in a specific order. For n distinct elements there are n! permutations. Unlike subsets, order matters: [1,2,3] and [3,2,1] are different permutations. Two techniques: <strong>visited array</strong> (intuitive, explicit tracking) and <strong>swap-based</strong> (in-place, constant extra space).</div></div>
+    <div class="highlight">n=3: [1,2,3] [1,3,2] [2,1,3] [2,3,1] [3,1,2] [3,2,1] — 3! = 6 permutations</div>
+    <div class="card"><div class="card-label">Key difference from subsets/combinations</div><div class="card-text">No start index — you can pick any remaining element at each step. Use a visited[] boolean array to mark which elements are currently in the path. Or swap elements in-place to denote "used".</div></div>`,
+
+    `<div class="card"><div class="card-label">Visited array approach</div></div>
+    <div class="code-block">permute([1,2,3]):
+  path=[], visited=[F,F,F]
+  pick 1 → path=[1], visited=[T,F,F]
+    pick 2 → path=[1,2], visited=[T,T,F]
+      pick 3 → path=[1,2,3] → LEAF, add to results ✓
+    unpick 2 → path=[1], visited=[T,F,F]
+    pick 3 → path=[1,3], visited=[T,F,T]
+      pick 2 → path=[1,3,2] → LEAF ✓
+    unpick 3 → path=[1]
+  unpick 1 → path=[], visited=[F,F,F]
+  pick 2 → ... (continues)</div>
+    <div class="card"><div class="card-label">Swap-based approach</div><div class="card-text">Swap current position i with each position j ≥ i. Recurse on i+1. Swap back. The subarray [i, n-1] represents "remaining choices". No extra space needed but results come in different order.</div></div>`,
+
+    `<table class="complexity-table"><tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
+    <tr><td>Visited array</td><td class="o-bad">O(n! · n)</td><td class="o-mid">O(n)</td><td>n! leaves, each O(n) to copy; O(n) stack + visited</td></tr>
+    <tr><td>Swap-based</td><td class="o-bad">O(n! · n)</td><td class="o-good">O(n)</td><td>Same time, no visited[] — uses input array itself</td></div></td></tr>
+    <tr><td>With duplicates</td><td class="o-bad">O(n! · n)</td><td class="o-mid">O(n)</td><td>Sort + skip: fewer actual results but same worst-case traversal</td></tr>
+    </table>`,
+
+    `<div class="pattern-card"><div class="pattern-name">Unique Permutations — Visited Array (LC 46)</div><div class="pattern-when">Clean and intuitive. Use when you need to build path explicitly and check visited status. Iterate all n elements, skip visited ones.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Unique Permutations — Swap-based (LC 46 alt)</div><div class="pattern-when">In-place. Treat nums[i..n-1] as remaining pool. Swap nums[i] with each nums[j≥i]. Recurse on i+1. Swap back.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Permutations II — With Duplicates (LC 47)</div><div class="pattern-when">Sort input. Use visited[]. At each level, if nums[i]==nums[i-1] AND visited[i-1] is false, skip (means we already used that value at this level via a sibling branch).</div></div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">1. Permutation Enumeration</div><div class="trigger">Mental trigger: "all orderings" / "arrange all elements"</div><div class="pattern-when">Full permutation backtracking with visited array. Collect at leaf (path.size() == n).</div></div>
+    <div class="pattern-card"><div class="pattern-name">2. Next Permutation</div><div class="trigger">Mental trigger: "next lexicographic permutation in O(n)"</div><div class="pattern-when">Find rightmost descent, swap with next larger, reverse suffix. LC 31. No backtracking needed.</div></div>
+    <div class="pattern-card"><div class="pattern-name">3. Permutation as Ordering Problem</div><div class="trigger">Mental trigger: "task scheduling / seat assignment / arrangement"</div><div class="pattern-when">Model choices as permutations. Add constraint checking (isValid) to prune. E.g., task scheduler with cooldowns.</div></div>`,
+
+    `<div class="card"><div class="card-label">Problem smell → pattern map</div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"all permutations" or "all orderings"</span><span class="smell-why">→ Backtracking + visited array, collect at leaves</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">input has duplicate values</span><span class="smell-why">→ Sort + skip when nums[i]==nums[i-1] && !visited[i-1]</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"next permutation" / "kth permutation"</span><span class="smell-why">→ Math-based O(n), not backtracking</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">arrange items with constraints</span><span class="smell-why">→ Permutation backtracking + pruning (like N-Queens)</span></div>
+    </div>`,
+
+    `<div class="code-block">// LC 46 — Permutations (unique elements, visited array)
+List&lt;List&lt;Integer&gt;&gt; permute(int[] nums) {
+    List&lt;List&lt;Integer&gt;&gt; res = new ArrayList&lt;&gt;();
+    backtrack(nums, new boolean[nums.length], new ArrayList&lt;&gt;(), res);
+    return res;
+}
+void backtrack(int[] nums, boolean[] visited, List&lt;Integer&gt; path,
+               List&lt;List&lt;Integer&gt;&gt; res) {
+    if (path.size() == nums.length) {
+        res.add(new ArrayList&lt;&gt;(path)); // LEAF: complete permutation
+        return;
+    }
+    for (int i = 0; i &lt; nums.length; i++) {
+        if (visited[i]) continue;        // already in current path
+        visited[i] = true;               // CHOOSE
+        path.add(nums[i]);
+        backtrack(nums, visited, path, res); // EXPLORE
+        path.remove(path.size() - 1);   // UNCHOOSE
+        visited[i] = false;
+    }
+}
+
+// LC 47 — Permutations II (with duplicates)
+void backtrack(int[] nums, boolean[] visited, List&lt;Integer&gt; path,
+               List&lt;List&lt;Integer&gt;&gt; res) {
+    if (path.size() == nums.length) { res.add(new ArrayList&lt;&gt;(path)); return; }
+    for (int i = 0; i &lt; nums.length; i++) {
+        if (visited[i]) continue;
+        // Skip: same value AND previous sibling not yet used
+        if (i > 0 &amp;&amp; nums[i] == nums[i-1] &amp;&amp; !visited[i-1]) continue;
+        visited[i] = true;
+        path.add(nums[i]);
+        backtrack(nums, visited, path, res);
+        path.remove(path.size()-1);
+        visited[i] = false;
+    }
+}</div>`,
+
+    `<div class="card"><div class="card-label">LC 46 — Permutations</div></div>
+    <div class="highlight"><strong>Key insight:</strong> At each depth level, pick ANY unvisited element. Loop over all n elements, skip visited ones. No start index needed since order matters.</div>
+    <div class="code-block">// Trace for [1,2,3], depth=0:
+// i=0: visit 1 → recurse depth=1
+//   i=0: visited, skip
+//   i=1: visit 2 → recurse depth=2
+//     i=2: visit 3 → leaf [1,2,3] ✓
+//   i=2: visit 3 → recurse depth=2
+//     i=1: visit 2 → leaf [1,3,2] ✓
+// i=1: visit 2 → recurse depth=1
+//   ... → [2,1,3] [2,3,1]
+// i=2: visit 3 → ... → [3,1,2] [3,2,1]</div>`,
+
+    `<div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 46 — Permutations</div><div class="problem-meta"><strong>Why:</strong> Core template problem. No duplicates, pure visited array backtracking.<br><strong>Key insight:</strong> Collect at leaf (path.size() == n), not at every node.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 47 — Permutations II</div><div class="problem-meta"><strong>Why:</strong> Adds duplicate handling. The !visited[i-1] condition is tricky.<br><strong>Key insight:</strong> Sort first. Sibling with same value is skipped if predecessor is not currently visited.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 31 — Next Permutation</div><div class="problem-meta"><strong>Why:</strong> O(n) permutation math. Not backtracking but same conceptual space.<br><strong>Key insight:</strong> Find rightmost descent, swap, reverse suffix.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 60 — Permutation Sequence</div><div class="problem-meta"><strong>Why:</strong> Find kth permutation mathematically using factorial number system.<br><strong>Key insight:</strong> At each position, digit = k / (n-1)!, avoids full enumeration.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 996 — Number of Squareful Arrays</div><div class="problem-meta"><strong>Why:</strong> Count permutations where adjacent sums are perfect squares. Permutation + constraint.<br><strong>Key insight:</strong> Prune: only extend if last element + candidate forms perfect square.</div></div>`,
+
+    `<div class="card"><div class="card-label">What interviewers test</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you explain WHY !visited[i-1] deduplicates in Permutations II?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you know when to use swap-based vs visited array approach?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you derive n! complexity from first principles?</span></div>
+    </div>
+    <div class="highlight"><strong>Dedup condition explained:</strong> if nums[i]==nums[i-1] && !visited[i-1]: we're at a level where i-1 was NOT chosen yet (it's a sibling, not parent). So choosing nums[i] here would create the same sequence as when we chose nums[i-1] at this level — skip it.</div>`
+  ]
+},
+
+{
+  title:"Combinations",
+  subtitle:"Combination sum · Phone letter combinations",
+  sections:[
+    `<div class="card"><div class="card-label">What it is</div><div class="card-text">Combinations are selections of elements where <strong>order does not matter</strong>. C(n,k) = n!/(k!(n-k)!). Unlike permutations, [1,2,3] and [3,2,1] are the same combination. The start index trick prevents duplicates naturally. Variants include: fixed-size k, variable-size with target sum, elements reusable.</div></div>
+    <div class="highlight">Rule of thumb: combinations = start index, permutations = visited array</div>
+    <div class="card"><div class="card-label">Key variants</div><div class="card-text"><strong>Combination Sum (LC 39):</strong> unlimited reuse, find all combos summing to target. <strong>Combination Sum II (LC 40):</strong> each element used once, duplicates in input. <strong>Combinations (LC 77):</strong> choose k from 1..n. <strong>Phone combinations (LC 17):</strong> map digits to letters.</div></div>`,
+
+    `<div class="card"><div class="card-label">Start index mechanics</div></div>
+    <div class="code-block">combinationSum([2,3,6,7], target=7):
+  path=[], sum=0, start=0
+  pick 2 (sum=2, start=0 — can reuse 2!)
+    pick 2 (sum=4, start=0)
+      pick 2 (sum=6, start=0)
+        pick 2 → sum=8 > 7, PRUNE
+        pick 3 → sum=9 > 7, PRUNE
+      pick 3 (sum=7) → LEAF [2,2,3] ✓
+    pick 3 (sum=5, start=1)
+      pick 3 → sum=8, PRUNE
+      ...
+  pick 3 (sum=3, start=1)
+    pick 3 (sum=6)
+      pick 3 → sum=9, PRUNE
+    pick 6 → sum=9, PRUNE
+    ...
+  pick 7 (sum=7) → LEAF [7] ✓</div>`,
+
+    `<table class="complexity-table"><tr><th>Problem</th><th>Time</th><th>Space</th><th>Note</th></tr>
+    <tr><td>Combinations C(n,k)</td><td class="o-mid">O(C(n,k) · k)</td><td class="o-mid">O(k)</td><td>C(n,k) results, depth k</td></tr>
+    <tr><td>Combination Sum (reuse)</td><td class="o-bad">O(N^(T/M))</td><td class="o-mid">O(T/M)</td><td>N=candidates, T=target, M=min candidate</td></tr>
+    <tr><td>Phone Combinations</td><td class="o-mid">O(4ⁿ · n)</td><td class="o-mid">O(n)</td><td>At most 4 letters per digit, n digits</td></tr>
+    </table>`,
+
+    `<div class="pattern-card"><div class="pattern-name">Combination Sum (unlimited reuse, LC 39)</div><div class="pattern-when">Pass i (not i+1) to allow re-selecting same element. Prune when sum > target. Collect when sum == target.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Combination Sum II (each once, LC 40)</div><div class="pattern-when">Sort. Pass i+1 (no reuse). Skip duplicates with sibling-skip rule: i > start && nums[i]==nums[i-1].</div></div>
+    <div class="pattern-card"><div class="pattern-name">Combinations k from n (LC 77)</div><div class="pattern-when">Choose exactly k elements from 1..n. Prune when remaining elements can't fill k spots: i > n - (k - path.size()) + 1.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Phone Letter Combinations (LC 17)</div><div class="pattern-when">Map each digit to letter set. DFS one digit at a time, iterate over its letters. No start index needed — one element per digit level.</div></div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">1. Fixed-Size Combination</div><div class="trigger">Mental trigger: "choose exactly k elements from n"</div><div class="pattern-when">Collect when path.size() == k. Add pruning: if remaining elements too few to fill k, skip.</div></div>
+    <div class="pattern-card"><div class="pattern-name">2. Sum-Target Combination</div><div class="trigger">Mental trigger: "find all subsets summing to X"</div><div class="pattern-when">Track running sum. Prune sum > target. Collect sum == target. Sort to enable early termination.</div></div>
+    <div class="pattern-card"><div class="pattern-name">3. Cartesian Product of Sets</div><div class="trigger">Mental trigger: "one choice from each group" (phone digits, dominos)</div><div class="pattern-when">Each recursion level represents one group. Iterate over choices in that group, recurse to next group.</div></div>`,
+
+    `<div class="card"><div class="card-label">Problem smell → pattern map</div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"combinations summing to target, elements reusable"</span><span class="smell-why">→ Backtrack with start=i (allow reuse), prune &gt; target</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"combinations summing to target, each used once, no dup output"</span><span class="smell-why">→ Sort + start=i+1 + sibling-skip rule</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"choose k from 1..n"</span><span class="smell-why">→ Backtrack with pruning: skip when not enough left to fill k</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"all letter combinations from digit mapping"</span><span class="smell-why">→ Cartesian product backtracking, one digit per level</span></div>
+    </div>`,
+
+    `<div class="code-block">// LC 39 — Combination Sum (unlimited reuse)
+List&lt;List&lt;Integer&gt;&gt; combinationSum(int[] candidates, int target) {
+    List&lt;List&lt;Integer&gt;&gt; res = new ArrayList&lt;&gt;();
+    Arrays.sort(candidates);           // optional: enables early break
+    backtrack(candidates, target, 0, 0, new ArrayList&lt;&gt;(), res);
+    return res;
+}
+void backtrack(int[] c, int target, int start, int sum,
+               List&lt;Integer&gt; path, List&lt;List&lt;Integer&gt;&gt; res) {
+    if (sum == target) { res.add(new ArrayList&lt;&gt;(path)); return; }
+    for (int i = start; i &lt; c.length; i++) {
+        if (sum + c[i] > target) break; // sorted → prune rest too
+        path.add(c[i]);
+        backtrack(c, target, i, sum + c[i], path, res); // i not i+1
+        path.remove(path.size() - 1);
+    }
+}
+
+// LC 17 — Phone Letter Combinations
+String[] map = {"","","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"};
+List&lt;String&gt; letterCombinations(String digits) {
+    List&lt;String&gt; res = new ArrayList&lt;&gt;();
+    if (digits.isEmpty()) return res;
+    backtrack(digits, 0, new StringBuilder(), res);
+    return res;
+}
+void backtrack(String digits, int index, StringBuilder sb,
+               List&lt;String&gt; res) {
+    if (index == digits.length()) { res.add(sb.toString()); return; }
+    String letters = map[digits.charAt(index) - '0'];
+    for (char c : letters.toCharArray()) {
+        sb.append(c);                  // CHOOSE
+        backtrack(digits, index + 1, sb, res); // EXPLORE
+        sb.deleteCharAt(sb.length()-1); // UNCHOOSE
+    }
+}</div>`,
+
+    `<div class="card"><div class="card-label">LC 39 — Combination Sum</div></div>
+    <div class="highlight"><strong>Key insight:</strong> Pass i (not i+1) to allow reuse. Sorting + break enables early pruning — once a candidate exceeds remaining target, all larger candidates will too.</div>
+    <div class="code-block">// For candidates=[2,3,6,7], target=7:
+// Sorted: [2,3,6,7]
+// i=0 (2): sum=2 → recurse i=0
+//   i=0 (2): sum=4 → recurse i=0
+//     i=0 (2): sum=6 → recurse i=0
+//       i=0 (2): sum=8 > 7 → BREAK (sorted, rest bigger)
+//       i=1 (3): sum=9 > 7 → BREAK
+//     i=1 (3): sum=7 → [2,2,3] ✓
+//   i=1 (3): sum=5 → recurse i=1
+//     i=1 (3): sum=8 → BREAK
+//   ...
+// i=3 (7): sum=7 → [7] ✓</div>`,
+
+    `<div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 39 — Combination Sum</div><div class="problem-meta"><strong>Why:</strong> Core combination pattern. Unlimited reuse → pass i not i+1.<br><strong>Key insight:</strong> Sort + break for early termination.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 40 — Combination Sum II</div><div class="problem-meta"><strong>Why:</strong> Duplicates in input. Adds sibling-skip on top of Combo Sum I.<br><strong>Key insight:</strong> Sort + i > start && nums[i]==nums[i-1] → continue.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 77 — Combinations</div><div class="problem-meta"><strong>Why:</strong> Fixed-size k. Teaches the "not enough elements left" pruning.<br><strong>Key insight:</strong> Prune when i > n-(k-path.size())+1.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 17 — Letter Combinations of Phone Number</div><div class="problem-meta"><strong>Why:</strong> Cartesian product over groups. One digit per recursion level.<br><strong>Key insight:</strong> Use digit→letters map. StringBuilder for O(1) append/delete.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 301 — Remove Invalid Parentheses</div><div class="problem-meta"><strong>Why:</strong> Find all valid strings with min removals. Combination of what to remove.<br><strong>Key insight:</strong> Count min removals first, then backtrack checking validity.</div></div>`,
+
+    `<div class="card"><div class="card-label">What interviewers test</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you know when to pass i vs i+1 to the recursive call?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you add the sorted+break pruning optimization?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you distinguish Combination Sum I, II, and III quickly?</span></div>
+    </div>
+    <div class="highlight"><strong>Quick reference:</strong> Reuse allowed → pass i. No reuse → pass i+1. Duplicates in input → sort + skip. Fixed size → collect at path.size()==k. Sum target → collect at sum==target.</div>`
+  ]
+},
+
+{
+  title:"N-Queens",
+  subtitle:"Constraint propagation · Pruning",
+  sections:[
+    `<div class="card"><div class="card-label">What it is</div><div class="card-text">Place n queens on an n×n chessboard such that no two queens attack each other. Queens attack on the same row, column, or diagonal. This is the canonical constraint satisfaction backtracking problem. It demonstrates how <strong>early pruning</strong> transforms an O(n^n) brute force into a tractable solution.</div></div>
+    <div class="highlight">For n=4: 2 solutions exist. For n=8: 92 solutions. The key insight: place one queen per row, use column/diagonal constraints to prune.</div>
+    <div class="card"><div class="card-label">Attack conditions</div><div class="card-text">Two queens at (r1,c1) and (r2,c2) attack if: same column (c1==c2), same main diagonal (r1-c1 == r2-c2), same anti-diagonal (r1+c1 == r2+c2). Track these with 3 sets for O(1) lookup.</div></div>`,
+
+    `<div class="card"><div class="card-label">Placement mechanics</div></div>
+    <div class="code-block">n=4, place one queen per row:
+Row 0: try columns 0,1,2,3
+  Col 0: place Q at (0,0) → columns={0}, diag={-0}=0, antiDiag={0}
+    Row 1: try columns 0,1,2,3
+      Col 0: column 0 taken → SKIP
+      Col 1: diag 1-1=0 taken → SKIP
+      Col 2: place Q at (1,2) → columns={0,2}, diag={-1}, anti={3}
+        Row 2: try columns
+          Col 0: column 0 taken → SKIP
+          Col 1: place Q at (2,1)?
+            diag: 2-1=1, not in {0,-1} ✓
+            anti: 2+1=3, TAKEN (from 1,2) → SKIP
+          Col 3: place Q at (2,3)?
+            diag: 2-3=-1, TAKEN → SKIP
+        ← ALL columns exhausted at row 2, BACKTRACK
+      Col 3: place Q at (1,3) ...
+  Col 1: place Q at (0,1) → ... eventually finds solution [1,3,0,2]</div>`,
+
+    `<table class="complexity-table"><tr><th>Aspect</th><th>Value</th><th>Why</th></tr>
+    <tr><td>Brute force</td><td class="o-bad">O(n^n)</td><td>Try all column placements at each row without pruning</td></tr>
+    <tr><td>With backtracking</td><td class="o-mid">O(n!)</td><td>First row: n choices. Second: ≤n-1 (one col taken). Roughly n!</td></tr>
+    <tr><td>Space (board)</td><td class="o-mid">O(n²)</td><td>n×n char array for result building</td></tr>
+    <tr><td>Space (sets)</td><td class="o-good">O(n)</td><td>At most n elements in each of 3 sets</td></tr>
+    </table>
+    <div class="highlight" style="margin-top:12px">Pruning impact: without constraint sets, checking attacks per row costs O(n²). With HashSets, it's O(1). Massive speedup in practice.</div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">One Queen Per Row</div><div class="pattern-when">Standard n-queens. Each row = one decision. Iterate over column choices. Constraint sets for O(1) attack check.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Bitmask N-Queens (optimized)</div><div class="pattern-when">Use integers as bitmasks for columns, diagonals, anti-diagonals. Extremely fast: isolate lowest available bit, recurse, undo. Reduces constant factor significantly for large n.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Count Only</div><div class="pattern-when">LC 52 asks for count of solutions, not the boards. Don't build board strings — just count at base case. Faster and simpler.</div></div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">1. Row-by-Row Placement</div><div class="trigger">Mental trigger: "place one element per row/unit, constrain columns/diagonals"</div><div class="pattern-when">One queen per row guarantees no row conflict. Only need to check column + diagonal constraints. Reduces branching factor progressively.</div></div>
+    <div class="pattern-card"><div class="pattern-name">2. Constraint Propagation</div><div class="trigger">Mental trigger: "each placement eliminates future options"</div><div class="pattern-when">Track forbidden columns/diagonals globally. O(1) check before placing. This is constraint propagation — a core CSP technique.</div></div>
+    <div class="pattern-card"><div class="pattern-name">3. Prune Entire Subtrees</div><div class="trigger">Mental trigger: "if this position is invalid, skip entire branch"</div><div class="pattern-when">Unlike value-checking at leaves, check at each placement step. Eliminates exponentially many invalid states.</div></div>`,
+
+    `<div class="card"><div class="card-label">Problem smell → pattern map</div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"place n items with mutual constraints"</span><span class="smell-why">→ N-Queens style: one per row, constraint sets</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"row/column/diagonal exclusion"</span><span class="smell-why">→ Track col set + (r-c) diag set + (r+c) antiDiag set</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"count valid configurations" (not enumerate)</span><span class="smell-why">→ Skip board-building, just increment counter at leaf</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">constraint satisfaction on a grid</span><span class="smell-why">→ Backtracking + propagate constraints on each choice</span></div>
+    </div>`,
+
+    `<div class="code-block">// LC 51 — N-Queens
+List&lt;List&lt;String&gt;&gt; solveNQueens(int n) {
+    List&lt;List&lt;String&gt;&gt; res = new ArrayList&lt;&gt;();
+    char[][] board = new char[n][n];
+    for (char[] row : board) Arrays.fill(row, '.');
+    Set&lt;Integer&gt; cols = new HashSet&lt;&gt;();
+    Set&lt;Integer&gt; diag = new HashSet&lt;&gt;();    // r - c
+    Set&lt;Integer&gt; antiDiag = new HashSet&lt;&gt;(); // r + c
+    backtrack(board, 0, n, cols, diag, antiDiag, res);
+    return res;
+}
+
+void backtrack(char[][] board, int row, int n,
+               Set&lt;Integer&gt; cols, Set&lt;Integer&gt; diag,
+               Set&lt;Integer&gt; antiDiag, List&lt;List&lt;String&gt;&gt; res) {
+    if (row == n) {               // all rows placed
+        List&lt;String&gt; solution = new ArrayList&lt;&gt;();
+        for (char[] r : board) solution.add(new String(r));
+        res.add(solution);
+        return;
+    }
+    for (int col = 0; col &lt; n; col++) {
+        // PRUNE: check all 3 constraints in O(1)
+        if (cols.contains(col) || diag.contains(row - col)
+                || antiDiag.contains(row + col)) continue;
+
+        // CHOOSE: place queen
+        board[row][col] = 'Q';
+        cols.add(col);
+        diag.add(row - col);
+        antiDiag.add(row + col);
+
+        backtrack(board, row + 1, n, cols, diag, antiDiag, res);
+
+        // UNCHOOSE: remove queen
+        board[row][col] = '.';
+        cols.remove(col);
+        diag.remove(row - col);
+        antiDiag.remove(row + col);
+    }
+}</div>`,
+
+    `<div class="card"><div class="card-label">LC 51 — N-Queens walkthrough (n=4)</div></div>
+    <div class="highlight"><strong>Why constraint sets?</strong> Without them, checking if a queen is safe requires scanning all placed queens — O(n) per check, O(n²) per row. With HashSets: O(1). r-c uniquely identifies each main diagonal; r+c each anti-diagonal.</div>
+    <div class="code-block">// n=4 solution found: [1,3,0,2] (queen columns per row)
+// Row 0, col 1: cols={1}, diag={-1}, anti={1}
+// Row 1, col 3: cols={1,3}, diag={-1,-2}, anti={1,4}
+// Row 2, col 0: cols={0,1,3}, diag={-1,-2,2}, anti={1,2,4}
+// Row 3, col 2: check: col 2 ✓, diag 3-2=1 ✓, anti 3+2=5 ✓
+//   → Place! row==n → collect solution [".Q..","...Q","Q...","..Q."]</div>`,
+
+    `<div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 51 — N-Queens</div><div class="problem-meta"><strong>Why:</strong> Classic constraint backtracking. Must know the diagonal formula.<br><strong>Key insight:</strong> r-c = same main diagonal. r+c = same anti-diagonal.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 52 — N-Queens II (count only)</div><div class="problem-meta"><strong>Why:</strong> Same logic, skip board construction. Tests if you understand the simplification.<br><strong>Key insight:</strong> Just increment counter at row==n.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 1001 — Grid Illumination</div><div class="problem-meta"><strong>Why:</strong> Same row/column/diagonal tracking concept from N-Queens applied to lamps.<br><strong>Key insight:</strong> Track lit rows, cols, diags with count maps.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 79 — Word Search</div><div class="problem-meta"><strong>Why:</strong> Backtracking on a 2D grid with visited tracking. Sibling of N-Queens.<br><strong>Key insight:</strong> Mark cell visited before recursing, unmark after.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 37 — Sudoku Solver</div><div class="problem-meta"><strong>Why:</strong> N-Queens extended to 9x9 with box constraints. Next topic!<br><strong>Key insight:</strong> Constraint propagation across row, col, and 3x3 box.</div></div>`,
+
+    `<div class="card"><div class="card-label">What interviewers test</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you derive r-c and r+c as diagonal identifiers from scratch?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you know why we place one queen per row (eliminates one constraint dimension)?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you estimate the pruning effect compared to O(n^n) brute force?</span></div>
+    </div>
+    <div class="highlight"><strong>Diagonal formula proof:</strong> All cells (r,c) on the same main diagonal have r-c = constant (slope=1). All cells on same anti-diagonal have r+c = constant (slope=-1). This gives O(1) lookup vs O(n) scan.</div>`
+  ]
+},
+
+{
+  title:"Sudoku Solver",
+  subtitle:"Constraint satisfaction + backtracking",
+  sections:[
+    `<div class="card"><div class="card-label">What it is</div><div class="card-text">Fill a 9×9 Sudoku grid so that each row, column, and 3×3 box contains digits 1–9 exactly once. This is a classic <strong>Constraint Satisfaction Problem (CSP)</strong>. Each empty cell is a variable. Its domain is {1–9} minus values already used in its row, column, and box. Backtracking + constraint propagation solves it efficiently.</div></div>
+    <div class="highlight">Sudoku extends N-Queens: same backtracking template, but 3 constraints per cell (row + col + box) and 81 variables instead of n.</div>
+    <div class="card"><div class="card-label">Box identification</div><div class="card-text">The 3×3 box containing cell (r,c) is identified by index: boxIndex = (r/3)*3 + (c/3). Row r/3 gives the box row (0,1,2) and c/3 gives box column. This gives 9 distinct box indices 0–8.</div></div>`,
+
+    `<div class="card"><div class="card-label">Constraint tracking mechanics</div></div>
+    <div class="code-block">// Pre-compute 3 boolean[9][10] arrays:
+// rows[r][d] = true if digit d is used in row r
+// cols[c][d] = true if digit d is used in col c
+// boxes[b][d] = true if digit d is used in box b (b = r/3*3 + c/3)
+
+// For each empty cell (r,c):
+// isValid(r,c,d) = !rows[r][d] && !cols[c][d] && !boxes[r/3*3+c/3][d]
+// Place d: rows[r][d]=cols[c][d]=boxes[...][d] = true, board[r][c]=d
+// Backtrack: reset all three constraints + board[r][c]='.'</div>
+    <div class="card"><div class="card-label">Search order matters</div><div class="card-text">A key optimization: find the empty cell with the fewest valid candidates (Minimum Remaining Values / MRV heuristic). This reduces branching factor dramatically. Basic approach: scan left-to-right, top-to-bottom. Advanced: MRV first.</div></div>`,
+
+    `<table class="complexity-table"><tr><th>Aspect</th><th>Value</th><th>Why</th></tr>
+    <tr><td>Worst case</td><td class="o-bad">O(9^m)</td><td>m = number of empty cells; 9 digit choices each. Pruning reduces this enormously.</td></tr>
+    <tr><td>Practical</td><td class="o-good">Very fast</td><td>Constraint propagation eliminates most branches. Well-designed puzzles have &lt;100 backtracks.</td></tr>
+    <tr><td>Space</td><td class="o-mid">O(81)</td><td>Fixed board + 3 boolean arrays, each 9×10 = constant</td></tr>
+    <tr><td>With MRV</td><td class="o-good">Much faster</td><td>Pick most constrained cell first → prune earlier</td></tr>
+    </table>`,
+
+    `<div class="pattern-card"><div class="pattern-name">Basic Backtracking Sudoku</div><div class="pattern-when">Scan cells left-to-right, top-to-bottom. For each empty cell, try digits 1-9, check 3 constraints, recurse. Return true on success.</div></div>
+    <div class="pattern-card"><div class="pattern-name">Constraint Propagation + Backtracking</div><div class="pattern-when">After placing a digit, propagate: eliminate it from row/col/box peers. If any peer has no remaining options, backtrack. "AC-3 algorithm" in CSP terminology.</div></div>
+    <div class="pattern-card"><div class="pattern-name">MRV (Minimum Remaining Values) Heuristic</div><div class="pattern-when">Always choose the empty cell with the fewest valid digits first. Fails fast if wrong, pruning subtrees early. Converts near-impossible puzzles to fast solves.</div></div>`,
+
+    `<div class="pattern-card"><div class="pattern-name">1. Find → Try → Recurse → Undo</div><div class="trigger">Mental trigger: "fill cells one by one, backtrack on failure"</div><div class="pattern-when">Core Sudoku loop: find next empty, try each valid digit, recurse, if stuck undo and try next digit.</div></div>
+    <div class="pattern-card"><div class="pattern-name">2. 3-Constraint O(1) Check</div><div class="trigger">Mental trigger: "is this digit valid here in O(1)?"</div><div class="pattern-when">Maintain 3 boolean arrays updated on each placement/removal. Avoid scanning rows/cols/boxes each time.</div></div>
+    <div class="pattern-card"><div class="pattern-name">3. Return-Value Propagation</div><div class="trigger">Mental trigger: "stop as soon as solution found"</div><div class="pattern-when">Unlike enumeration (collect all solutions), Sudoku just needs one. Return boolean. If recursive call returns true, immediately return true up the chain — don't continue exploring.</div></div>`,
+
+    `<div class="card"><div class="card-label">Problem smell → pattern map</div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"fill grid with constraints: row, col, box unique"</span><span class="smell-why">→ Sudoku backtracking with 3 constraint arrays</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"find ANY valid solution" (not all)</span><span class="smell-why">→ Return boolean, propagate true immediately up call stack</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">grid CSP with local neighborhood constraints</span><span class="smell-why">→ Sudoku template: identify constraint regions, track with arrays</span></div>
+    <div class="smell-row"><span class="smell-if">IF</span><span class="smell-then">"validate a sudoku board" (not solve)</span><span class="smell-why">→ Just check 3 constraint arrays for duplicates — no backtracking</span></div>
+    </div>`,
+
+    `<div class="code-block">// LC 37 — Sudoku Solver
+boolean[][] rows = new boolean[9][10];
+boolean[][] cols = new boolean[9][10];
+boolean[][] boxes = new boolean[9][10];
+
+void solveSudoku(char[][] board) {
+    // Initialize constraint arrays from given digits
+    for (int r = 0; r &lt; 9; r++)
+        for (int c = 0; c &lt; 9; c++)
+            if (board[r][c] != '.') {
+                int d = board[r][c] - '0';
+                int b = (r/3)*3 + (c/3);
+                rows[r][d] = cols[c][d] = boxes[b][d] = true;
+            }
+    backtrack(board, 0, 0);
+}
+
+boolean backtrack(char[][] board, int r, int c) {
+    // Advance to next cell
+    if (c == 9) { r++; c = 0; }
+    if (r == 9) return true;              // all cells filled → solved!
+    if (board[r][c] != '.') return backtrack(board, r, c+1);
+
+    int b = (r/3)*3 + (c/3);
+    for (int d = 1; d &lt;= 9; d++) {
+        if (rows[r][d] || cols[c][d] || boxes[b][d]) continue; // PRUNE
+
+        // CHOOSE: place digit d
+        board[r][c] = (char)('0' + d);
+        rows[r][d] = cols[c][d] = boxes[b][d] = true;
+
+        // EXPLORE: move to next cell
+        if (backtrack(board, r, c+1)) return true; // propagate success!
+
+        // UNCHOOSE: remove digit d
+        board[r][c] = '.';
+        rows[r][d] = cols[c][d] = boxes[b][d] = false;
+    }
+    return false;                         // no valid digit → backtrack
+}
+
+// LC 36 — Valid Sudoku (just validate, no solving)
+boolean isValidSudoku(char[][] board) {
+    boolean[][] rows = new boolean[9][10];
+    boolean[][] cols = new boolean[9][10];
+    boolean[][] boxes = new boolean[9][10];
+    for (int r = 0; r &lt; 9; r++)
+        for (int c = 0; c &lt; 9; c++) {
+            if (board[r][c] == '.') continue;
+            int d = board[r][c] - '0';
+            int b = (r/3)*3 + (c/3);
+            if (rows[r][d] || cols[c][d] || boxes[b][d]) return false;
+            rows[r][d] = cols[c][d] = boxes[b][d] = true;
+        }
+    return true;
+}</div>`,
+
+    `<div class="card"><div class="card-label">LC 37 — Sudoku Solver deep dive</div></div>
+    <div class="highlight"><strong>Key insight 1:</strong> Return boolean (not void). When solution is found, return true and propagate immediately. Don't continue exploring.</div>
+    <div class="highlight"><strong>Key insight 2:</strong> Box index = (r/3)*3 + (c/3). Integer division gives 0,1,2 per row/col group.</div>
+    <div class="code-block">// Why (r/3)*3 + (c/3) works:
+// Rows 0,1,2 → r/3 = 0. Rows 3,4,5 → r/3 = 1. Rows 6,7,8 → r/3 = 2.
+// Cols 0,1,2 → c/3 = 0. Same pattern.
+// So cell (4,7) → box (4/3)*3 + (7/3) = 1*3 + 2 = 5 (middle-right box ✓)
+
+// Optimization: process cells with fewer valid candidates first (MRV)
+// → find cell with minimum valid digits, solve it next
+// → prunes tree much earlier for hard puzzles</div>`,
+
+    `<div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 36 — Valid Sudoku</div><div class="problem-meta"><strong>Why:</strong> Simpler cousin — just validate, same constraint logic without backtracking.<br><strong>Key insight:</strong> Same 3 boolean arrays, just check for duplicates.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 37 — Sudoku Solver</div><div class="problem-meta"><strong>Why:</strong> Full constraint-satisfaction backtracking. The definitive grid CSP problem.<br><strong>Key insight:</strong> Return boolean and short-circuit on true. Pre-build constraint arrays.</div></div>
+    <div class="problem-card"><div class="problem-diff medium">Medium</div><div class="problem-name">LC 79 — Word Search</div><div class="problem-meta"><strong>Why:</strong> Grid backtracking with visited tracking. Structural sibling of Sudoku.<br><strong>Key insight:</strong> Mark visited before recursing, unmark after (classic unchoose step).</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 212 — Word Search II</div><div class="problem-meta"><strong>Why:</strong> Grid backtracking + Trie for multi-word search. Combination of two patterns.<br><strong>Key insight:</strong> Build Trie of words, DFS on grid, prune when prefix not in Trie.</div></div>
+    <div class="problem-card"><div class="problem-diff hard">Hard</div><div class="problem-name">LC 51 — N-Queens (review)</div><div class="problem-meta"><strong>Why:</strong> Natural pair with Sudoku. Same CSP approach, simpler constraints.<br><strong>Key insight:</strong> After Sudoku, N-Queens constraint propagation feels simpler.</div></div>`,
+
+    `<div class="card"><div class="card-label">What interviewers test</div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you derive the box index formula (r/3)*3 + (c/3) on the fly?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you use boolean return to short-circuit on success?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Do you pre-build constraint arrays instead of scanning each time?</span></div>
+    <div class="interview-pill"><span class="pill-dot"></span><span>Can you mention MRV heuristic as an optimization?</span></div>
+    </div>
+    <div class="highlight"><strong>Think-aloud script:</strong> "I'll use backtracking with constraint propagation. For each empty cell, I'll check row, column, and box constraints in O(1) using boolean arrays. I'll pre-initialize these from the given digits. When I find a valid digit, I'll place it, recurse to the next cell, and if the recursive call returns true I'll propagate immediately. If no digit works, I'll return false to trigger backtracking."</div>
+    <div class="card"><div class="card-label">Block 5 — Complete pattern summary</div>
+    <div class="smell-row"><span class="smell-if">T1</span><span class="smell-then">Recursion</span><span class="smell-why">Self-similar subproblem → delegate to n-1, trust recursion</span></div>
+    <div class="smell-row"><span class="smell-if">T2</span><span class="smell-then">D&C</span><span class="smell-why">Independent halves → split, conquer, merge → O(n log n)</span></div>
+    <div class="smell-row"><span class="smell-if">T3</span><span class="smell-then">Backtrack</span><span class="smell-why">Enumerate all → choose, explore, UNCHOOSE</span></div>
+    <div class="smell-row"><span class="smell-if">T4</span><span class="smell-then">Subsets</span><span class="smell-why">Collect every node, start index, duplicate → sort+skip</span></div>
+    <div class="smell-row"><span class="smell-if">T5</span><span class="smell-then">Permutations</span><span class="smell-why">Collect leaves, visited array, no start index</span></div>
+    <div class="smell-row"><span class="smell-if">T6</span><span class="smell-then">Combinations</span><span class="smell-why">Sum target or fixed k, start index, reuse → pass i not i+1</span></div>
+    <div class="smell-row"><span class="smell-if">T7</span><span class="smell-then">N-Queens</span><span class="smell-why">One per row, 3 constraint sets (col/diag/anti), O(1) check</span></div>
+    <div class="smell-row"><span class="smell-if">T8</span><span class="smell-then">Sudoku</span><span class="smell-why">3D constraints (row/col/box), return bool, propagate true fast</span></div>
+    </div>`
+  ]
+}
+];
+
+let currentTopic = 0;
+let currentSection = 0;
+
+function renderTabs() {
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = TABS.map((t,i) => `<button class="tab ${i===currentSection?'active':''}" onclick="selectSection(${i})">${t}</button>`).join('');
+}
+
+function renderContent() {
+  const topic = DATA[currentTopic];
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <div class="topic-header">
+      <div class="topic-title">${topic.title}</div>
+      <div class="topic-subtitle">${topic.subtitle}</div>
+    </div>
+    ${topic.sections[currentSection] || '<div class="card"><div class="card-text">Content coming soon.</div></div>'}
+  `;
+}
+
+function selectTopic(idx) {
+  currentTopic = idx;
+  currentSection = 0;
+  document.querySelectorAll('.topic-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  renderTabs();
+  renderContent();
+  document.getElementById('main').scrollTop = 0;
+}
+
+function selectSection(idx) {
+  currentSection = idx;
+  renderTabs();
+  renderContent();
+  document.getElementById('main').scrollTop = 0;
+}
+
+renderTabs();
+renderContent();
+</script>

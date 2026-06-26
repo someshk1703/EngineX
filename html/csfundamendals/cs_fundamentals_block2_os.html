@@ -1,0 +1,652 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+.shell{display:flex;height:700px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:224px;min-width:224px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 8px;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 10px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);transition:background .15s,color .15s;margin-bottom:2px}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-secondary)}
+.nav-num{font-size:11px;color:var(--color-text-tertiary);min-width:16px}
+.nav-item.active .nav-num{color:var(--color-text-secondary)}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic-tag{display:inline-block;font-size:11px;font-weight:500;color:var(--color-text-info);background:var(--color-background-info);padding:3px 10px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.topic-title{font-size:22px;font-weight:500;margin-bottom:8px}
+.topic-oneliner{font-size:15px;color:var(--color-text-secondary);line-height:1.6;border-left:2px solid var(--color-border-secondary);padding-left:12px;margin-bottom:24px}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.sec{margin-bottom:28px}
+.body{font-size:14px;line-height:1.75}
+.body p{margin-bottom:10px}
+.body p:last-child{margin-bottom:0}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.steps li::before{content:counter(s);min-width:22px;height:22px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-top:2px;flex-shrink:0}
+.card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px;background:var(--color-background-primary)}
+.card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.card-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;margin-top:6px;white-space:pre}
+.analogy{background:var(--color-background-secondary);border-left:2px solid var(--color-border-info);border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:12px 16px;font-size:14px;color:var(--color-text-secondary);line-height:1.7;font-style:italic}
+.iq{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:6px}
+.iq .q{font-size:13px;font-weight:500;margin-bottom:4px}
+.iq .a{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.pill{font-size:12px;padding:4px 10px;border-radius:20px;border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);background:var(--color-background-secondary)}
+.pill.danger{color:var(--color-text-danger);background:var(--color-background-danger);border-color:var(--color-border-danger)}
+.pill.success{color:var(--color-text-success);background:var(--color-background-success);border-color:var(--color-border-success)}
+.pill.info{color:var(--color-text-info);background:var(--color-background-info);border-color:var(--color-border-info)}
+.bad{display:flex;gap:10px;margin-bottom:8px;font-size:13px;line-height:1.6}
+.bad .ic{color:var(--color-text-danger);font-size:15px;margin-top:1px;flex-shrink:0}
+.connects{display:flex;flex-wrap:wrap;gap:6px}
+.cp{font-size:12px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+</style>
+
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Block 2 — Operating Systems: 13-topic interactive reference covering processes through I/O models</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sidebar-title">Block 2 — OS</div>
+  <div class="nav-item active" onclick="show(0,this)"><span class="nav-num">01</span>Process / Thread / Coroutine</div>
+  <div class="nav-item" onclick="show(1,this)"><span class="nav-num">02</span>Process Lifecycle</div>
+  <div class="nav-item" onclick="show(2,this)"><span class="nav-num">03</span>CPU Scheduling</div>
+  <div class="nav-item" onclick="show(3,this)"><span class="nav-num">04</span>Concurrency vs Parallelism</div>
+  <div class="nav-item" onclick="show(4,this)"><span class="nav-num">05</span>Deadlock</div>
+  <div class="nav-item" onclick="show(5,this)"><span class="nav-num">06</span>Mutex / Semaphore / Monitor</div>
+  <div class="nav-item" onclick="show(6,this)"><span class="nav-num">07</span>Virtual Memory</div>
+  <div class="nav-item" onclick="show(7,this)"><span class="nav-num">08</span>Paging</div>
+  <div class="nav-item" onclick="show(8,this)"><span class="nav-num">09</span>Segmentation vs Paging</div>
+  <div class="nav-item" onclick="show(9,this)"><span class="nav-num">10</span>Memory Allocation</div>
+  <div class="nav-item" onclick="show(10,this)"><span class="nav-num">11</span>File Systems</div>
+  <div class="nav-item" onclick="show(11,this)"><span class="nav-num">12</span>System Calls</div>
+  <div class="nav-item" onclick="show(12,this)"><span class="nav-num">13</span>I/O Models</div>
+</nav>
+<main class="content" id="content"></main>
+</div>
+
+<script>
+const T=[
+{
+tag:"OS Fundamentals",title:"Process vs Thread vs Coroutine",
+oneliner:"A process is an isolated program in execution; a thread is a unit of execution inside a process sharing its memory; a coroutine is a cooperative user-space task that yields control voluntarily.",
+secs:[
+{l:"Why the distinction matters",b:`<p>The unit of execution you choose determines isolation, memory cost, context-switch overhead, and scheduling control. Getting this wrong in system design — spawning 10,000 OS threads for a chat server, for example — is a classic performance failure.</p>`},
+{l:"Process — internals",b:`<p>When the OS creates a process it allocates a <strong>Process Control Block (PCB)</strong> and a private virtual address space containing:</p>
+<div class="code">Virtual address space layout (low → high address):
+┌─────────────────┐  High address
+│   Kernel space  │  (process cannot touch directly)
+├─────────────────┤
+│      Stack      │  local vars, function frames — grows ↓
+│         ↓       │
+│   (gap/guard)   │
+│         ↑       │
+│       Heap      │  dynamic allocations (malloc) — grows ↑
+├─────────────────┤
+│  BSS segment    │  uninitialised globals (zeroed at start)
+│  Data segment   │  initialised globals & statics
+│  Text segment   │  executable code (read-only)
+└─────────────────┘  Low address (0x0 - NULL)</div>
+<p>Two processes have completely separate address spaces. Communication requires IPC (pipes, sockets, shared memory, signals). Context switching between processes saves/restores the full PCB: registers, stack pointer, page table base register (CR3 on x86), file descriptors, signal state.</p>`},
+{l:"Thread — internals",b:`<p>A thread is a light-weight execution unit inside a process. All threads in a process share: the heap, the code (text) segment, data/BSS, and open file descriptors. Each thread has its own: stack, program counter, register set, and thread-local storage (TLS).</p>
+<p>Context switching between threads of the <em>same</em> process is cheaper than switching processes — no page table swap (TLB flush), no address space switch. But sharing memory means a bug in one thread can corrupt another's stack (no isolation).</p>
+<p><strong>User-level threads vs kernel threads:</strong> Kernel threads (pthreads) are scheduled by the OS and can run in parallel on multiple cores. User-level threads are managed by a library in user space — the kernel sees one thread; fast to create/switch but can't exploit multiple cores and one blocking call blocks all.</p>`},
+{l:"Coroutine — internals",b:`<div class="card"><div class="card-name">Coroutine (green thread / fiber)</div><div class="card-desc">User-space cooperative tasks. The runtime (not the OS) schedules them. A coroutine runs until it explicitly yields (await, yield keyword). No kernel involvement in the switch — just a function call that saves/restores a small context (stack pointer + registers). Creation cost ~2KB stack vs ~8MB for OS thread. Java 21 virtual threads, Go goroutines, Python asyncio, Kotlin coroutines all use this model.</div></div>
+<p><strong>Context switch cost comparison:</strong></p>
+<div class="code">OS process switch:   ~1-10 µs  (TLB flush, page table swap, full PCB save)
+OS thread switch:    ~0.5-2 µs (register save, stack switch, no page table swap)
+Coroutine switch:    ~10-100 ns (pure user-space, save ~handful of registers)</div>`},
+{l:"Green threads vs OS threads",b:`<div class="card"><div class="card-name">M:N threading (Go, Java 21)</div><div class="card-desc">M green threads multiplexed onto N OS threads. The runtime scheduler moves goroutines/virtual threads between OS threads. If one blocks on I/O, the OS thread picks up another green thread. Best of both worlds: cheap creation, true parallelism. Go runs millions of goroutines on 8 OS threads comfortably.</div></div>
+<div class="card"><div class="card-name">1:1 threading (pthreads, Java pre-21)</div><div class="card-desc">Each user thread = one kernel thread. True parallelism, but each thread costs ~1MB stack + OS overhead. Can't realistically run >10K threads. Java's virtual threads (Project Loom) fixes this.</div></div>`},
+{l:"Mental model",b:`<div class="analogy">A process is a separate restaurant — its own building, kitchen, and staff. Threads are waiters inside that restaurant — they share the kitchen (heap, code) but each runs their own route (stack, registers). Coroutines are a single waiter who serves multiple tables by putting one order in, walking to another table, coming back when the order is ready — no extra staff, just clever scheduling of one person's time.</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>Threads are not always faster than processes. For CPU-bound work, process isolation gives fault tolerance; thread-per-request servers collapse under load from 8MB stack per thread.</div></div>
+<div class="bad"><span class="ic">✕</span><div>Coroutines are not parallel. Two coroutines in one OS thread cannot run simultaneously — one runs while the other waits. Parallelism requires multiple OS threads or multiple processes.</div></div>
+<div class="bad"><span class="ic">✕</span><div>Python's GIL means Python threads are concurrent (interleaved) but not parallel for CPU-bound work. asyncio coroutines are explicit about this: I/O concurrent, CPU sequential.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How is a context switch between threads cheaper than between processes?</div><div class="a">Threads in the same process share the page table — no CR3 register swap, no TLB flush. Only registers + stack pointer saved/restored. Process switch requires full address space change — TLB invalidated, huge penalty on memory-intensive workloads.</div></div>
+<div class="iq"><div class="q">How does Node.js handle 100K concurrent connections with one thread?</div><div class="a">Event loop + async I/O. Each request registers a callback and yields. The single thread never blocks — it processes callbacks when I/O completes. This is coroutine-style cooperative scheduling. CPU-bound tasks block the loop — that's why Node uses worker_threads for CPU work.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Process Lifecycle (PCB)</span><span class="cp">CPU Scheduling</span><span class="cp">Virtual Memory (address space)</span><span class="cp">I/O Models (async)</span><span class="cp">Java Concurrency (ExecutorService)</span><span class="cp">System Calls</span></div>`}
+]
+},
+
+{
+tag:"OS Fundamentals",title:"Process Lifecycle & PCB",
+oneliner:"A process moves through five states — new, ready, running, waiting, terminated — governed by the OS scheduler and tracked in the Process Control Block.",
+secs:[
+{l:"The five states",b:`<div class="code">        ┌─────────────────────────────────────────────────┐
+        │                                                 │
+  fork()│     scheduler         I/O request              │ I/O complete
+  exec()↓     dispatch          sleep/wait               ↓
+  [NEW]→[READY]────────→[RUNNING]──────────→[WAITING]────┘
+           ↑                │
+           └────────────────┘    ↓ exit() / kill
+            preempted/          [TERMINATED]
+            time slice end</div>
+<div class="card"><div class="card-name">New</div><div class="card-desc">Process is being created. OS allocates PCB, assigns PID, loads program into memory. Not yet ready to run.</div></div>
+<div class="card"><div class="card-name">Ready</div><div class="card-desc">Process is in the ready queue — has all resources except CPU. Waiting for the scheduler to dispatch it.</div></div>
+<div class="card"><div class="card-name">Running</div><div class="card-desc">Executing on CPU. On a single-core system, only one process runs at a time. Leaves when: time slice ends (→ Ready), I/O requested (→ Waiting), or exits (→ Terminated).</div></div>
+<div class="card"><div class="card-name">Waiting (Blocked)</div><div class="card-desc">Waiting for an event: I/O completion, semaphore, child process exit, network packet. Cannot run. CPU is freed for other processes.</div></div>
+<div class="card"><div class="card-name">Terminated</div><div class="card-desc">Process finished (exit()) or was killed. PCB kept briefly for parent to collect exit status (wait() syscall). Until collected: zombie process. If parent dies without collecting: orphan, reparented to init/PID 1.</div></div>`},
+{l:"Process Control Block (PCB)",b:`<div class="code">PCB fields:
+  PID               — unique process identifier
+  Process state     — new/ready/running/waiting/terminated
+  Program counter   — address of next instruction
+  CPU registers     — all general-purpose registers saved here on switch
+  CPU scheduling    — priority, nice value, scheduling queue pointers
+  Memory management — page table base address, segment table, limits
+  Accounting        — CPU time used, wall clock time, limits
+  I/O status        — list of open files, I/O devices in use, pending I/O
+  Parent PID        — for process tree (getppid())
+  Signal mask       — which signals blocked/pending</div>`},
+{l:"Zombie & orphan processes",b:`<p><strong>Zombie:</strong> process has exited but parent hasn't called wait() to read the exit status. PCB remains. Visible in ps as Z state. Long-lived zombies accumulate and can exhaust the PID table. Fix: parent must call wait() or install SIGCHLD handler.</p>
+<p><strong>Orphan:</strong> parent exits before child. Child is reparented to init (PID 1) or subreaper. init calls wait() periodically — orphans don't become zombies.</p>`},
+{l:"Mental model",b:`<div class="analogy">A process is like a job application at a company. New = application submitted, not yet reviewed. Ready = application approved, candidate waiting for an interview slot. Running = in the interview room talking to the interviewer (CPU). Waiting = sent to fetch a document (I/O) — interview room freed for someone else. Terminated = offer accepted or rejected, file closed. The PCB is the entire candidate file the HR department (OS) keeps.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is a zombie process and how do you prevent it?</div><div class="a">A process that has exited but whose exit status hasn't been collected by its parent via wait(). PCB persists. Prevent: always call wait() in the parent, or handle SIGCHLD with SIG_DFL/SIG_IGN to auto-reap. In Java: ProcessBuilder.waitFor().</div></div>
+<div class="iq"><div class="q">What happens to child processes when the parent is killed?</div><div class="a">Children become orphans. The OS reparents them to PID 1 (init/systemd). init periodically calls wait() so they don't become zombies. In Docker: PID 1 is often your app — needs to handle SIGCHLD if it spawns children.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">CPU Scheduling (ready queue)</span><span class="cp">System Calls (fork/exec/wait)</span><span class="cp">Virtual Memory (address space per process)</span><span class="cp">Concurrency (thread = lightweight process)</span></div>`}
+]
+},
+
+{
+tag:"OS Fundamentals",title:"CPU Scheduling Algorithms",
+oneliner:"CPU scheduling decides which ready process gets the CPU next — the algorithm chosen trades off throughput, latency, fairness, and starvation prevention.",
+secs:[
+{l:"Key metrics",b:`<div class="code">Throughput     — processes completed per unit time (want high)
+Turnaround     — time from submission to completion (want low)
+Waiting time   — time spent in ready queue (want low)
+Response time  — time from submission to first CPU response (want low for interactive)
+CPU utilisation— fraction of time CPU is busy (want high)
+Starvation     — a process never gets CPU (want to avoid)</div>`},
+{l:"FCFS — First Come First Served",b:`<div class="card"><div class="card-name">FCFS (non-preemptive)</div><div class="card-desc">Queue order. First process to arrive runs to completion. Simple, no starvation. Problem: convoy effect — one long job makes all short jobs wait. Average waiting time is very high. Never used for interactive systems.</div></div>
+<div class="code">Arrival: P1(burst=24), P2(burst=3), P3(burst=3)
+Gantt: [P1 0-24][P2 24-27][P3 27-30]
+Avg wait: (0+24+27)/3 = 17ms  ← terrible for P2, P3</div>`},
+{l:"SJF / SRTF",b:`<div class="card"><div class="card-name">SJF — Shortest Job First (non-preemptive)</div><div class="card-desc">Pick the process with smallest burst time. Optimal average waiting time. Problem: requires knowing burst time in advance (use exponential averaging of past bursts). Long jobs starve if short ones keep arriving.</div></div>
+<div class="card"><div class="card-name">SRTF — Shortest Remaining Time First (preemptive SJF)</div><div class="card-desc">If a new arrival has shorter remaining time than the current process, preempt. Even better average wait. Still suffers starvation. Used in some batch systems.</div></div>`},
+{l:"Round Robin",b:`<div class="card"><div class="card-name">Round Robin (preemptive)</div><div class="card-desc">Each process gets a fixed time quantum (10-100ms). After quantum expires, process moves to back of ready queue. No starvation. Best response time for interactive workloads. Key: quantum size matters — too small = too many context switches (overhead); too large = degenerates to FCFS. Linux CFS uses dynamic quantum based on weight/nice value.</div></div>
+<div class="code">Quantum = 4: P1(24), P2(3), P3(3)
+[P1:0-4][P2:4-7][P3:7-10][P1:10-14][P1:14-18][P1:18-22][P1:22-26][P1:26-30]
+Avg wait = (6 + 4 + 7) / 3 = 5.67ms ← much better than FCFS</div>`},
+{l:"Priority scheduling & Multilevel Queue",b:`<div class="card"><div class="card-name">Priority scheduling</div><div class="card-desc">Each process has a priority; highest priority runs first. Preemptive or non-preemptive. Problem: starvation of low-priority processes. Solution: aging — gradually increase priority of waiting processes over time.</div></div>
+<div class="card"><div class="card-name">Multilevel Queue</div><div class="card-desc">Separate queues for different process classes (foreground/interactive, background/batch, system). Each queue has its own scheduling algorithm. Fixed priority between queues — starvation risk. Multilevel Feedback Queue allows processes to move between queues based on behaviour (CPU-bound processes drop in priority; I/O-bound stay high). Linux CFS and Windows Task Scheduler use MLFQ variants.</div></div>`},
+{l:"Mental model",b:`<div class="analogy">FCFS is a single cashier serving a queue in order — fast customer behind a big grocery trolley waits. SJF is express lane — shortest first, but someone with 100 items never gets served if 10-item customers keep arriving. Round Robin is a teacher calling on students in rotation — everyone gets a turn, no one monopolises. Priority with aging is an emergency room — critical patients first, but waiting patients' urgency classification increases with time to prevent indefinite waiting.</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>SJF is not always optimal in practice. Burst time estimation is imperfect, and in interactive systems, response time matters more than average turnaround.</div></div>
+<div class="bad"><span class="ic">✕</span><div>Round Robin doesn't mean fairness in CPU time on Linux. CFS (Completely Fair Scheduler) allocates CPU proportional to process weight (nice value), not equal slices.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why does Round Robin quantum size matter so much?</div><div class="a">Quantum too small: context switch overhead dominates (saving/restoring registers, TLB effects). Quantum too large: degenerates to FCFS; interactive apps feel unresponsive. Linux CFS targets ~20ms total scheduling latency divided by number of processes, dynamically adjusting.</div></div>
+<div class="iq"><div class="q">How does Linux actually schedule processes?</div><div class="a">CFS — Completely Fair Scheduler. Uses a red-black tree sorted by vruntime (virtual runtime, normalised by weight/nice). Always picks the leftmost node (least vruntime). No fixed time quantum — each process gets a dynamic slice proportional to its weight. O(log n) pick next.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Process Lifecycle (ready queue)</span><span class="cp">Concurrency vs Parallelism</span><span class="cp">Deadlock (starvation)</span><span class="cp">I/O Models (blocking moves process to waiting)</span></div>`}
+]
+},
+
+{
+tag:"OS Fundamentals",title:"Concurrency vs Parallelism",
+oneliner:"Concurrency is about dealing with multiple things at once (structure); parallelism is about doing multiple things at once (execution) — you can have either without the other.",
+secs:[
+{l:"Why the distinction matters",b:`<p>Confusing the two leads to wrong architecture choices: running 10,000 OS threads to handle concurrent requests when a single-threaded event loop (Node.js, Go channels) would suffice; or expecting single-threaded async code to speed up CPU-bound work when you need true parallelism.</p>`},
+{l:"Concurrency",b:`<div class="card"><div class="card-name">Concurrency — structure, not speed</div><div class="card-desc">Multiple tasks make progress over overlapping time periods, but not necessarily simultaneously. A single CPU can be concurrent by time-slicing. The key: tasks are interleaved. Example: a web server handling 1000 requests on one thread — it processes a bit of each when I/O is ready, never two simultaneously. Node.js, Python asyncio, Redis — all concurrent, single-threaded.</div></div>`},
+{l:"Parallelism",b:`<div class="card"><div class="card-name">Parallelism — execution, not structure</div><div class="card-desc">Multiple tasks execute simultaneously on multiple CPU cores. Requires actual hardware parallelism. Example: a matrix multiply distributed across 8 cores — all 8 genuinely compute at the same instant. Java parallel streams, Go goroutines across cores, GPU computation. Parallelism is always concurrent, but concurrency is not always parallel.</div></div>`},
+{l:"Examples that clarify the boundary",b:`<div class="code">Concurrent, NOT parallel:
+  Node.js handling 1000 HTTP requests (single thread, event loop)
+  Python asyncio downloading 100 URLs (single thread, awaits I/O)
+  Single-core OS running many processes (time-slicing)
+
+Parallel, NOT meaningfully concurrent:
+  Two independent calculations running on 2 cores, no shared state
+  (rarely the interesting case in practice)
+
+Both concurrent AND parallel (most real systems):
+  Java web server: thread pool (parallel) + async I/O (concurrent per thread)
+  Go: goroutines (concurrent) multiplexed on N OS threads (parallel on N cores)
+  Database: parallel query execution + concurrent transaction management</div>`},
+{l:"Why Python's GIL matters here",b:`<p>CPython has a Global Interpreter Lock — only one thread executes Python bytecode at a time. Python threads are concurrent (interleaved by the GIL) but not parallel for CPU-bound work. For I/O-bound work (waiting on network), threads release the GIL and achieve effective concurrency. For CPU-bound: use multiprocessing (separate processes, no GIL) or C extensions.</p>`},
+{l:"Mental model",b:`<div class="analogy">Concurrency is one chef who can work on multiple dishes — while the pasta boils, they chop vegetables; while sauce simmers, they plate the salad. They're not doing two things at the same instant — they're juggling. Parallelism is four chefs, each making a different dish at the same time. A restaurant kitchen does both: four chefs (parallel) each juggling their own tasks (concurrent).</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Can you have concurrency without parallelism? Give an example.</div><div class="a">Yes. Node.js runs on one thread — one piece of code executes at a time, but the event loop interleaves many requests. When request A is waiting for a DB response, request B runs. Concurrent, not parallel.</div></div>
+<div class="iq"><div class="q">Why does asyncio not help with CPU-bound Python code?</div><div class="a">asyncio yields control only at await points (I/O boundaries). CPU-bound code has no await points — it holds the thread continuously. For CPU work: use ProcessPoolExecutor (bypasses GIL via separate processes) or NumPy/C extensions that release the GIL.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Process vs Thread</span><span class="cp">CPU Scheduling (time-slicing = concurrency)</span><span class="cp">Mutex/Semaphore (shared state in concurrency)</span><span class="cp">I/O Models (async = concurrent)</span><span class="cp">Java Concurrency (streams/completable future)</span></div>`}
+]
+},
+
+{
+tag:"OS Fundamentals",title:"Deadlock",
+oneliner:"Deadlock is a state where a set of processes are each waiting for a resource held by another process in the set — no process can proceed, and the system is stuck forever.",
+secs:[
+{l:"Four necessary conditions (Coffman, 1971)",b:`<div class="card"><div class="card-name">1. Mutual Exclusion</div><div class="card-desc">At least one resource is non-shareable — only one process can use it at a time (e.g. a printer, a mutex).</div></div>
+<div class="card"><div class="card-name">2. Hold and Wait</div><div class="card-desc">A process holds at least one resource and is waiting to acquire additional resources held by others.</div></div>
+<div class="card"><div class="card-name">3. No Preemption</div><div class="card-desc">Resources cannot be forcibly taken from a process — they must be released voluntarily.</div></div>
+<div class="card"><div class="card-name">4. Circular Wait</div><div class="card-desc">A circular chain of processes: P1 waits for P2, P2 waits for P3, ... Pn waits for P1. All four must hold simultaneously for deadlock.</div></div>
+<div class="code">Classic: P1 holds Mutex_A, wants Mutex_B
+         P2 holds Mutex_B, wants Mutex_A
+         → circular wait → deadlock</div>`},
+{l:"Prevention — break a condition",b:`<div class="card"><div class="card-name">Break Hold and Wait</div><div class="card-desc">Require processes to request ALL resources at once before starting. Wasteful — low resource utilisation. Or: release all held resources before requesting new ones.</div></div>
+<div class="card"><div class="card-name">Break Circular Wait (most practical)</div><div class="card-desc">Impose a total ordering on all resource types. Always acquire resources in increasing order. No circular wait is possible. This is how Java recommends lock ordering — always lock(A) then lock(B), never the reverse.</div></div>
+<div class="card"><div class="card-name">Allow Preemption</div><div class="card-desc">If a process can't get what it needs, preempt its held resources and re-queue. Works for resources with easy state save/restore (CPU registers). Hard for resources like printers or mutexes with ongoing operations.</div></div>`},
+{l:"Avoidance — Banker's Algorithm",b:`<p>Instead of breaking conditions, check whether granting a request leads to a safe state. A safe state is one where there exists at least one sequence in which all processes can complete.</p>
+<div class="code">Given: n processes, m resource types, Max[][] and Allocation[][]
+Need[i][j] = Max[i][j] - Allocation[i][j]
+
+Safety algorithm:
+1. Work = Available (copy)
+   Finish[i] = false for all i
+2. Find i where Finish[i]=false AND Need[i] ≤ Work
+3. Work += Allocation[i]; Finish[i] = true; goto 2
+4. If all Finish[i]=true → safe state; else UNSAFE
+
+Resource-request: only grant if resulting state is safe.
+Complexity: O(n² × m) — impractical for OSes, used in resource-constrained embedded systems.</div>`},
+{l:"Detection & Recovery",b:`<div class="card"><div class="card-name">Detection</div><div class="card-desc">Allow deadlock to occur. Periodically run cycle detection on the resource allocation graph (Tarjan's SCC). Heavy overhead — typically used in databases (lock timeout + rollback), not general OS.</div></div>
+<div class="card"><div class="card-name">Recovery</div><div class="card-desc">Kill one process in the cycle (victim selection: lowest priority, least progress, most preemptable). Or preempt resources (checkpoint + rollback). Databases use transaction rollback as recovery.</div></div>`},
+{l:"Real-world deadlock examples",b:`<div class="code">Database: Transaction T1 locks row A, T2 locks row B, T1 wants B, T2 wants A
+→ DB detects cycle, rolls back the cheaper transaction
+
+Java: synchronized(a){ synchronized(b){...} } in Thread 1
+      synchronized(b){ synchronized(a){...} } in Thread 2
+→ lock ordering fix: always acquire in alphabetical/hash order
+
+OS: two processes both requesting exclusive access to microphone + speaker</div>`},
+{l:"Mental model",b:`<div class="analogy">Four cars at a four-way intersection, each entered the junction but none can exit because the car ahead blocks them. Mutual exclusion: each occupies a lane. Hold and wait: each holds their section, waiting for the next. No preemption: you can't teleport a car backward. Circular wait: A waits for B, B for C, C for D, D for A. Deadlock prevention = traffic lights that prevent all four entering simultaneously.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Name the four Coffman conditions. How do you break each?</div><div class="a">Mutual exclusion (use shareable resources), Hold and wait (request all at once), No preemption (allow forcible preemption), Circular wait (impose lock ordering). In practice: lock ordering (breaks circular wait) is the most applicable in code.</div></div>
+<div class="iq"><div class="q">How does a database handle deadlock?</div><div class="a">Uses a waits-for graph, detects cycles (detection, not prevention). Selects a victim (lowest cost transaction), rolls it back, releases its locks. The other transactions proceed. The rolled-back transaction is retried by the application.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Mutex/Semaphore (lock primitives)</span><span class="cp">CPU Scheduling (starvation)</span><span class="cp">Database isolation levels</span><span class="cp">Java concurrency (ReentrantLock)</span><span class="cp">Distributed deadlock (distributed systems)</span></div>`}
+]
+},
+
+{
+tag:"Synchronisation",title:"Mutex vs Semaphore vs Monitor",
+oneliner:"Mutex = binary ownership lock; semaphore = counting signal with no ownership; monitor = language-level construct combining a mutex with condition variables for structured synchronisation.",
+secs:[
+{l:"Mutex",b:`<div class="card"><div class="card-name">Mutex (Mutual Exclusion Lock)</div><div class="card-desc">Binary lock with ownership. Only the thread that locked it can unlock it. Used for protecting a critical section. Attempts to unlock a mutex you don't own → error/undefined behaviour. Re-entrant mutex: same thread can lock multiple times without deadlocking (tracks lock count).</div></div>
+<div class="code">// Java
+ReentrantLock lock = new ReentrantLock();
+lock.lock();
+try {
+    // critical section — only one thread here at a time
+    sharedCounter++;
+} finally {
+    lock.unlock();  // always in finally to prevent deadlock on exception
+}</div>`},
+{l:"Semaphore",b:`<div class="card"><div class="card-name">Semaphore (counting / binary)</div><div class="card-desc">Integer counter. wait() (P/down) decrements — blocks if 0. signal() (V/up) increments — wakes a blocked waiter. No ownership — any thread can signal. Binary semaphore (count 0/1) ≈ mutex but without ownership semantics. Counting semaphore: control access to N resources (e.g. max 10 DB connections).</div></div>
+<div class="code">// Java — Semaphore for connection pool (max 5 concurrent)
+Semaphore sem = new Semaphore(5);
+
+// Thread trying to use a connection:
+sem.acquire();   // blocks if 5 already acquired (count → 0)
+try {
+    useConnection();
+} finally {
+    sem.release();  // count++ — wakes a waiting thread
+}
+// Note: sem.release() can be called by a DIFFERENT thread than acquire()</div>`},
+{l:"Monitor",b:`<div class="card"><div class="card-name">Monitor</div><div class="card-desc">Language-level synchronisation: bundles data + mutex + condition variables. Java's synchronized keyword implements a monitor per object. A thread entering a synchronized method acquires the object's intrinsic lock. Condition variables (wait/notify/notifyAll) let threads sleep inside the monitor and be woken when conditions change.</div></div>
+<div class="code">// Java synchronized = monitor on 'this'
+class BoundedBuffer {
+    private Queue<Integer> buf = new ArrayDeque<>();
+    private final int MAX = 10;
+
+    synchronized void produce(int item) throws InterruptedException {
+        while (buf.size() == MAX) wait();   // release lock + sleep
+        buf.add(item);
+        notifyAll();  // wake consumers
+    }
+
+    synchronized int consume() throws InterruptedException {
+        while (buf.isEmpty()) wait();
+        int item = buf.remove();
+        notifyAll();  // wake producers
+        return item;
+    }
+}</div>`},
+{l:"Producer-consumer problem",b:`<p>Classic synchronisation problem: one or more producers add to a bounded buffer; one or more consumers remove from it. Problems to solve: don't produce when full, don't consume when empty, no simultaneous access (race condition). The monitor solution above solves all three. With semaphores: use three — mutex (binary), empty (count=N), full (count=0).</p>
+<div class="code">// Semaphore solution
+Semaphore mutex = new Semaphore(1);    // mutual exclusion
+Semaphore empty = new Semaphore(N);    // slots available
+Semaphore full  = new Semaphore(0);    // items available
+
+// Producer:
+empty.acquire(); mutex.acquire();
+// add item
+mutex.release(); full.release();
+
+// Consumer:
+full.acquire(); mutex.acquire();
+// remove item
+mutex.release(); empty.release();</div>`},
+{l:"Comparison table",b:`<div class="code">                Mutex           Semaphore        Monitor
+Ownership:      yes (thread)    no               yes (implicit)
+Count:          binary (0/1)    0..N             binary (0/1)
+Wait mechanism: spin/block      block queue      condition variable
+Unlock by:      owner only      any thread       owner only (wait releases)
+Language level: library         library/OS       language construct
+Use for:        critical section resource pool   complex condition logic</div>`},
+{l:"Mental model",b:`<div class="analogy">Mutex is a single bathroom key — only the person who took the key can return it. Semaphore is a parking lot with N spaces — a counter on a sign; anyone who finds a space uses it, anyone can update the sign when they leave. Monitor is a formal meeting room policy — one person in the room at a time, and anyone waiting can be paged when a specific condition is met (like "projector free").</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>Binary semaphore ≠ mutex. A binary semaphore has no ownership — Thread A can signal a semaphore Thread B decremented. This is intentional for signalling, wrong for mutual exclusion (leaves critical sections unprotected if misused).</div></div>
+<div class="bad"><span class="ic">✕</span><div>Use notifyAll(), not notify(), when multiple threads wait on different conditions. notify() wakes an arbitrary thread — if a producer wakes another producer (not a consumer), the woken thread sees the buffer still full and goes back to sleep — potential livelock.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is the difference between a mutex and a semaphore?</div><div class="a">Mutex: binary, owned by the locking thread — only that thread can unlock. For mutual exclusion. Semaphore: integer counter, no ownership — any thread can signal. For counting resource availability or signalling between threads.</div></div>
+<div class="iq"><div class="q">Explain the producer-consumer problem and solve it with a monitor.</div><div class="a">Shared bounded buffer; producers must wait when full, consumers when empty, both need exclusive access. Java monitor solution: synchronized method + while loop + wait()/notifyAll(). Always use while (not if) before wait — spurious wakeups and multiple waiters require re-checking the condition.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Deadlock (mutex ordering)</span><span class="cp">Java Concurrency (synchronized, ReentrantLock)</span><span class="cp">Process vs Thread (shared memory)</span><span class="cp">I/O Models (blocking waits)</span></div>`}
+]
+},
+
+{
+tag:"Memory Management",title:"Virtual Memory",
+oneliner:"Virtual memory gives each process the illusion of a large, private, contiguous address space, while the OS maps regions to physical RAM or disk on demand.",
+secs:[
+{l:"Why it exists",b:`<p>Without virtual memory: processes must fit entirely in physical RAM, can read each other's memory (security nightmare), and addresses are physical — two programs can't use the same addresses. Virtual memory solves: isolation (each process has its own space), overcommit (run more than RAM allows), simplified programming (every process starts at 0), and memory-mapped files/device I/O.</p>`},
+{l:"How it works — address translation",b:`<ol class="steps">
+<li>Process generates a virtual address (e.g. 0x7FFF1234)</li>
+<li>CPU's MMU (Memory Management Unit) splits it: virtual page number (VPN) + offset</li>
+<li>MMU looks up VPN in the page table (per-process, stored in RAM, pointed to by CR3 register on x86)</li>
+<li>Page table entry gives physical frame number (PFN) + flags (present, writable, executable, dirty, accessed)</li>
+<li>Physical address = PFN + offset. Memory access proceeds.</li>
+<li>If present bit = 0 → page fault → OS page fault handler runs → load page from disk → retry</li>
+</ol>
+<div class="code">Virtual address: 0x7FFF1234
+Page size: 4KB = 2^12, so offset = low 12 bits = 0x234
+VPN = 0x7FFF1  (high bits)
+
+Page table lookup: VPN 0x7FFF1 → PFN 0x00A3B (present=1)
+Physical address: 0x00A3B000 + 0x234 = 0x00A3B234</div>`},
+{l:"Memory-mapped files",b:`<p>mmap() maps a file directly into the process's virtual address space. Reading a page triggers a page fault → OS loads the file chunk into RAM → the process reads it as if it were in memory. Writes go to the page (dirty bit set), flushed to disk later. Used by: database buffer pools (PostgreSQL, SQLite), JVM class loading, shared libraries (one physical copy, many virtual mappings), shared memory IPC.</p>`},
+{l:"Overcommit",b:`<p>Linux allows processes to allocate more virtual memory than physical RAM exists. This works because not all pages are accessed simultaneously. When actual RAM fills up, the OOM (Out-Of-Memory) killer selects a process to terminate based on memory usage and priority. Kubernetes sets memory limits to prevent OOM kill in containers.</p>`},
+{l:"Mental model",b:`<div class="analogy">Virtual memory is like a hotel with room numbers. Every hotel uses room 101, 102, 103... — the numbers overlap, but each hotel is a separate building (process). The hotel directory (page table) maps your room number to an actual physical address (physical frame). If the room isn't made up yet (not in RAM), the concierge goes to storage (disk) and prepares it on demand (page fault).</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>"Virtual memory = swap space." Swap is one destination for evicted pages. Virtual memory is the entire address space abstraction — most of it is in RAM; some in swap; some not loaded yet (lazy loading of executables).</div></div>
+<div class="bad"><span class="ic">✕</span><div>"malloc() allocates physical memory." malloc() reserves virtual address space. Physical frames are allocated only on first access (demand paging). malloc(1GB) succeeds even with 512MB RAM.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What happens when a process accesses an unmapped virtual address?</div><div class="a">Segmentation fault (SIGSEGV). The page table entry has present=0 and no backing store — the OS has no page to load. Contrast with a page fault on a valid address that's been swapped out — the OS loads the page and the access succeeds transparently.</div></div>
+<div class="iq"><div class="q">How does virtual memory enable process isolation?</div><div class="a">Each process has its own page table. The OS only maps pages the process owns. Process A cannot generate a virtual address that maps to Process B's physical frames — they don't share a page table. The kernel enforces this by controlling page table contents.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Paging (implementation)</span><span class="cp">Segmentation (alternative)</span><span class="cp">System Calls (mmap, brk)</span><span class="cp">Process lifecycle (address space per process)</span><span class="cp">Memory allocation (malloc uses virtual memory)</span></div>`}
+]
+},
+
+{
+tag:"Memory Management",title:"Paging",
+oneliner:"Paging implements virtual memory by dividing address spaces into fixed-size pages (virtual) mapped to frames (physical), using a page table for translation and the TLB as a hardware cache for that table.",
+secs:[
+{l:"Pages, frames, and page tables",b:`<div class="code">Typical page size: 4KB (x86), 2MB or 1GB for huge pages (TLB pressure reduction)
+
+Page table entry (PTE) fields:
+  Present bit     — is the page in physical RAM?
+  Frame number    — which physical frame
+  Dirty bit       — has the page been written? (need to flush to disk on evict)
+  Accessed bit    — recently used? (used by LRU approximation)
+  Read/Write bit  — writable?
+  User/Supervisor — can user-mode access this?
+  NX (No Execute) — prevent code execution (stack/heap not executable)</div>
+<p>Multi-level page tables (x86-64 uses 4-level / 5-level) avoid storing a page table entry for every possible virtual page. A 48-bit virtual address space would need 2³⁶ PTEs at 4KB pages — 512GB just for the table. Multi-level: only allocate table entries for pages actually in use. Trade-off: translation now takes 4 memory lookups instead of 1.</p>`},
+{l:"TLB — Translation Lookaside Buffer",b:`<p>The TLB is a small hardware cache (typically 64–4096 entries) inside the CPU that caches recent VPN→PFN translations. A TLB hit: ~1 cycle. A TLB miss: walk the page table in RAM (~10-100s of cycles per level).</p>
+<div class="code">TLB hit rate matters enormously:
+  High spatial locality (sequential access) → high hit rate → fast
+  Random access to many pages → TLB thrashing → slow
+
+Context switch: TLB must be flushed (or tagged with ASID — Address Space Identifier)
+  Without ASID: every context switch invalidates TLB → cold start
+  With ASID: TLB entries tagged with process ID; no flush needed</div>`},
+{l:"Page faults",b:`<div class="card"><div class="card-name">Minor page fault</div><div class="card-desc">Page not in this process's page table but is in memory (shared library already loaded for another process, copy-on-write page). No disk I/O. OS just updates the page table. Fast.</div></div>
+<div class="card"><div class="card-name">Major page fault</div><div class="card-desc">Page not in RAM at all — must be loaded from disk (swap, memory-mapped file, executable). Expensive: disk I/O latency (µs for SSD, ms for HDD). Process is blocked until I/O completes.</div></div>
+<div class="card"><div class="card-name">Segmentation fault (not a page fault)</div><div class="card-desc">Access to an address that has no mapping at all (null pointer, out-of-bounds). OS sends SIGSEGV signal. Not recoverable — process terminates unless signal is caught.</div></div>`},
+{l:"Page replacement algorithms",b:`<div class="card"><div class="card-name">OPT (Optimal) — theoretical baseline</div><div class="card-desc">Replace the page that will not be used for the longest time in the future. Lowest page fault rate possible. Not implementable (requires future knowledge). Used as a benchmark.</div></div>
+<div class="card"><div class="card-name">LRU — Least Recently Used</div><div class="card-desc">Replace the page accessed least recently. Good approximation of OPT. Exact LRU is expensive — needs a timestamp or ordered list update on every access. In practice: approximated.</div></div>
+<div class="card"><div class="card-name">CLOCK (Approximation of LRU)</div><div class="card-desc">Pages arranged in a circle. A "clock hand" sweeps. Each page has a reference bit (set to 1 by hardware on access). On eviction: if ref bit = 1, clear it (give second chance), advance hand. If ref bit = 0, evict this page. Linux uses a variant of CLOCK.</div></div>`},
+{l:"Thrashing",b:`<p>When a process's working set (pages actively used) is larger than available physical RAM, the OS constantly evicts pages that are immediately needed again. The system spends more time swapping than executing. Symptoms: 100% disk I/O, near-0% CPU utilisation, system feels frozen.</p>
+<p>Fix: reduce degree of multiprogramming (run fewer processes), add RAM, increase swap, or use working-set model (track each process's working set and only schedule it when enough frames are available).</p>`},
+{l:"Mental model",b:`<div class="analogy">Your desk (RAM) can hold 10 books (pages). Your bookshelf (disk) holds 1000. When you need a book not on your desk, you swap one out. The TLB is a sticky note on your desk listing where the last few books you grabbed are — super fast to check. If you're constantly reaching for books not on the sticky note, that's a TLB miss. If you're constantly walking to the shelf, that's thrashing.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is the TLB and why does it exist?</div><div class="a">Hardware cache for page table lookups. Without TLB: every memory access requires 4+ RAM accesses just for translation (multi-level page table walk) — 4x memory access overhead. TLB exploits temporal/spatial locality: once translated, the same VPN is used repeatedly. ~99% hit rate on typical workloads.</div></div>
+<div class="iq"><div class="q">Why does a context switch hurt performance even if no code changes?</div><div class="a">TLB flush (without ASID): all cached translations invalidated. New process starts with cold TLB — first N accesses all miss → page table walks → slow. Also: L1/L2 cache pollution — new process's data evicts current process's warm cache lines.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Virtual Memory (abstraction)</span><span class="cp">Segmentation (alternative)</span><span class="cp">Memory Allocation (malloc uses pages)</span><span class="cp">CPU Scheduling (context switch cost)</span><span class="cp">JVM GC (page faults from old-gen scan)</span></div>`}
+]
+},
+
+{
+tag:"Memory Management",title:"Segmentation vs Paging",
+oneliner:"Segmentation divides memory into variable-size logical units (code, stack, heap); paging divides into fixed-size physical units — modern OSes use paging, sometimes combined with segmentation for protection domains.",
+secs:[
+{l:"Segmentation",b:`<div class="card"><div class="card-name">Segmentation</div><div class="card-desc">Address space split into variable-size segments (code segment, data segment, stack segment, heap segment). Each segment has a base + limit in the segment table. A logical address is (segment_id, offset). Hardware checks offset < limit (bounds protection). Segments grow/shrink dynamically.</div></div>
+<p><strong>External fragmentation:</strong> over time, gaps of free memory appear between segments of varying sizes. No contiguous hole big enough even if total free memory is sufficient. Solved by compaction (expensive) or avoided by paging.</p>`},
+{l:"Paging advantages over segmentation",b:`<div class="code">Paging: fixed-size pages → NO external fragmentation
+         (any free frame can serve any virtual page)
+
+Segmentation: variable-size segments → external fragmentation inevitable
+               over time: [seg1][free 3KB][seg2][free 5KB][seg3]
+               new 6KB segment can't fit even though 8KB total free</div>
+<p><strong>Internal fragmentation (paging's cost):</strong> a process needing 4097 bytes gets two 4KB pages — 4095 bytes of the second page wasted. With 4KB pages, average internal fragmentation = 2KB per segment/region. Using huge pages (2MB) worsens internal fragmentation but reduces TLB pressure.</p>`},
+{l:"Modern: paging with segmentation",b:`<p>x86 (32-bit) used both — segmentation for protection rings (ring 0 kernel, ring 3 user), paging for virtual memory. x86-64 largely obsoleted segmentation (base=0, limit=max for most segments) — it's all paging. The kernel uses page-level protection bits (R/W, U/S, NX) instead of segment protection.</p>
+<p>However: the concept of segmentation lives on in the process memory layout — the OS treats the text, data, BSS, stack, and heap as logical segments with different protections, implemented through page table entries (code pages: read+execute, not write; stack pages: read+write, not execute — NX bit).</p>`},
+{l:"Protection comparison",b:`<div class="code">Segmentation protection:
+  - segment can have read/write/execute permissions
+  - bounds checking (offset < limit) catches buffer overflows naturally
+  - processes can't access each other's segments
+
+Paging protection:
+  - per-page R/W/Execute bits in PTE
+  - NX bit prevents code execution on data pages (prevents shellcode injection)
+  - Copy-on-write (COW): fork() shares pages as read-only; write triggers copy
+  - ASLR (Address Space Layout Randomization): randomise base addresses to defeat exploits</div>`},
+{l:"Mental model",b:`<div class="analogy">Segmentation is a house where each room (code room, bedroom, kitchen) is a different size — logical, but rooms create awkward gaps between them over time. Paging is an apartment building where every unit is the same size — you might waste part of a unit (internal fragmentation), but there's no awkward gap between apartments. Modern OSes are paging apartment buildings, but they pretend to the tenant that they have separate logical rooms (segments) by controlling which pages you can execute vs write.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is the difference between external and internal fragmentation?</div><div class="a">External fragmentation: total free memory is sufficient but not contiguous — no single hole fits the request. Caused by variable-size allocation (segmentation, malloc). Internal fragmentation: allocated block larger than requested — wasted space inside an allocation. Caused by fixed-size allocation (paging, power-of-two allocators). Paging trades external for internal fragmentation.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Virtual Memory</span><span class="cp">Paging</span><span class="cp">Memory Allocation (malloc fragmentation)</span><span class="cp">OS security (NX bit, ASLR)</span></div>`}
+]
+},
+
+{
+tag:"Memory Management",title:"Memory Allocation",
+oneliner:"Memory allocation manages the heap — malloc/free (and new/GC in managed languages) use free lists, buddy systems, or slab allocators to satisfy variable-size requests efficiently while fighting fragmentation.",
+secs:[
+{l:"malloc internals",b:`<p>glibc malloc (ptmalloc2) requests memory from the OS via brk() (extend data segment) or mmap() (anonymous mapping). It maintains free lists of previously freed blocks. A chunk has a header (size, prev_size, flags) prepended to the user data.</p>
+<div class="code">Heap structure (simplified):
+  [chunk header | user data | ...]   ← allocated
+  [chunk header | fd ptr | bk ptr |...] ← freed (linked into free list)
+  [top chunk]   ← wilderness — rest of brk'd memory
+
+On malloc(n):
+  1. Round up n to alignment (typically 16 bytes on 64-bit)
+  2. Check thread cache (tcache) — per-thread free list, no lock needed
+  3. Check fastbin (small chunks ≤88 bytes) — LIFO, no coalescing
+  4. Check smallbins, unsortedbin, largebins
+  5. Split from top chunk
+  6. brk()/mmap() for new memory if top chunk exhausted
+
+On free(p):
+  1. Return to tcache if space; else to fastbin; else coalesce + unsortedbin</div>`},
+{l:"Buddy system",b:`<div class="card"><div class="card-name">Buddy System</div><div class="card-desc">All allocations rounded to power-of-two sizes. Memory split into buddies (equal halves). Request for N bytes: find smallest block ≥ N, split until right size. Free: merge with buddy if buddy also free. Fast: merging/splitting O(log N). Used by Linux kernel's page allocator. Problem: severe internal fragmentation (request 65 bytes → get 128 byte block).</div></div>
+<div class="code">Available: 256KB block
+Request: 32KB
+  Split 256 → [128 | 128]
+  Split 128 → [64 | 64]
+  Split 64  → [32 | 32]
+  Allocate left 32KB
+
+Free 32KB: check right buddy (32KB) — if free, merge → 64KB; check buddy → merge, etc.</div>`},
+{l:"Slab allocator",b:`<div class="card"><div class="card-name">Slab Allocator (Linux kernel)</div><div class="card-desc">For frequently-allocated, fixed-size kernel objects (task_struct, inode, socket). Pre-allocates "slabs" (one or more pages) filled with objects of one type. Free objects kept initialised and ready — no constructor cost on re-allocation. Avoids fragmentation for fixed-size objects. Three lists per cache: full slabs, partial slabs, empty slabs. Used for: dentry (directory entry), inode, sk_buff (network buffer), virtually all kernel data structures.</div></div>`},
+{l:"Fragmentation in allocators",b:`<div class="code">External fragmentation in malloc:
+  malloc(100), malloc(200), free(100), malloc(150)
+  → 100-byte hole can't fit 150-byte request
+  → must get new memory from OS despite "free" space
+
+Mitigation:
+  - Coalescing: merge adjacent free blocks on free()
+  - Deferred coalescing: batch merges for performance
+  - Segregated free lists: separate lists per size class → faster best-fit
+  - jemalloc (used by Facebook/Firefox): better fragmentation, thread-local caches
+  - tcmalloc (used by Google): per-thread caches, central heap fallback</div>`},
+{l:"Mental model",b:`<div class="analogy">malloc is a hotel manager who reuses rooms. Slab allocator is a specialised dormitory for one type of guest (all king-sized rooms, all set up identically) — no setup cost when the same guest type checks in again. Buddy system is a hotel where you only book rooms in powers-of-two — need 3 rooms, you book 4 and waste one.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What happens when you call malloc(0)?</div><div class="a">Undefined behaviour in theory; in practice: glibc returns a unique non-null pointer to a zero-sized allocation (the chunk header still exists). Dereferencing it is UB. Must be free()'d.</div></div>
+<div class="iq"><div class="q">Why does the kernel use a slab allocator instead of malloc?</div><div class="a">Kernel objects (inodes, task_structs) have fixed sizes and are allocated/freed thousands of times per second. Slab pre-allocates and keeps objects initialised — avoiding constructor overhead, reducing fragmentation, and allowing fast O(1) allocation from a per-CPU cache.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Virtual Memory (malloc uses brk/mmap)</span><span class="cp">Paging (pages backing heap)</span><span class="cp">JVM GC (Java heap management)</span><span class="cp">System Calls (brk, mmap)</span></div>`}
+]
+},
+
+{
+tag:"Storage",title:"File Systems",
+oneliner:"A file system organises data on storage into named files and directories, providing abstractions over raw blocks — inodes track metadata, journaling prevents corruption on crash.",
+secs:[
+{l:"Inodes",b:`<p>An inode (index node) stores all metadata about a file except its name. The directory maps name → inode number. Inode contains: file type, permissions (rwx), owner UID/GID, size, timestamps (created, modified, accessed), link count (hard links), and pointers to data blocks.</p>
+<div class="code">ext4 inode structure (simplified):
+  mode (file type + permissions)
+  uid, gid
+  size (bytes)
+  atime, mtime, ctime (access, modify, change)
+  blocks count
+  Direct pointers:   12 × (points to data block directly)
+  Single indirect:   1  × (points to block of block pointers)
+  Double indirect:   1  × (pointer → block of pointers → data)
+  Triple indirect:   1  × (3 levels deep)
+  → max file size: depends on block size (4KB blocks → ~16TB with triple indirect)</div>
+<p>Consequence: deleting a file just decrements the link count and frees the inode + blocks when count reaches 0. The directory entry (name → inode mapping) is removed. This is why unlink() is the delete syscall.</p>`},
+{l:"Directory structure",b:`<p>A directory is a file containing a list of (name, inode number) pairs. Hard link: two directory entries point to the same inode. Symbolic link (symlink): a file whose content is a path string — a redirect. Symlinks can cross file systems and point to non-existent targets; hard links cannot cross file systems.</p>
+<div class="code">$ ls -li /tmp
+inode  permissions  links  owner  size  name
+123456 -rw-r--r--   2      root   1024  file.txt     ← 2 hard links
+123456 -rw-r--r--   2      root   1024  file_link    ← same inode! 
+789012 lrwxrwxrwx   1      root   8     symlink → file.txt</div>`},
+{l:"Journaling",b:`<div class="card"><div class="card-name">Journaling (Write-Ahead Logging)</div><div class="card-desc">Before modifying file system structures, write the intent to a journal (circular log). After the operation completes, mark it committed. On crash recovery: replay committed journal entries, discard uncommitted ones. Prevents inconsistent state (e.g. inode updated but directory entry not written). ext4, NTFS, APFS all journal. Three modes: writeback (metadata only, fastest), ordered (metadata after data, default), full journal (data + metadata, safest but slow).</div></div>`},
+{l:"FAT vs ext4 vs APFS",b:`<div class="card"><div class="card-name">FAT32 / exFAT</div><div class="card-desc">Simple linked-list allocation via File Allocation Table. No journaling, no permissions, no symlinks. Max file size: 4GB (FAT32). Used for: USB drives, SD cards, cross-platform compatibility.</div></div>
+<div class="card"><div class="card-name">ext4 (Linux default)</div><div class="card-desc">Extent-based (replaces block pointers with contiguous ranges), journaling, delayed allocation (accumulate writes, do one big I/O), dir_index (HTree for large directories), 1 exabyte volume support, 16TB max file.</div></div>
+<div class="card"><div class="card-name">APFS (Apple)</div><div class="card-desc">Copy-on-write B-tree, snapshots, clones (instant file copy sharing blocks until modified), encryption per-file, space sharing between volumes on same container, checksums on metadata. Optimised for SSDs.</div></div>`},
+{l:"Mental model",b:`<div class="analogy">A file system is a library. Inodes are the catalog cards — they describe a book (size, author/owner, location of pages) but are not the book. Directory entries are the shelf labels that say "the book called 'main.c' is catalog card #123456." Journaling is the librarian's to-do list — before moving books, write down "I'm moving X to shelf Y" so if interrupted, the job can be completed or undone cleanly.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What happens when you delete a file that's still open?</div><div class="a">The directory entry is removed (unlink), but the inode's link count decrements to 0 and the data blocks are not freed until all file descriptors pointing to it are closed. The file remains accessible to the process that has it open. This is how "tmpfile" works in Unix — create, unlink immediately, use the fd, data disappears on close.</div></div>
+<div class="iq"><div class="q">What is journaling and why does it matter?</div><div class="a">Write-ahead logging for file system metadata. Without it, a crash mid-operation leaves the FS in an inconsistent state (inode says file has 3 blocks; block bitmap says otherwise). Journaling guarantees either the full operation commits or it's rolled back on recovery — fsck is fast (just replay/discard journal).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">System Calls (open, read, write, unlink)</span><span class="cp">Virtual Memory (mmap for files)</span><span class="cp">I/O Models (file I/O blocking)</span><span class="cp">Database WAL (same journaling idea)</span></div>`}
+]
+},
+
+{
+tag:"OS Interface",title:"System Calls",
+oneliner:"A system call is the controlled mechanism by which user-space programs request kernel services — crossing the protection boundary via a trap instruction, at a cost of ~100-1000ns.",
+secs:[
+{l:"User space vs kernel space",b:`<p>The CPU has privilege levels (rings on x86: ring 0 = kernel, ring 3 = user). User processes run in ring 3 — restricted: cannot directly access hardware, cannot modify page tables, cannot disable interrupts. The kernel runs in ring 0 — full hardware access. This separation prevents a buggy user process from corrupting kernel state or other processes.</p>`},
+{l:"How a syscall works",b:`<ol class="steps">
+<li>User program calls libc wrapper (e.g. read()). Wrapper places syscall number in RAX register, arguments in RDI/RSI/RDX/R10/R8/R9 (x86-64 Linux ABI).</li>
+<li>Executes SYSCALL instruction (fast path on x86-64; older: INT 0x80).</li>
+<li>CPU switches to ring 0, saves user registers, loads kernel stack. Control jumps to syscall dispatch table.</li>
+<li>Kernel executes the requested service (e.g. copies data from file descriptor to user buffer).</li>
+<li>SYSRET instruction: restores user registers, switches back to ring 3, returns to user program.</li>
+</ol>
+<div class="code">// strace shows syscalls made by a process
+$ strace ls
+execve("/bin/ls", ["ls"], envp)           = 0
+openat(AT_FDCWD, ".", O_RDONLY|O_DIRECTORY) = 3
+getdents64(3, /* 12 entries */, 32768)   = 376
+write(1, "file.txt  dir1  ...\n", 20)   = 20
+close(3)                                 = 0
+exit_group(0)                            = ?</div>`},
+{l:"Context switch overhead",b:`<div class="code">Syscall cost breakdown (~100-300ns for a fast syscall):
+  SYSCALL instruction:       ~20ns  (register save/switch)
+  Kernel execution:          varies (read may block → blocking I/O cost)
+  SYSRET:                    ~20ns
+  Side effects:
+    CPU branch predictor flush (spectre mitigations)
+    TLB partially polluted by kernel execution
+    L1 cache disruption (kernel code/data evicts user data)
+
+Expensive syscall example:
+  page fault → fault handler → disk I/O → ~100µs-1ms
+
+Meltdown/Spectre mitigations (KPTI):
+  Kernel page table isolation: kernel+user address spaces separated
+  Every syscall must switch CR3 → full TLB flush on older CPUs
+  Added ~10-30% overhead to syscall-heavy workloads</div>`},
+{l:"vDSO — virtual dynamic shared object",b:`<p>For read-only syscalls that don't need ring 0 (gettimeofday, clock_gettime, getcpu), Linux maps a small kernel-provided shared library into every process's address space. These calls execute entirely in user space — no ring switch. gettimeofday() went from ~100ns (syscall) to ~10ns (vDSO). Redis, high-frequency trading systems, and any latency-sensitive code benefits from this.</p>`},
+{l:"Common syscalls by category",b:`<div class="code">Process:  fork, exec, exit, wait, kill, getpid
+File I/O: open, close, read, write, seek, stat, unlink, rename, mmap
+Memory:   brk, mmap, munmap, mprotect
+Network:  socket, bind, listen, accept, connect, send, recv
+Sync:     futex (fast userspace mutex — only enters kernel on contention)
+Time:     clock_gettime (via vDSO — no kernel entry!)</div>`},
+{l:"Mental model",b:`<div class="analogy">Syscalls are like making requests at a bank teller window. You (user space) can handle your wallet yourself (user operations). For anything involving the vault (hardware, other processes' memory), you must go to the teller (syscall), show ID, wait for them to process it, and return to your seat (back to user space). The teller window (trap instruction) is the only authorised entry point — you can't just walk into the vault.</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>printf() is not a syscall. It's a libc function that buffers output and eventually calls write(). Many printf()s can result in one or zero write() syscalls. fflush() forces the write().</div></div>
+<div class="bad"><span class="ic">✕</span><div>Threads don't require syscalls for context switches (within a process). Coroutine/green thread switches are pure user-space. Only kernel thread scheduling involves the kernel scheduler.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why are system calls expensive compared to function calls?</div><div class="a">Ring transition (user→kernel→user), register save/restore, kernel stack switch, Spectre/Meltdown mitigations (KPTI adds TLB flush per syscall), and cache/branch predictor disruption. ~100-1000x more expensive than a function call (~1ns). Why Node.js/nginx batch I/O: fewer syscalls = better throughput.</div></div>
+<div class="iq"><div class="q">What is a futex and why does it matter?</div><div class="a">Fast userspace mutex. The lock state is an integer in shared memory. If uncontended: lock/unlock is a single atomic CAS — no syscall, ~5ns. Only on contention (integer shows another thread waiting) does it call futex() syscall to sleep/wake. Java's synchronized, pthread_mutex, Go's sync.Mutex all use futex underneath.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">I/O Models (syscalls for I/O)</span><span class="cp">Virtual Memory (mmap syscall)</span><span class="cp">Process Lifecycle (fork/exec)</span><span class="cp">File Systems (file I/O syscalls)</span><span class="cp">Mutex/Semaphore (futex underneath)</span></div>`}
+]
+},
+
+{
+tag:"I/O",title:"I/O Models",
+oneliner:"I/O models describe how a thread relates to an I/O operation — blocking (wait), non-blocking (poll), I/O multiplexing (watch many), and async I/O (get notified when done) — the choice determines scalability.",
+secs:[
+{l:"The fundamental problem",b:`<p>I/O (disk, network, pipes) is thousands to millions of times slower than CPU operations. The question is: what does the calling thread do while waiting? Your answer determines how many concurrent connections your server can handle.</p>`},
+{l:"Blocking I/O",b:`<div class="card"><div class="card-name">Blocking I/O</div><div class="card-desc">Thread calls read() and sleeps until data arrives. Simple to write. One thread per connection model: 1000 connections = 1000 threads. Each blocked thread holds ~1MB stack. At scale: memory exhaustion + 1000s of context switches. OK for: simple scripts, small servers, CPU-bound work where I/O is rare.</div></div>
+<div class="code">// Blocking — thread suspended by OS until read completes
+String data = socket.getInputStream().read();  // thread blocked here
+// execution resumes when data arrives — could be 100ms later</div>`},
+{l:"Non-blocking I/O",b:`<div class="card"><div class="card-name">Non-blocking I/O</div><div class="card-desc">Set socket to non-blocking mode (fcntl O_NONBLOCK). read() returns immediately with EAGAIN/EWOULDBLOCK if no data. Application must poll in a loop. Wastes CPU spinning. Only useful combined with I/O multiplexing — check if data is ready, then read.</div></div>`},
+{l:"I/O Multiplexing — select / poll / epoll",b:`<div class="card"><div class="card-name">select / poll (POSIX)</div><div class="card-desc">Register a set of file descriptors; block until one or more are ready. select: O(n) — scans all fds up to max. Limited to 1024 fds on many systems. poll: same O(n) but no fd limit. Still: kernel copies entire fd set on every call — doesn't scale to 100K fds.</div></div>
+<div class="card"><div class="card-name">epoll (Linux) / kqueue (BSD/macOS)</div><div class="card-desc">Kernel maintains a persistent data structure of watched fds. epoll_wait() returns only ready events — O(ready events), not O(total fds). Can watch 1M fds with minimal overhead. Edge-triggered (ET) vs level-triggered (LT) modes. Foundation of: Nginx, Node.js, Netty, Redis, every high-performance Linux server.</div></div>
+<div class="code">// epoll — the engine under Node.js / Nginx
+int epfd = epoll_create1(0);
+
+// Register interest in readable events
+struct epoll_event ev = {.events=EPOLLIN, .data.fd=sockfd};
+epoll_ctl(epfd, EPOLL_CTL_ADD, sockfd, &ev);
+
+// Event loop — single thread, 100K connections
+while (true) {
+    int n = epoll_wait(epfd, events, MAX_EVENTS, -1);  // blocks until events
+    for (int i = 0; i < n; i++) {
+        if (events[i].data.fd == listen_fd)  accept_connection();
+        else                                  handle_data(events[i].data.fd);
+    }
+    // single thread, but handles all ready fds each iteration
+}</div>`},
+{l:"Async I/O",b:`<div class="card"><div class="card-name">POSIX AIO / io_uring (Linux 5.1+)</div><div class="card-desc">Submit I/O request and continue immediately. Kernel signals completion via callback, signal, or completion queue. io_uring: single mmap'd ring buffer shared between user and kernel — zero-copy, zero-syscall fast path. Game changer for high-throughput storage (database I/O). Java 21 virtual threads + io_uring provides async benefits with sync-style code.</div></div>`},
+{l:"Why Node.js is fast (for I/O)",b:`<div class="code">Node.js architecture:
+  Single thread → no context switches, no synchronisation overhead
+  libuv → wraps epoll (Linux) / kqueue (macOS) / IOCP (Windows)
+  Event loop: poll for events → run callbacks → poll again
+
+  Request arrives:
+    Node calls read() → non-blocking, registers with epoll
+    Event loop continues handling other requests
+    Data arrives → epoll returns → callback runs → response sent
+
+Why NOT for CPU-bound work:
+    Heavy crypto/image processing in callback blocks the loop
+    ALL other requests stall — no concurrency, no parallelism
+    Fix: Worker threads (node:worker_threads) for CPU work</div>`},
+{l:"Comparison",b:`<div class="code">Model         | Syscalls/conn | Scale    | Complexity | Used in
+Blocking      | many          | 1K conn  | simplest   | JDBC, basic Java IO
+Non-blocking  | polling loops | N/A alone| medium     | (combined only)  
+select/poll   | O(n) per call | ~1K fds  | medium     | legacy servers
+epoll/kqueue  | O(1) per event| 1M+ fds  | medium     | Nginx, Node, Redis
+io_uring      | near-zero     | storage  | high       | databases, Rust servers</div>`},
+{l:"Mental model",b:`<div class="analogy">Blocking: you sit at a restaurant and stare at the kitchen until your food comes — you do nothing else. Non-blocking: you peek at the kitchen window every second — still you doing the work, just less staring. select/poll: a buzzer system where you check if ANY of your 100 tables need attention, but you scan all 100 every time. epoll: an intelligent pager that only notifies you about tables that actually need you right now, regardless of how many tables you manage.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Explain how Node.js handles 100K concurrent connections with a single thread.</div><div class="a">libuv wraps epoll. One thread registers all socket fds with epoll. epoll_wait() blocks until any socket has data ready — O(1) per event. Callbacks execute synchronously on the single thread. No thread-per-connection overhead. Limit: CPU-bound callbacks block the loop — Node uses worker threads for those. Pure I/O workloads: single-threaded event loop is faster than multi-threaded due to no sync overhead.</div></div>
+<div class="iq"><div class="q">What is the difference between select and epoll?</div><div class="a">select: copies the entire fd set to kernel on every call, scans all fds for readiness — O(n). Limited to 1024 fds. epoll: persistent kernel data structure; epoll_wait returns only ready events — O(ready_events). No fd limit. Scales to millions of connections. Edge case: epoll ET mode requires reading until EAGAIN or you miss events.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">System Calls (epoll_wait, read, write)</span><span class="cp">Process vs Thread (event loop avoids threads)</span><span class="cp">Concurrency vs Parallelism (async = concurrent)</span><span class="cp">TCP (socket I/O)</span><span class="cp">Java NIO (Selector = epoll wrapper)</span></div>`}
+]
+}
+];
+
+function show(idx,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  render(idx);
+}
+
+function render(idx){
+  const t=T[idx];
+  let h=`<span class="topic-tag">${t.tag}</span><div class="topic-title">${t.title}</div><div class="topic-oneliner">${t.oneliner}</div>`;
+  for(const s of t.secs){
+    h+=`<div class="sec"><div class="sec-label">${s.l}</div><div class="body">${s.b}</div></div>`;
+  }
+  const c=document.getElementById('content');
+  c.innerHTML=h;
+  c.scrollTop=0;
+}
+render(0);
+</script>

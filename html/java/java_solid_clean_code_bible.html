@@ -1,0 +1,888 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,system-ui);background:transparent;color:var(--color-text-primary)}
+.w{padding:.5rem 0 2.5rem}
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem}
+.nb{padding:6px 12px;border:.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.nb:hover{background:var(--color-background-secondary)}
+.nb.on{background:#EEEDFE;border-color:#534AB7;color:#3C3489;font-weight:500}
+.tp{display:none}.tp.vis{display:block}
+.ttl{font-size:20px;font-weight:500;margin-bottom:3px}
+.sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.25rem}
+.stabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.25rem;padding-bottom:10px;border-bottom:.5px solid var(--color-border-tertiary)}
+.st{padding:5px 12px;font-size:12px;border-radius:16px;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.st:hover{background:var(--color-background-secondary)}
+.st.on{background:#EEEDFE;color:#3C3489;font-weight:500}
+.sc{display:none}.sc.vis{display:block}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.def{font-size:15px;line-height:1.7}
+code{font-family:var(--font-mono,monospace);font-size:.9em;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px}
+.cb{background:var(--color-background-secondary);border:.5px solid var(--color-border-tertiary);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;font-size:12px;line-height:1.8;margin-bottom:1rem;white-space:pre;font-family:var(--font-mono,monospace)}
+.kw{color:#534AB7;font-weight:500}.cm{color:var(--color-text-secondary)}.str{color:#085041}.nm{color:#993C1D}
+.flow{display:flex;flex-direction:column;gap:8px}
+.fs{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:8px;background:var(--color-background-secondary);border-left:3px solid #AFA9EC}
+.fs.t{border-left-color:#5DCAA5}.fs.a{border-left-color:#EF9F27}.fs.r{border-left-color:#E24B4A}.fs.c{border-left-color:#F0997B}
+.fn{min-width:22px;height:22px;border-radius:50%;background:#EEEDFE;color:#3C3489;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.fn.t{background:#E1F5EE;color:#085041}.fn.a{background:#FAEEDA;color:#633806}.fn.r{background:#FCEBEB;color:#A32D2D}
+.mi{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.mi:last-child{border-bottom:none}
+.mico{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:13px}
+.mico-r{background:#FCEBEB}.mico-g{background:#EAF3DE}
+.mt{font-size:13.5px;line-height:1.6}.mt strong{font-weight:500;color:#A32D2D}
+.mt.ok strong{color:#3B6D11}
+.qi{padding:10px 12px;border-radius:8px;background:var(--color-background-secondary);margin-bottom:8px;font-size:13.5px;cursor:pointer;border:.5px solid var(--color-border-tertiary);transition:all .15s;line-height:1.5}
+.qi:hover{border-color:#AFA9EC;background:#EEEDFE}
+.ql{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.qa{font-size:13px;color:var(--color-text-secondary);margin-top:6px;padding-top:6px;border-top:.5px solid var(--color-border-tertiary);display:none;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:5px 13px;border-radius:16px;font-size:13px;background:#EEEDFE;color:#3C3489;border:.5px solid #AFA9EC;cursor:pointer}
+.chip:hover{background:#CECBF6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.hl{border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.6;border:.5px solid}
+.hlp{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.hlt{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.hla{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.hlc{background:#FAECE7;border-color:#F0997B;color:#712B13}
+.hlb{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.hlr{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.hlg{background:#EAF3DE;border-color:#97C459;color:#3B6D11}
+.hn{font-weight:500;font-size:12px;margin-bottom:4px}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;margin-right:3px;vertical-align:middle}
+.bp{background:#EEEDFE;color:#3C3489}.bt{background:#E1F5EE;color:#085041}.ba{background:#FAEEDA;color:#633806}
+.br{background:#FCEBEB;color:#A32D2D}.bg{background:#EAF3DE;color:#3B6D11}
+.smell-card{border-radius:10px;border:.5px solid;padding:10px 13px;margin-bottom:8px}
+.smell-bad{background:#FAECE7;border-color:#F0997B}
+.smell-fix{background:#E1F5EE;border-color:#5DCAA5;margin-bottom:0}
+.smell-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.smell-bad .smell-label{color:#712B13}
+.smell-fix .smell-label{color:#085041}
+.smell-text{font-size:13px;line-height:1.5}
+.smell-bad .smell-text{color:#712B13}
+.smell-fix .smell-text{color:#085041}
+.principle-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:500;margin-bottom:.75rem;border:.5px solid}
+.tag-s{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC}
+.tag-o{background:#E1F5EE;color:#085041;border-color:#5DCAA5}
+.tag-l{background:#FAEEDA;color:#633806;border-color:#EF9F27}
+.tag-i{background:#E6F1FB;color:#0C447C;border-color:#85B7EB}
+.tag-d{background:#FAECE7;color:#712B13;border-color:#F0997B}
+.bad-good{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.bg-label{font-size:11px;font-weight:500;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.bad-label{color:#A32D2D}.good-label{color:#3B6D11}
+</style>
+
+<div class="w">
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">SOLID Principles and Clean Code Visual Bible — 8 topics</h2>
+<div style="margin-bottom:1.25rem"><p style="font-size:13px;color:var(--color-text-secondary)">Block 7 · SOLID & Clean Code · 8 topics · click a principle → pick a section → click questions to reveal answers</p></div>
+
+<div class="nav">
+  <button class="nb on" onclick="T(0)">S · Single Responsibility</button>
+  <button class="nb" onclick="T(1)">O · Open/Closed</button>
+  <button class="nb" onclick="T(2)">L · Liskov Substitution</button>
+  <button class="nb" onclick="T(3)">I · Interface Segregation</button>
+  <button class="nb" onclick="T(4)">D · Dependency Inversion</button>
+  <button class="nb" onclick="T(5)">DRY · KISS · YAGNI</button>
+  <button class="nb" onclick="T(6)">Code Smells</button>
+  <button class="nb" onclick="T(7)">SOLID — full map</button>
+</div>
+
+<!-- ════ T0: SRP ════ -->
+<div class="tp vis" id="t0">
+  <div class="ttl">Single Responsibility Principle</div>
+  <div class="principle-tag tag-s">S in SOLID</div>
+  <div class="sub">A class should have one, and only one, reason to change</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t0','s0')">Definition</button>
+    <button class="st" onclick="S('t0','s1')">The real meaning</button>
+    <button class="st" onclick="S('t0','s2')">Bad vs good</button>
+    <button class="st" onclick="S('t0','s3')">Code</button>
+    <button class="st" onclick="S('t0','s4')">Spring context</button>
+    <button class="st" onclick="S('t0','s5')">Interview</button>
+    <button class="st" onclick="S('t0','s6')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t0-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A class should have one, and only one, reason to change. Robert C. Martin defines "reason to change" as a stakeholder or actor whose requirements could force a modification. If two different actors can demand a change to the same class — that class violates SRP.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlp"><div class="hn">One responsibility</div>The class does one thing well. Changes to that one concern only require touching this class. Easy to name, test, and reason about.</div>
+      <div class="hl hlr"><div class="hn">Multiple responsibilities</div>Changes to any one concern require touching the class. Changes intended for one actor can break behaviour for another. The class is hard to name without "and".</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s1">
+    <div class="card"><div class="ct">The real meaning — "reason to change" is about actors, not functions</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft">SRP is NOT "a class should only do one thing" in the trivial sense. A <code>UserService</code> can have 10 methods — that's fine if they all serve the same business actor (user management). The question is: whose requirements can force this class to change?</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft">Classic violation: a <code>Report</code> class with <code>generateReport()</code> AND <code>formatForEmail()</code> AND <code>saveToDatabase()</code>. Three actors: the analytics team, the marketing team, and the persistence team. Any one of them changing requirements forces you into this class, risking breaking the others.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft">The tell-tale sign: if you struggle to name the class without using "and" — <code>UserParserAndValidator</code>, <code>OrderServiceAndEmailer</code> — SRP is violated. A class named with "and" is confessing to two responsibilities.</div></div>
+        <div class="fs t"><div class="fn t">4</div><div class="ft">In Spring Boot: the three-layer architecture (Controller → Service → Repository) enforces SRP at the architectural level. Controllers handle HTTP concerns, services handle business logic, repositories handle persistence. Each layer has one actor: the web team, the business team, the DBA team.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s2">
+    <div class="card"><div class="ct">Violation vs fix — the <code>OrderProcessor</code> antipattern</div>
+      <div class="smell-card smell-bad">
+        <div class="smell-label">Violation — one class, three actors</div>
+        <div class="smell-text">class OrderProcessor {<br>&nbsp;&nbsp;void processOrder(Order o) { validate(); charge(); saveToDb(); sendEmail(); }<br>&nbsp;&nbsp;void validate() { /* business rules team */ }<br>&nbsp;&nbsp;void charge() { /* payments team */ }<br>&nbsp;&nbsp;void saveToDb() { /* DBA team */ }<br>&nbsp;&nbsp;void sendEmail() { /* marketing team */ }<br>}</div>
+      </div>
+      <div style="text-align:center;font-size:18px;color:var(--color-text-secondary);padding:6px">↓ split by actor</div>
+      <div class="smell-card smell-fix">
+        <div class="smell-label">Fixed — one class per actor</div>
+        <div class="smell-text">class OrderValidator { void validate(Order o) { ... } }<br>class PaymentService { void charge(Order o) { ... } }<br>class OrderRepository { void save(Order o) { ... } }<br>class OrderNotifier { void sendConfirmation(Order o) { ... } }<br>class OrderOrchestrator {<br>&nbsp;&nbsp;// orchestrates — depends on the four above<br>}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s3">
+    <div class="card"><div class="ct">Code — Spring Boot SRP in practice</div>
+<div class="cb"><span class="cm">// VIOLATION — UserService does everything</span>
+<span class="kw">@Service</span>
+<span class="kw">public class</span> <span class="nm">UserService</span> {
+    <span class="kw">void</span> register(<span class="nm">UserDto</span> dto) {
+        validate(dto);              <span class="cm">// validation logic</span>
+        <span class="nm">String</span> hash = hash(dto.password()); <span class="cm">// security logic</span>
+        <span class="nm">User</span> u = repo.save(toEntity(dto, hash)); <span class="cm">// persistence</span>
+        emailService.sendWelcome(u.email()); <span class="cm">// notification</span>
+        analytics.track(<span class="str">"USER_REGISTERED"</span>, u.id()); <span class="cm">// analytics</span>
+    }
+    <span class="cm">// changes for: validation rules, hashing algo, DB schema, email template, analytics schema</span>
+    <span class="cm">// = 5 reasons to change in one class</span>
+}
+
+<span class="cm">// SRP-COMPLIANT — each class has one reason to change</span>
+<span class="kw">@Component</span>
+<span class="kw">public class</span> <span class="nm">UserRegistrationValidator</span> {  <span class="cm">// actor: product team</span>
+    <span class="kw">public void</span> validate(<span class="nm">UserDto</span> dto) { <span class="cm">/* rules */</span> }
+}
+
+<span class="kw">@Component</span>
+<span class="kw">public class</span> <span class="nm">PasswordHasher</span> {             <span class="cm">// actor: security team</span>
+    <span class="kw">public</span> <span class="nm">String</span> hash(<span class="nm">String</span> raw) { <span class="cm">/* bcrypt */</span> <span class="kw">return null</span>; }
+}
+
+<span class="kw">@Service</span>
+<span class="kw">public class</span> <span class="nm">UserRegistrationService</span> {      <span class="cm">// actor: business team, orchestrates</span>
+    <span class="nm">UserRegistrationValidator</span> validator;
+    <span class="nm">PasswordHasher</span>             hasher;
+    <span class="nm">UserRepository</span>             repo;
+    <span class="nm">WelcomeEmailSender</span>         emailer;
+
+    <span class="kw">public</span> <span class="nm">User</span> register(<span class="nm">UserDto</span> dto) {
+        validator.validate(dto);
+        <span class="nm">String</span> hash = hasher.hash(dto.password());
+        <span class="kw">return</span> repo.save(toEntity(dto, hash));
+        <span class="cm">// emailer called async via @EventListener on UserRegisteredEvent</span>
+    }
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s4">
+    <div class="card"><div class="ct">Spring Boot enforces SRP architecturally</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">@</div><div class="ft"><strong>@RestController</strong> — handles HTTP. Parses request, validates input format, delegates to service, maps response. Zero business logic. Reason to change: API contract.</div></div>
+        <div class="fs t"><div class="fn t">@</div><div class="ft"><strong>@Service</strong> — business logic only. No HTTP, no SQL, no email formatting. Reason to change: business rules.</div></div>
+        <div class="fs t"><div class="fn t">@</div><div class="ft"><strong>@Repository</strong> — persistence only. SQL, JPA, query logic. No business rules, no HTTP. Reason to change: schema or query optimisation.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft">The most common SRP violation in Spring Boot: business logic creeping into controllers (<code>if (dto.amount() > 1000) applyTax()</code>) or SQL being written in services. Keep the layers clean.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What does "one reason to change" mean? How do you identify SRP violations?<div class="qa">A "reason to change" = a stakeholder whose requirements could force a modification. SRP is violated when multiple different stakeholders can demand changes to the same class. Identify violations by: (1) the "and" test — if the class name needs "and", it has multiple responsibilities. (2) the actor test — list every person or team that might ask you to change this class. If more than one actor appears, split. (3) Change frequency — if different methods change for unrelated reasons, it's a sign of multiple responsibilities. Production signal: a class that's always in git diff no matter which feature is being built.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Spring</div>How does the three-layer Spring Boot architecture implement SRP?<div class="qa">The Controller layer handles HTTP concerns — its single reason to change is the API contract. The Service layer handles business logic — its reason to change is business rules. The Repository layer handles persistence — its reason to change is the data schema or query optimisation. Each layer depends only on the layer below, never on the layer above. This creates clean separation of actors: the frontend team drives controllers, the product team drives services, the DBA team drives repositories. No single class has to change for all three actors simultaneously.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How does the Single Responsibility Principle connect to cohesion and coupling in software design?')">Cohesion & coupling</span>
+      <span class="chip" onclick="sendPrompt('Explain the God Class code smell and how SRP prevents it')">God class smell</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T1: OCP ════ -->
+<div class="tp" id="t1">
+  <div class="ttl">Open/Closed Principle</div>
+  <div class="principle-tag tag-o">O in SOLID</div>
+  <div class="sub">Software entities should be open for extension, closed for modification</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t1','s0')">Definition</button>
+    <button class="st" onclick="S('t1','s1')">The real meaning</button>
+    <button class="st" onclick="S('t1','s2')">Bad vs good</button>
+    <button class="st" onclick="S('t1','s3')">Code</button>
+    <button class="st" onclick="S('t1','s4')">Interview</button>
+    <button class="st" onclick="S('t1','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t1-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Software entities (classes, modules, functions) should be open for extension — new behaviour can be added — but closed for modification — adding new behaviour should not require changing existing, tested code. New requirements should be met by writing new code, not editing old code.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlr"><div class="hn">Violation signal</div>Every time you add a new feature, you open an existing class and add another <code>if/else</code> or <code>switch</code> case. The class grows with every new requirement.</div>
+      <div class="hl hlt"><div class="hn">Correct approach</div>Define an abstraction (interface). Add new behaviour by creating a new implementation class. Existing code never touched — existing tests pass unchanged.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s1">
+    <div class="card"><div class="ct">How to achieve OCP — the two mechanisms</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Abstraction + polymorphism (runtime)</strong> — define an interface. Client code depends on the interface. New behaviours = new implementations. This is the Strategy, Factory, and Observer pattern in action. The client is "closed" because it never changes. The system is "open" because you add new implementations freely.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Template Method (compile-time)</strong> — base class defines the skeleton (closed). Subclasses override specific steps (open for extension). Same idea via inheritance. Java's <code>HttpServlet</code> is the template method; your <code>doGet()</code> override is the extension point.</div></div>
+        <div class="fs t"><div class="fn t">!</div><div class="ft">OCP doesn't mean "never modify code". It means: for the anticipated axes of variation, design so those variations don't require modifying existing logic. You can't predict all change, but you can identify the most likely axes (e.g. "we'll add more payment providers") and protect against those.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s2">
+    <div class="card"><div class="ct">The payment provider problem — violation vs fix</div>
+      <div class="smell-card smell-bad">
+        <div class="smell-label">Violation — adding Razorpay means modifying PaymentService</div>
+        <div class="smell-text">class PaymentService {<br>&nbsp;&nbsp;void process(Order o, String provider) {<br>&nbsp;&nbsp;&nbsp;&nbsp;if ("STRIPE".equals(provider)) { stripeCall(); }<br>&nbsp;&nbsp;&nbsp;&nbsp;else if ("PAYPAL".equals(provider)) { paypalCall(); }<br>&nbsp;&nbsp;&nbsp;&nbsp;// Adding Razorpay = open this class = risk regression<br>&nbsp;&nbsp;}<br>}</div>
+      </div>
+      <div style="text-align:center;font-size:18px;color:var(--color-text-secondary);padding:6px">↓ extract abstraction</div>
+      <div class="smell-card smell-fix">
+        <div class="smell-label">Fixed — adding Razorpay = new class, zero modification</div>
+        <div class="smell-text">interface PaymentGateway { Receipt charge(Order o); }<br>class StripeGateway implements PaymentGateway { ... }<br>class PaypalGateway implements PaymentGateway { ... }<br>class RazorpayGateway implements PaymentGateway { ... }  // NEW — no edits<br><br>class PaymentService {<br>&nbsp;&nbsp;private final PaymentGateway gateway; // injected — never changes<br>&nbsp;&nbsp;Receipt process(Order o) { return gateway.charge(o); }<br>}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s3">
+    <div class="card"><div class="ct">Code — OCP with Strategy + Spring DI</div>
+<div class="cb"><span class="cm">// Interface = extension point (the "open" seam)</span>
+<span class="kw">public interface</span> <span class="nm">DiscountPolicy</span> {
+    <span class="kw">double</span> apply(<span class="kw">double</span> basePrice, <span class="nm">Order</span> order);
+}
+
+<span class="cm">// Existing implementations — NEVER touched when adding new policies</span>
+<span class="kw">@Component</span>(<span class="str">"noDiscount"</span>)
+<span class="kw">class</span> <span class="nm">NoDiscountPolicy</span>      <span class="kw">implements</span> <span class="nm">DiscountPolicy</span> {
+    <span class="kw">public double</span> apply(<span class="kw">double</span> p, <span class="nm">Order</span> o) { <span class="kw">return</span> p; }
+}
+
+<span class="kw">@Component</span>(<span class="str">"seasonalDiscount"</span>)
+<span class="kw">class</span> <span class="nm">SeasonalDiscountPolicy</span> <span class="kw">implements</span> <span class="nm">DiscountPolicy</span> {
+    <span class="kw">public double</span> apply(<span class="kw">double</span> p, <span class="nm">Order</span> o) { <span class="kw">return</span> p * 0.85; }
+}
+
+<span class="cm">// New requirement: add flash sale — ZERO modification to existing code</span>
+<span class="kw">@Component</span>(<span class="str">"flashSale"</span>)
+<span class="kw">class</span> <span class="nm">FlashSalePolicy</span>        <span class="kw">implements</span> <span class="nm">DiscountPolicy</span> {
+    <span class="kw">public double</span> apply(<span class="kw">double</span> p, <span class="nm">Order</span> o) { <span class="kw">return</span> p * 0.6; }
+}
+
+<span class="cm">// Consumer — closed for modification</span>
+<span class="kw">@Service</span>
+<span class="kw">class</span> <span class="nm">PricingService</span> {
+    <span class="kw">private final</span> <span class="nm">Map</span>&lt;<span class="nm">String</span>, <span class="nm">DiscountPolicy</span>&gt; policies; <span class="cm">// Spring injects all</span>
+
+    <span class="kw">double</span> price(<span class="nm">Order</span> o, <span class="nm">String</span> policyName) {
+        <span class="kw">return</span> policies.getOrDefault(policyName,
+            policies.get(<span class="str">"noDiscount"</span>))
+            .apply(o.basePrice(), o);
+        <span class="cm">// Adding a new policy never touches this method</span>
+    }
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What does "closed for modification" actually mean in practice?<div class="qa">It means existing, tested code should not need to be edited to support new requirements along anticipated axes of variation. "Closed" refers to the class's interface and existing behaviour — callers don't need to change. "Open" refers to the implementation's internal extension points — new behaviour is added by writing new code (new implementations, new subclasses) not by editing existing logic. The if-else chain that grows with every feature is the canonical violation — each addition modifies existing logic, which risks breaking existing tests and behaviour.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Design</div>How do you apply OCP without over-engineering?<div class="qa">Don't apply OCP speculatively to everything — that leads to interface explosion. Apply it reactively or when you can clearly identify the axis of variation. The rule of three: the first time you implement something, just do it. The second time you add a similar case, note the pattern. The third time, refactor to an abstraction. In Spring: every time you find yourself adding an if-else to a service based on a string/enum type parameter, that's the signal to extract a strategy interface and inject implementations by name or via a factory.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How do the Strategy pattern and Factory pattern implement the Open/Closed Principle?')">Strategy + Factory</span>
+      <span class="chip" onclick="sendPrompt('Explain the Shotgun Surgery code smell and how OCP prevents it')">Shotgun surgery smell</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T2: LSP ════ -->
+<div class="tp" id="t2">
+  <div class="ttl">Liskov Substitution Principle</div>
+  <div class="principle-tag tag-l">L in SOLID</div>
+  <div class="sub">Subtypes must be substitutable for their base types without breaking correctness</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t2','s0')">Definition</button>
+    <button class="st" onclick="S('t2','s1')">The real meaning</button>
+    <button class="st" onclick="S('t2','s2')">Classic violations</button>
+    <button class="st" onclick="S('t2','s3')">Code</button>
+    <button class="st" onclick="S('t2','s4')">Interview</button>
+    <button class="st" onclick="S('t2','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t2-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">If S is a subtype of T, then objects of type T may be replaced with objects of type S without altering the correctness of the program. A subclass must honour the contract of its parent. You must be able to use a subclass anywhere a parent is expected — without the caller needing to know it's a subclass.</p>
+    </div>
+    <div class="card" style="background:var(--color-background-secondary)">
+      <div class="ct">The contract a subtype must honour</div>
+      <div class="flow" style="gap:6px">
+        <div class="fs t" style="padding:7px 10px"><div class="fn t" style="font-size:10px">Pre</div><div class="ft" style="font-size:13px">Preconditions cannot be strengthened — subclass can't require MORE than the parent required</div></div>
+        <div class="fs t" style="padding:7px 10px"><div class="fn t" style="font-size:10px">Post</div><div class="ft" style="font-size:13px">Postconditions cannot be weakened — subclass must deliver at LEAST what the parent promised</div></div>
+        <div class="fs t" style="padding:7px 10px"><div class="fn t" style="font-size:10px">Inv</div><div class="ft" style="font-size:13px">Invariants must be preserved — subclass cannot break the parent's guarantees about its state</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s1">
+    <div class="card"><div class="ct">The real meaning — behavioural substitutability, not just type hierarchy</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft">LSP is about <strong>behaviour</strong>, not just type signatures. A <code>Square</code> IS-A <code>Rectangle</code> in mathematics. But in code, if <code>Rectangle.setWidth(w)</code> is expected to keep height unchanged, then <code>Square.setWidth(w)</code> (which also changes height to maintain equal sides) breaks LSP — even though the type hierarchy is technically valid.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft">LSP violation detection: if you find <code>instanceof</code> checks or <code>if (shape instanceof Square)</code> in code that calls a method on a <code>Rectangle</code> — that's the caller defending against broken substitutability. The client code should never need to know the concrete type.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft">The practical rule: if overriding a method requires adding a condition the parent doesn't have, or throwing an exception the parent doesn't throw, or returning values outside the parent's promised range — it's an LSP violation. The fix is usually to not use inheritance and instead use composition, or to redesign the abstraction.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s2">
+    <div class="card"><div class="ct">Classic violations — square/rectangle + unsupported operations</div>
+      <div class="smell-card smell-bad">
+        <div class="smell-label">Violation 1 — Square extends Rectangle</div>
+        <div class="smell-text">class Rectangle { setWidth(w) { this.w=w; }  setHeight(h) { this.h=h; } }<br>class Square extends Rectangle {<br>&nbsp;&nbsp;// LSP broken: setting width also sets height<br>&nbsp;&nbsp;setWidth(w) { this.w=w; this.h=w; } // postcondition: h stays same — VIOLATED<br>}<br>// Client: rect.setWidth(5); rect.setHeight(3); assert area()==15; // FAILS for Square</div>
+      </div>
+      <div class="smell-card smell-bad" style="margin-top:8px">
+        <div class="smell-label">Violation 2 — throwing UnsupportedOperationException</div>
+        <div class="smell-text">class ImmutableList extends ArrayList {<br>&nbsp;&nbsp;void add(E e) { throw new UnsupportedOperationException(); }<br>  // Violates: callers of List.add() expect it to work<br>  // Collections.unmodifiableList() has the same issue — use with care<br>}</div>
+      </div>
+      <div class="smell-card smell-fix" style="margin-top:8px">
+        <div class="smell-label">Fix — separate the abstraction</div>
+        <div class="smell-text">interface Shape { double area(); }  // no setWidth/setHeight<br>class Rectangle implements Shape { ... } // own setters<br>class Square    implements Shape { ... } // own setters<br>// Neither is a subtype of the other — no LSP issue</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s3">
+    <div class="card"><div class="ct">Code — LSP violation + correct design</div>
+<div class="cb"><span class="cm">// VIOLATION — PremiumBird violates Bird's fly() contract</span>
+<span class="kw">class</span> <span class="nm">Bird</span> {
+    <span class="kw">void</span> fly() { <span class="nm">System</span>.out.println(<span class="str">"flying"</span>); }
+}
+<span class="kw">class</span> <span class="nm">Penguin</span> <span class="kw">extends</span> <span class="nm">Bird</span> {
+    <span class="kw">void</span> fly() { <span class="kw">throw new</span> <span class="nm">UnsupportedOperationException</span>(<span class="str">"Penguins can't fly"</span>); }
+    <span class="cm">// Caller: bird.fly() — works for Sparrow, throws for Penguin. LSP violated.</span>
+}
+
+<span class="cm">// FIX — redesign the hierarchy by capability</span>
+<span class="kw">interface</span> <span class="nm">Bird</span>    { <span class="kw">void</span> eat(); }
+<span class="kw">interface</span> <span class="nm">Flyable</span> { <span class="kw">void</span> fly(); }
+<span class="kw">interface</span> <span class="nm">Swimmable</span> { <span class="kw">void</span> swim(); }
+
+<span class="kw">class</span> <span class="nm">Sparrow</span> <span class="kw">implements</span> <span class="nm">Bird</span>, <span class="nm">Flyable</span>   { ... } <span class="cm">// can fly</span>
+<span class="kw">class</span> <span class="nm">Penguin</span> <span class="kw">implements</span> <span class="nm">Bird</span>, <span class="nm">Swimmable</span> { ... } <span class="cm">// can't fly, swims</span>
+<span class="cm">// Callers of Flyable only get birds that can fly — no surprise exception</span>
+
+<span class="cm">// Production LSP check — does your Spring @Repository subtype behave consistently?</span>
+<span class="cm">// If CachedUserRepository extends UserRepository but returns stale data</span>
+<span class="cm">// without callers knowing — that's a behavioural LSP violation</span>
+<span class="cm">// Fix: CachedUserRepository implements UserRepository (not extends)</span>
+<span class="cm">// and clearly documents its cache semantics in the interface contract</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Explain the Square-Rectangle LSP violation.<div class="qa">Rectangle has setWidth(w) that keeps height unchanged, and setHeight(h) that keeps width unchanged. Square inherits from Rectangle but overrides setWidth to also set height (squares have equal sides). A caller that creates a Rectangle, sets width=5, height=3, and asserts area==15 will fail when given a Square — setting width to 5 also sets height to 5. The postcondition of Rectangle.setWidth (height unchanged) is violated by Square. The fix: don't model this with inheritance. Both Rectangle and Square should implement a Shape interface with area() but neither should be a subtype of the other — they have fundamentally different setter semantics.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Detection</div>How do you detect LSP violations in code reviews?<div class="qa">Key signals: (1) instanceof checks — if client code does if (animal instanceof Penguin) to avoid calling fly(), the abstraction is broken. (2) Overriding methods that throw UnsupportedOperationException — the base type promised this would work. (3) Overriding with stronger preconditions — "parent accepts any non-null string; subclass requires it to be numeric." (4) Methods that return null or empty when the parent's contract says it always returns a value. (5) Subclass methods that are no-ops for capabilities the parent advertised. Any of these means clients can't safely substitute the subtype — the abstraction is leaking.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How does Design by Contract relate to the Liskov Substitution Principle?')">Design by Contract</span>
+      <span class="chip" onclick="sendPrompt('How does LSP relate to the Interface Segregation Principle?')">LSP ↔ ISP</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T3: ISP ════ -->
+<div class="tp" id="t3">
+  <div class="ttl">Interface Segregation Principle</div>
+  <div class="principle-tag tag-i">I in SOLID</div>
+  <div class="sub">Clients should not be forced to depend on methods they do not use</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t3','s0')">Definition</button>
+    <button class="st" onclick="S('t3','s1')">Fat interface problem</button>
+    <button class="st" onclick="S('t3','s2')">Code</button>
+    <button class="st" onclick="S('t3','s3')">Interview</button>
+    <button class="st" onclick="S('t3','s4')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t3-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">No client should be forced to depend on interfaces it does not use. Prefer many small, specific interfaces over one large general-purpose interface. When a class is forced to implement methods it doesn't need, changes to those unused methods force recompilation and retesting of the class — unnecessary coupling.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlr"><div class="hn">Fat interface</div>One interface with 10 methods. Implementors must provide all 10 even if they only need 3. Unused methods get empty stubs or <code>UnsupportedOperationException</code> — which also violates LSP.</div>
+      <div class="hl hlt"><div class="hn">Segregated interfaces</div>Multiple focused interfaces, each representing a specific capability. Classes implement only the interfaces for capabilities they actually have. Callers depend only on the methods they actually call.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s1">
+    <div class="card"><div class="ct">The fat interface problem — Worker + Robot</div>
+      <div class="smell-card smell-bad">
+        <div class="smell-label">Violation — Robot forced to implement eat()</div>
+        <div class="smell-text">interface Worker { void work(); void eat(); void sleep(); }<br>class Human implements Worker { ... } // all methods make sense<br>class Robot  implements Worker {<br>&nbsp;&nbsp;void work() { ... }   // fine<br>&nbsp;&nbsp;void eat()  { throw new UnsupportedOperationException(); } // nonsense<br>&nbsp;&nbsp;void sleep(){ throw new UnsupportedOperationException(); } // nonsense<br>// Robot is forced to depend on methods it will never use<br>}</div>
+      </div>
+      <div style="text-align:center;font-size:18px;color:var(--color-text-secondary);padding:6px">↓ split by capability</div>
+      <div class="smell-card smell-fix">
+        <div class="smell-label">Fixed — each interface = one capability</div>
+        <div class="smell-text">interface Workable  { void work(); }<br>interface Feedable  { void eat(); }<br>interface Restable  { void sleep(); }<br><br>class Human implements Workable, Feedable, Restable { ... }<br>class Robot implements Workable { ... }  // only what it can do<br>// WorkScheduler depends only on Workable — works with both</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s2">
+    <div class="card"><div class="ct">Code — ISP in Spring Boot repository pattern</div>
+<div class="cb"><span class="cm">// FAT INTERFACE — read-only services forced to compile against write methods</span>
+<span class="kw">interface</span> <span class="nm">UserRepository</span> {
+    <span class="nm">User</span>         findById(<span class="nm">String</span> id);
+    <span class="nm">List</span>&lt;<span class="nm">User</span>&gt;   findAll();
+    <span class="kw">void</span>         save(<span class="nm">User</span> u);
+    <span class="kw">void</span>         delete(<span class="nm">String</span> id);
+    <span class="kw">void</span>         bulkImport(<span class="nm">List</span>&lt;<span class="nm">User</span>&gt; users);
+    <span class="kw">void</span>         reindex();  <span class="cm">// admin-only, forces all implementors to know this</span>
+}
+
+<span class="cm">// ISP-COMPLIANT — segregated by actor/capability</span>
+<span class="kw">interface</span> <span class="nm">UserReadRepository</span> {
+    <span class="nm">User</span>       findById(<span class="nm">String</span> id);
+    <span class="nm">List</span>&lt;<span class="nm">User</span>&gt; findAll();
+}
+<span class="kw">interface</span> <span class="nm">UserWriteRepository</span> {
+    <span class="kw">void</span> save(<span class="nm">User</span> u);
+    <span class="kw">void</span> delete(<span class="nm">String</span> id);
+}
+<span class="kw">interface</span> <span class="nm">UserAdminRepository</span> {
+    <span class="kw">void</span> bulkImport(<span class="nm">List</span>&lt;<span class="nm">User</span>&gt; users);
+    <span class="kw">void</span> reindex();
+}
+
+<span class="cm">// Service dependencies are precise — no accidental write in read service</span>
+<span class="kw">@Service</span>
+<span class="kw">class</span> <span class="nm">UserSearchService</span> {
+    <span class="kw">private final</span> <span class="nm">UserReadRepository</span> repo; <span class="cm">// can ONLY read</span>
+}
+
+<span class="kw">@Service</span>
+<span class="kw">class</span> <span class="nm">UserManagementService</span> {
+    <span class="kw">private final</span> <span class="nm">UserReadRepository</span>  reader;
+    <span class="kw">private final</span> <span class="nm">UserWriteRepository</span> writer; <span class="cm">// explicit write access</span>
+}
+
+<span class="cm">// JpaUserRepository implements all three — one concrete class, multiple interfaces</span>
+<span class="kw">@Repository</span>
+<span class="kw">class</span> <span class="nm">JpaUserRepository</span> <span class="kw">implements</span> <span class="nm">UserReadRepository</span>,
+    <span class="nm">UserWriteRepository</span>, <span class="nm">UserAdminRepository</span> { ... }</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s3">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Why is a "fat interface" a problem even if the client only calls some methods?<div class="qa">Two problems: (1) Forced coupling — if the fat interface changes a method the client doesn't use, the client still recompiles. In large systems, this ripples through unnecessary rebuild chains. (2) Implementation burden — classes implementing the fat interface must provide bodies for all methods, even irrelevant ones, often via empty stubs or UnsupportedOperationException (which also violates LSP). Segregating interfaces means: each client depends only on what it uses, each implementor only provides what it supports, and changes to one capability don't force recompilation of unrelated clients.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">CQRS</div>How does ISP relate to the CQRS pattern?<div class="qa">CQRS (Command Query Responsibility Segregation) is ISP applied at the architectural level. The "Query" side of the system depends on read interfaces; the "Command" side depends on write interfaces. They're segregated so that the read model (potentially a materialized view or read replica) can change independently of the write model. A fat UserRepository that mixes reads and writes is the exact ISP violation CQRS solves at scale. In code: a UserReadRepository and UserWriteRepository are the ISP-compliant building blocks that CQRS formalises.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s4">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain how Spring Data JPA repository hierarchy implements ISP with CrudRepository, PagingAndSortingRepository, JpaRepository')">Spring Data ISP</span>
+      <span class="chip" onclick="sendPrompt('Explain CQRS and how it relates to the Interface Segregation Principle')">CQRS + ISP</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T4: DIP ════ -->
+<div class="tp" id="t4">
+  <div class="ttl">Dependency Inversion Principle</div>
+  <div class="principle-tag tag-d">D in SOLID</div>
+  <div class="sub">High-level modules must not depend on low-level modules — both should depend on abstractions</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t4','s0')">Definition</button>
+    <button class="st" onclick="S('t4','s1')">The inversion explained</button>
+    <button class="st" onclick="S('t4','s2')">Code</button>
+    <button class="st" onclick="S('t4','s3')">Spring DI connection</button>
+    <button class="st" onclick="S('t4','s4')">Interview</button>
+    <button class="st" onclick="S('t4','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t4-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">High-level modules (business logic) should not depend on low-level modules (infrastructure, persistence, messaging). Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions. This is the principle that makes Spring's dependency injection architecturally sound.</p>
+    </div>
+    <div class="card" style="background:var(--color-background-secondary)">
+      <div class="ct">The dependency direction before and after inversion</div>
+      <div class="two">
+        <div>
+          <p style="font-size:11px;font-weight:500;color:#A32D2D;margin-bottom:6px">Without DIP — business depends on infrastructure</p>
+          <div style="font-size:12px;line-height:1.8;font-family:var(--font-mono,monospace)">OrderService<br>&nbsp;&nbsp;→ MySqlOrderRepo (concrete!)<br>&nbsp;&nbsp;→ SendGridMailer (concrete!)<br>&nbsp;&nbsp;→ StripeGateway (concrete!)</div>
+          <p style="font-size:11px;color:#A32D2D;margin-top:6px">Changing DB requires editing OrderService</p>
+        </div>
+        <div>
+          <p style="font-size:11px;font-weight:500;color:#085041;margin-bottom:6px">With DIP — both depend on abstractions</p>
+          <div style="font-size:12px;line-height:1.8;font-family:var(--font-mono,monospace)">OrderService<br>&nbsp;&nbsp;→ OrderRepository (interface)<br>&nbsp;&nbsp;→ EmailSender (interface)<br>&nbsp;&nbsp;→ PaymentGateway (interface)<br>↑ MySqlOrderRepo implements OrderRepository</div>
+          <p style="font-size:11px;color:#085041;margin-top:6px">Swap DB by swapping the implementation</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s1">
+    <div class="card"><div class="ct">What "inversion" means — the direction of dependency flips</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft">In traditional layered code: high-level (business) creates instances of low-level (persistence). <code>OrderService</code> does <code>new MySqlOrderRepository()</code>. The dependency arrow points from business to infrastructure. Business knows the concrete type.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft">After inversion: <code>OrderService</code> depends on <code>OrderRepository</code> (interface). <code>MySqlOrderRepository</code> implements <code>OrderRepository</code> — the low-level module now depends on the abstraction, not the other way around. The dependency arrow from infrastructure to the interface is the "inversion".</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft">Who resolves the abstraction to a concrete type? An external injector — Spring's IoC container, a factory, or the main method. This is the boundary between application code and configuration. Business logic is clean of all "which implementation" decisions.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft">DIP ≠ Dependency Injection. DIP is the principle. Dependency Injection is a technique to implement it. You can have DI without DIP (injecting concrete types). And you can satisfy DIP without a DI framework (factory pattern achieves the same dependency direction).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s2">
+    <div class="card"><div class="ct">Code — without DIP vs with DIP + Spring</div>
+<div class="cb"><span class="cm">// WITHOUT DIP — high-level depends on low-level concrete</span>
+<span class="kw">class</span> <span class="nm">OrderService</span> {
+    <span class="kw">private final</span> <span class="nm">MySqlOrderRepository</span> repo;  <span class="cm">// concrete class!</span>
+    <span class="kw">private final</span> <span class="nm">SendGridEmailer</span>        mail;  <span class="cm">// concrete class!</span>
+
+    <span class="nm">OrderService</span>() {
+        repo = <span class="kw">new</span> <span class="nm">MySqlOrderRepository</span>(); <span class="cm">// creates its own — untestable</span>
+        mail = <span class="kw">new</span> <span class="nm">SendGridEmailer</span>();
+    }
+    <span class="cm">// To test, you MUST have a MySQL DB and SendGrid credentials</span>
+}
+
+<span class="cm">// WITH DIP — depends on abstractions, injected from outside</span>
+<span class="kw">interface</span> <span class="nm">OrderRepository</span> { <span class="nm">Order</span> save(<span class="nm">Order</span> o); <span class="nm">Optional</span>&lt;<span class="nm">Order</span>&gt; findById(<span class="nm">String</span> id); }
+<span class="kw">interface</span> <span class="nm">EmailSender</span>      { <span class="kw">void</span> sendConfirmation(<span class="nm">Order</span> o); }
+
+<span class="kw">@Service</span>
+<span class="kw">class</span> <span class="nm">OrderService</span> {
+    <span class="kw">private final</span> <span class="nm">OrderRepository</span> repo;  <span class="cm">// abstractions only</span>
+    <span class="kw">private final</span> <span class="nm">EmailSender</span>     mail;
+
+    <span class="cm">// Spring injects the concrete implementations</span>
+    <span class="nm">OrderService</span>(<span class="nm">OrderRepository</span> repo, <span class="nm">EmailSender</span> mail) {
+        <span class="kw">this</span>.repo = repo; <span class="kw">this</span>.mail = mail;
+    }
+
+    <span class="kw">public</span> <span class="nm">Order</span> place(<span class="nm">Order</span> o) {
+        <span class="nm">Order</span> saved = repo.save(o);
+        mail.sendConfirmation(saved);
+        <span class="kw">return</span> saved;
+    }
+}
+
+<span class="cm">// In tests: inject mock implementations — zero DB, zero email</span>
+<span class="kw">class</span> <span class="nm">OrderServiceTest</span> {
+    <span class="nm">OrderRepository</span> mockRepo = <span class="nm">Mockito</span>.mock(<span class="nm">OrderRepository</span>.<span class="kw">class</span>);
+    <span class="nm">EmailSender</span>     mockMail = <span class="nm">Mockito</span>.mock(<span class="nm">EmailSender</span>.<span class="kw">class</span>);
+    <span class="nm">OrderService</span>    svc      = <span class="kw">new</span> <span class="nm">OrderService</span>(mockRepo, mockMail);
+    <span class="cm">// Full business logic tests, no infrastructure needed</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s3">
+    <div class="card"><div class="ct">How Spring DI implements DIP</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">1</div><div class="ft"><strong>@Autowired / constructor injection</strong> — Spring sees that <code>OrderService</code> needs an <code>OrderRepository</code>. It scans for a bean that implements that interface, creates it, and injects it. The service never calls <code>new</code>. The IoC container is the "external injector" that resolves abstractions to concretions.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>Constructor injection (preferred)</strong> — Spring Boot 2.1+ does constructor injection without <code>@Autowired</code> annotation if there's one constructor. This makes dependencies explicit, enables immutable fields, and makes unit testing trivial (just pass mocks to the constructor).</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Profiles for swapping implementations</strong> — <code>@Profile("test")</code> <code>InMemoryOrderRepository</code> vs <code>@Profile("production")</code> <code>JpaOrderRepository</code>. Same interface, different impl. The service code is identical in both profiles — DIP makes this zero-effort.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What is the difference between Dependency Inversion and Dependency Injection?<div class="qa">Dependency Inversion is the design principle: high-level modules should not depend on low-level modules; both should depend on abstractions. It's about the direction of dependency arrows in your design. Dependency Injection is a technique (one of several) to implement DIP: instead of a class creating its dependencies, they're provided from outside (via constructor, setter, or field). Spring's IoC container is a DI framework. You can satisfy DIP without Spring (using factories or manual construction). You can also use DI badly — injecting concrete classes rather than interfaces — which implements the technique but violates the principle.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Testing</div>How does DIP make unit testing possible?<div class="qa">When a class creates its own dependencies (new MySqlRepo()), you can't test it without those dependencies running — you need a real database. When a class receives its dependencies via interfaces (DIP + DI), you can inject test doubles (mocks, stubs) that don't need infrastructure. Mockito.mock(OrderRepository.class) creates an in-memory mock that satisfies the interface. The business logic is tested in complete isolation — fast, deterministic, no I/O. DIP is the principle that makes mocking meaningful: because the dependency is an abstraction, any conforming implementation (including a mock) can be substituted.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain the hexagonal architecture (Ports and Adapters) and how it implements DIP at architectural level')">Hexagonal architecture</span>
+      <span class="chip" onclick="sendPrompt('Explain Spring IoC container internals — BeanFactory, ApplicationContext, BeanDefinition')">Spring IoC internals</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T5: DRY KISS YAGNI ════ -->
+<div class="tp" id="t5">
+  <div class="ttl">DRY · KISS · YAGNI</div>
+  <div class="sub">Three principles every senior engineer internalises — misapplication is as dangerous as violation</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t5','s0')">DRY</button>
+    <button class="st" onclick="S('t5','s1')">KISS</button>
+    <button class="st" onclick="S('t5','s2')">YAGNI</button>
+    <button class="st" onclick="S('t5','s3')">Misapplication</button>
+    <button class="st" onclick="S('t5','s4')">Code</button>
+    <button class="st" onclick="S('t5','s5')">Interview</button>
+  </div>
+
+  <div class="sc vis" id="t5-s0">
+    <div class="card"><div class="ct">DRY — Don't Repeat Yourself</div>
+      <p class="def">Every piece of knowledge must have a single, unambiguous, authoritative representation in a system. When you change a rule, you change it in one place. DRY is about knowledge duplication, not just code duplication.</p>
+    </div>
+    <div class="flow">
+      <div class="fs t"><div class="fn t">!</div><div class="ft">DRY is about <strong>knowledge</strong>, not just literals. Two methods that look different but encode the same business rule — that's a DRY violation even if the code doesn't look like copy-paste. Two methods that look similar but represent genuinely different concepts are NOT a DRY violation.</div></div>
+      <div class="fs"><div class="fn">E</div><div class="ft">Example: <code>MAX_RETRY_COUNT = 3</code> defined in three different config files. When the team decides to change it to 5, they must find and update all three. That's the DRY violation — the "knowledge" (max retries) has three representations. Fix: extract to a single constant or configuration property.</div></div>
+      <div class="fs r"><div class="fn r">!</div><div class="ft">Misapplication: creating a shared utility function for two methods that <em>happen</em> to look the same but represent different concepts. When one needs to change, you're forced to break the other or add a flag parameter. This is "Wrong Abstraction" — bad DRY. The rule: if removing the duplication requires adding parameters to distinguish cases, the methods aren't actually the same knowledge.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s1">
+    <div class="card"><div class="ct">KISS — Keep It Simple, Stupid</div>
+      <p class="def">Systems work best when they're kept simple. Avoid unnecessary complexity. The simplest solution that correctly solves the problem is the right solution. Complexity is the enemy of reliability and maintainability.</p>
+    </div>
+    <div class="flow">
+      <div class="fs t"><div class="fn t">!</div><div class="ft">Simple ≠ easy. Simple means: one concept per unit, minimal state, minimal dependencies, obvious behaviour. A 5-line method can be complex (doing too much). A 30-line method can be simple (one clear thing, well-named).</div></div>
+      <div class="fs"><div class="fn">1</div><div class="ft">KISS violations in Java: unnecessary inheritance chains, abstract classes with one subclass, factory patterns for a single type, 6-layer deep object hierarchies for a simple value holder. When a junior dev asks "why is this so complicated?" — KISS was violated.</div></div>
+      <div class="fs"><div class="fn">2</div><div class="ft">The simplicity test: can a developer who didn't write this code understand what it does in under 2 minutes? If not, simplify. Good naming + simple structure > clever abstraction.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s2">
+    <div class="card"><div class="ct">YAGNI — You Aren't Gonna Need It</div>
+      <p class="def">Don't add functionality until it's needed. Implement only what you need now, not what you think you might need in the future. Speculative features add complexity without adding value — they're maintenance burden without ROI.</p>
+    </div>
+    <div class="flow">
+      <div class="fs r"><div class="fn r">!</div><div class="ft">YAGNI violations: building a plugin system when you have one plugin, designing a multi-tenant schema when you have one tenant, adding a "mode" parameter to a method that will always be called with one value, abstracting a DB that will never change.</div></div>
+      <div class="fs t"><div class="fn t">!</div><div class="ft">YAGNI isn't "never design for change." It means: don't pay the complexity cost today for a benefit that may never arrive. Do design obvious seams (like depending on interfaces per DIP) — that's cheap. Don't build elaborate plugin frameworks speculatively.</div></div>
+      <div class="fs"><div class="fn">R</div><div class="ft">The economic argument: code you write today costs testing, documentation, maintenance, and understanding. Future requirements almost always differ from what you predicted. Writing YAGNI code often means throwing it away and rewriting when the real requirement arrives.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s3">
+    <div class="card"><div class="ct">Misapplication — the traps senior engineers avoid</div>
+      <div class="smell-card smell-bad">
+        <div class="smell-label">DRY misapplication — wrong abstraction</div>
+        <div class="smell-text">// calculateShippingCost and calculateTaxAmount look similar — DRY them?<br>// NO — they're different knowledge that happen to share a formula shape.<br>// When shipping rules change, you must not change tax calculation.<br>// "Duplication is far cheaper than the wrong abstraction" — Sandi Metz</div>
+      </div>
+      <div class="smell-card smell-bad" style="margin-top:8px">
+        <div class="smell-label">KISS misapplication — "simple" at the wrong level</div>
+        <div class="smell-text">// Putting everything in one class is "simple" at the file level<br>// but complex at the understanding level.<br>// KISS operates on cognitive load, not line count.</div>
+      </div>
+      <div class="smell-card smell-bad" style="margin-top:8px">
+        <div class="smell-label">YAGNI vs good engineering tension</div>
+        <div class="smell-text">// "We'll only ever have one payment provider" — YAGNI says: don't abstract.<br>// But DIP says: depend on an interface because swapping is cheap to set up.<br>// Resolution: create the interface (cheap seam) but don't build a plugin system.<br>// YAGNI prevents WORK, not STRUCTURE.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s4">
+    <div class="card"><div class="ct">Code — DRY done right, DRY done wrong</div>
+<div class="cb"><span class="cm">// DRY VIOLATION — business rule duplicated in 3 places</span>
+<span class="kw">class</span> <span class="nm">OrderController</span>  { <span class="kw">if</span>(amount > 10000) applyGST(); }
+<span class="kw">class</span> <span class="nm">InvoiceService</span>   { <span class="kw">if</span>(amount > 10000) addTaxLine(); }
+<span class="kw">class</span> <span class="nm">ReportGenerator</span>  { <span class="kw">if</span>(amount > 10000) flagForAudit(); }
+<span class="cm">// threshold 10000 is knowledge — lives in 3 places</span>
+
+<span class="cm">// DRY FIX — single source of truth</span>
+<span class="kw">class</span> <span class="nm">TaxPolicy</span> {
+    <span class="kw">private static final long</span> GST_THRESHOLD = 10_000L;
+    <span class="kw">public static boolean</span> requiresGST(<span class="kw">long</span> amount) { <span class="kw">return</span> amount > GST_THRESHOLD; }
+}
+<span class="cm">// Change: edit TaxPolicy.GST_THRESHOLD in one place</span>
+
+<span class="cm">// WRONG DRY — two different concepts forced into one method</span>
+<span class="kw">double</span> calculate(<span class="kw">boolean</span> isShipping, <span class="kw">double</span> value) {
+    <span class="kw">return</span> isShipping ? value * SHIPPING_RATE : value * TAX_RATE;
+}
+<span class="cm">// "Duplication is far cheaper than the wrong abstraction"</span>
+
+<span class="cm">// CORRECT — separate methods for genuinely different knowledge</span>
+<span class="kw">double</span> calculateShipping(<span class="kw">double</span> value) { <span class="kw">return</span> value * SHIPPING_RATE; }
+<span class="kw">double</span> calculateTax(<span class="kw">double</span> value)      { <span class="kw">return</span> value * TAX_RATE; }
+
+<span class="cm">// YAGNI violation — building for a "future" we're not sure about</span>
+<span class="kw">interface</span> <span class="nm">NotificationPlugin</span> { <span class="kw">void</span> send(<span class="nm">Event</span> e); }
+<span class="kw">class</span> <span class="nm">NotificationPluginRegistry</span> { <span class="cm">/* entire plugin system for 1 notification type */</span> }
+<span class="cm">// YAGNI fix: just send the email. Refactor to a plugin when you have N>1 plugins.</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">DRY</div>Is it always wrong to have duplicate code? When is duplication acceptable?<div class="qa">Duplication of code that represents the same knowledge is wrong. Duplication of code that looks similar but represents different knowledge is fine and often preferable. Sandi Metz: "duplication is far cheaper than the wrong abstraction." The signal: if you need to add an if-statement or a boolean parameter to a shared function to distinguish between two use cases, the two use cases are not actually the same knowledge — they just look similar today. Premature deduplication creates accidental coupling. Also: in tests, some repetition makes tests clearer and more isolated — don't blindly DRY test setup code.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Tension</div>How do you balance YAGNI with good design principles like DIP?<div class="qa">YAGNI prevents unnecessary WORK, not necessary STRUCTURE. Depending on an interface (DIP) is cheap structural work that pays dividends immediately — it enables testing, enables clean layering. Building an entire plugin framework speculatively is YAGNI work that costs now for uncertain future benefit. The guideline: do the cheap, low-cost structural decisions (interfaces, clear naming, small methods) always. Defer expensive functionality (plugin systems, multi-tenant architecture, elaborate caching layers) until you have a concrete requirement for it.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ T6: CODE SMELLS ════ -->
+<div class="tp" id="t6">
+  <div class="ttl">Code Smells</div>
+  <div class="sub">Long method · God class · Primitive obsession · Shotgun surgery · Feature envy · Data clumps</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t6','s0')">What are smells</button>
+    <button class="st" onclick="S('t6','s1')">Smells + fixes</button>
+    <button class="st" onclick="S('t6','s2')">Code examples</button>
+    <button class="st" onclick="S('t6','s3')">Interview</button>
+    <button class="st" onclick="S('t6','s4')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t6-s0">
+    <div class="card"><div class="ct">What are code smells?</div>
+      <p class="def">A code smell is a surface symptom that indicates a deeper problem. Smells don't break code — they indicate design problems that will cause bugs, make changes expensive, and accumulate technical debt. They're called "smells" because they alert you something is wrong before you know exactly what.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlp"><div class="hn">Smells are signals, not absolute rules</div>A long method isn't always wrong. A God class might be acceptable in certain contexts. The smell tells you: investigate here. The diagnosis tells you: here's why it's a problem.</div>
+      <div class="hl hla"><div class="hn">Smells and SOLID</div>Most code smells are symptoms of SOLID violations: God class = SRP violation. Divergent change = SRP + OCP. Refused bequest = LSP. Feature envy = wrong responsibility distribution.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s1">
+    <div class="card"><div class="ct">6 critical smells — what they are, what they signal, how to fix</div>
+      <div class="flow">
+        <div class="fs r"><div class="fn r">1</div><div class="ft"><strong>Long method</strong> — a method that's hard to name in one phrase, that does multiple things, that requires comments to explain different sections. Signal: SRP violation inside a method. Fix: extract method. Name each extracted method after its intention, not its implementation. Rule of thumb: if you need a comment before a code block, that block is a method waiting to be extracted.</div></div>
+        <div class="fs r"><div class="fn r">2</div><div class="ft"><strong>God class</strong> — one class that knows everything and does everything. Thousands of lines, dozens of unrelated methods. Signal: SRP violated at class scale. Fix: find the different "actors" whose requirements drive changes to this class. Extract a class per actor. Common in legacy services that accreted behaviour over years: <code>UserService</code> that now handles registration, authentication, billing, preferences, analytics, and audit logging.</div></div>
+        <div class="fs r"><div class="fn r">3</div><div class="ft"><strong>Primitive obsession</strong> — using primitives (String, int, long) to represent domain concepts that deserve their own type. <code>String email</code> everywhere instead of <code>Email email</code>. <code>long amountInPaisa</code> instead of <code>Money amount</code>. Signal: domain logic that belongs in a class leaks into every caller. Fix: introduce value objects — small, immutable classes with validation in the constructor and domain methods on them.</div></div>
+        <div class="fs r"><div class="fn r">4</div><div class="ft"><strong>Shotgun surgery</strong> — making one logical change requires editing many unrelated classes. Adding a new notification channel means touching 6 different files. Signal: OCP violation — the axis of variation isn't protected by an abstraction. Fix: consolidate the scattered logic behind an interface. One class, one responsibility. Adding the notification channel = adding one class.</div></div>
+        <div class="fs r"><div class="fn r">5</div><div class="ft"><strong>Feature envy</strong> — a method in class A spends most of its time accessing data and methods from class B. The method wants to be in class B. Signal: wrong responsibility distribution. Fix: move the method to the class whose data it uses most. Ask: "whose data does this method need most?" — that's where it belongs.</div></div>
+        <div class="fs r"><div class="fn r">6</div><div class="ft"><strong>Data clumps</strong> — three or more data items that always appear together: <code>(String street, String city, String pincode)</code> passing around as separate params everywhere. Signal: these belong in a class. Fix: introduce a class. <code>Address address</code> — now you have a cohesive object with validation and formatting methods.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s2">
+    <div class="card"><div class="ct">Code — primitive obsession + God class + shotgun surgery</div>
+<div class="cb"><span class="cm">// SMELL: Primitive obsession — email as String</span>
+<span class="kw">class</span> <span class="nm">UserService</span> {
+    <span class="kw">void</span> register(<span class="nm">String</span> email) {  <span class="cm">// validation logic scattered everywhere</span>
+        <span class="kw">if</span>(!email.contains(<span class="str">"@"</span>)) <span class="kw">throw new</span> <span class="nm">IllegalArgumentException</span>();
+        <span class="kw">if</span>(email.length() > 254)  <span class="kw">throw new</span> <span class="nm">IllegalArgumentException</span>();
+        <span class="cm">// repeated in 5 other services that take email</span>
+    }
+}
+
+<span class="cm">// FIX: Value object — Email</span>
+<span class="kw">record</span> <span class="nm">Email</span>(<span class="nm">String</span> value) {
+    <span class="nm">Email</span> {
+        <span class="kw">if</span> (!value.matches(<span class="str">"^[^@]+@[^@]+\\.[^@]+$"</span>)) <span class="kw">throw new</span> <span class="nm">IllegalArgumentException</span>();
+        <span class="kw">if</span> (value.length() > 254) <span class="kw">throw new</span> <span class="nm">IllegalArgumentException</span>();
+        value = value.toLowerCase(); <span class="cm">// normalise once, here</span>
+    }
+    <span class="nm">String</span> domain() { <span class="kw">return</span> value.substring(value.indexOf(<span class="str">'@'</span>) + 1); }
+}
+<span class="cm">// register(Email email) — valid by construction, validation in ONE place</span>
+
+<span class="cm">// SMELL: Shotgun surgery — adding "SMS" requires editing 4 classes</span>
+<span class="kw">class</span> <span class="nm">OrderService</span>  { <span class="kw">if</span>(pref.equals(<span class="str">"EMAIL"</span>)) email(); <span class="kw">else if</span>(<span class="str">"PUSH"</span>) push(); }
+<span class="kw">class</span> <span class="nm">RefundService</span>  { <span class="kw">if</span>(pref.equals(<span class="str">"EMAIL"</span>)) email(); <span class="kw">else if</span>(<span class="str">"PUSH"</span>) push(); }
+<span class="kw">class</span> <span class="nm">ShipmentService</span>{ <span class="kw">if</span>(pref.equals(<span class="str">"EMAIL"</span>)) email(); <span class="kw">else if</span>(<span class="str">"PUSH"</span>) push(); }
+
+<span class="cm">// FIX: consolidate behind Notifier interface (OCP)</span>
+<span class="kw">interface</span> <span class="nm">Notifier</span>  { <span class="kw">void</span> notify(<span class="nm">Event</span> e); }
+<span class="kw">class</span> <span class="nm">EmailNotifier</span> <span class="kw">implements</span> <span class="nm">Notifier</span> { ... }
+<span class="kw">class</span> <span class="nm">PushNotifier</span>  <span class="kw">implements</span> <span class="nm">Notifier</span> { ... }
+<span class="kw">class</span> <span class="nm">SmsNotifier</span>   <span class="kw">implements</span> <span class="nm">Notifier</span> { ... } <span class="cm">// NEW: only this file changes</span>
+<span class="cm">// OrderService, RefundService, ShipmentService all depend on Notifier — zero change</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s3">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What is primitive obsession and how do you fix it?<div class="qa">Primitive obsession is using primitives (String, int, long) to represent domain concepts that have their own rules and behaviours. A String email has no inherent validation or formatting — validation logic gets duplicated everywhere it's used. Fix: introduce value objects. Create an Email class (or record in Java 16+) with validation in the constructor. Now email is always valid by construction, normalisation happens once, and you can add domain methods like domain(), isDisposable() on the object. The benefit: the type system enforces correctness — a method signature taking Email instead of String is self-documenting and compiler-enforced.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Detection</div>How do you identify a God class in a Spring Boot codebase and what's your remediation approach?<div class="qa">Signals: a @Service class over ~400 lines, a class with more than 5-7 @Autowired dependencies, a class whose methods span unrelated concerns (authentication + order processing + reporting), a class that's always in the git diff regardless of which feature is being worked on. Remediation: (1) list every method in the class. (2) Group methods by actor — who would request a change to this method? (3) Extract a new service per actor group. (4) Use events (@ApplicationEvent) to decouple the extracted services instead of direct calls. (5) Extract value objects for primitive obsessions found during the process. This typically takes 2-3 iterations to stabilise.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s4">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain refactoring techniques for each code smell — Extract Method, Move Method, Replace Primitive with Object')">Refactoring techniques</span>
+      <span class="chip" onclick="sendPrompt('Explain the Value Object pattern in DDD and how it eliminates primitive obsession')">Value objects (DDD)</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════ T7: FULL MAP ════ -->
+<div class="tp" id="t7">
+  <div class="ttl">SOLID — the full map</div>
+  <div class="sub">How the five principles connect, reinforce, and interact</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t7','s0')">Principle map</button>
+    <button class="st" onclick="S('t7','s1')">Quick reference</button>
+    <button class="st" onclick="S('t7','s2')">Spring Boot matrix</button>
+    <button class="st" onclick="S('t7','s3')">Interview</button>
+  </div>
+
+  <div class="sc vis" id="t7-s0">
+    <div class="card"><div class="ct">How the principles reinforce each other</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">S+D</div><div class="ft"><strong>SRP → DIP</strong>: When you split a God class by responsibility (SRP), you naturally create seams. Those seams are the abstraction boundaries DIP says to depend on. SRP creates the motivation; DIP determines the dependency direction.</div></div>
+        <div class="fs"><div class="fn">O+D</div><div class="ft"><strong>OCP + DIP</strong>: OCP says "depend on abstractions so you can extend without modifying." DIP says "high-level modules depend on abstractions." Both demand the same thing: an interface sits between the caller and the concrete type. They're two perspectives on the same design choice.</div></div>
+        <div class="fs"><div class="fn">L+I</div><div class="ft"><strong>LSP + ISP</strong>: A fat interface (ISP violation) forces implementors to implement methods they don't need — often via UnsupportedOperationException — which violates LSP (callers can't substitute the subtype). ISP fixes the interface; LSP is the symptom that tells you ISP was violated.</div></div>
+        <div class="fs t"><div class="fn t">All</div><div class="ft"><strong>All five together</strong>: SRP defines clean units. OCP protects them from change-driven modification. LSP ensures subtypes are trustworthy. ISP keeps dependencies precise. DIP keeps business logic clean of infrastructure. A codebase that honours all five is testable, extensible, and maintainable — the three outcomes SOLID aims for.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s1">
+    <div class="card"><div class="ct">Quick reference card</div>
+      <div class="flow" style="gap:6px">
+        <div class="fs" style="background:#EEEDFE;border-left-color:#534AB7;padding:8px 11px"><div class="ft"><span style="font-weight:500;color:#3C3489">S — SRP</span><span style="color:#534AB7;font-size:13px;margin-left:8px">One reason to change. If you need "and" to name it — split it.</span></div></div>
+        <div class="fs t" style="background:#E1F5EE;border-left-color:#0F6E56;padding:8px 11px"><div class="ft"><span style="font-weight:500;color:#085041">O — OCP</span><span style="color:#0F6E56;font-size:13px;margin-left:8px">New behaviour = new class. No editing existing tested code.</span></div></div>
+        <div class="fs a" style="background:#FAEEDA;border-left-color:#854F0B;padding:8px 11px"><div class="ft"><span style="font-weight:500;color:#633806">L — LSP</span><span style="color:#854F0B;font-size:13px;margin-left:8px">Subtypes must honour the parent's contract. No surprise exceptions.</span></div></div>
+        <div class="fs" style="background:#E6F1FB;border-left-color:#185FA5;padding:8px 11px"><div class="ft"><span style="font-weight:500;color:#0C447C">I — ISP</span><span style="color:#185FA5;font-size:13px;margin-left:8px">Clients depend only on what they use. No fat interfaces.</span></div></div>
+        <div class="fs c" style="background:#FAECE7;border-left-color:#993C1D;padding:8px 11px"><div class="ft"><span style="font-weight:500;color:#712B13">D — DIP</span><span style="color:#993C1D;font-size:13px;margin-left:8px">Business depends on interfaces. Infrastructure implements them.</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s2">
+    <div class="card"><div class="ct">Spring Boot — where each principle shows up</div>
+      <div class="flow" style="gap:6px">
+        <div class="fs"><div class="fn" style="background:#EEEDFE;color:#3C3489">S</div><div class="ft" style="font-size:13px">Controller/Service/Repository layer split. Each @Component class serves one concern. EventListener for cross-cutting concerns instead of direct calls.</div></div>
+        <div class="fs t"><div class="fn t">O</div><div class="ft" style="font-size:13px">@Bean with interface type. Spring injects all implementations of an interface into a Map. Add a new implementation = register a @Component. Zero modification to the consumer.</div></div>
+        <div class="fs a"><div class="fn a">L</div><div class="ft" style="font-size:13px">Any class you mock in a @MockBean must honour its interface contract. If your mock works but the real impl throws — the real impl violates LSP.</div></div>
+        <div class="fs"><div class="fn" style="background:#E6F1FB;color:#0C447C">I</div><div class="ft" style="font-size:13px">Spring Data: CrudRepository vs JpaRepository. Your service injects only CrudRepository if it only needs save/findById. Doesn't need to know about flush(), merge(), etc.</div></div>
+        <div class="fs c"><div class="fn c">D</div><div class="ft" style="font-size:13px">Constructor injection of interfaces. @Profile("test") InMemoryImpl vs @Profile("prod") JpaImpl. The service never knows which it gets — that's DIP working.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s3">
+    <div class="card"><div class="ct">Master interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Walk me through all 5 SOLID principles with one cohesive example.<div class="qa">Using a payment processing service: SRP — PaymentService only orchestrates; PaymentValidator, PaymentNotifier, PaymentRepository are separate classes, each with one reason to change. OCP — PaymentGateway is an interface; adding Razorpay = new RazorpayGateway class, zero modification to PaymentService. LSP — RazorpayGateway honours the same contract as StripeGateway; calling charge() always returns a Receipt or throws PaymentException, never UnsupportedOperationException. ISP — PaymentService depends on PaymentGateway (charge + refund); ReportService depends on PaymentReadRepository (queries only) — not the full repository with write methods. DIP — PaymentService depends on PaymentGateway interface; the Spring container injects StripeGateway or RazorpayGateway based on config. Unit tests inject a mock gateway — zero network calls.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Trade-offs</div>Can following SOLID principles make code worse? When do you stop?<div class="qa">Yes. Over-application creates: interface explosion (an interface for everything, even things that will never have two implementations), premature abstraction (extracting classes for variations that never materialise), indirection fatigue (10 files to trace one request). SOLID is a set of principles, not rules. Apply them when: (1) you see concrete pain — tests are hard to write, changes ripple unexpectedly, classes are hard to understand. (2) You can identify a real axis of variation. The cost of not applying SOLID compounds over time. The cost of over-applying it is immediate complexity. The senior engineer judgment is knowing which cost is higher in the given context — and YAGNI is your guide for when NOT to apply them.</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function T(i){
+  document.querySelectorAll('.tp').forEach((p,j)=>p.classList.toggle('vis',j===i));
+  document.querySelectorAll('.nb').forEach((b,j)=>b.classList.toggle('on',j===i));
+  var tp=document.querySelectorAll('.tp')[i];
+  if(tp){var st=tp.querySelector('.st');if(st)st.click();}
+}
+function S(tid,sid){
+  var tp=document.getElementById(tid);
+  if(!tp)return;
+  tp.querySelectorAll('.sc').forEach(s=>s.classList.remove('vis'));
+  var sc=document.getElementById(tid+'-'+sid);
+  if(sc)sc.classList.add('vis');
+  var sids=['s0','s1','s2','s3','s4','s5','s6'];
+  tp.querySelectorAll('.st').forEach((b,i)=>b.classList.toggle('on',sids[i]===sid));
+}
+function A(el){
+  var a=el.querySelector('.qa');
+  if(a)a.style.display=a.style.display==='block'?'none':'block';
+}
+</script>

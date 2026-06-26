@@ -1,0 +1,759 @@
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--c-accent:#533AB7;--c-accent-light:#EEEDFE;--c-accent-mid:#AFA9EC;--c-teal:#0F6E56;--c-teal-light:#E1F5EE;--c-coral:#993C1D;--c-coral-light:#FAECE7;--c-amber:#854F0B;--c-amber-light:#FAEEDA}
+  body{font-family:var(--font-sans,system-ui);background:transparent;color:var(--color-text-primary)}
+  .bible-wrap{padding:0.5rem 0 2rem}
+  .nav-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem}
+  .nav-btn{padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:13px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all 0.15s}
+  .nav-btn:hover{background:var(--color-background-secondary)}
+  .nav-btn.active{background:#EEEDFE;border-color:#534AB7;color:#3C3489;font-weight:500}
+  .topic-panel{display:none}
+  .topic-panel.visible{display:block}
+  .topic-title{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+  .topic-sub{font-size:14px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+  .section-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.25rem;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:10px}
+  .stab{padding:5px 12px;font-size:12px;border-radius:16px;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);transition:all 0.15s}
+  .stab:hover{background:var(--color-background-secondary)}
+  .stab.active{background:#EEEDFE;color:#3C3489;font-weight:500}
+  .section-content{display:none}
+  .section-content.visible{display:block}
+  .card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg,12px);padding:1rem 1.25rem;margin-bottom:1rem}
+  .card-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px}
+  .def-text{font-size:15px;line-height:1.7;color:var(--color-text-primary)}
+  .pillar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:1rem}
+  .pillar-card{border-radius:var(--border-radius-lg,12px);padding:1rem 1.25rem;border:0.5px solid var(--color-border-tertiary)}
+  .pillar-enc{background:#EEEDFE;border-color:#AFA9EC}
+  .pillar-inh{background:#E1F5EE;border-color:#5DCAA5}
+  .pillar-pol{background:#FAEEDA;border-color:#EF9F27}
+  .pillar-abs{background:#FAECE7;border-color:#F0997B}
+  .pillar-name{font-size:14px;font-weight:500;margin-bottom:6px}
+  .pillar-enc .pillar-name{color:#3C3489}
+  .pillar-inh .pillar-name{color:#085041}
+  .pillar-pol .pillar-name{color:#633806}
+  .pillar-abs .pillar-name{color:#712B13}
+  .pillar-desc{font-size:13px;line-height:1.6}
+  .pillar-enc .pillar-desc{color:#534AB7}
+  .pillar-inh .pillar-desc{color:#0F6E56}
+  .pillar-pol .pillar-desc{color:#854F0B}
+  .pillar-abs .pillar-desc{color:#993C1D}
+  code,pre{font-family:var(--font-mono,monospace)}
+  .code-block{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md,8px);padding:1rem;overflow-x:auto;font-size:12.5px;line-height:1.7;margin-bottom:1rem;white-space:pre}
+  .kw{color:#534AB7;font-weight:500}
+  .cm{color:var(--color-text-secondary)}
+  .st{color:#085041}
+  .nm{color:#993C1D}
+  .mistake-item{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .mistake-item:last-child{border-bottom:none}
+  .mistake-icon{width:24px;height:24px;border-radius:50%;background:#FCEBEB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:13px}
+  .mistake-text{font-size:14px;line-height:1.6;color:var(--color-text-primary)}
+  .mistake-text strong{font-weight:500;color:#A32D2D}
+  .q-item{padding:10px 12px;border-radius:var(--border-radius-md,8px);background:var(--color-background-secondary);margin-bottom:8px;font-size:14px;line-height:1.6;cursor:pointer;border:0.5px solid var(--color-border-tertiary);transition:all 0.15s}
+  .q-item:hover{border-color:#AFA9EC;background:#EEEDFE}
+  .q-item .q-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px}
+  .q-item .q-text{color:var(--color-text-primary)}
+  .q-ans{font-size:13px;color:var(--color-text-secondary);margin-top:6px;padding-top:6px;border-top:0.5px solid var(--color-border-tertiary);display:none;line-height:1.6}
+  .connects-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .connects-chip{padding:5px 14px;border-radius:16px;font-size:13px;background:#EEEDFE;color:#3C3489;border:0.5px solid #AFA9EC;cursor:pointer}
+  .connects-chip:hover{background:#CECBF6}
+  .badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:500;margin-right:4px}
+  .badge-blue{background:#E6F1FB;color:#0C447C}
+  .badge-green{background:#EAF3DE;color:#3B6D11}
+  .badge-amber{background:#FAEEDA;color:#633806}
+  .badge-red{background:#FCEBEB;color:#A32D2D}
+  .comp-table{width:100%;border-collapse:collapse;font-size:13px}
+  .comp-table th{text-align:left;padding:8px 10px;background:var(--color-background-secondary);color:var(--color-text-secondary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .comp-table td{padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary);line-height:1.5;vertical-align:top}
+  .comp-table tr:last-child td{border-bottom:none}
+  .wildcard-row{display:flex;gap:12px;margin-bottom:10px}
+  .wc-box{flex:1;border-radius:var(--border-radius-md,8px);padding:10px 12px;font-size:13px;line-height:1.6}
+  .wc-extends{background:#E1F5EE;border:0.5px solid #5DCAA5;color:#085041}
+  .wc-super{background:#FAEEDA;border:0.5px solid #EF9F27;color:#633806}
+  .wc-label{font-weight:500;font-size:12px;margin-bottom:4px}
+  .internal-flow{display:flex;flex-direction:column;gap:8px}
+  .flow-step{display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:var(--border-radius-md,8px);background:var(--color-background-secondary);border-left:3px solid #AFA9EC}
+  .flow-num{width:22px;height:22px;border-radius:50%;background:#EEEDFE;color:#3C3489;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .flow-text{font-size:14px;line-height:1.6}
+  .pool-diagram{display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap}
+  .pool-box{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md,8px);padding:10px 12px;flex:1;min-width:180px}
+  .pool-box-title{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em}
+  .pool-entry{font-size:13px;padding:4px 8px;border-radius:6px;margin-bottom:4px;background:#EEEDFE;color:#3C3489}
+  .pool-entry.shared{background:#E1F5EE;color:#085041}
+  .pool-entry.heap{background:#FAEEDA;color:#633806}
+</style>
+
+<div class="bible-wrap">
+  <h2 style="sr-only" aria-hidden="false" style="display:none">Java OOP Visual Bible — 6 core topics with interactive sections</h2>
+
+  <div style="margin-bottom:1.5rem">
+    <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.6">Block 1 · OOP &amp; Type System · 6 topics · click any topic, then pick a section</p>
+  </div>
+
+  <div class="nav-bar" id="navBar">
+    <button class="nav-btn active" onclick="showTopic(0)">1 · 4 OOP Pillars</button>
+    <button class="nav-btn" onclick="showTopic(1)">2 · Interface vs Abstract</button>
+    <button class="nav-btn" onclick="showTopic(2)">3 · Generics</button>
+    <button class="nav-btn" onclick="showTopic(3)">4 · Immutability</button>
+    <button class="nav-btn" onclick="showTopic(4)">5 · Pass by Value</button>
+    <button class="nav-btn" onclick="showTopic(5)">6 · Type Casting</button>
+  </div>
+
+  <!-- TOPIC 0: 4 OOP PILLARS -->
+  <div class="topic-panel visible" id="t0">
+    <div class="topic-title">The 4 OOP Pillars</div>
+    <div class="topic-sub">Encapsulation · Inheritance · Polymorphism · Abstraction</div>
+    <div class="section-tabs">
+      <button class="stab active" onclick="showSection('t0','s0')">Definition</button>
+      <button class="stab" onclick="showSection('t0','s1')">How it Works</button>
+      <button class="stab" onclick="showSection('t0','s2')">Code</button>
+      <button class="stab" onclick="showSection('t0','s3')">Real World</button>
+      <button class="stab" onclick="showSection('t0','s4')">Mistakes</button>
+      <button class="stab" onclick="showSection('t0','s5')">Interview</button>
+      <button class="stab" onclick="showSection('t0','s6')">Connects To</button>
+    </div>
+    <div class="section-content visible" id="t0-s0">
+      <div class="card">
+        <div class="card-title">Definition</div>
+        <p class="def-text">OOP organises code around <strong>objects</strong> — bundles of state (fields) and behaviour (methods) — rather than procedures. Four principles govern how objects are designed, related, and replaced.</p>
+      </div>
+      <div class="pillar-grid">
+        <div class="pillar-card pillar-enc">
+          <div class="pillar-name">Encapsulation</div>
+          <div class="pillar-desc">Hide internal state. Expose only what callers need via a controlled public API. The object owns its own invariants — callers can't corrupt them.</div>
+        </div>
+        <div class="pillar-card pillar-inh">
+          <div class="pillar-name">Inheritance</div>
+          <div class="pillar-desc">A subclass acquires fields and methods from a superclass. Enables code reuse and "is-a" relationships. In Java, single-class inheritance only.</div>
+        </div>
+        <div class="pillar-card pillar-pol">
+          <div class="pillar-name">Polymorphism</div>
+          <div class="pillar-desc">One interface, many implementations. A reference of type <code>Shape</code> can hold a <code>Circle</code> or <code>Rectangle</code> — the correct method fires at runtime (dynamic dispatch).</div>
+        </div>
+        <div class="pillar-card pillar-abs">
+          <div class="pillar-name">Abstraction</div>
+          <div class="piltr-desc" style="font-size:13px;line-height:1.6;color:#712B13">Expose <em>what</em> an object does, hide <em>how</em>. Achieved via abstract classes and interfaces. Callers program to a contract, not a concrete type.</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t0-s1">
+      <div class="card">
+        <div class="card-title">How it works internally</div>
+        <div class="internal-flow">
+          <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Encapsulation</strong> — the compiler enforces access modifiers (<code>private</code>, <code>protected</code>, <code>public</code>). The JVM itself doesn't care — it's a compile-time contract. Reflection can bypass it at runtime (deliberate escape hatch).</div></div>
+          <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Inheritance</strong> — the JVM stores a reference to the parent class in the class metadata. Field lookup walks up the hierarchy. Method dispatch uses the <em>virtual method table (vtable)</em> — a per-class array of method pointers built at class-load time.</div></div>
+          <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Polymorphism / dynamic dispatch</strong> — when you call <code>shape.draw()</code>, the JVM looks up the vtable of the <em>actual object's class</em> at runtime (not the reference type). This is the <em>invokevirtual</em> bytecode instruction. Costs one extra pointer dereference — negligible unless in a tight loop with many types (JIT's megamorphic call site problem).</div></div>
+          <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Abstraction</strong> — abstract methods have no bytecode body; the JVM will throw <code>AbstractMethodError</code> if an unimplemented abstract class is somehow instantiated. Interfaces add an <em>interface table (itable)</em> lookup because a class can implement many interfaces.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t0-s2">
+      <div class="card">
+        <div class="card-title">Code example — all 4 pillars in one slice</div>
+        <div class="code-block"><span class="cm">// ABSTRACTION — contract only, no impl</span>
+<span class="kw">abstract class</span> <span class="nm">Shape</span> {
+    <span class="kw">private</span> <span class="nm">String</span> color;   <span class="cm">// ENCAPSULATION — private field</span>
+
+    <span class="kw">public</span> <span class="nm">Shape</span>(<span class="nm">String</span> color) { <span class="kw">this</span>.color = color; }
+
+    <span class="kw">public</span> <span class="nm">String</span> getColor() { <span class="kw">return</span> color; } <span class="cm">// controlled getter</span>
+
+    <span class="kw">public abstract double</span> area();  <span class="cm">// subclass MUST provide impl</span>
+
+    <span class="kw">public void</span> describe() {
+        <span class="cm">// calls overridden area() at runtime — POLYMORPHISM</span>
+        <span class="nm">System</span>.out.println(color + <span class="st">" shape, area="</span> + area());
+    }
+}
+
+<span class="kw">class</span> <span class="nm">Circle</span> <span class="kw">extends</span> <span class="nm">Shape</span> {    <span class="cm">// INHERITANCE</span>
+    <span class="kw">private double</span> radius;
+
+    <span class="kw">public</span> <span class="nm">Circle</span>(<span class="nm">String</span> c, <span class="kw">double</span> r) { <span class="kw">super</span>(c); <span class="kw">this</span>.radius = r; }
+
+    <span class="kw">@Override public double</span> area() { <span class="kw">return</span> <span class="nm">Math</span>.PI * radius * radius; }
+}
+
+<span class="kw">class</span> <span class="nm">Rect</span> <span class="kw">extends</span> <span class="nm">Shape</span> {
+    <span class="kw">private double</span> w, h;
+    <span class="kw">public</span> <span class="nm">Rect</span>(<span class="nm">String</span> c, <span class="kw">double</span> w, <span class="kw">double</span> h) { <span class="kw">super</span>(c); <span class="kw">this</span>.w=w; <span class="kw">this</span>.h=h; }
+    <span class="kw">@Override public double</span> area() { <span class="kw">return</span> w*h; }
+}
+
+<span class="cm">// Main — polymorphic loop (vtable dispatch fires here)</span>
+<span class="nm">Shape</span>[] shapes = { <span class="kw">new</span> <span class="nm">Circle</span>(<span class="st">"Red"</span>, 5), <span class="kw">new</span> <span class="nm">Rect</span>(<span class="st">"Blue"</span>, 4, 6) };
+<span class="kw">for</span> (<span class="nm">Shape</span> s : shapes) s.describe();
+<span class="cm">// Red shape, area=78.53...  /  Blue shape, area=24.0</span></div>
+      </div>
+    </div>
+    <div class="section-content" id="t0-s3">
+      <div class="card">
+        <div class="card-title">Real-world use cases</div>
+        <div class="mistake-item"><div class="mistake-icon">🏦</div><div class="mistake-text"><strong>Encapsulation</strong> — Spring's <code>@Service</code> beans hide their repository dependencies. Callers invoke <code>userService.createUser()</code> with no knowledge of how DB writes happen.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">🔗</div><div class="mistake-text"><strong>Inheritance</strong> — Spring Data JPA: <code>JpaRepository</code> → <code>PagingAndSortingRepository</code> → <code>CrudRepository</code>. You extend <code>JpaRepository</code> and inherit 20+ methods for free.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚙️</div><div class="mistake-text"><strong>Polymorphism</strong> — Strategy pattern in payment systems: <code>PaymentProcessor process(PaymentRequest)</code> implemented by <code>StripeProcessor</code>, <code>RazorpayProcessor</code>, <code>UPIProcessor</code>. Spring injects the right bean by name.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">📐</div><div class="mistake-text"><strong>Abstraction</strong> — JDBC's <code>Connection</code>/<code>Statement</code> interfaces. Your code calls <code>conn.prepareStatement(sql)</code> — same code works with MySQL, Postgres, H2 without changing a line.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t0-s4">
+      <div class="card">
+        <div class="card-title">Common mistakes</div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Making fields public "for convenience"</strong> — destroys encapsulation. Any class can corrupt state. Always start private, expose via methods.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Overusing inheritance for code reuse</strong> — Inheritance models IS-A. If you're inheriting just to reuse a method, use composition. Violation leads to fragile base class problems.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Forgetting @Override</strong> — without the annotation, a typo in the method signature creates a new method silently. The compiler won't catch it. Dynamic dispatch then calls the parent version — debugging nightmare.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Calling overridable methods from constructors</strong> — the subclass hasn't initialized yet. The overridden method runs with uninitialized subclass fields → NullPointerException or wrong values.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t0-s5">
+      <div class="card">
+        <div class="card-title">Interview questions — click to reveal answers</div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Concept</div><div class="q-text">What is the difference between encapsulation and abstraction?</div><div class="q-ans">Encapsulation is about <em>hiding data</em> — bundling state and protecting it from outside access. Abstraction is about <em>hiding complexity</em> — showing only the interface, not the implementation. You can have encapsulation without abstraction (a class with private fields and concrete methods), but abstraction implies encapsulation.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Deep dive</div><div class="q-text">How does Java implement polymorphism at the bytecode level?</div><div class="q-ans">Via the <code>invokevirtual</code> bytecode instruction. Each class has a vtable — an array of method pointers. At runtime the JVM reads the actual object's class from the object header, indexes into its vtable, and calls the correct implementation. <code>invokeinterface</code> does similar but must handle multiple interface implementations (itable lookup).</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Follow-up</div><div class="q-text">Why can't you instantiate an abstract class?</div><div class="q-ans">Abstract methods have no bytecode body. If the JVM allowed instantiation, calling an abstract method would crash with no handler to jump to. The compiler enforces this. Note: you CAN create anonymous subclasses that implement all abstract methods — the JVM creates a concrete class behind the scenes.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Design</div><div class="q-text">When would you choose composition over inheritance?</div><div class="q-ans">When the relationship is HAS-A, not IS-A. Also: (1) if you need to change behaviour at runtime (strategy), (2) if the parent class may change (fragile base class), (3) if you're tempted to inherit just for code reuse. Rule: "Favour composition over inheritance" — GoF, effective Java Item 18.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t0-s6">
+      <div class="card">
+        <div class="card-title">Connects to</div>
+        <div class="connects-grid">
+          <span class="connects-chip" onclick="sendPrompt('Explain the SOLID principles in Java')">SOLID principles</span>
+          <span class="connects-chip" onclick="sendPrompt('Explain the Strategy design pattern in Java')">Strategy pattern</span>
+          <span class="connects-chip" onclick="sendPrompt('How do Java interfaces enable polymorphism?')">Interfaces</span>
+          <span class="connects-chip" onclick="sendPrompt('Explain invokevirtual vs invokeinterface bytecode')">JVM bytecode</span>
+          <span class="connects-chip" onclick="sendPrompt('Explain the Template Method pattern in Java')">Template Method</span>
+          <span class="connects-chip" onclick="sendPrompt('What is the fragile base class problem in Java?')">Fragile base class</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 1: INTERFACE VS ABSTRACT -->
+  <div class="topic-panel" id="t1">
+    <div class="topic-title">Interface vs Abstract Class</div>
+    <div class="topic-sub">Contracts, default methods, functional interfaces</div>
+    <div class="section-tabs">
+      <button class="stab active" onclick="showSection('t1','s0')">Definition</button>
+      <button class="stab" onclick="showSection('t1','s1')">How it Works</button>
+      <button class="stab" onclick="showSection('t1','s2')">Comparison</button>
+      <button class="stab" onclick="showSection('t1','s3')">Code</button>
+      <button class="stab" onclick="showSection('t1','s4')">Mistakes</button>
+      <button class="stab" onclick="showSection('t1','s5')">Interview</button>
+      <button class="stab" onclick="showSection('t1','s6')">Connects To</button>
+    </div>
+    <div class="section-content visible" id="t1-s0">
+      <div class="card">
+        <div class="card-title">Definition</div>
+        <p class="def-text">An <strong>interface</strong> is a pure contract — a list of method signatures that implementing classes must fulfil. An <strong>abstract class</strong> is a partial implementation — it can mix abstract methods with concrete ones and hold state. Java 8+ blurred the line with <code>default</code> and <code>static</code> methods on interfaces.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:1rem">
+        <div class="pillar-card pillar-enc" style="background:#E6F1FB;border-color:#85B7EB">
+          <div class="pillar-name" style="color:#0C447C">Interface</div>
+          <div class="pillar-desc" style="color:#185FA5">Defines WHAT. No state (except static final constants). Multiple implementation allowed. Use when unrelated classes share a capability (Comparable, Serializable).</div>
+        </div>
+        <div class="pillar-card pillar-abs" style="background:#FAEEDA;border-color:#EF9F27">
+          <div class="pillar-name" style="color:#633806">Abstract Class</div>
+          <div class="pillar-desc" style="color:#854F0B">Defines WHAT + partially HOW. Can hold state. Single inheritance. Use when classes are related and share common base state/behaviour (HttpServlet, AbstractList).</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t1-s1">
+      <div class="card">
+        <div class="card-title">How it works internally</div>
+        <div class="internal-flow">
+          <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Interfaces</strong> — compiled to a class file with <code>ACC_INTERFACE</code> flag. Method calls use <code>invokeinterface</code> bytecode (slower than <code>invokevirtual</code> — must scan itable). Since Java 8, <code>default</code> methods are real bytecode in the interface class file; implementing classes inherit them unless they override.</div></div>
+          <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Abstract classes</strong> — normal class files with <code>ACC_ABSTRACT</code> flag + abstract methods with no Code attribute. JVM blocks <code>new</code> on them at runtime. Dispatch is <code>invokevirtual</code> — faster than interface dispatch.</div></div>
+          <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Functional interfaces</strong> — any interface with exactly 1 abstract method. The <code>@FunctionalInterface</code> annotation is a compile-time guard (optional but recommended). Lambdas are syntactic sugar: the compiler generates an <code>invokedynamic</code> instruction that creates the implementing class lazily at first call via <code>LambdaMetafactory</code>.</div></div>
+          <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Default method diamond conflict</strong> — if two interfaces provide <code>default</code> methods with the same signature, the implementing class <em>must</em> override to resolve ambiguity — compile error otherwise.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t1-s2">
+      <div class="card">
+        <div class="card-title">Side-by-side comparison</div>
+        <table class="comp-table">
+          <thead><tr><th>Axis</th><th>Interface</th><th>Abstract Class</th></tr></thead>
+          <tbody>
+            <tr><td>State (fields)</td><td>Only <code>public static final</code> constants</td><td>Any fields, any visibility</td></tr>
+            <tr><td>Constructor</td><td>❌ None</td><td>✅ Yes (for subclass init)</td></tr>
+            <tr><td>Multiple "inheritance"</td><td>✅ A class implements many</td><td>❌ Single extends only</td></tr>
+            <tr><td>Access modifiers</td><td>Methods are <code>public</code> by default (Java 9+ allows <code>private</code> helpers)</td><td>Any modifier</td></tr>
+            <tr><td>Concrete methods</td><td>Only via <code>default</code> / <code>static</code></td><td>Yes, freely</td></tr>
+            <tr><td>Use when</td><td>Unrelated classes share a capability; you want to define a type</td><td>Related classes share code + state; template method pattern</td></tr>
+            <tr><td>Examples in JDK</td><td>Comparable, Runnable, Serializable, List</td><td>AbstractList, HttpServlet, AbstractQueuedSynchronizer</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="section-content" id="t1-s3">
+      <div class="card">
+        <div class="card-title">Code — default methods + functional interface</div>
+        <div class="code-block"><span class="cm">// Functional interface — exactly 1 abstract method</span>
+<span class="kw">@FunctionalInterface</span>
+<span class="kw">interface</span> <span class="nm">Validator</span>&lt;<span class="nm">T</span>&gt; {
+    <span class="kw">boolean</span> validate(<span class="nm">T</span> value);
+
+    <span class="cm">// default method — chaining validators (added Java 8)</span>
+    <span class="kw">default</span> <span class="nm">Validator</span>&lt;<span class="nm">T</span>&gt; and(<span class="nm">Validator</span>&lt;<span class="nm">T</span>&gt; other) {
+        <span class="kw">return</span> v -&gt; <span class="kw">this</span>.validate(v) &amp;&amp; other.validate(v);
+    }
+}
+
+<span class="cm">// Abstract class — shared state + template</span>
+<span class="kw">abstract class</span> <span class="nm">BaseService</span> {
+    <span class="kw">protected final</span> <span class="nm">String</span> serviceName; <span class="cm">// state — can't put in interface</span>
+    <span class="kw">public</span> <span class="nm">BaseService</span>(<span class="nm">String</span> name) { <span class="kw">this</span>.serviceName = name; }
+
+    <span class="kw">public abstract void</span> process();    <span class="cm">// subclass fills in</span>
+    <span class="kw">public void</span> log() {                <span class="cm">// shared concrete method</span>
+        <span class="nm">System</span>.out.println(serviceName + <span class="st">" processed"</span>);
+    }
+}
+
+<span class="cm">// Usage — lambda satisfies functional interface</span>
+<span class="nm">Validator</span>&lt;<span class="nm">String</span>&gt; notBlank = s -&gt; !s.isBlank();
+<span class="nm">Validator</span>&lt;<span class="nm">String</span>&gt; maxLen   = s -&gt; s.length() &lt;= 50;
+<span class="nm">Validator</span>&lt;<span class="nm">String</span>&gt; combined = notBlank.and(maxLen);
+combined.validate(<span class="st">"hello"</span>); <span class="cm">// true</span></div>
+      </div>
+    </div>
+    <div class="section-content" id="t1-s4">
+      <div class="card">
+        <div class="card-title">Common mistakes</div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Using abstract class when you mean interface</strong> — if you have no state and no shared behaviour, an abstract class just burns your single inheritance slot for no reason.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Putting too much in default methods</strong> — default methods can't access instance state. Complex logic in defaults creates confusion about where behaviour lives. Keep defaults thin (e.g., chaining helpers).</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Forgetting @FunctionalInterface</strong> — without it, adding a second abstract method later silently breaks all lambda usages — no compile error at the interface definition site.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Marker interfaces vs annotations</strong> — empty interfaces like <code>Serializable</code> were the old way to tag classes. For new code, use annotations (<code>@Transactional</code>, custom meta-annotations). Marker interfaces still exist in the JDK for historical reasons.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t1-s5">
+      <div class="card">
+        <div class="card-title">Interview questions</div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Classic</div><div class="q-text">Can an interface extend another interface? Can an abstract class implement an interface?</div><div class="q-ans">Yes to both. An interface can extend multiple interfaces (interface multiple inheritance is fine). An abstract class can implement an interface without providing method bodies — the first concrete subclass must implement them.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Java 8+</div><div class="q-text">What problem did default methods solve and what new problem did they create?</div><div class="q-ans">Solved: retroactively adding methods to interfaces (e.g. <code>List.forEach</code>) without breaking all existing implementations. Created: diamond problem — two interfaces with same default method signature forces the implementor to resolve the conflict explicitly via override.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Depth</div><div class="q-text">Why is invokeinterface slower than invokevirtual?</div><div class="q-ans">vtable index is fixed per class — the JVM can jump straight to the right slot. itable is variable per class (a class may implement many interfaces in any order) — JVM must scan to find the right interface entry. JIT can optimise both away with inlining when the call site is monomorphic.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t1-s6">
+      <div class="card">
+        <div class="card-title">Connects to</div>
+        <div class="connects-grid">
+          <span class="connects-chip" onclick="sendPrompt('Explain Java functional interfaces and lambdas in depth')">Lambdas &amp; Streams</span>
+          <span class="connects-chip" onclick="sendPrompt('Explain the Template Method pattern in Java')">Template Method</span>
+          <span class="connects-chip" onclick="sendPrompt('What is the SOLID Interface Segregation Principle?')">ISP principle</span>
+          <span class="connects-chip" onclick="sendPrompt('How does Spring use interfaces for dependency injection?')">Spring DI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPIC 2: GENERICS -->
+  <div class="topic-panel" id="t2">
+    <div class="topic-title">Generics</div>
+    <div class="topic-sub">Generic methods · bounded wildcards · type erasure</div>
+    <div class="section-tabs">
+      <button class="stab active" onclick="showSection('t2','s0')">Definition</button>
+      <button class="stab" onclick="showSection('t2','s1')">How it Works</button>
+      <button class="stab" onclick="showSection('t2','s2')">Wildcards</button>
+      <button class="stab" onclick="showSection('t2','s3')">Code</button>
+      <button class="stab" onclick="showSection('t2','s4')">Mistakes</button>
+      <button class="stab" onclick="showSection('t2','s5')">Interview</button>
+      <button class="stab" onclick="showSection('t2','s6')">Connects To</button>
+    </div>
+    <div class="section-content visible" id="t2-s0">
+      <div class="card">
+        <div class="card-title">Definition</div>
+        <p class="def-text">Generics let you write a class or method once and parameterise it with a type — so <code>List&lt;String&gt;</code> and <code>List&lt;Integer&gt;</code> share one implementation but give you type safety at compile time. The type parameter is erased at runtime — the JVM only ever sees raw types.</p>
+      </div>
+    </div>
+    <div class="section-content" id="t2-s1">
+      <div class="card">
+        <div class="card-title">Type erasure — what the JVM actually sees</div>
+        <div class="internal-flow">
+          <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">At compile time, the compiler checks all generic types for correctness and inserts <strong>casts</strong> automatically where needed.</div></div>
+          <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">The compiler then <strong>erases</strong> all type parameters — <code>List&lt;String&gt;</code> becomes <code>List</code>. Bounded types (<code>T extends Comparable</code>) become their bound (<code>Comparable</code>). Unbounded become <code>Object</code>.</div></div>
+          <div class="flow-step"><div class="flow-num">3</div><div class="flow-text">At runtime: <code>List&lt;String&gt;</code> and <code>List&lt;Integer&gt;</code> are the <em>same class</em>. <code>new T()</code> is impossible. <code>instanceof List&lt;String&gt;</code> is impossible. This is why you can't create generic arrays.</div></div>
+          <div class="flow-step"><div class="flow-num">4</div><div class="flow-text">Reflection can reveal generic type info via <code>ParameterizedType</code> — because the compiler embeds it in the class file's <code>Signature</code> attribute. Jackson uses this to deserialize <code>List&lt;User&gt;</code>.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t2-s2">
+      <div class="card">
+        <div class="card-title">Wildcards — PECS rule</div>
+        <div style="background:#EEEDFE;border:0.5px solid #AFA9EC;border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:12px;font-size:14px;color:#3C3489;font-weight:500">PECS: Producer Extends, Consumer Super</div>
+        <div class="wildcard-row">
+          <div class="wc-box wc-extends">
+            <div class="wc-label">&lt;? extends T&gt; — upper bound</div>
+            You can READ T from this collection. You cannot add to it (compiler doesn't know exact subtype). Use when the collection <em>produces</em> T values for you. Example: <code>sum(List&lt;? extends Number&gt; list)</code>
+          </div>
+          <div class="wc-box wc-super">
+            <div class="wc-label">&lt;? super T&gt; — lower bound</div>
+            You can WRITE T into this collection. You can only read Object out. Use when the collection <em>consumes</em> T values from you. Example: <code>addNumbers(List&lt;? super Integer&gt; list)</code>
+          </div>
+        </div>
+        <div class="code-block"><span class="cm">// PECS in practice — Collections.copy signature</span>
+<span class="kw">static</span> &lt;<span class="nm">T</span>&gt; <span class="kw">void</span> copy(<span class="nm">List</span>&lt;? <span class="kw">super</span> <span class="nm">T</span>&gt; dest,   <span class="cm">// consumer — super</span>
+                      <span class="nm">List</span>&lt;? <span class="kw">extends</span> <span class="nm">T</span>&gt; src) { <span class="cm">// producer — extends</span>
+    <span class="kw">for</span> (<span class="nm">T</span> t : src) dest.add(t);
+}</span></div>
+      </div>
+    </div>
+    <div class="section-content" id="t2-s3">
+      <div class="card">
+        <div class="card-title">Code — generic class + method + type erasure demo</div>
+        <div class="code-block"><span class="cm">// Generic class</span>
+<span class="kw">class</span> <span class="nm">Pair</span>&lt;<span class="nm">A</span>, <span class="nm">B</span>&gt; {
+    <span class="kw">private final</span> <span class="nm">A</span> first;
+    <span class="kw">private final</span> <span class="nm">B</span> second;
+    <span class="kw">public</span> <span class="nm">Pair</span>(<span class="nm">A</span> a, <span class="nm">B</span> b) { first=a; second=b; }
+    <span class="kw">public</span> <span class="nm">A</span> first()  { <span class="kw">return</span> first; }
+    <span class="kw">public</span> <span class="nm">B</span> second() { <span class="kw">return</span> second; }
+}
+
+<span class="cm">// Generic method — T inferred from args</span>
+<span class="kw">public static</span> &lt;<span class="nm">T</span> <span class="kw">extends</span> <span class="nm">Comparable</span>&lt;<span class="nm">T</span>&gt;&gt; <span class="nm">T</span> max(<span class="nm">T</span> a, <span class="nm">T</span> b) {
+    <span class="kw">return</span> a.compareTo(b) &gt;= 0 ? a : b;
+}
+
+<span class="cm">// Type erasure — at runtime both are just List</span>
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt;  ls = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;();
+<span class="nm">List</span>&lt;<span class="nm">Integer</span>&gt; li = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;();
+<span class="nm">System</span>.out.println(ls.getClass() == li.getClass()); <span class="cm">// true!</span>
+
+<span class="cm">// TypeToken pattern (Jackson / Gson) to survive erasure</span>
+<span class="nm">ObjectMapper</span> mapper = <span class="kw">new</span> <span class="nm">ObjectMapper</span>();
+<span class="nm">List</span>&lt;<span class="nm">User</span>&gt; users = mapper.readValue(json,
+    <span class="kw">new</span> <span class="nm">TypeReference</span>&lt;<span class="nm">List</span>&lt;<span class="nm">User</span>&gt;&gt;(){});
+<span class="cm">// TypeReference creates anonymous subclass; compiler embeds
+// generic type in Signature attribute — readable at runtime</span></div>
+      </div>
+    </div>
+    <div class="section-content" id="t2-s4">
+      <div class="card">
+        <div class="card-title">Common mistakes</div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Using raw types</strong> — <code>List list = new ArrayList()</code> bypasses compile-time checks. A bad cast can hide for months until a <code>ClassCastException</code> at runtime.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Creating generic arrays</strong> — <code>new T[]</code> is illegal because erasure makes it unsafe. Use <code>List&lt;T&gt;</code> or cast from <code>Object[]</code> with an unchecked warning you consciously suppress.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Confusing &lt;?&gt; with &lt;Object&gt;</strong> — <code>List&lt;?&gt;</code> is a list of some unknown type (you can only read Object out, can't add). <code>List&lt;Object&gt;</code> accepts any object for writes but <code>List&lt;String&gt;</code> is NOT a subtype of it.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Forgetting PECS direction</strong> — passing a <code>List&lt;Number&gt;</code> where <code>List&lt;? extends Number&gt;</code> is expected works. Reversing the wildcard doesn't — compiler error. PECS is the mental model to get this right every time.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t2-s5">
+      <div class="card">
+        <div class="card-title">Interview questions</div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Classic</div><div class="q-text">What is type erasure and what are its practical consequences?</div><div class="q-ans">At compile time generics are checked and then removed — the JVM sees only raw types. Consequences: (1) can't use instanceof with generic type, (2) can't create generic arrays, (3) can't instantiate T with new, (4) two List&lt;?&gt; are the same class at runtime. Workaround: TypeToken / TypeReference pattern for reflection.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">PECS</div><div class="q-text">Why is List&lt;String&gt; not a subtype of List&lt;Object&gt;?</div><div class="q-ans">Because generics are invariant. If it were a subtype, you could pass a List&lt;String&gt; where List&lt;Object&gt; is expected and add an Integer into it — type safety breaks. Arrays ARE covariant (String[] IS-A Object[]) and that's exactly why arrays can throw ArrayStoreException. Generics chose invariance to catch this at compile time.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Depth</div><div class="q-text">How does Jackson deserialize List&lt;User&gt; when type erasure hides the generic?</div><div class="q-ans">TypeReference creates an anonymous subclass. The compiler embeds the full generic signature in the class file's Signature attribute (erasure only removes it from bytecode method bodies, not from class-level declarations). Jackson reflects on this to recover List&lt;User&gt; and instantiate User for each element.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t2-s6">
+      <div class="card"><div class="card-title">Connects to</div><div class="connects-grid">
+        <span class="connects-chip" onclick="sendPrompt('Explain Java Collections Framework internals')">Collections Framework</span>
+        <span class="connects-chip" onclick="sendPrompt('How do Java Streams use generics?')">Streams API</span>
+        <span class="connects-chip" onclick="sendPrompt('Explain Java reflection and ParameterizedType')">Reflection</span>
+        <span class="connects-chip" onclick="sendPrompt('How does Jackson TypeReference work internally?')">Jackson internals</span>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- TOPIC 3: IMMUTABILITY -->
+  <div class="topic-panel" id="t3">
+    <div class="topic-title">Immutability</div>
+    <div class="topic-sub">String pool · StringBuilder vs StringBuffer · custom immutable classes</div>
+    <div class="section-tabs">
+      <button class="stab active" onclick="showSection('t3','s0')">Definition</button>
+      <button class="stab" onclick="showSection('t3','s1')">How it Works</button>
+      <button class="stab" onclick="showSection('t3','s2')">String Pool</button>
+      <button class="stab" onclick="showSection('t3','s3')">Code</button>
+      <button class="stab" onclick="showSection('t3','s4')">Mistakes</button>
+      <button class="stab" onclick="showSection('t3','s5')">Interview</button>
+      <button class="stab" onclick="showSection('t3','s6')">Connects To</button>
+    </div>
+    <div class="section-content visible" id="t3-s0">
+      <div class="card"><div class="card-title">Definition</div>
+        <p class="def-text">An immutable object's state cannot change after construction. Java's <code>String</code> is immutable — every "modification" creates a new object. Immutability is a cornerstone of thread safety: if an object can't change, no synchronisation is needed.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:0.5rem">
+        <div class="pillar-card" style="background:#E1F5EE;border-color:#5DCAA5">
+          <div class="pillar-name" style="color:#085041">String (immutable)</div>
+          <div class="pillar-desc" style="color:#0F6E56">Safe to share across threads. Can be interned (pooled). Used as HashMap key safely. Cost: new object on every change.</div>
+        </div>
+        <div class="pillar-card" style="background:#FAEEDA;border-color:#EF9F27">
+          <div class="pillar-name" style="color:#633806">StringBuilder (mutable)</div>
+          <div class="pillar-desc" style="color:#854F0B">Not thread-safe. Best for single-thread string construction. Backed by a resizable char array.</div>
+        </div>
+        <div class="pillar-card" style="background:#FCEBEB;border-color:#F09595">
+          <div class="pillar-name" style="color:#A32D2D">StringBuffer (mutable)</div>
+          <div class="pillar-desc" style="color:#791F1F">Thread-safe via synchronized methods. Slower than StringBuilder. Legacy — rarely needed now; prefer explicit synchronisation.</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t3-s1">
+      <div class="card"><div class="card-title">Why String is immutable — 5 design reasons</div>
+        <div class="internal-flow">
+          <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>String pool / caching</strong> — if strings could change, sharing them in a pool would corrupt all references. Immutability makes pooling safe.</div></div>
+          <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>HashMap keys</strong> — hashCode is computed once and cached in the String object. If the value changed, the hash would be wrong and the key would be unfindable in a HashMap.</div></div>
+          <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Thread safety for free</strong> — immutable objects need no locks. Strings passed between threads are safe without synchronisation.</div></div>
+          <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Security</strong> — class loading, file paths, network connections all use String. If mutable, an attacker could change a path after a security check but before use (TOCTOU attack).</div></div>
+          <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>Implementation</strong> — <code>String</code> is <code>final</code> class + <code>private final char[] value</code>. No setters. No subclassing allowed. Since Java 9, uses <code>byte[]</code> with a coder flag for compact strings (LATIN1 = 1 byte/char).</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t3-s2">
+      <div class="card"><div class="card-title">String pool diagram</div>
+        <div class="pool-diagram">
+          <div class="pool-box">
+            <div class="pool-box-title">String Pool (Heap, Metaspace pre-Java 7)</div>
+            <div class="pool-entry shared">"hello" ← s1, s3</div>
+            <div class="pool-entry shared">"world"</div>
+            <div class="pool-entry shared">"java"</div>
+          </div>
+          <div style="display:flex;align-items:center;font-size:20px;color:var(--color-text-secondary)">→</div>
+          <div class="pool-box">
+            <div class="pool-box-title">Regular Heap objects</div>
+            <div class="pool-entry heap">new String("hello") ← s2</div>
+            <div class="pool-entry heap">new String("hello") ← s4</div>
+            <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px;padding-top:6px;border-top:0.5px solid var(--color-border-tertiary)">s1 == s3 → true (same pool ref)<br>s1 == s2 → false (different objects)<br>s1.equals(s2) → true (value equal)<br>s2.intern() → returns pool ref</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t3-s3">
+      <div class="card"><div class="card-title">Code — custom immutable class + StringBuilder perf</div>
+        <div class="code-block"><span class="cm">// Custom immutable class — recipe</span>
+<span class="kw">public final class</span> <span class="nm">Money</span> {             <span class="cm">// final — no subclassing</span>
+    <span class="kw">private final long</span> amount;           <span class="cm">// final fields</span>
+    <span class="kw">private final</span> <span class="nm">String</span> currency;
+
+    <span class="kw">public</span> <span class="nm">Money</span>(<span class="kw">long</span> amount, <span class="nm">String</span> currency) {
+        <span class="kw">this</span>.amount = amount;
+        <span class="kw">this</span>.currency = currency;         <span class="cm">// String already immutable</span>
+    }
+    <span class="kw">public long</span> getAmount()   { <span class="kw">return</span> amount; }
+    <span class="kw">public</span> <span class="nm">String</span> getCurrency(){ <span class="kw">return</span> currency; }
+
+    <span class="kw">public</span> <span class="nm">Money</span> add(<span class="nm">Money</span> other) {    <span class="cm">// return new object, don't mutate</span>
+        <span class="kw">if</span> (!currency.equals(other.currency)) <span class="kw">throw new</span> <span class="nm">IllegalArgumentException</span>();
+        <span class="kw">return new</span> <span class="nm">Money</span>(amount + other.amount, currency);
+    }
+}
+
+<span class="cm">// StringBuilder vs String concatenation</span>
+<span class="cm">// BAD — O(n²) — each += creates a new String object</span>
+<span class="nm">String</span> result = <span class="st">""</span>;
+<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 1000; i++) result += i;
+
+<span class="cm">// GOOD — O(n) — single resizable buffer</span>
+<span class="nm">StringBuilder</span> sb = <span class="kw">new</span> <span class="nm">StringBuilder</span>();
+<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 1000; i++) sb.append(i);
+<span class="nm">String</span> r = sb.toString();</div>
+      </div>
+    </div>
+    <div class="section-content" id="t3-s4">
+      <div class="card"><div class="card-title">Common mistakes</div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Mutable fields in "immutable" class</strong> — if your immutable class holds a <code>List</code>, callers can mutate the list via the getter. Fix: return <code>Collections.unmodifiableList()</code> or copy on return.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>String concatenation in loops</strong> — <code>s += x</code> in a loop is O(n²) because each concat allocates a new String. Use StringBuilder. Note: Java compiler optimises single-expression concat like <code>"a" + b + "c"</code> to StringBuilder automatically — only loops are a problem.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Using == for String comparison</strong> — compares references, not values. Pool interning makes it work sometimes, which creates subtle bugs that only appear in production (where strings come from DB, not literals). Always use <code>.equals()</code>.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t3-s5">
+      <div class="card"><div class="card-title">Interview questions</div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Classic</div><div class="q-text">Why is String immutable in Java?</div><div class="q-ans">5 reasons: (1) String pool safety — shared references need stable values, (2) HashMap key integrity — cached hashCode must stay valid, (3) thread safety for free, (4) security — class loading and file paths use String; mutability = TOCTOU attacks, (5) design philosophy — strings are value-like, not object-like.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Differentiate</div><div class="q-text">StringBuilder vs StringBuffer — when do you actually use StringBuffer?</div><div class="q-ans">Almost never in new code. StringBuffer's synchronised methods are coarse-grained and slow. If you need thread-safe string building, you usually want to confine StringBuilder to a single thread anyway, or use a higher-level abstraction. StringBuffer is a Java 1.0 relic — StringBuilder (Java 5) replaced it in single-threaded contexts.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Design</div><div class="q-text">How would you make a class with a List field truly immutable?</div><div class="q-ans">Copy the list in the constructor (defensive copy), store as a private final field, and return Collections.unmodifiableList() or List.copyOf() from the getter. Java 16+ records do this cleanly. Also: mark the class final to prevent mutable subclasses.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t3-s6">
+      <div class="card"><div class="card-title">Connects to</div><div class="connects-grid">
+        <span class="connects-chip" onclick="sendPrompt('How does Java memory model relate to immutability and thread safety?')">Java Memory Model</span>
+        <span class="connects-chip" onclick="sendPrompt('Explain Java HashMap internals and why String is a good key')">HashMap internals</span>
+        <span class="connects-chip" onclick="sendPrompt('What are Java records and how do they enforce immutability?')">Java Records</span>
+        <span class="connects-chip" onclick="sendPrompt('Explain value objects in DDD and how to implement them in Java')">Value Objects (DDD)</span>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- TOPIC 4: PASS BY VALUE -->
+  <div class="topic-panel" id="t4">
+    <div class="topic-title">Pass by Value vs Reference</div>
+    <div class="topic-sub">Java is always pass-by-value — but what that means for objects is subtle</div>
+    <div class="section-tabs">
+      <button class="stab active" onclick="showSection('t4','s0')">Definition</button>
+      <button class="stab" onclick="showSection('t4','s1')">How it Works</button>
+      <button class="stab" onclick="showSection('t4','s2')">Code</button>
+      <button class="stab" onclick="showSection('t4','s3')">Mistakes</button>
+      <button class="stab" onclick="showSection('t4','s4')">Interview</button>
+      <button class="stab" onclick="showSection('t4','s5')">Connects To</button>
+    </div>
+    <div class="section-content visible" id="t4-s0">
+      <div class="card"><div class="card-title">Definition</div>
+        <p class="def-text">Java is <strong>always pass-by-value</strong>. For primitives, the value itself is copied. For objects, the <em>reference</em> (memory address) is copied — not the object. So the callee gets its own copy of the pointer, not a pointer-to-pointer. You can mutate the object the reference points to, but you cannot make the caller's variable point to a different object.</p>
+      </div>
+    </div>
+    <div class="section-content" id="t4-s1">
+      <div class="card"><div class="card-title">Memory model — what actually happens on the stack</div>
+        <div class="internal-flow">
+          <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Primitive (<code>int x = 5</code>)</strong> — value <code>5</code> lives on the caller's stack frame. Passing to a method copies <code>5</code> to the callee's stack frame. Changing it in the callee has zero effect on the caller.</div></div>
+          <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Object (<code>Dog d = new Dog("Rex")</code>)</strong> — <code>d</code> on the stack holds a reference (think: memory address, e.g. <code>0x7f4a</code>). Passing <code>d</code> copies the address <code>0x7f4a</code> to the callee. Both caller and callee now hold <code>0x7f4a</code> — same dog on the heap. Mutating <code>dog.name = "Max"</code> via the callee's copy is visible to the caller. But doing <code>dog = new Dog("other")</code> in the callee only updates the callee's local copy of the address — caller's <code>d</code> still points to <code>0x7f4a</code>.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t4-s2">
+      <div class="card"><div class="card-title">Code — the classic demo</div>
+        <div class="code-block"><span class="kw">class</span> <span class="nm">Dog</span> { <span class="nm">String</span> name; <span class="nm">Dog</span>(<span class="nm">String</span> n){ name=n; } }
+
+<span class="kw">void</span> tryReassign(<span class="nm">Dog</span> d) {
+    d.name = <span class="st">"Max"</span>;         <span class="cm">// mutates the heap object — VISIBLE to caller</span>
+    d = <span class="kw">new</span> <span class="nm">Dog</span>(<span class="st">"Other"</span>);  <span class="cm">// reassigns LOCAL copy of reference — NOT visible</span>
+}
+
+<span class="nm">Dog</span> rex = <span class="kw">new</span> <span class="nm">Dog</span>(<span class="st">"Rex"</span>);
+tryReassign(rex);
+<span class="nm">System</span>.out.println(rex.name); <span class="cm">// "Max" — mutation visible</span>
+                               <span class="cm">// NOT "Other" — reassign not visible</span>
+
+<span class="cm">// Primitive</span>
+<span class="kw">void</span> tryChange(<span class="kw">int</span> x) { x = 99; }
+<span class="kw">int</span> v = 5;
+tryChange(v);
+<span class="nm">System</span>.out.println(v); <span class="cm">// still 5</span></div>
+      </div>
+    </div>
+    <div class="section-content" id="t4-s3">
+      <div class="card"><div class="card-title">Common mistakes</div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Thinking Java objects are pass-by-reference</strong> — they're not. You pass a copy of the reference. The distinction matters when you want to swap two objects or make a method return a new object to the caller — you can't do it via parameter alone.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Mutating parameters unintentionally</strong> — passing a List into a helper, modifying it, and not realising the caller's List is now changed. Use defensive copies when you don't intend mutation.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t4-s4">
+      <div class="card"><div class="card-title">Interview questions</div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Classic</div><div class="q-text">Is Java pass-by-value or pass-by-reference?</div><div class="q-ans">Always pass-by-value. For primitives that's the primitive value. For objects that's the value of the reference (the address). The confusion arises because you can mutate the object via the copied reference — but you can't make the caller's variable point elsewhere. True pass-by-reference (like C++ &) would allow that.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Follow-up</div><div class="q-text">How would you write a swap(a, b) method in Java that actually works?</div><div class="q-ans">You can't swap primitive local variables via a method in Java. For objects you can wrap them in an array or a holder object: pass int[] arr = {a, b} and swap arr[0]/arr[1]. Or return a Pair. This is one of the most common Java gotchas — the language simply doesn't support true pass-by-reference.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t4-s5">
+      <div class="card"><div class="card-title">Connects to</div><div class="connects-grid">
+        <span class="connects-chip" onclick="sendPrompt('Explain Java stack vs heap memory model')">Stack vs Heap</span>
+        <span class="connects-chip" onclick="sendPrompt('What is a defensive copy in Java and when do you need it?')">Defensive copy</span>
+        <span class="connects-chip" onclick="sendPrompt('How does Java garbage collector handle object references?')">GC &amp; References</span>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- TOPIC 5: TYPE CASTING -->
+  <div class="topic-panel" id="t5">
+    <div class="topic-title">Type Casting</div>
+    <div class="topic-sub">Widening · narrowing · ClassCastException · instanceof pattern matching</div>
+    <div class="section-tabs">
+      <button class="stab active" onclick="showSection('t5','s0')">Definition</button>
+      <button class="stab" onclick="showSection('t5','s1')">How it Works</button>
+      <button class="stab" onclick="showSection('t5','s2')">Code</button>
+      <button class="stab" onclick="showSection('t5','s3')">Mistakes</button>
+      <button class="stab" onclick="showSection('t5','s4')">Interview</button>
+      <button class="stab" onclick="showSection('t5','s5')">Connects To</button>
+    </div>
+    <div class="section-content visible" id="t5-s0">
+      <div class="card"><div class="card-title">Definition</div>
+        <p class="def-text">Type casting converts a value from one type to another. <strong>Widening</strong> (implicit) goes up the type hierarchy — safe, no data loss, done automatically. <strong>Narrowing</strong> (explicit) goes down — potentially lossy, requires a cast operator, can throw <code>ClassCastException</code> at runtime if the object isn't actually of the target type.</p>
+      </div>
+      <div style="margin-top:1rem">
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Primitive widening chain (automatic)</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px">
+          <span class="badge badge-blue">byte</span><span style="color:var(--color-text-secondary)">→</span>
+          <span class="badge badge-blue">short</span><span style="color:var(--color-text-secondary)">→</span>
+          <span class="badge badge-blue">int</span><span style="color:var(--color-text-secondary)">→</span>
+          <span class="badge badge-blue">long</span><span style="color:var(--color-text-secondary)">→</span>
+          <span class="badge badge-green">float</span><span style="color:var(--color-text-secondary)">→</span>
+          <span class="badge badge-green">double</span>
+          <span style="margin-left:8px;font-size:12px;color:var(--color-text-secondary)">(narrowing goes ← — explicit cast required)</span>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t5-s1">
+      <div class="card"><div class="card-title">How it works internally</div>
+        <div class="internal-flow">
+          <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Primitive widening</strong> — compiler emits conversion bytecodes (<code>i2l</code>, <code>l2f</code>, etc.). No runtime cost. <code>int → float</code> can lose precision for very large ints (float has 23-bit mantissa).</div></div>
+          <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Primitive narrowing</strong> — explicit cast like <code>(int) 3.9</code> emits <code>d2i</code> bytecode. Truncates, doesn't round. <code>(byte) 300</code> wraps: <code>300 &amp; 0xFF = 44</code>.</div></div>
+          <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Reference widening</strong> — upcasting (<code>Animal a = new Dog()</code>). Always safe, done implicitly. No bytecode instruction — just changes the compile-time type of the reference.</div></div>
+          <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Reference narrowing</strong> — downcasting (<code>(Dog) animal</code>). JVM emits <code>checkcast</code> bytecode: reads the actual class from the object header and compares to the target type. If mismatch → <code>ClassCastException</code>. Always guard with <code>instanceof</code> or use pattern matching (Java 16+).</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-content" id="t5-s2">
+      <div class="card"><div class="card-title">Code — widening, narrowing, checkcast, pattern matching</div>
+        <div class="code-block"><span class="cm">// Primitive widening — implicit</span>
+<span class="kw">int</span> i = 42;
+<span class="kw">long</span> l = i;       <span class="cm">// int → long, safe</span>
+<span class="kw">double</span> d = i;     <span class="cm">// int → double, safe</span>
+
+<span class="cm">// Primitive narrowing — explicit, lossy</span>
+<span class="kw">double</span> pi = 3.14159;
+<span class="kw">int</span> truncated = (<span class="kw">int</span>) pi;  <span class="cm">// 3 — truncated, not rounded</span>
+<span class="kw">byte</span> b = (<span class="kw">byte</span>) 300;        <span class="cm">// 44 — wrap-around (300 & 0xFF)</span>
+
+<span class="cm">// Reference widening — upcast, implicit</span>
+<span class="nm">Animal</span> a = <span class="kw">new</span> <span class="nm">Dog</span>(<span class="st">"Rex"</span>); <span class="cm">// Dog IS-A Animal</span>
+
+<span class="cm">// Reference narrowing — downcast, DANGEROUS without check</span>
+<span class="kw">if</span> (a <span class="kw">instanceof</span> <span class="nm">Dog</span>) {
+    <span class="nm">Dog</span> dog = (<span class="nm">Dog</span>) a;     <span class="cm">// safe — checkcast passes</span>
+    dog.fetch();
+}
+
+<span class="cm">// Java 16+ pattern matching — cleaner, no double-cast</span>
+<span class="kw">if</span> (a <span class="kw">instanceof</span> <span class="nm">Dog</span> dog) {
+    dog.fetch();           <span class="cm">// dog is already Dog type here</span>
+}
+
+<span class="cm">// Java 21 switch pattern matching</span>
+<span class="nm">String</span> result = <span class="kw">switch</span> (a) {
+    <span class="kw">case</span> <span class="nm">Dog</span> dog  -&gt; <span class="st">"Dog: "</span> + dog.getName();
+    <span class="kw">case</span> <span class="nm">Cat</span> cat  -&gt; <span class="st">"Cat: "</span> + cat.purr();
+    <span class="kw">default</span>       -&gt; <span class="st">"Unknown animal"</span>;
+};</div>
+      </div>
+    </div>
+    <div class="section-content" id="t5-s3">
+      <div class="card"><div class="card-title">Common mistakes</div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Casting without instanceof check</strong> — leads to <code>ClassCastException</code> at runtime. The compiler can't always detect this (it only knows the declared type, not the actual runtime type).</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Assuming int → double is always safe</strong> — it is, but <code>int → float</code> can lose precision for large ints. <code>(float) 123456789</code> gives <code>1.23456792E8</code> — slightly different due to float's 23-bit mantissa.</div></div>
+        <div class="mistake-item"><div class="mistake-icon">⚠️</div><div class="mistake-text"><strong>Integer autoboxing type confusion</strong> — <code>Integer x = 127; Integer y = 127; x == y</code> is <code>true</code> (cached). <code>Integer x = 128; Integer y = 128; x == y</code> is <code>false</code> (different objects). Always use <code>.equals()</code> for object comparison.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t5-s4">
+      <div class="card"><div class="card-title">Interview questions</div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Classic</div><div class="q-text">What causes ClassCastException and how do you prevent it?</div><div class="q-ans">ClassCastException is thrown by the checkcast JVM instruction when the actual runtime type of an object is not compatible with the cast target. Prevent with: (1) instanceof check before casting, (2) Java 16+ pattern matching (combines check + cast), (3) generics to catch invalid types at compile time. Never suppress ClassCastException — it means your type model is wrong.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Subtle</div><div class="q-text">What's the output of (int)(char)(byte) -1 and why?</div><div class="q-ans">-1 as int → byte: -1 (fits, all 8 bits = 0xFF = 11111111). byte -1 → char: char is unsigned 16-bit — byte -1 (0xFF) sign-extends to int -1 (0xFFFFFFFF) then masked to 16 bits = 0xFFFF = 65535. char 65535 → int: 65535. Output: 65535. Tests whether you understand sign extension and unsigned char.</div></div>
+        <div class="q-item" onclick="toggleAns(this)"><div class="q-label">Modern Java</div><div class="q-text">How does Java 16+ pattern matching instanceof improve on the old approach?</div><div class="q-ans">Old: you check with instanceof, then cast again — two operations that must be kept in sync. If you accidentally cast to a different type than checked, ClassCastException at runtime. New: if (obj instanceof Dog dog) — single operation that checks AND binds the variable. The compiler guarantees the binding is type-safe. Cleaner, safer, and enables sealed class exhaustiveness checking.</div></div>
+      </div>
+    </div>
+    <div class="section-content" id="t5-s5">
+      <div class="card"><div class="card-title">Connects to</div><div class="connects-grid">
+        <span class="connects-chip" onclick="sendPrompt('Explain Java sealed classes and pattern matching switch in Java 21')">Sealed classes</span>
+        <span class="connects-chip" onclick="sendPrompt('Explain Java autoboxing and Integer cache internals')">Autoboxing cache</span>
+        <span class="connects-chip" onclick="sendPrompt('How does JVM checkcast bytecode work internally?')">JVM bytecode</span>
+        <span class="connects-chip" onclick="sendPrompt('Explain Java generics and how they eliminate ClassCastException')">Generics type safety</span>
+      </div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showTopic(idx){
+  document.querySelectorAll('.topic-panel').forEach((p,i)=>p.classList.toggle('visible',i===idx));
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+}
+function showSection(topic, sec){
+  var panel = document.getElementById(topic);
+  panel.querySelectorAll('.section-content').forEach(s=>s.classList.remove('visible'));
+  var target = document.getElementById(topic+'-'+sec);
+  if(target) target.classList.add('visible');
+  panel.querySelectorAll('.stab').forEach((b,i)=>{
+    var sections = ['s0','s1','s2','s3','s4','s5','s6'];
+    b.classList.toggle('active', sections[i]===sec);
+  });
+}
+function toggleAns(el){
+  var ans = el.querySelector('.q-ans');
+  if(ans) ans.style.display = ans.style.display==='block'?'none':'block';
+}
+</script>

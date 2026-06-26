@@ -1,0 +1,1811 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,'system-ui');font-size:15px;color:var(--color-text-primary);background:transparent;line-height:1.6}
+.app{display:flex;height:100vh;min-height:600px;max-height:900px}
+.sidebar{width:210px;min-width:180px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 0;flex-shrink:0}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;padding:0 14px 8px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-radius:0;transition:background .15s,color .15s;border-left:2px solid transparent}
+.nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-secondary);color:var(--color-text-primary);border-left:2px solid #7F77DD;font-weight:500}
+.nav-badge{font-size:10px;background:var(--color-background-tertiary);color:var(--color-text-tertiary);padding:1px 5px;border-radius:4px;margin-left:auto}
+.main{flex:1;overflow-y:auto;padding:24px 28px}
+.section-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:20px;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:12px}
+.tab{padding:5px 12px;font-size:12px;border-radius:6px;cursor:pointer;border:0.5px solid var(--color-border-tertiary);background:transparent;color:var(--color-text-secondary);transition:all .15s;white-space:nowrap}
+.tab:hover{background:var(--color-background-secondary)}
+.tab.active{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-secondary);font-weight:500}
+.content-block{display:none}
+.content-block.visible{display:block}
+h1{font-size:20px;font-weight:500;margin-bottom:4px}
+h2{font-size:15px;font-weight:500;margin:20px 0 8px;color:var(--color-text-primary)}
+h3{font-size:13px;font-weight:500;margin:12px 0 4px;color:var(--color-text-secondary)}
+p{margin-bottom:10px;color:var(--color-text-secondary);font-size:14px}
+.subtitle{font-size:13px;color:var(--color-text-tertiary);margin-bottom:16px}
+.card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:500;margin-bottom:6px}
+.card p{margin-bottom:0}
+.complexity-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:12px}
+.complexity-table th{text-align:left;padding:6px 10px;font-weight:500;font-size:12px;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.complexity-table td{padding:6px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.complexity-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;margin-right:4px}
+.badge-o1{background:#EAF3DE;color:#3B6D11}
+.badge-ologn{background:#E6F1FB;color:#0C447C}
+.badge-on{background:#FAEEDA;color:#854F0B}
+.badge-onlogn{background:#FAECE7;color:#993C1D}
+.badge-on2{background:#FCEBEB;color:#A32D2D}
+.pattern-item{border-left:2px solid #7F77DD;padding:8px 12px;margin-bottom:8px;background:var(--color-background-secondary);border-radius:0 8px 8px 0}
+.pattern-name{font-size:13px;font-weight:500}
+.pattern-trigger{font-size:12px;color:#534AB7;margin-top:2px;font-style:italic}
+.pattern-when{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.smell-item{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-radius:8px;margin-bottom:6px;background:var(--color-background-secondary);font-size:13px}
+.smell-if{color:#0C447C;font-weight:500;min-width:auto;flex:1}
+.smell-arrow{color:var(--color-text-tertiary);flex-shrink:0}
+.smell-use{color:#3B6D11;font-weight:500;flex:1}
+pre{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:14px;font-family:var(--font-mono,'monospace');font-size:12px;overflow-x:auto;margin-bottom:12px;line-height:1.5}
+.keyword{color:#534AB7}
+.comment{color:#888780;font-style:italic}
+.string{color:#3B6D11}
+.practice-item{border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.practice-header{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.difficulty{font-size:11px;padding:2px 6px;border-radius:4px;font-weight:500}
+.easy{background:#EAF3DE;color:#3B6D11}
+.medium{background:#FAEEDA;color:#854F0B}
+.hard{background:#FCEBEB;color:#A32D2D}
+.practice-name{font-size:13px;font-weight:500}
+.practice-insight{font-size:12px;color:var(--color-text-secondary);margin-top:4px}
+.interview-tip{border-left:2px solid #1D9E75;padding:8px 12px;margin-bottom:8px;background:var(--color-background-secondary);border-radius:0 8px 8px 0;font-size:13px;color:var(--color-text-secondary)}
+.worked-step{margin-bottom:16px}
+.worked-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-tertiary);margin-bottom:4px}
+.topic-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.topic-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.variants-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+@media(max-width:560px){.variants-grid{grid-template-columns:1fr}.app{flex-direction:column}.sidebar{width:100%;min-height:auto;border-right:none;border-bottom:0.5px solid var(--color-border-tertiary)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-title">Block 2 — Non-linear</div>
+    <div id="nav"></div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+<script>
+const TOPICS = [
+  {id:'bt',icon:'🌳',name:'Binary Tree',short:'Binary Tree'},
+  {id:'bst',icon:'🔍',name:'Binary Search Tree',short:'BST'},
+  {id:'avl',icon:'⚖️',name:'AVL Tree',short:'AVL Tree'},
+  {id:'rbt',icon:'🔴',name:'Red-Black Tree',short:'Red-Black'},
+  {id:'heap',icon:'🏔️',name:'Heap (Min & Max)',short:'Heap'},
+  {id:'trie',icon:'📖',name:'Trie (Prefix Tree)',short:'Trie'},
+  {id:'segtree',icon:'📊',name:'Segment Tree',short:'Segment Tree'},
+  {id:'bit',icon:'🔢',name:'Fenwick Tree (BIT)',short:'Fenwick Tree'},
+  {id:'uf',icon:'🔗',name:'Union-Find',short:'Union-Find'},
+];
+
+const SECTIONS = ['Definition','Mechanics','Complexity','Subtypes','Patterns','Smells','Java','Worked Example','Practice','Interview'];
+
+const DATA = {
+bt:{
+  definition:`A Binary Tree is a hierarchical data structure where each node has at most two children, called the left child and right child. There is no ordering constraint between parent and children — that's what separates it from a BST. It's the foundation for nearly every tree structure in CS.`,
+  mechanics:`
+  Node structure: class TreeNode { int val; TreeNode left, right; }
+  
+  Memory: each node is an object on the heap. The root is a reference. Children are null if absent.
+  
+  Traversals (fundamental operations):
+  • Inorder   (L → Root → R): for BSTs gives sorted order
+  • Preorder  (Root → L → R): for serialization / copying
+  • Postorder (L → R → Root): for deletion, expression trees
+  • Level-order (BFS): for width, zigzag, right-side view
+  
+  Height = max depth from root to a leaf (0-indexed).
+  Size = total number of nodes.`,
+  complexity:[
+    {op:'Access (arbitrary node)',avg:'O(n)',worst:'O(n)',why:'No ordering; must traverse all'},
+    {op:'Search',avg:'O(n)',worst:'O(n)',why:'Linear scan worst case'},
+    {op:'Insert (at specific pos)',avg:'O(n)',worst:'O(n)',why:'Must find parent first'},
+    {op:'Traversal',avg:'O(n)',worst:'O(n)',why:'Visit every node once'},
+    {op:'Height',avg:'O(log n)',worst:'O(n)',why:'Balanced vs degenerate (linked list)'},
+    {op:'Space (recursion stack)',avg:'O(h)',worst:'O(n)',why:'h = height; O(n) if skewed'},
+  ],
+  subtypes:[
+    {name:'Full Binary Tree',desc:'Every node has 0 or 2 children. No node has exactly 1 child.'},
+    {name:'Complete Binary Tree',desc:'All levels are filled except possibly the last, which is filled left-to-right. Heap property relies on this.'},
+    {name:'Perfect Binary Tree',desc:'All internal nodes have 2 children and all leaves are at the same level. n = 2^(h+1) - 1 nodes.'},
+    {name:'Balanced Binary Tree',desc:'Height is O(log n). Left and right subtree heights differ by at most 1 at every node. AVL enforces this strictly.'},
+    {name:'Degenerate / Pathological',desc:'Every parent has only one child — effectively a linked list. Worst case for all operations: O(n).'},
+  ],
+  patterns:[
+    {name:'Recursive DFS (Divide & Conquer)',when:'Any problem that asks about subtree properties — height, diameter, max path sum, LCA.',trigger:'"What is the [property] of the tree?" → recurse left + right, combine.'},
+    {name:'Iterative DFS with Stack',when:'When recursion depth is too large or explicit state control needed.',trigger:'"Avoid recursion" or "large tree" → explicit stack mimicking call stack.'},
+    {name:'BFS / Level-Order with Queue',when:'Level-based problems: right-side view, zigzag traversal, level averages.',trigger:'"Level", "row", "layer", "width" → BFS with queue.'},
+    {name:'Serialization / Deserialization',when:'Reconstruct a tree from a flat representation (preorder + inorder).',trigger:'"Reconstruct", "serialize", "encode" → preorder with null markers.'},
+    {name:'Two-pass / Bottom-up aggregation',when:'Diameter, longest path — the answer is not at the root but at some intermediate node.',trigger:'"Maximum path", "diameter" → return local height, maintain global max via int[].'},
+  ],
+  smells:[
+    {if:'Problem asks about tree height, depth, balance',use:'Recursive DFS returning int — recurse, combine'},
+    {if:'"Level order", "layer", "width", "rightmost"',use:'BFS with Queue<TreeNode> and size-based loop'},
+    {if:'"Path sum", "path from root to leaf"',use:'DFS with running sum, backtrack on leaf'},
+    {if:'"Lowest common ancestor"',use:'Recursive: if node == p or q, return node; combine left+right'},
+    {if:'"Serialize/deserialize tree"',use:'Preorder DFS with "#" for null; split by comma'},
+    {if:'"Diameter of tree"',use:'Bottom-up: max(leftH + rightH), return max(leftH, rightH)+1'},
+  ],
+  java:`// ─── Binary Tree Node ─────────────────────────────────
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int val) { this.val = val; }
+}
+
+// ─── Inorder Traversal (recursive) ────────────────────
+void inorder(TreeNode root, List<Integer> res) {
+    if (root == null) return;   // base case
+    inorder(root.left, res);    // left subtree
+    res.add(root.val);          // process root
+    inorder(root.right, res);   // right subtree
+}
+
+// ─── Iterative Inorder (avoids stack overflow) ─────────
+List<Integer> inorderIterative(TreeNode root) {
+    List<Integer> res = new ArrayList<>();
+    Deque<TreeNode> stack = new ArrayDeque<>();
+    TreeNode cur = root;
+    while (cur != null || !stack.isEmpty()) {
+        while (cur != null) { stack.push(cur); cur = cur.left; }
+        cur = stack.pop();
+        res.add(cur.val);
+        cur = cur.right;         // move to right subtree
+    }
+    return res;
+}
+
+// ─── BFS / Level Order ────────────────────────────────
+List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> res = new ArrayList<>();
+    if (root == null) return res;
+    Queue<TreeNode> q = new LinkedList<>();
+    q.offer(root);
+    while (!q.isEmpty()) {
+        int size = q.size();     // snapshot of level size
+        List<Integer> level = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            TreeNode node = q.poll();
+            level.add(node.val);
+            if (node.left != null) q.offer(node.left);
+            if (node.right != null) q.offer(node.right);
+        }
+        res.add(level);
+    }
+    return res;
+}
+
+// ─── Height of Tree ───────────────────────────────────
+int height(TreeNode root) {
+    if (root == null) return -1;   // -1 for edges, 0 for nodes
+    return 1 + Math.max(height(root.left), height(root.right));
+}
+
+// ─── Diameter (Longest Path Between Two Nodes) ────────
+int[] maxDiam = {0};
+int diameterHelper(TreeNode root) {
+    if (root == null) return 0;
+    int left = diameterHelper(root.left);
+    int right = diameterHelper(root.right);
+    maxDiam[0] = Math.max(maxDiam[0], left + right); // update global
+    return 1 + Math.max(left, right);                 // return height
+}`,
+  worked:{
+    title:'LC 124 — Binary Tree Maximum Path Sum',
+    problem:'A path in a binary tree is a sequence of nodes where each pair is connected. The path does not need to go through the root. Return the maximum sum of any path.',
+    brute:`// BRUTE FORCE: For every node, compute all paths through it
+// Time: O(n^2) — compute contribution from every subtree for each node
+// Problem: redundant traversals
+
+int maxSum = Integer.MIN_VALUE;
+void brute(TreeNode root) {
+    if (root == null) return;
+    // compute max gain through this node
+    int gain = gainThrough(root);
+    maxSum = Math.max(maxSum, gain);
+    brute(root.left);
+    brute(root.right);
+}
+int gainThrough(TreeNode node) {
+    if (node == null) return 0;
+    int left = Math.max(0, gainThrough(node.left));
+    int right = Math.max(0, gainThrough(node.right));
+    return node.val + left + right;  // repeated work!
+}`,
+    optimal:`// OPTIMAL: Bottom-up DFS — O(n) time, O(h) space
+// Key insight: at each node, the path through it uses BOTH subtrees
+// but the return value to parent can only use ONE subtree (no branching upward)
+
+int[] max = {Integer.MIN_VALUE};
+
+int maxPathSum(TreeNode root) {
+    dfs(root);
+    return max[0];
+}
+
+int dfs(TreeNode node) {
+    if (node == null) return 0;
+    // only take positive contributions from children
+    int left  = Math.max(0, dfs(node.left));
+    int right = Math.max(0, dfs(node.right));
+    // path through this node (can bend here, using both sides)
+    max[0] = Math.max(max[0], node.val + left + right);
+    // return to parent: can only extend ONE direction
+    return node.val + Math.max(left, right);
+}
+// Why bottom-up? The answer might be a subtree, not at root.
+// We compute each node's LOCAL max but maintain a GLOBAL max.`,
+  },
+  practice:[
+    {name:'LC 104 — Maximum Depth',diff:'easy',why:'Pure recursive bottom-up. Base pattern.',insight:'return 1 + max(left, right); null → 0'},
+    {name:'LC 226 — Invert Binary Tree',diff:'easy',why:'Classic recursive swap.',insight:'Swap left/right pointers, recurse both sides.'},
+    {name:'LC 199 — Binary Tree Right Side View',diff:'medium',why:'BFS level-order, take last node each level.',insight:'Queue + size snapshot pattern.'},
+    {name:'LC 236 — Lowest Common Ancestor',diff:'medium',why:'Bottom-up DFS with return values.',insight:'If root==p||root==q, return root. LCA is where both sides are non-null.'},
+    {name:'LC 297 — Serialize & Deserialize Binary Tree',diff:'hard',why:'Preorder DFS with null markers.',insight:'Encode: "1,2,#,#,3,#,#" — decode with queue + counter.'},
+  ],
+  interview:`What interviewers test:
+  • Can you identify which traversal to use without being told?
+  • Do you handle null/edge cases (empty tree, single node, negative values)?
+  • Can you convert recursive to iterative under pressure?
+  
+  Follow-up questions you must be ready for:
+  • "What if the tree is unbalanced?" (space complexity O(n) for recursion stack)
+  • "Can you solve this iteratively?" (explicit stack)
+  • "How would you handle a very large tree?" (BFS for shallow, iterative for deep)
+  
+  Think-aloud framework:
+  1. Clarify: balanced? negative values? return type?
+  2. Identify traversal type needed
+  3. State recursive structure: "At each node, I compute X from left and right..."
+  4. State base case explicitly
+  5. Mention time/space before coding`
+},
+
+bst:{
+  definition:`A Binary Search Tree is a binary tree with an ordering property: for every node N, all values in the left subtree are less than N.val, and all values in the right subtree are greater. This constraint makes search, insert, and delete O(log n) on average — but degrades to O(n) if the tree becomes skewed. Inorder traversal of a BST always yields a sorted sequence.`,
+  mechanics:`
+  Invariant: left.val < node.val < right.val (strict, assuming no duplicates)
+  
+  SEARCH: Compare target with current node → go left if smaller, right if larger.
+  
+  INSERT: Search for position where null would be → insert there.
+  
+  DELETE (3 cases):
+  1. Leaf → just remove
+  2. One child → replace node with that child
+  3. Two children → find inorder successor (smallest in right subtree)
+     → replace node's value with successor's value → delete successor
+  
+  INORDER = SORTED: Because left < root < right at every node, visiting
+  L→Root→R visits all values in ascending order. Key insight for problems.`,
+  complexity:[
+    {op:'Search',avg:'O(log n)',worst:'O(n)',why:'Balanced: halve at each step. Skewed: linear scan.'},
+    {op:'Insert',avg:'O(log n)',worst:'O(n)',why:'Find position via search, then O(1) link.'},
+    {op:'Delete',avg:'O(log n)',worst:'O(n)',why:'Find node + find successor: two searches.'},
+    {op:'Min / Max',avg:'O(log n)',worst:'O(n)',why:'Follow left/right all the way down.'},
+    {op:'Inorder traversal',avg:'O(n)',worst:'O(n)',why:'Must visit every node exactly once.'},
+    {op:'Space (recursive)',avg:'O(h)',worst:'O(n)',why:'Call stack depth = tree height.'},
+  ],
+  subtypes:[
+    {name:'Unbalanced BST',desc:'No structural constraint. Degenerates to O(n) if insertion order is sorted.'},
+    {name:'AVL Tree',desc:'Self-balancing BST. Guarantees O(log n) always via rotations.'},
+    {name:'Red-Black Tree',desc:'Self-balancing with color properties. Java TreeMap uses this.'},
+    {name:'Treap',desc:'BST + Heap hybrid with random priority. Expected O(log n). Used in competitive programming.'},
+    {name:'Splay Tree',desc:'Self-adjusting: recently accessed nodes move to root. Good for temporal locality.'},
+  ],
+  patterns:[
+    {name:'Inorder = Sorted Order',when:'Any problem needing the k-th smallest, sorted list from BST, or validating BST correctness.',trigger:'"k-th smallest", "sorted order", "validate BST" → inorder traversal.'},
+    {name:'Binary Search on BST',when:'Searching, finding floor/ceil, closest value.',trigger:'"Find X in BST", "closest to target" → compare and go left or right.'},
+    {name:'Recursive Property Validation',when:'Validate BST, find range of valid values using min/max bounds.',trigger:'"Is it a valid BST?" → pass (minBound, maxBound) down recursively.'},
+    {name:'LCA in BST',when:'LCA is simpler in BST due to ordering.',trigger:'"LCA in BST" → if both < root, go left; if both > root, go right; else root is LCA.'},
+    {name:'Convert BST ↔ Sorted Array',when:'Many problems reduce to sorted array operations on BST.',trigger:'"Balanced BST from sorted array" → binary divide; pick mid as root.'},
+  ],
+  smells:[
+    {if:'"k-th smallest element in BST"',use:'Inorder traversal — count to k'},
+    {if:'"Validate BST"',use:'Recursive with (long min, long max) bounds — not left < root < right locally'},
+    {if:'"LCA in BST"',use:'Navigate: both < root → go left; both > → go right; else return root'},
+    {if:'"Convert sorted array to balanced BST"',use:'Binary divide: mid = root, recurse on halves'},
+    {if:'"Find floor/ceil in BST"',use:'Binary search: track last valid node when moving direction'},
+    {if:'"Delete node in BST"',use:'Handle 3 cases: leaf, 1 child, 2 children (inorder successor)'},
+  ],
+  java:`// ─── BST Node ──────────────────────────────────────────
+class BST {
+    TreeNode root;
+
+    // ─── Insert ─────────────────────────────────────────
+    TreeNode insert(TreeNode root, int val) {
+        if (root == null) return new TreeNode(val); // base: insert here
+        if (val < root.val) root.left = insert(root.left, val);
+        else if (val > root.val) root.right = insert(root.right, val);
+        // val == root.val: ignore duplicate
+        return root;
+    }
+
+    // ─── Search ─────────────────────────────────────────
+    boolean search(TreeNode root, int val) {
+        if (root == null) return false;
+        if (val == root.val) return true;
+        return val < root.val
+            ? search(root.left, val)
+            : search(root.right, val);
+    }
+
+    // ─── Delete ─────────────────────────────────────────
+    TreeNode delete(TreeNode root, int val) {
+        if (root == null) return null;
+        if (val < root.val) {
+            root.left = delete(root.left, val);
+        } else if (val > root.val) {
+            root.right = delete(root.right, val);
+        } else {
+            // Case 1: leaf or one child
+            if (root.left == null) return root.right;
+            if (root.right == null) return root.left;
+            // Case 2: two children → find inorder successor
+            TreeNode succ = findMin(root.right);
+            root.val = succ.val;                       // copy successor value
+            root.right = delete(root.right, succ.val); // delete successor
+        }
+        return root;
+    }
+
+    TreeNode findMin(TreeNode node) {
+        while (node.left != null) node = node.left; // go all the way left
+        return node;
+    }
+
+    // ─── Validate BST ───────────────────────────────────
+    boolean isValidBST(TreeNode root) {
+        return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    boolean validate(TreeNode node, long min, long max) {
+        if (node == null) return true;
+        if (node.val <= min || node.val >= max) return false;
+        return validate(node.left, min, node.val)
+            && validate(node.right, node.val, max);
+    }
+
+    // ─── k-th Smallest ──────────────────────────────────
+    int kthSmallest(TreeNode root, int k) {
+        int[] count = {0};
+        int[] result = {-1};
+        inorder(root, k, count, result);
+        return result[0];
+    }
+    void inorder(TreeNode node, int k, int[] count, int[] result) {
+        if (node == null) return;
+        inorder(node.left, k, count, result);
+        if (++count[0] == k) { result[0] = node.val; return; }
+        inorder(node.right, k, count, result);
+    }
+}`,
+  worked:{
+    title:'LC 98 — Validate Binary Search Tree',
+    problem:'Given the root of a binary tree, determine if it is a valid BST.',
+    brute:`// BRUTE FORCE: For each node, check all left subtree values < node
+// and all right subtree values > node — O(n^2)
+boolean brute(TreeNode root) {
+    if (root == null) return true;
+    if (!allLess(root.left, root.val)) return false;
+    if (!allGreater(root.right, root.val)) return false;
+    return brute(root.left) && brute(root.right);
+}
+// This checks the local invariant but not the global one!
+// Counterexample: root=5, left=4, left.right=6 — locally ok but 6 > 5!`,
+    optimal:`// OPTIMAL: Pass valid range (min, max) down the tree — O(n)
+// Key insight: a node's valid range is constrained by ALL its ancestors,
+// not just its direct parent.
+
+boolean isValidBST(TreeNode root) {
+    return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);
+}
+
+boolean validate(TreeNode node, long min, long max) {
+    if (node == null) return true;  // null nodes are valid
+    // node.val must be strictly within (min, max)
+    if (node.val <= min || node.val >= max) return false;
+    // left subtree: upper bound tightened to node.val
+    // right subtree: lower bound tightened to node.val
+    return validate(node.left, min, node.val)
+        && validate(node.right, node.val, max);
+}
+// Why Long? To handle Integer.MIN_VALUE and MAX_VALUE as node values.
+// This is O(n) — each node visited exactly once.`,
+  },
+  practice:[
+    {name:'LC 700 — Search in BST',diff:'easy',why:'Pure BST search pattern.',insight:'Compare and go left or right. Base pattern for all BST problems.'},
+    {name:'LC 230 — Kth Smallest in BST',diff:'medium',why:'Inorder = sorted trick.',insight:'Inorder traversal, count to k. O(H+k) with Morris traversal possible.'},
+    {name:'LC 235 — LCA of BST',diff:'medium',why:'BST ordering enables O(log n) LCA.',insight:'Both < root → go left. Both > root → go right. Otherwise return root.'},
+    {name:'LC 450 — Delete Node in BST',diff:'medium',why:'All 3 deletion cases.',insight:'Two children: replace with inorder successor (leftmost of right subtree).'},
+    {name:'LC 99 — Recover BST',diff:'hard',why:'Two nodes swapped — find via inorder.',insight:'In sorted inorder, two positions will be out of order. Swap them back.'},
+  ],
+  interview:`Interviewers test:
+  • Do you know the 3-case delete algorithm cold?
+  • Do you know why local left < root < right check is WRONG for validation?
+  • Can you explain inorder = sorted without hesitation?
+  
+  Follow-ups:
+  • "What's the worst-case for BST search?" → O(n) for sorted insertion — leads to AVL/RBT discussion
+  • "How do you handle duplicates?" → left <= node, or separate list at each node
+  • "What's the difference between BST and balanced BST?" → AVL/RBT guarantee O(log n)
+  
+  Think-aloud: always state "The BST invariant means..." before diving in.`
+},
+
+avl:{
+  definition:`An AVL Tree (Adelson-Velsky and Landis, 1962) is a self-balancing BST where the height difference between left and right subtrees (the balance factor) is at most 1 for every node. After every insert or delete, it performs rotations to restore balance, guaranteeing O(log n) for all operations in the worst case.`,
+  mechanics:`
+  Balance Factor = height(left) - height(right)
+  Valid values: -1, 0, +1
+  
+  INSERTION: Insert like BST → walk back up updating heights → if BF becomes ±2, rotate.
+  
+  4 ROTATION CASES:
+  1. Left-Left (BF = +2, left child BF = +1): Right rotate at node
+  2. Right-Right (BF = -2, right child BF = -1): Left rotate at node
+  3. Left-Right (BF = +2, left child BF = -1): Left rotate at left child, then Right rotate at node
+  4. Right-Left (BF = -2, right child BF = +1): Right rotate at right child, then Left rotate at node
+  
+  Right Rotate(y): x = y.left; y.left = x.right; x.right = y; update heights.
+  Left Rotate(x): y = x.right; x.right = y.left; y.left = x; update heights.`,
+  complexity:[
+    {op:'Search',avg:'O(log n)',worst:'O(log n)',why:'Height always O(log n) guaranteed.'},
+    {op:'Insert',avg:'O(log n)',worst:'O(log n)',why:'BST insert + at most O(log n) rotations walking back up.'},
+    {op:'Delete',avg:'O(log n)',worst:'O(log n)',why:'BST delete + rebalancing. May propagate rotations to root.'},
+    {op:'Rotation',avg:'O(1)',worst:'O(1)',why:'Pointer reassignment only — constant ops.'},
+    {op:'Space',avg:'O(n)',worst:'O(n)',why:'One extra int (height/BF) per node.'},
+  ],
+  subtypes:[
+    {name:'Standard AVL',desc:'Balance factor ∈ {-1, 0, 1}. Strictest balance. More rotations than RBT on insert/delete.'},
+    {name:'Weight-Balanced Tree',desc:'Balance by subtree sizes instead of height. Better for rank/select operations.'},
+    {name:'Scapegoat Tree',desc:'Periodic full rebuilds instead of rotations. Simpler to implement.'},
+  ],
+  patterns:[
+    {name:'Guaranteed O(log n) all ops',when:'When BST performance is needed but input order is unknown (could be sorted).',trigger:'"Cannot afford O(n) worst case" → self-balancing tree'},
+    {name:'Ordered set / map operations',when:'When you need sorted order + fast insert/delete/search simultaneously.',trigger:'"Maintain sorted order, support dynamic insertions" → AVL or RBT'},
+    {name:'Rotation mechanics for interviews',when:'AVL is often used to test rotation knowledge even if you\'d use TreeMap in production.',trigger:'"Explain how self-balancing works" → AVL rotations'},
+  ],
+  smells:[
+    {if:'"Maintain sorted dynamic dataset"',use:'Use Java TreeMap (backed by RBT) — AVL concept, RBT implementation'},
+    {if:'"Ceiling/floor in dynamic sorted set"',use:'TreeMap.ceilingKey() / floorKey()'},
+    {if:'"Rank of element in dynamic set"',use:'Augmented AVL with subtree size — or TreeMap + manual counting'},
+    {if:'"Interview asks about self-balancing"',use:'Explain AVL: BF = height(L) - height(R), ±2 triggers rotation'},
+  ],
+  java:`// ─── AVL Node ──────────────────────────────────────────
+class AVLNode {
+    int val, height;
+    AVLNode left, right;
+    AVLNode(int val) { this.val = val; this.height = 1; }
+}
+
+class AVLTree {
+    AVLNode root;
+
+    int height(AVLNode n) { return n == null ? 0 : n.height; }
+
+    void updateHeight(AVLNode n) {
+        n.height = 1 + Math.max(height(n.left), height(n.right));
+    }
+
+    int balanceFactor(AVLNode n) {
+        return n == null ? 0 : height(n.left) - height(n.right);
+    }
+
+    // ─── Right Rotation (Left-Left case) ────────────────
+    //     y                 x
+    //    / \               / \
+    //   x   T3    →      T1   y
+    //  / \                   / \
+    // T1  T2               T2  T3
+    AVLNode rotateRight(AVLNode y) {
+        AVLNode x = y.left;
+        AVLNode T2 = x.right;
+        x.right = y;        // x becomes new root
+        y.left = T2;        // T2 moves to y's left
+        updateHeight(y);    // update y FIRST (it's now lower)
+        updateHeight(x);    // then x
+        return x;
+    }
+
+    // ─── Left Rotation (Right-Right case) ───────────────
+    AVLNode rotateLeft(AVLNode x) {
+        AVLNode y = x.right;
+        AVLNode T2 = y.left;
+        y.left = x;
+        x.right = T2;
+        updateHeight(x);
+        updateHeight(y);
+        return y;
+    }
+
+    // ─── Insert with Rebalancing ─────────────────────────
+    AVLNode insert(AVLNode node, int val) {
+        // 1. Standard BST insert
+        if (node == null) return new AVLNode(val);
+        if (val < node.val) node.left = insert(node.left, val);
+        else if (val > node.val) node.right = insert(node.right, val);
+        else return node;  // duplicate
+
+        // 2. Update height of this ancestor
+        updateHeight(node);
+
+        // 3. Get balance factor and check if unbalanced
+        int bf = balanceFactor(node);
+
+        // Left-Left: right rotate
+        if (bf > 1 && val < node.left.val) return rotateRight(node);
+        // Right-Right: left rotate
+        if (bf < -1 && val > node.right.val) return rotateLeft(node);
+        // Left-Right: left rotate left child, then right rotate
+        if (bf > 1 && val > node.left.val) {
+            node.left = rotateLeft(node.left);
+            return rotateRight(node);
+        }
+        // Right-Left: right rotate right child, then left rotate
+        if (bf < -1 && val < node.right.val) {
+            node.right = rotateRight(node.right);
+            return rotateLeft(node);
+        }
+        return node;  // balanced, no rotation needed
+    }
+}`,
+  worked:{
+    title:'LC 1382 — Balance a Binary Search Tree',
+    problem:'Given the root of a BST, return a balanced BST with the same node values.',
+    brute:`// BRUTE FORCE: In-order traversal to get sorted array, then rebuild
+// This is actually O(n) — but "brute force" thinking misses the elegant approach
+// Naive: insert all values one by one into a new BST (O(n log n) but may skew)
+void naiveInsertAll(int[] vals) {
+    TreeNode root = null;
+    for (int v : vals) root = bstInsert(root, v); // could skew!
+}`,
+    optimal:`// OPTIMAL: Inorder → sorted array → build balanced BST from middle
+// Time: O(n), Space: O(n)
+
+TreeNode balanceBST(TreeNode root) {
+    List<Integer> inorder = new ArrayList<>();
+    collectInorder(root, inorder);      // sorted values
+    return buildBalanced(inorder, 0, inorder.size() - 1);
+}
+
+void collectInorder(TreeNode node, List<Integer> list) {
+    if (node == null) return;
+    collectInorder(node.left, list);
+    list.add(node.val);
+    collectInorder(node.right, list);
+}
+
+// Always pick middle as root → minimum height tree
+TreeNode buildBalanced(List<Integer> vals, int lo, int hi) {
+    if (lo > hi) return null;
+    int mid = lo + (hi - lo) / 2;     // avoid integer overflow
+    TreeNode node = new TreeNode(vals.get(mid));
+    node.left  = buildBalanced(vals, lo, mid - 1);
+    node.right = buildBalanced(vals, mid + 1, hi);
+    return node;
+}`,
+  },
+  practice:[
+    {name:'LC 110 — Balanced Binary Tree',diff:'easy',why:'Checks balance factor definition.',insight:'height() returns -1 if unbalanced — propagates upward.'},
+    {name:'LC 1382 — Balance a BST',diff:'medium',why:'Inorder + rebuild pattern.',insight:'Mid = root gives minimum height. Key AVL insight.'},
+    {name:'LC 108 — Sorted Array to BST',diff:'easy',why:'Build balanced tree from sorted input.',insight:'Always pick middle index as root. Same as rebuild in 1382.'},
+    {name:'LC 1649 — Create Sorted Array Through Instructions',diff:'hard',why:'Needs self-balancing or BIT for O(n log n).',insight:'AVL or BIT to count elements less/greater dynamically.'},
+    {name:'Design Order Statistics Tree',diff:'hard',why:'Augment AVL with subtree size for rank/select.',insight:'Each node stores size(subtree). rank(x) = size(left) + 1 if root.'},
+  ],
+  interview:`Interviewers test:
+  • Can you draw the 4 rotation cases on a whiteboard?
+  • Do you know WHEN each rotation case triggers?
+  • Can you explain why you update child height before parent height?
+  
+  Key facts to memorize:
+  • AVL guarantees height ≤ 1.44 * log₂(n)
+  • At most 2 rotations needed after any single insertion
+  • Delete may require O(log n) rotations (unlike insert: at most 1)
+  • Java has no built-in AVL — TreeMap uses Red-Black instead
+  
+  Interview tip: "In Java, I'd use TreeMap which uses a Red-Black tree giving
+  O(log n) guarantees. AVL is stricter but costs more rotations on writes."`
+},
+
+rbt:{
+  definition:`A Red-Black Tree is a self-balancing BST where every node is colored RED or BLACK. Five properties guarantee that the longest path is at most 2x the shortest, bounding height at O(log n). Java's TreeMap and TreeSet use Red-Black Trees. They sacrifice AVL's strict balance for fewer rotations on write, making them better for write-heavy workloads.`,
+  mechanics:`
+  5 RED-BLACK PROPERTIES (memorize these):
+  1. Every node is RED or BLACK.
+  2. The root is always BLACK.
+  3. Every leaf (null sentinel) is BLACK.
+  4. If a node is RED, both its children are BLACK. (No two reds in a row)
+  5. All paths from a node to its descendant NULL leaves have the same number of BLACK nodes.
+     (Black-height is uniform)
+  
+  These properties imply: height ≤ 2 * log₂(n+1)
+  
+  INSERTION: Insert RED node (never violates property 5) → fix violations of property 4:
+  - Uncle is RED: recolor parent+uncle BLACK, grandparent RED → recurse up
+  - Uncle is BLACK with triangle: rotate to make it a line case
+  - Uncle is BLACK with line: rotate at grandparent, recolor
+  
+  WHY Java uses RBT over AVL: Fewer rotations on insert/delete → better for
+  maps/sets where writes are frequent. TreeMap: O(log n) put/get/remove guaranteed.`,
+  complexity:[
+    {op:'Search',avg:'O(log n)',worst:'O(log n)',why:'Height bounded by 2log(n+1).'},
+    {op:'Insert',avg:'O(log n)',worst:'O(log n)',why:'BST insert + at most 2 rotations (amortized better than AVL).'},
+    {op:'Delete',avg:'O(log n)',worst:'O(log n)',why:'Complex fix-up but bounded by height.'},
+    {op:'Recolor',avg:'O(log n)',worst:'O(log n)',why:'May propagate up to root.'},
+    {op:'TreeMap.get/put/remove (Java)',avg:'O(log n)',worst:'O(log n)',why:'Direct usage of RBT.'},
+  ],
+  subtypes:[
+    {name:'Standard Red-Black Tree',desc:'The classic formulation. Used in most standard libraries.'},
+    {name:'Left-Leaning Red-Black Tree (LLRB)',desc:'Simpler variant: red links only lean left. 1/3 the code. Used in Sedgewick\'s implementation.'},
+    {name:'AA Tree',desc:'Simplified RBT: red nodes only allowed on right. Easier to implement.'},
+  ],
+  patterns:[
+    {name:'TreeMap as ordered map',when:'Need sorted order + O(log n) insert/delete/search + ceiling/floor operations.',trigger:'"Sorted", "dynamic", "ceiling", "floor", "first greater" → TreeMap'},
+    {name:'TreeSet as sorted set',when:'Track a sorted set of unique values dynamically.',trigger:'"Maintain sorted elements", "find closest", "sliding window with order" → TreeSet'},
+    {name:'Floor/Ceiling queries',when:'Find largest element ≤ X or smallest element ≥ X in a dynamic set.',trigger:'"Floor", "ceiling", "predecessor", "successor" → TreeMap.floorKey()/ceilingKey()'},
+  ],
+  smells:[
+    {if:'"Maintain sorted dynamic set with range queries"',use:'TreeMap / TreeSet (backed by RBT in Java)'},
+    {if:'"Find k-th element in sorted dynamic set"',use:'TreeMap with size tracking or PolicyBasedTree (competitive prog)'},
+    {if:'"Sliding window: elements in sorted order"',use:'TreeMap<Integer, Integer> as multiset with frequency'},
+    {if:'"Scheduling: next available time slot"',use:'TreeMap.ceilingKey(time)'},
+    {if:'"Count of elements in range [l, r]"',use:'TreeMap.subMap(l, true, r, true).size()'},
+  ],
+  java:`// ─── Java TreeMap (backed by Red-Black Tree) ──────────
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+// ─── TreeMap — sorted key-value map ─────────────────
+TreeMap<Integer, String> map = new TreeMap<>();
+map.put(3, "three");
+map.put(1, "one");
+map.put(5, "five");
+
+map.firstKey();              // 1 (minimum key)
+map.lastKey();               // 5 (maximum key)
+map.floorKey(4);             // 3 (largest key ≤ 4)
+map.ceilingKey(4);           // 5 (smallest key ≥ 4)
+map.lowerKey(3);             // 1 (largest key < 3)
+map.higherKey(3);            // 5 (smallest key > 3)
+map.subMap(1, true, 4, true); // keys in [1, 4]
+map.headMap(3);              // keys < 3
+map.tailMap(3);              // keys >= 3
+
+// ─── TreeSet — sorted unique set ─────────────────────
+TreeSet<Integer> set = new TreeSet<>();
+set.add(3); set.add(1); set.add(5);
+set.floor(4);    // 3
+set.ceiling(4);  // 5
+set.pollFirst(); // remove and return min (1)
+set.pollLast();  // remove and return max (5)
+
+// ─── TreeMap as MultiSet (allowing duplicates) ────────
+TreeMap<Integer, Integer> multiset = new TreeMap<>();
+void addToMultiset(int val) {
+    multiset.merge(val, 1, Integer::sum);  // increment count
+}
+void removeFromMultiset(int val) {
+    multiset.merge(val, -1, Integer::sum);
+    if (multiset.get(val) == 0) multiset.remove(val);
+}
+
+// ─── Sliding Window Maximum using TreeMap ─────────────
+// Window [i, j] — maintain sorted frequencies
+// For sliding window: O(n log k) vs O(n) monotonic deque
+// Use deque for max only; use TreeMap when need full sorted window`,
+  worked:{
+    title:'LC 220 — Contains Duplicate III',
+    problem:'Given array nums, find if there exist i≠j such that |nums[i]-nums[j]| ≤ valueDiff and |i-j| ≤ indexDiff.',
+    brute:`// BRUTE: Check all pairs in window — O(n*k) time
+boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+    for (int i = 0; i < nums.length; i++)
+        for (int j = i+1; j <= Math.min(i+k, nums.length-1); j++)
+            if (Math.abs((long)nums[i] - nums[j]) <= t) return true;
+    return false;
+}`,
+    optimal:`// OPTIMAL: Sliding Window + TreeSet (RBT) — O(n log k)
+// Key: maintain a sorted window of size k
+// For each new element, check if any element in [num-t, num+t] exists in TreeSet
+// TreeSet.subSet / floor / ceiling gives O(log k) per element
+
+boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+    TreeSet<Long> window = new TreeSet<>();
+    for (int i = 0; i < nums.length; i++) {
+        long num = nums[i];
+        // check if there's a value in [num-t, num+t]
+        Long floor = window.floor(num + t);     // largest ≤ num+t
+        if (floor != null && floor >= num - t) return true;
+        window.add(num);
+        // maintain window size k
+        if (i >= k) window.remove((long) nums[i - k]);
+    }
+    return false;
+}
+// Why TreeSet? Sliding window needs:
+// 1. Fast insert/delete: O(log k)
+// 2. Range query [num-t, num+t]: O(log k)
+// → TreeMap/TreeSet (Red-Black Tree) is the exact right tool.`,
+  },
+  practice:[
+    {name:'LC 220 — Contains Duplicate III',diff:'medium',why:'Sliding window + TreeSet range query.',insight:'floor() and ceiling() give O(log k) range check.'},
+    {name:'LC 315 — Count of Smaller Numbers After Self',diff:'hard',why:'BST/BIT for count queries.',insight:'TreeMap or BIT: insert right-to-left, count smaller.'},
+    {name:'LC 218 — The Skyline Problem',diff:'hard',why:'TreeMap as sorted event structure.',insight:'Sweep line + TreeMap of active buildings by height.'},
+    {name:'LC 480 — Sliding Window Median',diff:'hard',why:'Two TreeMaps (low half, high half).',insight:'Rebalance two halves as window slides.'},
+    {name:'LC 2034 — Stock Price Fluctuation',diff:'medium',why:'TreeMap for sorted prices, HashMap for timestamps.',insight:'Track current price frequencies, query min/max in O(log n).'},
+  ],
+  interview:`Key points interviewers want to hear:
+  • Java's TreeMap/TreeSet is backed by a Red-Black Tree
+  • All operations are O(log n) guaranteed (unlike HashMap which is O(1) average but O(n) worst)
+  • Know the 5 RBT properties — interviewers may ask to recite them
+  • Know when to use TreeMap vs HashMap: sorted order needed → TreeMap
+  
+  Critical API to know cold:
+  • floorKey(k), ceilingKey(k), lowerKey(k), higherKey(k)
+  • firstKey(), lastKey(), pollFirstEntry(), pollLastEntry()
+  • subMap(from, to), headMap(to), tailMap(from)
+  
+  Common pitfall: using TreeMap when HashMap suffices → O(log n) vs O(1).
+  Always justify the choice.`
+},
+
+heap:{
+  definition:`A Heap is a complete binary tree satisfying the heap property. In a Min-Heap, every parent is ≤ its children — the root is always the minimum. In a Max-Heap, every parent is ≥ its children — the root is always the maximum. Heaps are implemented as arrays (no pointers needed) and power Java's PriorityQueue.`,
+  mechanics:`
+  ARRAY REPRESENTATION (0-indexed):
+  • Parent of i    = (i - 1) / 2
+  • Left child     = 2*i + 1
+  • Right child    = 2*i + 2
+  
+  The complete binary tree property fills left-to-right, so the array
+  has no gaps — perfectly packed memory layout.
+  
+  HEAPIFY UP (used in insert):
+  Add element at end → compare with parent → swap if violates → repeat upward
+  O(log n) — at most height swaps.
+  
+  HEAPIFY DOWN (used in extract):
+  Swap root with last element → remove last → compare root with children
+  → swap with smallest child (min-heap) → repeat downward
+  O(log n) — at most height swaps.
+  
+  BUILD HEAP (from array): Start at last non-leaf (n/2 - 1) → heapify down each.
+  O(n) — NOT O(n log n). Mathematical proof: sum of heights across all nodes = O(n).`,
+  complexity:[
+    {op:'Insert (offer)',avg:'O(log n)',worst:'O(log n)',why:'Heapify up: at most h = log n swaps.'},
+    {op:'Extract min/max (poll)',avg:'O(log n)',worst:'O(log n)',why:'Heapify down: at most h = log n swaps.'},
+    {op:'Peek (top element)',avg:'O(1)',worst:'O(1)',why:'Root is always at index 0.'},
+    {op:'Build Heap (heapify)',avg:'O(n)',worst:'O(n)',why:'Sum of heights of all subtrees = O(n). Not O(n log n).'},
+    {op:'Heap Sort',avg:'O(n log n)',worst:'O(n log n)',why:'Build O(n) + n extractions each O(log n).'},
+    {op:'Arbitrary search',avg:'O(n)',worst:'O(n)',why:'No ordering between siblings — must scan all.'},
+  ],
+  subtypes:[
+    {name:'Min-Heap',desc:'Root = minimum. PriorityQueue() in Java. Used for: k-th largest (!) by keeping size k.'},
+    {name:'Max-Heap',desc:'Root = maximum. PriorityQueue(Comparator.reverseOrder()) in Java.'},
+    {name:'Binary Heap',desc:'The standard 2-ary heap described above. Most common.'},
+    {name:'d-ary Heap',desc:'Each node has d children. Lower height but slower sift-down. Better cache for d=4.'},
+    {name:'Fibonacci Heap',desc:'Amortized O(1) decrease-key. Used in Dijkstra\'s optimal version.'},
+    {name:'Min-Max Heap',desc:'Alternating min and max levels. O(1) peek at both min and max.'},
+  ],
+  patterns:[
+    {name:'K-th Largest / Smallest',when:'Find k-th largest → min-heap of size k. Find k-th smallest → max-heap of size k.',trigger:'"k-th largest/smallest", "top k" → heap of size k'},
+    {name:'Merge K Sorted Lists',when:'Always pull the smallest current element across k lists.',trigger:'"Merge k sorted" → min-heap with (value, listIndex, elementIndex)'},
+    {name:'Sliding Window Maximum',when:'Track maximum in a window. Prefer monotonic deque O(n), heap is O(n log n).',trigger:'"Running maximum", "window max" → deque (faster) or max-heap with lazy deletion'},
+    {name:'Continuous Median',when:'Maintain median of a stream dynamically.',trigger:'"Median of stream", "find median dynamically" → max-heap (lower half) + min-heap (upper half)'},
+    {name:'Dijkstra / Prim (graph shortest path)',when:'Always expand the cheapest unvisited node.',trigger:'"Shortest path", "cheapest cost" → min-heap of (cost, node)'},
+  ],
+  smells:[
+    {if:'"Find k largest elements"',use:'Min-heap of size k — if new > heap.peek(), pop and push'},
+    {if:'"Find k smallest elements"',use:'Max-heap of size k — if new < heap.peek(), pop and push'},
+    {if:'"Merge k sorted arrays/lists"',use:'Min-heap with (value, arrayIndex) — always pull minimum'},
+    {if:'"Median of data stream"',use:'Two heaps: maxHeap (lower half) + minHeap (upper half), rebalance on insert'},
+    {if:'"Task scheduler", "CPU scheduling"',use:'Max-heap by frequency, simulate rounds'},
+    {if:'"Dijkstra shortest path"',use:'Min-heap (dist, node), relax neighbors'},
+  ],
+  java:`// ─── Java PriorityQueue (Min-Heap by default) ─────────
+PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+minHeap.offer(5); minHeap.offer(1); minHeap.offer(3);
+minHeap.peek();   // 1 — does NOT remove
+minHeap.poll();   // 1 — removes and returns min
+
+// ─── Max-Heap ─────────────────────────────────────────
+PriorityQueue<Integer> maxHeap =
+    new PriorityQueue<>(Comparator.reverseOrder());
+// or: new PriorityQueue<>((a, b) -> b - a);
+
+// ─── Custom Objects ───────────────────────────────────
+PriorityQueue<int[]> pq =
+    new PriorityQueue<>((a, b) -> a[0] - b[0]); // sort by first element
+
+// ─── K-th Largest Element ─────────────────────────────
+int findKthLargest(int[] nums, int k) {
+    PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+    for (int num : nums) {
+        minHeap.offer(num);
+        if (minHeap.size() > k) minHeap.poll(); // evict smallest
+    }
+    return minHeap.peek(); // root = k-th largest
+}
+
+// ─── Median of Data Stream ────────────────────────────
+class MedianFinder {
+    PriorityQueue<Integer> lo = new PriorityQueue<>(Comparator.reverseOrder()); // max-heap
+    PriorityQueue<Integer> hi = new PriorityQueue<>();  // min-heap
+
+    void addNum(int num) {
+        lo.offer(num);                   // always add to lower half first
+        hi.offer(lo.poll());             // balance: push max of lo → hi
+        if (hi.size() > lo.size())       // lo must be >= hi in size
+            lo.offer(hi.poll());
+    }
+
+    double findMedian() {
+        return lo.size() > hi.size()
+            ? lo.peek()                  // odd total: median is top of lo
+            : (lo.peek() + hi.peek()) / 2.0; // even total: average of tops
+    }
+}
+
+// ─── Build Heap from Array — O(n) ────────────────────
+int[] heap = {5, 3, 8, 1, 2, 9, 4};
+// Heapify from last non-leaf to root
+int n = heap.length;
+for (int i = n/2 - 1; i >= 0; i--) heapifyDown(heap, n, i);
+
+void heapifyDown(int[] arr, int n, int i) {
+    int smallest = i, left = 2*i+1, right = 2*i+2;
+    if (left < n && arr[left] < arr[smallest]) smallest = left;
+    if (right < n && arr[right] < arr[smallest]) smallest = right;
+    if (smallest != i) {
+        int tmp = arr[i]; arr[i] = arr[smallest]; arr[smallest] = tmp;
+        heapifyDown(arr, n, smallest);
+    }
+}`,
+  worked:{
+    title:'LC 295 — Find Median from Data Stream',
+    problem:'Design a class to add numbers from a stream and find the current median at any time.',
+    brute:`// BRUTE: Keep sorted list, find middle — O(n) insert, O(1) median
+List<Integer> sorted = new ArrayList<>();
+void addNum(int num) {
+    int pos = Collections.binarySearch(sorted, num); // O(log n) find
+    sorted.add(pos < 0 ? -pos-1 : pos, num);        // O(n) shift!
+}
+double findMedian() {
+    int n = sorted.size();
+    return n%2==0 ? (sorted.get(n/2-1)+sorted.get(n/2))/2.0 : sorted.get(n/2);
+}`,
+    optimal:`// OPTIMAL: Two heaps — O(log n) insert, O(1) median
+// Insight: split numbers into lower half and upper half.
+// Lower half: max-heap (top = lower median)
+// Upper half: min-heap (top = upper median)
+// INVARIANT: lo.size() == hi.size() OR lo.size() == hi.size() + 1
+
+class MedianFinder {
+    PriorityQueue<Integer> lo = new PriorityQueue<>(Collections.reverseOrder());
+    PriorityQueue<Integer> hi = new PriorityQueue<>();
+
+    void addNum(int num) {
+        lo.offer(num);           // step 1: add to lo
+        hi.offer(lo.poll());     // step 2: push lo's max to hi (ensures lo ≤ hi)
+        if (hi.size() > lo.size())   // step 3: rebalance size
+            lo.offer(hi.poll());
+    }
+
+    double findMedian() {
+        if (lo.size() > hi.size()) return lo.peek();
+        return (lo.peek() + hi.peek()) / 2.0;
+    }
+}
+// Why two heaps? We need O(1) access to the MIDDLE of a sorted stream.
+// lo.peek() = max of lower half = left median element
+// hi.peek() = min of upper half = right median element`,
+  },
+  practice:[
+    {name:'LC 215 — Kth Largest Element in Array',diff:'medium',why:'Classic min-heap of size k.',insight:'Min-heap size k: if num > peek, poll and push. Final peek = answer.'},
+    {name:'LC 23 — Merge K Sorted Lists',diff:'hard',why:'Min-heap with (node.val, node) across k lists.',insight:'Always extract minimum, push its next. O(n log k).'},
+    {name:'LC 295 — Find Median from Data Stream',diff:'hard',why:'Two-heap split pattern.',insight:'maxHeap for lower, minHeap for upper. Rebalance sizes.'},
+    {name:'LC 347 — Top K Frequent Elements',diff:'medium',why:'Min-heap of size k by frequency.',insight:'Build freq map, then min-heap. Bucket sort is O(n) alternative.'},
+    {name:'LC 632 — Smallest Range Covering Elements from K Lists',diff:'hard',why:'Min-heap tracking current min across all lists.',insight:'Track global max separately. Advance min-list pointer. Stop when any list exhausted.'},
+  ],
+  interview:`Interviewers test:
+  • Do you know the parent/child index formulas for 0-indexed array?
+  • Do you know build-heap is O(n) and WHY? (Not O(n log n))
+  • Can you implement two-heap pattern for median without stumbling?
+  • K-th largest via min-heap vs sorting — why heap is better for streaming?
+  
+  Critical trap: "k-th LARGEST → min-heap of size k"
+  The min-heap root is the smallest of the top-k largest = k-th largest element.
+  This is counterintuitive — say it explicitly in interviews.
+  
+  Java gotcha: PriorityQueue does NOT support decrease-key.
+  For Dijkstra, use lazy deletion: add duplicate (new_dist, node) and skip stale entries.`
+},
+
+trie:{
+  definition:`A Trie (Prefix Tree or Retrieval Tree, pronounced "try") is a tree-like data structure where each node represents a character, and paths from root to nodes represent prefixes/words. It enables O(L) insert, search, and prefix search where L is the string length — independent of the number of stored words. Essential for autocomplete, spell check, and IP routing.`,
+  mechanics:`
+  Node structure:
+    class TrieNode {
+      TrieNode[] children = new TrieNode[26]; // or HashMap for general chars
+      boolean isEnd;  // marks end of a valid word
+    }
+  
+  Root = empty string. Each edge represents one character.
+  "cat" → root → c-node → a-node → t-node (isEnd=true)
+  "car" → root → c-node → a-node → r-node (isEnd=true)
+  Shared prefix! "c" and "ca" nodes are reused.
+  
+  INSERT: For each char in word, if child doesn't exist → create it → move down.
+  SEARCH: For each char, if child is null → return false. At end, check isEnd.
+  STARTS_WITH: Same as search but don't check isEnd — any path to end is valid.
+  
+  Space: O(ALPHABET_SIZE * L * N) in worst case, but shared prefixes save space.`,
+  complexity:[
+    {op:'Insert',avg:'O(L)',worst:'O(L)',why:'L = word length. Create/traverse one node per character.'},
+    {op:'Search',avg:'O(L)',worst:'O(L)',why:'L = word length. Traverse one node per character.'},
+    {op:'Starts With (prefix search)',avg:'O(L)',worst:'O(L)',why:'L = prefix length. Same as search without isEnd check.'},
+    {op:'Delete',avg:'O(L)',worst:'O(L)',why:'Traverse + potentially remove nodes with no other words sharing.'},
+    {op:'Space per word',avg:'O(L)',worst:'O(L * ALPHA)',why:'Shared prefixes compress. Worst: all chars unique.'},
+    {op:'Autocomplete (find all with prefix)',avg:'O(L + W)',worst:'O(L + W)',why:'L to reach prefix node, W = total chars in all matching words.'},
+  ],
+  subtypes:[
+    {name:'Array-backed Trie',desc:'children[26] per node. Fast (O(1) child lookup) but memory-heavy for sparse alphabets.'},
+    {name:'HashMap-backed Trie',desc:'children = Map<Character, TrieNode>. Better for large/sparse alphabets (Unicode). Slightly slower lookup.'},
+    {name:'Compressed Trie (Patricia/Radix)',desc:'Merge single-child chains into one edge with a string label. Saves space. Used in IP routing.'},
+    {name:'Suffix Trie / Suffix Tree',desc:'Insert all suffixes of a string. Enables O(m) substring search for pattern of length m.'},
+    {name:'Bitwise Trie (Binary Trie)',desc:'Each node branches on a bit (0 or 1). Used for XOR maximization problems.'},
+  ],
+  patterns:[
+    {name:'Insert + Search + StartsWith',when:'Any dictionary-based problem: word search, autocomplete.',trigger:'"Dictionary", "prefix", "autocomplete", "word list" → Trie'},
+    {name:'Maximum XOR',when:'Maximize XOR of two numbers using binary trie (insert bit by bit, greedily choose opposite bit).',trigger:'"Maximum XOR", "XOR of any two" → Binary Trie'},
+    {name:'Word Search in Grid',when:'BackTracking + Trie to prune branches early.',trigger:'"Find all words in grid from dictionary" → Build Trie of dictionary, DFS in grid'},
+    {name:'Replace Words with Roots',when:'Find shortest prefix in dictionary for each word.',trigger:'"Root/prefix replacement", "shortest prefix" → Trie startsWith'},
+    {name:'Count distinct substrings',when:'Insert all substrings; count nodes created.',trigger:'"Count distinct substrings" → Suffix Trie or Trie of all substrings'},
+  ],
+  smells:[
+    {if:'"Design autocomplete system"',use:'Trie + frequency map at isEnd nodes'},
+    {if:'"Word search in dictionary, find all words with prefix"',use:'Trie with DFS from prefix node'},
+    {if:'"Maximum XOR of two numbers in array"',use:'Binary Trie: insert all, for each num greedily pick opposite bit'},
+    {if:'"Find all words in grid from given word list"',use:'Trie of word list + backtracking DFS in grid'},
+    {if:'"Replace words with their shortest root"',use:'Trie: for each sentence word, traverse until isEnd hit'},
+    {if:'"Count of strings with given prefix"',use:'Trie: store count at each node during insert'},
+  ],
+  java:`// ─── Trie Node ────────────────────────────────────────
+class TrieNode {
+    TrieNode[] children = new TrieNode[26];  // for lowercase a-z
+    boolean isEnd = false;                    // marks complete word
+}
+
+// ─── Trie ─────────────────────────────────────────────
+class Trie {
+    TrieNode root = new TrieNode();
+
+    // ─── Insert ──────────────────────────────────────
+    void insert(String word) {
+        TrieNode cur = root;
+        for (char c : word.toCharArray()) {
+            int idx = c - 'a';
+            if (cur.children[idx] == null)
+                cur.children[idx] = new TrieNode(); // create if absent
+            cur = cur.children[idx];
+        }
+        cur.isEnd = true;  // mark end of word
+    }
+
+    // ─── Search (exact word) ──────────────────────────
+    boolean search(String word) {
+        TrieNode node = traverse(word);
+        return node != null && node.isEnd; // must reach end AND be a word
+    }
+
+    // ─── Starts With (prefix exists) ─────────────────
+    boolean startsWith(String prefix) {
+        return traverse(prefix) != null;   // just reach the prefix node
+    }
+
+    // ─── Helper: traverse to end of string ───────────
+    TrieNode traverse(String s) {
+        TrieNode cur = root;
+        for (char c : s.toCharArray()) {
+            int idx = c - 'a';
+            if (cur.children[idx] == null) return null; // path broken
+            cur = cur.children[idx];
+        }
+        return cur;
+    }
+
+    // ─── Autocomplete: all words with given prefix ────
+    List<String> autocomplete(String prefix) {
+        TrieNode node = traverse(prefix);
+        List<String> results = new ArrayList<>();
+        if (node != null) dfs(node, new StringBuilder(prefix), results);
+        return results;
+    }
+
+    void dfs(TrieNode node, StringBuilder sb, List<String> results) {
+        if (node.isEnd) results.add(sb.toString());
+        for (int i = 0; i < 26; i++) {
+            if (node.children[i] != null) {
+                sb.append((char)('a' + i));
+                dfs(node.children[i], sb, results);
+                sb.deleteCharAt(sb.length() - 1); // backtrack
+            }
+        }
+    }
+}
+
+// ─── Binary Trie for Maximum XOR ─────────────────────
+int findMaximumXOR(int[] nums) {
+    // Build trie on bits (MSB to LSB, assume 32-bit)
+    int[][] trie = new int[nums.length * 32][2];
+    int idx = 1; // 0 = null sentinel
+    for (int num : nums) {
+        int cur = 0;
+        for (int i = 31; i >= 0; i--) {
+            int bit = (num >> i) & 1;
+            if (trie[cur][bit] == 0) trie[cur][bit] = idx++;
+            cur = trie[cur][bit];
+        }
+    }
+    int max = 0;
+    for (int num : nums) {
+        int cur = 0, xor = 0;
+        for (int i = 31; i >= 0; i--) {
+            int bit = (num >> i) & 1;
+            int want = 1 - bit;  // greedily choose opposite bit
+            if (trie[cur][want] != 0) { xor |= (1 << i); cur = trie[cur][want]; }
+            else cur = trie[cur][bit];
+        }
+        max = Math.max(max, xor);
+    }
+    return max;
+}`,
+  worked:{
+    title:'LC 212 — Word Search II',
+    problem:'Given a board of characters and a list of words, find all words that can be formed by adjacent cells (no reuse per path).',
+    brute:`// BRUTE: For each word, run DFS from every cell — O(words * m*n * 4^L)
+// Extremely slow for large dictionaries
+List<String> findWords_brute(char[][] board, String[] words) {
+    List<String> res = new ArrayList<>();
+    for (String word : words)
+        if (existsInBoard(board, word)) res.add(word);
+    return res;
+}`,
+    optimal:`// OPTIMAL: Build Trie of all words, single DFS over board — O(m*n*4^L)
+// Key: Trie prunes entire subtrees that can't match any word
+// Instead of checking each word separately, check ALL words simultaneously
+
+List<String> findWords(char[][] board, String[] words) {
+    Trie trie = new Trie();
+    for (String w : words) trie.insert(w);
+
+    List<String> res = new ArrayList<>();
+    int m = board.length, n = board[0].length;
+    boolean[][] visited = new boolean[m][n];
+
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            dfs(board, i, j, trie.root, new StringBuilder(), res, visited);
+    return res;
+}
+
+void dfs(char[][] board, int i, int j, TrieNode node,
+         StringBuilder path, List<String> res, boolean[][] visited) {
+    if (i<0||i>=board.length||j<0||j>=board[0].length||visited[i][j]) return;
+    char c = board[i][j];
+    TrieNode next = node.children[c - 'a'];
+    if (next == null) return;  // PRUNE: no word with this prefix
+
+    visited[i][j] = true;
+    path.append(c);
+    if (next.isEnd) {
+        res.add(path.toString());
+        next.isEnd = false;  // avoid duplicates
+    }
+    int[][] dirs = {{0,1},{0,-1},{1,0},{-1,0}};
+    for (int[] d : dirs) dfs(board, i+d[0], j+d[1], next, path, res, visited);
+    path.deleteCharAt(path.length() - 1);
+    visited[i][j] = false;    // backtrack
+}`,
+  },
+  practice:[
+    {name:'LC 208 — Implement Trie',diff:'medium',why:'Core Trie implementation from scratch.',insight:'children[26] + isEnd. Traverse char by char.'},
+    {name:'LC 648 — Replace Words',diff:'medium',why:'Find shortest prefix in trie for each word.',insight:'Traverse trie; return word so far when isEnd is hit.'},
+    {name:'LC 421 — Maximum XOR of Two Numbers',diff:'medium',why:'Binary Trie greedy XOR.',insight:'Insert all, for each num greedily choose opposite bit.'},
+    {name:'LC 212 — Word Search II',diff:'hard',why:'Trie + DFS backtracking on grid.',insight:'Build Trie of words, DFS from each cell, prune dead branches.'},
+    {name:'LC 745 — Prefix and Suffix Search',diff:'hard',why:'Augmented Trie with suffix encoding.',insight:'Wrap words as "{suffix}#{word}", insert, query combined prefix.'},
+  ],
+  interview:`Interviewers test:
+  • Can you implement Trie from scratch in ~15 minutes?
+  • Do you know array[26] vs HashMap tradeoffs?
+  • Can you explain the pruning advantage of Trie over brute-force?
+  
+  Common gotchas:
+  • isEnd flag is crucial — "app" and "apple" share a path. Without isEnd, can't distinguish.
+  • Deletion is tricky: only remove nodes that have no other words branching through them
+  • For general alphabets (Unicode), always use HashMap<Character, TrieNode>
+  
+  When to use Trie in an interview:
+  • String prefix operations → always reach for Trie
+  • "Among n strings, find those matching prefix" → Trie beats O(n*L) brute to O(L)
+  • If word list is static (pre-built once), Trie is perfect`
+},
+
+segtree:{
+  definition:`A Segment Tree is a binary tree built over an array where each node stores aggregate information (sum, min, max, GCD, etc.) for a contiguous subarray. It answers range queries (e.g., "sum of elements from index 3 to 10") and supports point updates in O(log n) time — far better than prefix sums (O(n) update) or brute force (O(n) query).`,
+  mechanics:`
+  Build: Root covers [0, n-1]. Left child = [0, mid], right child = [mid+1, n-1].
+  Recursively build until leaf nodes (single elements).
+  
+  Array size needed: 4*n (to be safe — leaves + internal nodes)
+  
+  Node at position i:
+  • Left child  = 2*i
+  • Right child = 2*i + 1
+  • OR: tree[i] stores aggregate for range [l, r]; children are [l, mid] and [mid+1, r]
+  
+  QUERY [ql, qr]: If current range fully inside [ql,qr] → return value.
+                   If no overlap → return identity. Otherwise split and combine.
+  
+  UPDATE (point): Walk down to leaf matching index → update → propagate up.
+  
+  LAZY PROPAGATION: For range updates ("add X to all elements in [l, r]"):
+  Instead of updating every element, mark a "lazy" tag at the highest covering node.
+  Push lazy down only when a node's children need to be accessed.
+  Converts range update from O(n) to O(log n).`,
+  complexity:[
+    {op:'Build',avg:'O(n)',worst:'O(n)',why:'Visit each of 2n nodes once (leaves + internal).'},
+    {op:'Point update',avg:'O(log n)',worst:'O(log n)',why:'Walk root to leaf: height = log n.'},
+    {op:'Range query',avg:'O(log n)',worst:'O(log n)',why:'At most 4 * log n nodes visited (proof: each level contributes ≤4).'},
+    {op:'Range update (lazy)',avg:'O(log n)',worst:'O(log n)',why:'Update O(log n) nodes, defer to children via lazy tags.'},
+    {op:'Space',avg:'O(n)',worst:'O(4n)',why:'4n array allocation ensures all nodes fit.'},
+  ],
+  subtypes:[
+    {name:'Point Update, Range Query',desc:'Classic segment tree. Update one element, query range aggregate.'},
+    {name:'Range Update, Point Query',desc:'Use difference array approach or lazy propagation.'},
+    {name:'Range Update, Range Query',desc:'Lazy propagation mandatory. Most powerful and complex.'},
+    {name:'Persistent Segment Tree',desc:'Each update creates a new root, preserving old versions. O(log n) per version. Used for kth order statistics over time.'},
+    {name:'2D Segment Tree',desc:'For 2D range queries. O(log²n) per operation.'},
+    {name:'Merge Sort Tree',desc:'Each node stores sorted array of its range. For queries like count of elements in [l,r] less than k.'},
+  ],
+  patterns:[
+    {name:'Range Sum / Min / Max Query',when:'Repeatedly query aggregate of subarrays; array is mutable.',trigger:'"Range query", "subarray sum with updates" → Segment Tree (not prefix sum if updates exist)'},
+    {name:'Lazy Range Update',when:'Apply same operation to entire range (add X, set to X).',trigger:'"Add to range", "set range to value", then query → Lazy Segment Tree'},
+    {name:'Count of Inversions',when:'Count pairs (i,j) where i<j but arr[i]>arr[j]. Process right to left, query range [0, arr[i]-1].',trigger:'"Count inversions" → Segment Tree or BIT on value range'},
+    {name:'Range XOR / GCD',when:'Any associative operation over ranges.',trigger:'"Range XOR", "range GCD" → Segment Tree with appropriate merge function'},
+  ],
+  smells:[
+    {if:'"Range sum/min/max query on mutable array"',use:'Segment Tree — prefix sum breaks with updates'},
+    {if:'"Update a range, query a range"',use:'Lazy Segment Tree — standard is only point update'},
+    {if:'"Count inversions"',use:'BIT or Segment Tree: process array, query count of smaller elements seen so far'},
+    {if:'"Number of elements in range [l, r]"',use:'Coordinate compressed Segment Tree or BIT'},
+    {if:'"Range set all to X, then query sum"',use:'Lazy propagation with set/sum merge function'},
+  ],
+  java:`// ─── Segment Tree (Range Sum, Point Update) ───────────
+class SegmentTree {
+    int[] tree;
+    int n;
+
+    SegmentTree(int[] arr) {
+        n = arr.length;
+        tree = new int[4 * n];  // safe upper bound
+        build(arr, 0, 0, n - 1);
+    }
+
+    // ─── Build ────────────────────────────────────────
+    void build(int[] arr, int node, int l, int r) {
+        if (l == r) { tree[node] = arr[l]; return; }  // leaf
+        int mid = l + (r - l) / 2;
+        build(arr, 2*node, l, mid);         // build left
+        build(arr, 2*node+1, mid+1, r);     // build right
+        tree[node] = tree[2*node] + tree[2*node+1]; // aggregate
+    }
+
+    // ─── Point Update ─────────────────────────────────
+    void update(int node, int l, int r, int idx, int val) {
+        if (l == r) { tree[node] = val; return; }  // at leaf
+        int mid = l + (r - l) / 2;
+        if (idx <= mid) update(2*node, l, mid, idx, val);
+        else            update(2*node+1, mid+1, r, idx, val);
+        tree[node] = tree[2*node] + tree[2*node+1]; // recompute
+    }
+
+    // ─── Range Query [ql, qr] ─────────────────────────
+    int query(int node, int l, int r, int ql, int qr) {
+        if (ql <= l && r <= qr) return tree[node]; // fully covered
+        if (qr < l || r < ql) return 0;            // no overlap (0 = identity for sum)
+        int mid = l + (r - l) / 2;
+        return query(2*node, l, mid, ql, qr)
+             + query(2*node+1, mid+1, r, ql, qr);
+    }
+
+    // Public API: hide internal params
+    void update(int idx, int val) { update(1, 0, n-1, idx, val); }
+    int query(int l, int r) { return query(1, 0, n-1, l, r); }
+}
+
+// ─── Lazy Propagation (Range Add, Range Sum Query) ────
+class LazySegTree {
+    int[] tree, lazy;
+    int n;
+
+    LazySegTree(int[] arr) {
+        n = arr.length; tree = new int[4*n]; lazy = new int[4*n];
+        build(arr, 1, 0, n-1);
+    }
+
+    void build(int[] a, int node, int l, int r) {
+        if (l == r) { tree[node] = a[l]; return; }
+        int m = (l+r)/2;
+        build(a, 2*node, l, m); build(a, 2*node+1, m+1, r);
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+
+    void pushDown(int node, int l, int r) {
+        if (lazy[node] != 0) {
+            int m = (l+r)/2;
+            // apply lazy to children
+            tree[2*node]   += lazy[node] * (m - l + 1);
+            lazy[2*node]   += lazy[node];
+            tree[2*node+1] += lazy[node] * (r - m);
+            lazy[2*node+1] += lazy[node];
+            lazy[node] = 0;  // clear after pushing
+        }
+    }
+
+    void rangeAdd(int node, int l, int r, int ql, int qr, int val) {
+        if (ql <= l && r <= qr) {
+            tree[node] += val * (r - l + 1);
+            lazy[node] += val; return;
+        }
+        if (qr < l || r < ql) return;
+        pushDown(node, l, r);  // CRITICAL: push before going to children
+        int m = (l+r)/2;
+        rangeAdd(2*node, l, m, ql, qr, val);
+        rangeAdd(2*node+1, m+1, r, ql, qr, val);
+        tree[node] = tree[2*node] + tree[2*node+1];
+    }
+}`,
+  worked:{
+    title:'LC 307 — Range Sum Query — Mutable',
+    problem:'Given an array, support two operations: update(i, val) and sumRange(l, r).',
+    brute:`// BRUTE: Update O(1), Query O(n)
+// or Prefix Sum: Update O(n) recompute, Query O(1)
+// Neither handles BOTH efficiently
+
+int[] arr; // O(1) update, O(n) query
+int sumRange(int l, int r) {
+    int sum = 0;
+    for (int i = l; i <= r; i++) sum += arr[i]; // O(n) per query!
+    return sum;
+}`,
+    optimal:`// OPTIMAL: Segment Tree — O(log n) update AND query
+// Key insight: when you need BOTH fast update AND fast query, prefix sum fails.
+// Segment Tree is the canonical answer.
+
+class NumArray {
+    SegmentTree st;
+    NumArray(int[] nums) { st = new SegmentTree(nums); }
+    void update(int i, int val) { st.update(i, val); }  // O(log n)
+    int sumRange(int l, int r) { return st.query(l, r); } // O(log n)
+}
+
+// Interview note: BIT (Fenwick Tree) also solves this with
+// O(log n) for both — and is shorter to implement.
+// Segment Tree is more general (handles min/max/GCD/etc).
+// BIT only handles invertible operations (sum, XOR).`,
+  },
+  practice:[
+    {name:'LC 307 — Range Sum Query Mutable',diff:'medium',why:'Canonical segment tree / BIT problem.',insight:'Prefix sum breaks on updates. O(log n) for both update + query.'},
+    {name:'LC 315 — Count of Smaller Numbers After Self',diff:'hard',why:'Process right-to-left, query Seg Tree for count < num.',insight:'Coordinate compress → Seg tree on value range.'},
+    {name:'LC 493 — Reverse Pairs',diff:'hard',why:'Count pairs (i,j) where nums[i] > 2*nums[j], i<j.',insight:'Modified merge sort or Seg Tree on sorted values.'},
+    {name:'LC 699 — Falling Squares',diff:'hard',why:'Range max query after each square drop.',insight:'Lazy Seg Tree: range max update, global max query.'},
+    {name:'LC 2407 — Longest Increasing Subsequence II',diff:'hard',why:'dp[i] = max(dp[j]) for j in [nums[i]-k, nums[i]-1] + 1.',insight:'Seg tree range max query on value axis.'},
+  ],
+  interview:`Interviewers test:
+  • Can you implement build + query + update without bugs?
+  • Do you know when to use lazy propagation?
+  • BIT vs Segment Tree — which when?
+  
+  BIT vs Segment Tree:
+  • BIT: Only for INVERTIBLE operations (sum, XOR). Simpler code.
+  • Segment Tree: Any associative operation (sum, min, max, GCD). More powerful.
+  • If the problem needs range update + range query → Segment Tree with lazy
+  • If prefix sum breaks due to updates → try BIT first (simpler code)
+  
+  Think-aloud template: "This needs O(log n) range [operation] with point updates.
+  Prefix sum is O(1) query but O(n) update. I'll use a Segment Tree: build O(n),
+  query O(log n), update O(log n)."
+  
+  Common bugs: off-by-one in range bounds; forgetting to push lazy before recursing.`
+},
+
+bit:{
+  definition:`A Fenwick Tree (Binary Indexed Tree, BIT) is a data structure that efficiently answers prefix sum queries and supports point updates — both in O(log n). It uses a clever bit manipulation trick to store partial sums in an array, making it 2-3x more cache-friendly and shorter to code than a Segment Tree, at the cost of being limited to invertible/associative operations.`,
+  mechanics:`
+  KEY INSIGHT: Each index i stores the sum of a range of elements determined by 
+  the lowest set bit (LSB) of i.
+  
+  i = 6 (binary 110): LSB = 2, so tree[6] stores sum of arr[5..6] (2 elements)
+  i = 4 (binary 100): LSB = 4, so tree[4] stores sum of arr[1..4] (4 elements)
+  i = 8 (binary 1000): LSB = 8, so tree[8] stores sum of arr[1..8]
+  
+  LSB trick: i & (-i) gives the lowest set bit of i.
+  
+  PREFIX SUM QUERY (1-indexed):
+  sum(i): result += tree[i]; i -= i & (-i);  // remove LSB, go to parent
+  
+  POINT UPDATE:
+  update(i, delta): tree[i] += delta; i += i & (-i);  // add LSB, go to next responsible
+  
+  Both operations traverse at most log n steps.
+  
+  Range sum [l, r] = prefix(r) - prefix(l-1)  (using invertibility of subtraction)`,
+  complexity:[
+    {op:'Prefix sum query',avg:'O(log n)',worst:'O(log n)',why:'Remove LSB each step: at most log n steps (bits in n).'},
+    {op:'Point update',avg:'O(log n)',worst:'O(log n)',why:'Add LSB each step: at most log n steps.'},
+    {op:'Build from array',avg:'O(n log n)',worst:'O(n log n)',why:'n updates each O(log n). O(n) possible with a smarter init.'},
+    {op:'Range sum query',avg:'O(log n)',worst:'O(log n)',why:'Two prefix queries.'},
+    {op:'Space',avg:'O(n)',worst:'O(n)',why:'Single array of size n+1 (1-indexed).'},
+  ],
+  subtypes:[
+    {name:'1D BIT (Point Update, Prefix Query)',desc:'Classic. Sum, XOR. Only invertible operations.'},
+    {name:'1D BIT (Range Update, Point Query)',desc:'Use difference array trick: update(l, delta), update(r+1, -delta). Query at point = prefix sum.'},
+    {name:'1D BIT (Range Update, Range Query)',desc:'Maintain two BITs. More complex derivation. See competitive programming resources.'},
+    {name:'2D BIT',desc:'For 2D prefix sums with point updates. O(log²n) per operation. Used in 2D range query problems.'},
+    {name:'BIT for Order Statistics',desc:'Build BIT over value range (with coordinate compression) to answer rank/kth element queries.'},
+  ],
+  patterns:[
+    {name:'Prefix Sum with Updates',when:'Subarray sum query with occasional updates. BIT beats prefix sum (O(n) update) and beats brute force (O(n) query).',trigger:'"Point update + range sum query" → BIT (simpler than Seg Tree)'},
+    {name:'Count Inversions',when:'Count pairs (i,j) where i<j and arr[i]>arr[j]. Process left-to-right, query how many seen values > current.',trigger:'"Count inversions" / "count pairs (i,j) with arr[i]>arr[j]" → BIT on value range'},
+    {name:'Order Statistics / Rank Query',when:'In a dynamic set, find how many elements are ≤ x, or find the k-th smallest.',trigger:'"Rank", "how many elements ≤ x", "kth smallest dynamically" → BIT on coordinate-compressed values'},
+    {name:'2D Range Sum',when:'Grid problems needing 2D range sums with point updates.',trigger:'"2D prefix sum with updates" → 2D BIT'},
+  ],
+  smells:[
+    {if:'"Point update + prefix/range sum query"',use:'BIT — simpler code than Segment Tree for sum/XOR'},
+    {if:'"Count of elements seen so far that are < X"',use:'BIT on value range: update(X, 1), query(X-1) = count less than X'},
+    {if:'"Count inversions in array"',use:'Process array; for each element query(max) - query(arr[i]) = count of greater seen'},
+    {if:'"Kth smallest in dynamic multiset"',use:'BIT on value space: binary search on BIT prefix sums'},
+    {if:'"2D grid: point update, rectangle sum"',use:'2D BIT: O(log²n) per operation'},
+  ],
+  java:`// ─── Fenwick Tree (1-indexed, Range Sum) ──────────────
+class FenwickTree {
+    int[] tree;
+    int n;
+
+    FenwickTree(int n) {
+        this.n = n;
+        tree = new int[n + 1];  // 1-indexed: tree[0] unused
+    }
+
+    // ─── Point Update ─────────────────────────────────
+    // Adds delta to position i, propagates to all responsible ranges
+    void update(int i, int delta) {
+        for (; i <= n; i += i & (-i))  // add lowest set bit
+            tree[i] += delta;
+    }
+
+    // ─── Prefix Sum [1, i] ────────────────────────────
+    // Sum from index 1 to i (1-indexed)
+    int query(int i) {
+        int sum = 0;
+        for (; i > 0; i -= i & (-i))   // remove lowest set bit
+            sum += tree[i];
+        return sum;
+    }
+
+    // ─── Range Sum [l, r] ─────────────────────────────
+    int query(int l, int r) {
+        return query(r) - query(l - 1);
+    }
+
+    // ─── Build from array — O(n log n) ────────────────
+    FenwickTree(int[] arr) {
+        this(arr.length);
+        for (int i = 0; i < arr.length; i++)
+            update(i + 1, arr[i]);  // convert to 1-indexed
+    }
+}
+
+// ─── Count Inversions using BIT ───────────────────────
+int countInversions(int[] arr) {
+    // Coordinate compress to [1..n]
+    int[] sorted = arr.clone();
+    Arrays.sort(sorted);
+    Map<Integer, Integer> rank = new HashMap<>();
+    for (int i = 0; i < sorted.length; i++)
+        rank.put(sorted[i], i + 1);  // 1-indexed rank
+
+    FenwickTree bit = new FenwickTree(arr.length);
+    int inversions = 0;
+    for (int i = arr.length - 1; i >= 0; i--) {
+        int r = rank.get(arr[i]);
+        inversions += bit.query(r - 1); // count elements < arr[i] seen to right
+        bit.update(r, 1);               // mark arr[i] as seen
+    }
+    return inversions;
+}
+
+// ─── BIT for Rank Query (How many ≤ x) ──────────────
+// Useful for problems needing dynamic order statistics
+// Key: coordinate compress values, use BIT on value space
+// update(val): mark val as present
+// query(val): count how many present values are ≤ val
+
+// ─── Range Update, Point Query (Difference Array BIT) ─
+class DiffBIT {
+    FenwickTree bit;
+    DiffBIT(int n) { bit = new FenwickTree(n); }
+    void rangeAdd(int l, int r, int val) {
+        bit.update(l, val);
+        if (r + 1 <= bit.n) bit.update(r + 1, -val);
+    }
+    int pointQuery(int i) { return bit.query(i); } // prefix sum = value at i
+}`,
+  worked:{
+    title:'LC 327 — Count of Range Sum',
+    problem:'Given an array, count the number of range sums that lie in [lower, upper].',
+    brute:`// BRUTE: O(n^2) — try every pair (i, j), compute sum
+int countRangeSum_brute(int[] nums, int lower, int upper) {
+    int n = nums.length, count = 0;
+    long[] prefix = new long[n + 1];
+    for (int i = 0; i < n; i++) prefix[i+1] = prefix[i] + nums[i];
+    for (int i = 0; i < n; i++)
+        for (int j = i+1; j <= n; j++) {
+            long sum = prefix[j] - prefix[i];
+            if (sum >= lower && sum <= upper) count++;
+        }
+    return count;
+}`,
+    optimal:`// OPTIMAL: BIT with coordinate compression — O(n log n)
+// rangeSum[i..j] = prefix[j+1] - prefix[i]
+// We want: lower ≤ prefix[j+1] - prefix[i] ≤ upper
+// ↔ prefix[j+1] - upper ≤ prefix[i] ≤ prefix[j+1] - lower
+// So: for each j, count prefix[i] values in [prefix[j+1]-upper, prefix[j+1]-lower]
+
+// Sweep left-to-right with BIT on coordinate-compressed prefix sums
+// As we process each prefix[j+1]:
+//   1. Query BIT for count in [prefix[j]-upper, prefix[j]-lower]
+//   2. Add prefix[j+1] to BIT
+
+// Space: O(n), Time: O(n log n)
+// Full implementation uses modified merge sort or BIT with coordinate compression.
+// Merge sort approach (commonly seen in solutions):
+int count = 0;
+mergeCount(prefix, 0, n, lower, upper); // divide and count during merge
+
+// Why this approach: we turn a 2D problem (i,j pairs) into counting
+// elements in a 1D range using BIT. Coordinate compression handles
+// the fact that prefix sums can be large.`,
+  },
+  practice:[
+    {name:'LC 307 — Range Sum Query Mutable',diff:'medium',why:'Classic BIT application: point update, range sum.',insight:'BIT is cleaner than Seg Tree here — only 10 lines.'},
+    {name:'LC 315 — Count Smaller Numbers After Self',diff:'hard',why:'Process right-to-left, BIT on compressed values.',insight:'For each num, query(rank-1) = count of smaller to right. Update rank.'},
+    {name:'LC 493 — Reverse Pairs',diff:'hard',why:'Count i<j where arr[i] > 2*arr[j].',insight:'Merge sort or BIT on compressed 2*arr[j] values.'},
+    {name:'LC 2179 — Count Good Triplets in Array',diff:'hard',why:'BIT for prefix count queries.',insight:'For each middle element, count left < mid AND right > mid using BIT.'},
+    {name:'LC 1395 — Count Number of Teams',diff:'medium',why:'BIT for left-smaller and right-greater counts.',insight:'For each middle, query BIT for counts in both directions.'},
+  ],
+  interview:`BIT vs Segment Tree — the definitive guide:
+  
+  USE BIT when:
+  • Operation is invertible (sum: a+b, XOR: a^b, but NOT min/max)
+  • Code simplicity matters (BIT is ~10 lines vs ~30 for Seg Tree)
+  • Point update + prefix/range query
+  
+  USE Segment Tree when:
+  • Non-invertible operations (min, max, GCD)
+  • Range update needed (lazy propagation)
+  • More complex queries (kth element, range XOR, etc.)
+  
+  BIT trick to memorize:
+  • i & (-i) = lowest set bit (LSB) of i
+  • Update: add LSB (i += i & -i) — goes to next responsible range
+  • Query: remove LSB (i -= i & -i) — peels off coverage from large to small
+  
+  Always say in interviews: "I'll use a Fenwick Tree for O(log n) point updates
+  and prefix sum queries. The key operation is i & (-i) to isolate the lowest set bit."`
+},
+
+uf:{
+  definition:`Union-Find (Disjoint Set Union, DSU) is a data structure that tracks elements partitioned into disjoint (non-overlapping) groups. It supports two operations: find(x) — which group does x belong to? — and union(x, y) — merge x's group with y's group. With two optimizations (path compression + union by rank), both operations run in near-constant amortized time O(α(n)) where α is the inverse Ackermann function — effectively O(1) for any practical n.`,
+  mechanics:`
+  Internal: parent[] array where parent[i] = i means i is its own root (set representative).
+  Initially: parent[i] = i (each element is its own group).
+  
+  FIND (with Path Compression):
+  Follow parent pointers to root. On the way back, point every visited node
+  directly to root ("path compression"). Future finds for these nodes go directly to root.
+  
+  UNION (by Rank/Size):
+  Find root of both elements. If different roots, merge the smaller tree under the larger.
+  rank[] tracks tree height (or size[]).
+  
+  WHY O(α(n))? The inverse Ackermann function grows so slowly that for any n
+  ≤ 10^600, α(n) ≤ 4. Combined path compression + union by rank guarantees this.
+  
+  Key applications:
+  • Detecting cycles in undirected graphs
+  • Kruskal's MST algorithm
+  • Connected components
+  • Dynamic connectivity`,
+  complexity:[
+    {op:'Make Set',avg:'O(1)',worst:'O(1)',why:'Just set parent[i] = i.'},
+    {op:'Find (naive)',avg:'O(n)',worst:'O(n)',why:'Could traverse full chain without compression.'},
+    {op:'Find (path compression)',avg:'O(log n)',worst:'O(log n)',why:'Amortized — future finds are O(1).'},
+    {op:'Find (compression + rank)',avg:'O(α(n))',worst:'O(α(n))',why:'Inverse Ackermann — practically O(1).'},
+    {op:'Union (by rank)',avg:'O(α(n))',worst:'O(α(n))',why:'Calls Find twice + O(1) merge.'},
+    {op:'Space',avg:'O(n)',worst:'O(n)',why:'Two arrays: parent[] and rank[] (or size[]).'},
+  ],
+  subtypes:[
+    {name:'Basic Union-Find (no optimizations)',desc:'O(n) worst case per operation. For interviews: implement compressed version.'},
+    {name:'Union by Rank',desc:'Attach shorter tree under taller. Keeps height O(log n). Rank = upper bound on height.'},
+    {name:'Union by Size',desc:'Attach smaller subtree under larger. Similar guarantees. Count = number of elements.'},
+    {name:'Path Compression',desc:'Point all nodes on find-path directly to root. Flattens tree over time.'},
+    {name:'Both Optimizations',desc:'O(α(n)) — the gold standard. Use this always in interviews.'},
+    {name:'Weighted Union-Find',desc:'Track edge weights or offsets from parent. Used for bipartite check, relative ranks.'},
+  ],
+  patterns:[
+    {name:'Connected Components',when:'Find how many connected components exist; which component does a node belong to?',trigger:'"Connected", "same group", "islands", "friends" → Union-Find'},
+    {name:'Cycle Detection (undirected)',when:'If union(u, v) and find(u) == find(v) → adding edge (u,v) creates a cycle.',trigger:'"Detect cycle in undirected graph" → Union-Find; for directed → DFS with coloring'},
+    {name:'Kruskal\'s MST',when:'Sort edges by weight, greedily add if they connect different components.',trigger:'"Minimum Spanning Tree" → Kruskal = sort edges + Union-Find'},
+    {name:'Dynamic Connectivity',when:'Nodes join/merge over time; answer "are x and y connected?" after each merge.',trigger:'"Accounts merging", "friend circles", "union operations then connectivity" → DSU'},
+    {name:'Bipartite Check',when:'Use weighted/bipartite DSU to track parity.',trigger:'"Is graph bipartite?" → DSU with parity or BFS/DFS 2-coloring'},
+  ],
+  smells:[
+    {if:'"Connected components in graph"',use:'Union-Find — union edges, count roots with parent[i]==i'},
+    {if:'"Detect cycle in undirected graph"',use:'Union-Find: if find(u)==find(v) before union → cycle'},
+    {if:'"Minimum spanning tree"',use:'Kruskal\'s = sort edges + union-find to skip same-component edges'},
+    {if:'"Friend circles / account merging"',use:'Union-Find: each unique value → union into same component'},
+    {if:'"Make all nodes connected minimum edges"',use:'Components - 1 edges needed (count components via DSU)'},
+    {if:'"Redundant connection in undirected graph"',use:'Union-Find: first edge (u,v) where find(u)==find(v) is redundant'},
+  ],
+  java:`// ─── Union-Find with Path Compression + Union by Rank ─
+class UnionFind {
+    int[] parent, rank;
+    int components;  // track number of disjoint sets
+
+    UnionFind(int n) {
+        parent = new int[n];
+        rank = new int[n];
+        components = n;
+        for (int i = 0; i < n; i++) parent[i] = i; // each is own root
+    }
+
+    // ─── Find with Path Compression ──────────────────
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]); // recursively compress path
+        return parent[x];
+    }
+
+    // ─── Iterative path compression (avoids stack overflow) ──
+    int findIterative(int x) {
+        int root = x;
+        while (parent[root] != root) root = parent[root]; // find root
+        while (parent[x] != root) {     // path compression
+            int next = parent[x];
+            parent[x] = root;
+            x = next;
+        }
+        return root;
+    }
+
+    // ─── Union by Rank ────────────────────────────────
+    boolean union(int x, int y) {
+        int rx = find(x), ry = find(y);
+        if (rx == ry) return false; // already same component
+        // attach smaller rank tree under larger rank
+        if (rank[rx] < rank[ry]) { int tmp = rx; rx = ry; ry = tmp; }
+        parent[ry] = rx;                    // ry → rx
+        if (rank[rx] == rank[ry]) rank[rx]++; // only grows when equal
+        components--;
+        return true;
+    }
+
+    boolean connected(int x, int y) { return find(x) == find(y); }
+    int getComponents() { return components; }
+}
+
+// ─── Kruskal's MST ────────────────────────────────────
+int kruskalMST(int n, int[][] edges) {
+    // edges: [u, v, weight]
+    Arrays.sort(edges, (a, b) -> a[2] - b[2]); // sort by weight
+    UnionFind uf = new UnionFind(n);
+    int totalWeight = 0, edgesUsed = 0;
+    for (int[] edge : edges) {
+        if (uf.union(edge[0], edge[1])) { // if connects different components
+            totalWeight += edge[2];
+            edgesUsed++;
+            if (edgesUsed == n - 1) break; // MST complete
+        }
+    }
+    return edgesUsed == n - 1 ? totalWeight : -1; // -1 if not connected
+}
+
+// ─── Number of Islands (Union-Find approach) ──────────
+int numIslands(char[][] grid) {
+    int m = grid.length, n = grid[0].length;
+    UnionFind uf = new UnionFind(m * n);
+    // subtract water cells from component count
+    int water = 0;
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            if (grid[i][j] == '0') water++;
+
+    int[][] dirs = {{0,1},{0,-1},{1,0},{-1,0}};
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            if (grid[i][j] == '1')
+                for (int[] d : dirs) {
+                    int ni = i+d[0], nj = j+d[1];
+                    if (ni>=0&&ni<m&&nj>=0&&nj<n&&grid[ni][nj]=='1')
+                        uf.union(i*n+j, ni*n+nj);
+                }
+    return uf.getComponents() - water;
+}`,
+  worked:{
+    title:'LC 684 — Redundant Connection',
+    problem:'Given an undirected graph that was a tree with one extra edge added, find the redundant edge.',
+    brute:`// BRUTE: For each edge, try removing it, check if graph stays connected — O(n^2)
+// DFS/BFS after removing each edge — expensive and clunky`,
+    optimal:`// OPTIMAL: Union-Find — O(n * α(n)) ≈ O(n)
+// Key insight: Process edges in order. The FIRST edge where find(u) == find(v)
+// is the redundant edge — adding it would create a cycle.
+
+int[] findRedundantConnection(int[][] edges) {
+    int n = edges.length;
+    UnionFind uf = new UnionFind(n + 1); // 1-indexed nodes
+    for (int[] edge : edges) {
+        int u = edge[0], v = edge[1];
+        if (!uf.union(u, v)) {
+            return edge; // find(u) == find(v) → this edge creates cycle
+        }
+    }
+    return new int[]{};  // unreachable by problem constraints
+}
+
+// Why Union-Find?
+// Tree has exactly n-1 edges. Adding one more creates exactly one cycle.
+// As we add edges, Union-Find tracks connectivity.
+// The first edge that connects two already-connected nodes = the cycle edge.
+// O(n α(n)) ≈ O(n) — perfect for this problem.
+
+// Alternative: DFS to detect cycle — same time complexity,
+// but Union-Find is far more elegant and interview-friendly here.`,
+  },
+  practice:[
+    {name:'LC 547 — Number of Provinces',diff:'medium',why:'Direct connected components counting.',insight:'Union all direct friendships. Count roots where parent[i]==i.'},
+    {name:'LC 684 — Redundant Connection',diff:'medium',why:'Cycle detection in undirected graph.',insight:'First edge where find(u)==find(v) before union = cycle edge.'},
+    {name:'LC 721 — Accounts Merge',diff:'medium',why:'Union emails within same account, merge across accounts.',insight:'Use email as node. Group by root. Map root → list of emails.'},
+    {name:'LC 1584 — Min Cost to Connect All Points',diff:'medium',why:'Kruskal\'s MST on all-pairs distances.',insight:'Generate all edges (n²), sort, greedily union until n-1 edges added.'},
+    {name:'LC 1202 — Smallest String With Swaps',diff:'medium',why:'Can swap elements in same component in any order.',insight:'Union all (i,j) swap pairs. Sort each component\'s characters.'},
+  ],
+  interview:`Interviewers test:
+  • Can you implement Union-Find from scratch in under 10 minutes?
+  • Do you apply BOTH path compression AND union by rank?
+  • Can you articulate WHY O(α(n)) — what α represents?
+  
+  Key implementation decisions to state:
+  • "I'm using union by rank and path compression for O(α(n)) — practically O(1)"
+  • "I track a components counter, decremented on each successful union"
+  • "find() uses recursive path compression — all nodes point directly to root after"
+  
+  Common pitfall: forgetting to check if find(u) == find(v) BEFORE union when 
+  detecting cycles. The check IS the cycle detection.
+  
+  When Union-Find > DFS for connectivity:
+  • Dynamic: edges added over time (online) → DSU handles it; DFS would re-run
+  • Simpler code: DSU for undirected connectivity is 3 functions, ~20 lines
+  • Speed: O(α(n)) beats DFS's O(V+E) for repeated queries
+  
+  "Connected components" → immediately say Union-Find in interviews.`
+}
+};
+
+// ─── RENDER ENGINE ──────────────────────────────────────
+
+let currentTopic = 'bt';
+let currentSection = 0;
+
+function renderNav() {
+  const nav = document.getElementById('nav');
+  nav.innerHTML = TOPICS.map(t =>
+    `<div class="nav-item${t.id===currentTopic?' active':''}" onclick="setTopic('${t.id}')">
+      <span>${t.icon}</span><span>${t.short}</span>
+    </div>`
+  ).join('');
+}
+
+function renderTabs() {
+  return `<div class="section-tabs">${SECTIONS.map((s,i)=>
+    `<div class="tab${i===currentSection?' active':''}" onclick="setSection(${i})">${s}</div>`
+  ).join('')}</div>`;
+}
+
+function codeBlock(code) {
+  return `<pre>${code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`;
+}
+
+function badge(text) {
+  const map = {'O(1)':'badge-o1','O(log n)':'badge-ologn','O(n)':'badge-on','O(n log n)':'badge-onlogn','O(n^2)':'badge-on2'};
+  return `<span class="badge ${map[text]||'badge-on'}">${text}</span>`;
+}
+
+function renderSection(t, d) {
+  const s = currentSection;
+  if(s===0) return `
+    <div class="card"><div class="card-title">What is it?</div><p>${d.definition}</p></div>`;
+  if(s===1) return `
+    <div class="card"><div class="card-title">How it works under the hood</div>
+    <pre style="background:transparent;border:none;padding:0;margin:0;font-size:12.5px;white-space:pre-wrap">${d.mechanics}</pre></div>`;
+  if(s===2) return `
+    <table class="complexity-table"><thead><tr><th>Operation</th><th>Average</th><th>Worst</th><th>Why</th></tr></thead><tbody>
+    ${d.complexity.map(c=>`<tr><td><strong>${c.op}</strong></td><td>${badge(c.avg)}</td><td>${badge(c.worst)}</td><td style="color:var(--color-text-tertiary);font-size:12px">${c.why}</td></tr>`).join('')}
+    </tbody></table>`;
+  if(s===3) return `
+    <div class="variants-grid">${d.subtypes.map(s=>`<div class="card"><div class="card-title">${s.name}</div><p>${s.desc}</p></div>`).join('')}</div>`;
+  if(s===4) return d.patterns.map(p=>`
+    <div class="pattern-item">
+      <div class="pattern-name">${p.name}</div>
+      <div class="pattern-when" style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">${p.when}</div>
+      <div class="pattern-trigger">🔑 "${p.trigger}"</div>
+    </div>`).join('');
+  if(s===5) return d.smells.map(s=>`
+    <div class="smell-item">
+      <div class="smell-if">if: "${s.if}"</div>
+      <div class="smell-arrow">→</div>
+      <div class="smell-use">${s.use}</div>
+    </div>`).join('');
+  if(s===6) return codeBlock(d.java);
+  if(s===7) {
+    const w = d.worked;
+    return `
+    <div class="card" style="margin-bottom:10px"><div class="card-title">${w.title}</div><p>${w.problem}</p></div>
+    <div class="worked-step"><div class="worked-label">Brute Force</div>${codeBlock(w.brute)}</div>
+    <div class="worked-step"><div class="worked-label">Optimal Solution</div>${codeBlock(w.optimal)}</div>`;
+  }
+  if(s===8) return d.practice.map(p=>`
+    <div class="practice-item">
+      <div class="practice-header">
+        <span class="difficulty ${p.diff}">${p.diff.charAt(0).toUpperCase()+p.diff.slice(1)}</span>
+        <span class="practice-name">${p.name}</span>
+      </div>
+      <div class="practice-insight">Why: ${p.why}</div>
+      <div class="practice-insight" style="color:var(--color-text-primary);margin-top:3px">💡 ${p.insight}</div>
+    </div>`).join('');
+  if(s===9) {
+    const lines = d.interview.split('\n').filter(l=>l.trim());
+    return lines.map(l=>`<div class="interview-tip">${l.trim()}</div>`).join('');
+  }
+  return '';
+}
+
+function render() {
+  const t = TOPICS.find(x=>x.id===currentTopic);
+  const d = DATA[currentTopic];
+  renderNav();
+  document.getElementById('main').innerHTML = `
+    <div class="topic-header">
+      <div class="topic-icon" style="background:var(--color-background-secondary)">${t.icon}</div>
+      <div><h1>${t.name}</h1><div class="subtitle">Block 2 · Non-linear Data Structures</div></div>
+    </div>
+    ${renderTabs()}
+    <div id="content">${renderSection(t, d)}</div>
+  `;
+}
+
+function setTopic(id) { currentTopic = id; currentSection = 0; render(); }
+function setSection(i) { currentSection = i; document.getElementById('content').innerHTML = renderSection(TOPICS.find(x=>x.id===currentTopic), DATA[currentTopic]); document.querySelectorAll('.tab').forEach((t,idx)=>t.classList.toggle('active',idx===i)); }
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,925 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,system-ui);background:transparent;color:var(--color-text-primary)}
+.w{padding:.5rem 0 2.5rem}
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem}
+.nb{padding:6px 12px;border:.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.nb:hover{background:var(--color-background-secondary)}
+.nb.on{background:#EEEDFE;border-color:#534AB7;color:#3C3489;font-weight:500}
+.tp{display:none}.tp.vis{display:block}
+.ttl{font-size:20px;font-weight:500;margin-bottom:3px}
+.sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.25rem}
+.stabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.25rem;padding-bottom:10px;border-bottom:.5px solid var(--color-border-tertiary)}
+.st{padding:5px 12px;font-size:12px;border-radius:16px;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);transition:all .15s}
+.st:hover{background:var(--color-background-secondary)}
+.st.on{background:#EEEDFE;color:#3C3489;font-weight:500}
+.sc{display:none}.sc.vis{display:block}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.def{font-size:15px;line-height:1.7}
+code{font-family:var(--font-mono,monospace);font-size:.9em;background:var(--color-background-secondary);padding:1px 5px;border-radius:4px}
+.cb{background:var(--color-background-secondary);border:.5px solid var(--color-border-tertiary);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;font-size:12px;line-height:1.8;margin-bottom:1rem;white-space:pre;font-family:var(--font-mono,monospace)}
+.kw{color:#534AB7;font-weight:500}.cm{color:var(--color-text-secondary)}.str{color:#085041}.nm{color:#993C1D}
+.flow{display:flex;flex-direction:column;gap:8px}
+.fs{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:8px;background:var(--color-background-secondary);border-left:3px solid #AFA9EC}
+.fs.t{border-left-color:#5DCAA5}.fs.a{border-left-color:#EF9F27}.fs.r{border-left-color:#E24B4A}.fs.c{border-left-color:#F0997B}
+.fn{min-width:22px;height:22px;border-radius:50%;background:#EEEDFE;color:#3C3489;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.fn.t{background:#E1F5EE;color:#085041}.fn.a{background:#FAEEDA;color:#633806}.fn.r{background:#FCEBEB;color:#A32D2D}
+.ft{font-size:13.5px;line-height:1.6}
+.mi{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.mi:last-child{border-bottom:none}
+.mico{width:22px;height:22px;border-radius:50%;background:#FCEBEB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:13px}
+.mt{font-size:13.5px;line-height:1.6}.mt strong{font-weight:500;color:#A32D2D}
+.qi{padding:10px 12px;border-radius:8px;background:var(--color-background-secondary);margin-bottom:8px;font-size:13.5px;line-height:1.6;cursor:pointer;border:.5px solid var(--color-border-tertiary);transition:all .15s}
+.qi:hover{border-color:#AFA9EC;background:#EEEDFE}
+.ql{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.qa{font-size:13px;color:var(--color-text-secondary);margin-top:6px;padding-top:6px;border-top:.5px solid var(--color-border-tertiary);display:none;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:5px 13px;border-radius:16px;font-size:13px;background:#EEEDFE;color:#3C3489;border:.5px solid #AFA9EC;cursor:pointer}
+.chip:hover{background:#CECBF6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.four{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.hl{border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.6;border:.5px solid}
+.hlp{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.hlt{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.hla{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.hlc{background:#FAECE7;border-color:#F0997B;color:#712B13}
+.hlb{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.hlr{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.hlg{background:#EAF3DE;border-color:#97C459;color:#3B6D11}
+.hn{font-weight:500;font-size:12px;margin-bottom:4px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:7px 10px;background:var(--color-background-secondary);color:var(--color-text-secondary);font-weight:500;border-bottom:.5px solid var(--color-border-tertiary)}
+.tbl td{padding:7px 10px;border-bottom:.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5}
+.tbl tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;margin-right:3px;vertical-align:middle}
+.bp{background:#EEEDFE;color:#3C3489}.bt{background:#E1F5EE;color:#085041}.ba{background:#FAEEDA;color:#633806}
+.br{background:#FCEBEB;color:#A32D2D}.bg{background:#EAF3DE;color:#3B6D11}
+.stream-pipe{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.pipe-stage{border-radius:8px;padding:6px 12px;font-size:12px;font-weight:500;border:.5px solid}
+.pipe-src{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.pipe-inter{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.pipe-term{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.pipe-arrow{color:var(--color-text-secondary);font-size:14px}
+.fi-card{border-radius:8px;padding:10px 13px;font-size:13px;border:.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.fi-sig{font-family:var(--font-mono,monospace);font-size:11px;color:#085041;background:#E1F5EE;padding:3px 7px;border-radius:5px;display:inline-block;margin-top:5px}
+.ver-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:500;background:#E1F5EE;color:#085041;border:.5px solid #5DCAA5;margin-bottom:8px}
+</style>
+
+<div class="w">
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Java Functional Programming & Modern Java Visual Bible — 8 topics</h2>
+<div style="margin-bottom:1.25rem"><p style="font-size:13px;color:var(--color-text-secondary)">Block 5 · Functional & Modern Java · 8 topics · pick topic → pick section → click questions to reveal answers</p></div>
+
+<div class="nav">
+  <button class="nb on" onclick="T(0)">1 · Lambdas</button>
+  <button class="nb" onclick="T(1)">2 · Stream API</button>
+  <button class="nb" onclick="T(2)">3 · Optional</button>
+  <button class="nb" onclick="T(3)">4 · Method references</button>
+  <button class="nb" onclick="T(4)">5 · Functional interfaces</button>
+  <button class="nb" onclick="T(5)">6 · Records</button>
+  <button class="nb" onclick="T(6)">7 · Sealed classes</button>
+  <button class="nb" onclick="T(7)">8 · var</button>
+</div>
+
+<!-- ════════ T0: LAMBDAS ════════ -->
+<div class="tp vis" id="t0">
+  <div class="ttl">Lambda expressions</div>
+  <div class="sub">Syntax · effectively final · target typing · invokedynamic under the hood</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t0','s0')">Definition</button>
+    <button class="st" onclick="S('t0','s1')">Internals</button>
+    <button class="st" onclick="S('t0','s2')">Syntax guide</button>
+    <button class="st" onclick="S('t0','s3')">Code</button>
+    <button class="st" onclick="S('t0','s4')">Mistakes</button>
+    <button class="st" onclick="S('t0','s5')">Interview</button>
+    <button class="st" onclick="S('t0','s6')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t0-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A lambda is an anonymous function — a block of code that can be passed around as data. In Java, a lambda is always an instance of a functional interface (any interface with exactly one abstract method). Lambdas enable functional-style programming: passing behaviour as arguments, returning behaviour from methods, and composing pipelines.</p>
+    </div>
+    <div class="three">
+      <div class="hl hlp"><div class="hn">Concise</div>Replace anonymous inner classes with a single expression. <code>(x) -> x * 2</code> vs 5 lines of boilerplate.</div>
+      <div class="hl hlt"><div class="hn">Target-typed</div>The compiler infers the lambda's type from context — the functional interface it's being assigned to or passed into.</div>
+      <div class="hl hla"><div class="hn">Captures context</div>Can close over local variables (must be effectively final) and instance fields (via implicit <code>this</code>).</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s1">
+    <div class="card"><div class="ct">How lambdas work under the hood — invokedynamic</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Not anonymous inner classes</strong> — before Java 8, anonymous inner classes were the pattern. They compile to separate <code>ClassName$1.class</code> files. Lambdas do NOT compile to inner class files — they're fundamentally different at the bytecode level.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>invokedynamic</strong> — each lambda call site compiles to an <code>invokedynamic</code> bytecode instruction (JDK 7 feature, Java 8 first consumer). This is a "bootstrap" mechanism — on first call, <code>LambdaMetafactory.metafactory()</code> is invoked which spins up an implementation class at runtime. Subsequent calls are direct — the bootstrap only runs once.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>LambdaMetafactory</strong> — generates a class that implements the functional interface and delegates to the lambda body, which the compiler extracted as a private synthetic method in the enclosing class. The JVM caches this generated class.</div></div>
+        <div class="fs t"><div class="fn t">4</div><div class="ft"><strong>Effectively final</strong> — local variables captured by a lambda must be final or effectively final (never reassigned after assignment). Why? The lambda may outlive the method stack frame. Effectively final guarantees the captured value is immutable — safe to copy into the lambda's closure. Mutable locals would require heap allocation and thread-safety guarantees the JVM doesn't provide here.</div></div>
+        <div class="fs t"><div class="fn t">5</div><div class="ft"><strong>Instance fields vs locals</strong> — instance fields captured by a lambda are accessed via an implicit <code>this</code> reference (always effectively final as a reference, even if the field's value changes). This means a lambda can mutate an object's fields — just not reassign a local variable.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s2">
+    <div class="card"><div class="ct">Syntax — every form in one place</div>
+<div class="cb"><span class="cm">// Zero params</span>
+<span class="nm">Runnable</span> r = () -> <span class="nm">System</span>.out.println(<span class="str">"hello"</span>);
+
+<span class="cm">// One param — parens optional</span>
+<span class="nm">Consumer</span>&lt;<span class="nm">String</span>&gt; c = s -> <span class="nm">System</span>.out.println(s);
+<span class="nm">Consumer</span>&lt;<span class="nm">String</span>&gt; c2 = (s) -> <span class="nm">System</span>.out.println(s);  <span class="cm">// also valid</span>
+
+<span class="cm">// Two params</span>
+<span class="nm">BiFunction</span>&lt;<span class="nm">Integer</span>, <span class="nm">Integer</span>, <span class="nm">Integer</span>&gt; add = (a, b) -> a + b;
+
+<span class="cm">// Block body — needs explicit return</span>
+<span class="nm">Function</span>&lt;<span class="nm">String</span>, <span class="nm">Integer</span>&gt; parse = s -> {
+    <span class="kw">int</span> result = <span class="nm">Integer</span>.parseInt(s.trim());
+    <span class="kw">return</span> result * 2;
+};
+
+<span class="cm">// With explicit types (rarely needed — usually inferred)</span>
+<span class="nm">BiFunction</span>&lt;<span class="nm">String</span>, <span class="nm">Integer</span>, <span class="nm">Boolean</span>&gt; fn =
+    (<span class="nm">String</span> s, <span class="nm">Integer</span> n) -> s.length() > n;
+
+<span class="cm">// Capturing local — MUST be effectively final</span>
+<span class="kw">int</span> threshold = 10;  <span class="cm">// effectively final — never reassigned</span>
+<span class="nm">Predicate</span>&lt;<span class="nm">Integer</span>&gt; above = n -> n > threshold;
+<span class="cm">// threshold = 20; // would cause compile error above</span>
+
+<span class="cm">// Capturing instance field — via implicit this (fine)</span>
+<span class="kw">class</span> <span class="nm">Processor</span> {
+    <span class="kw">private int</span> multiplier = 3;
+    <span class="nm">Function</span>&lt;<span class="nm">Integer</span>, <span class="nm">Integer</span>&gt; scale = n -> n * multiplier; <span class="cm">// ok — uses this</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s3">
+    <div class="card"><div class="ct">Real-world usage patterns</div>
+<div class="cb"><span class="cm">// 1. Passing behaviour — sorting with custom comparator</span>
+users.sort((a, b) -> a.getName().compareTo(b.getName()));
+users.sort(<span class="nm">Comparator</span>.comparing(<span class="nm">User</span>::getName)); <span class="cm">// method ref — cleaner</span>
+
+<span class="cm">// 2. Strategy pattern — no boilerplate class needed</span>
+<span class="nm">Map</span>&lt;<span class="nm">String</span>, <span class="nm">Function</span>&lt;<span class="nm">Order</span>, <span class="nm">Double</span>&gt;&gt; pricing = <span class="nm">Map</span>.of(
+    <span class="str">"STANDARD"</span>, order -> order.total(),
+    <span class="str">"PREMIUM"</span>,  order -> order.total() * 0.9,
+    <span class="str">"FLASH"</span>,    order -> order.total() * 0.7
+);
+
+<span class="cm">// 3. Returning lambdas — higher-order functions</span>
+<span class="kw">static</span> <span class="nm">Predicate</span>&lt;<span class="nm">String</span>&gt; longerThan(<span class="kw">int</span> n) {
+    <span class="kw">return</span> s -> s.length() > n; <span class="cm">// n is effectively final in context</span>
+}
+list.stream().filter(longerThan(5)).collect(toList());
+
+<span class="cm">// 4. Composing predicates</span>
+<span class="nm">Predicate</span>&lt;<span class="nm">User</span>&gt; active  = u -> u.isActive();
+<span class="nm">Predicate</span>&lt;<span class="nm">User</span>&gt; premium = u -> u.isPremium();
+<span class="nm">Predicate</span>&lt;<span class="nm">User</span>&gt; both   = active.and(premium);</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Mutating a captured local via an array trick</strong> — <code>int[] count = {0}; list.forEach(x -> count[0]++);</code> This is a code smell — the array is the workaround for effectively-final, but the mutation is not thread-safe. Use <code>AtomicInteger</code> or collect and count with streams.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Checking instanceof on a lambda</strong> — <code>myLambda instanceof Runnable</code> is true but <code>instanceof Comparator</code> is false even if the signature matches. Lambdas implement exactly one functional interface — the one they were targeted to. Don't rely on multi-interface casting.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Serialising lambdas</strong> — lambdas are not serialisable by default. If you need to serialise a functional interface value, either use an anonymous class or cast the lambda to Serializable (a hack). Better: don't serialise lambdas — redesign.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Internals</div>How does the JVM implement lambda expressions? Are they anonymous inner classes?<div class="qa">No — lambdas are NOT compiled to anonymous inner class files. Each lambda call site compiles to an invokedynamic bytecode instruction. On first execution, LambdaMetafactory.metafactory() is called: it generates (at runtime) a class that implements the target functional interface by delegating to the lambda body, which the compiler extracted as a private synthetic static method. This generated class is cached. Benefits over inner classes: (1) no .class file per lambda, (2) JVM can choose implementation strategy at runtime (e.g. direct method handle), (3) faster class loading.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Effectively final</div>Why must captured local variables be effectively final in lambdas?<div class="qa">A lambda may outlive the stack frame of the method that created it. Local variables live on the stack; when the method returns, the stack frame is gone. Java's solution: copy the local variable's value into the lambda's closure (a heap-allocated object). For this copy to be safe, the variable must never change after the copy is made — hence effectively final. If it could change, the lambda would have a stale copy and the original would be gone — an undetectable bug. Instance fields don't have this problem because they're on the heap and accessed via a stable 'this' reference.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain functional interfaces in Java — Predicate, Function, Consumer, Supplier with deep internals')">Functional interfaces</span>
+      <span class="chip" onclick="sendPrompt('Explain method references in Java — all 4 types with examples')">Method references</span>
+      <span class="chip" onclick="sendPrompt('How does invokedynamic work and what other Java features use it?')">invokedynamic</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T1: STREAM API ════════ -->
+<div class="tp" id="t1">
+  <div class="ttl">Stream API</div>
+  <div class="sub">Lazy evaluation · intermediate vs terminal · map/filter/reduce/collect/flatMap</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t1','s0')">Definition</button>
+    <button class="st" onclick="S('t1','s1')">Pipeline model</button>
+    <button class="st" onclick="S('t1','s2')">Key operations</button>
+    <button class="st" onclick="S('t1','s3')">Code</button>
+    <button class="st" onclick="S('t1','s4')">Mistakes</button>
+    <button class="st" onclick="S('t1','s5')">Interview</button>
+    <button class="st" onclick="S('t1','s6')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t1-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A <code>Stream</code> is a lazily-evaluated pipeline of operations on a sequence of elements. It doesn't store data — it pulls elements from a source, passes each through a chain of intermediate operations, and drives execution with a terminal operation. Streams support both sequential and parallel execution without changing the pipeline code.</p>
+    </div>
+    <div class="stream-pipe">
+      <div class="pipe-stage pipe-src">source</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage pipe-inter">filter</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage pipe-inter">map</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage pipe-inter">sorted</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-stage pipe-term">collect</div>
+    </div>
+    <div class="two" style="margin-top:.5rem">
+      <div class="hl hlp"><div class="hn">Intermediate operations</div>Return a new Stream. Lazy — nothing runs until a terminal op is called. Examples: filter, map, flatMap, distinct, sorted, peek, limit, skip.</div>
+      <div class="hl hla"><div class="hn">Terminal operations</div>Consume the stream, produce a result or side-effect. Trigger all lazy intermediate ops. Examples: collect, forEach, reduce, count, findFirst, anyMatch, toList (Java 16+).</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s1">
+    <div class="card"><div class="ct">Lazy evaluation — how the pipeline actually runs</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Nothing runs at declaration</strong> — calling <code>.filter()</code>, <code>.map()</code> builds a chain of <code>StatelessOp</code>/<code>StatefulOp</code> objects. No elements are processed. This is key: a stream pipeline with no terminal op does nothing.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Pull model</strong> — the terminal op pulls one element at a time through the entire pipeline. Element 1 goes through filter → map → sorted before element 2 is pulled. Exception: stateful ops like <code>sorted</code> and <code>distinct</code> must buffer the entire stream before emitting — they're "pipeline breaks".</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Short-circuit operations</strong> — <code>findFirst</code>, <code>anyMatch</code>, <code>limit(n)</code> stop pulling as soon as they have their answer. With <code>limit(1)</code> after a heavy computation, only ONE element is computed — not all. This is the power of lazy evaluation.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>Streams are single-use</strong> — once a terminal op is called, the stream is consumed. Calling any method on a used stream throws <code>IllegalStateException</code>. Unlike Iterable, you can't iterate a stream twice — recreate from the source.</div></div>
+        <div class="fs a"><div class="fn a">5</div><div class="ft"><strong>Parallel streams</strong> — <code>list.parallelStream()</code> or <code>stream.parallel()</code>. Uses the ForkJoinPool common pool. Each chunk is processed on a separate thread and merged. Use for CPU-bound stateless operations on large datasets (>10k elements). Avoid for I/O, stateful ops, or small data — overhead dominates.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s2">
+    <div class="card"><div class="ct">Key operations — what each does internally</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">map</div><div class="ft"><strong>map(Function)</strong> — 1-to-1 transform. Returns Stream of same size. <code>stream.map(String::toUpperCase)</code>. Type can change: <code>Stream&lt;String&gt; → Stream&lt;Integer&gt;</code> via <code>.map(String::length)</code>.</div></div>
+        <div class="fs"><div class="fn">fM</div><div class="ft"><strong>flatMap(Function)</strong> — 1-to-many then flatten. Function returns a Stream per element; flatMap concatenates them. Essential for nested collections. <code>orders.flatMap(o -> o.getItems().stream())</code> — gives a flat stream of all items across all orders.</div></div>
+        <div class="fs"><div class="fn">fi</div><div class="ft"><strong>filter(Predicate)</strong> — keeps elements matching the predicate, drops the rest. Stateless, O(1) per element. Always push filters early in the pipeline to reduce elements for downstream ops.</div></div>
+        <div class="fs"><div class="fn">re</div><div class="ft"><strong>reduce(identity, BinaryOperator)</strong> — fold the stream into a single value. <code>stream.reduce(0, Integer::sum)</code> = sum. Associative operator required for parallel correctness. The identity element must be the neutral element for the operation (0 for sum, 1 for product).</div></div>
+        <div class="fs t"><div class="fn t">co</div><div class="ft"><strong>collect(Collector)</strong> — mutable reduction. Collects into a container (List, Map, Set, String). More efficient than reduce for building collections. Key collectors: <code>toList()</code>, <code>toMap()</code>, <code>groupingBy()</code>, <code>joining()</code>, <code>partitioningBy()</code>.</div></div>
+        <div class="fs"><div class="fn">di</div><div class="ft"><strong>distinct/sorted/limit/skip</strong> — stateful ops. <code>distinct()</code> buffers seen elements in a LinkedHashSet. <code>sorted()</code> buffers entire stream into an array then sorts. Both break lazy pull. <code>limit(n)</code>/<code>skip(n)</code> are stateful but don't require full buffering — just a counter.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s3">
+    <div class="card"><div class="ct">Code — real-world pipeline patterns</div>
+<div class="cb"><span class="cm">// GROUP and aggregate — sales by category</span>
+<span class="nm">Map</span>&lt;<span class="nm">String</span>, <span class="nm">Double</span>&gt; totalByCategory = orders.stream()
+    .filter(<span class="nm">Order</span>::isCompleted)
+    .collect(<span class="nm">Collectors</span>.groupingBy(
+        <span class="nm">Order</span>::getCategory,
+        <span class="nm">Collectors</span>.summingDouble(<span class="nm">Order</span>::getTotal)));
+
+<span class="cm">// FLAT the nested — all products across all orders</span>
+<span class="nm">List</span>&lt;<span class="nm">Product</span>&gt; allProducts = orders.stream()
+    .flatMap(o -> o.getProducts().stream())
+    .distinct()
+    .sorted(<span class="nm">Comparator</span>.comparing(<span class="nm">Product</span>::getName))
+    .collect(<span class="nm">Collectors</span>.toList());
+
+<span class="cm">// PARTITION — premium vs standard users</span>
+<span class="nm">Map</span>&lt;<span class="nm">Boolean</span>, <span class="nm">List</span>&lt;<span class="nm">User</span>&gt;&gt; partitioned = users.stream()
+    .collect(<span class="nm">Collectors</span>.partitioningBy(<span class="nm">User</span>::isPremium));
+
+<span class="cm">// JOIN strings</span>
+<span class="nm">String</span> csv = items.stream()
+    .map(<span class="nm">Item</span>::getName)
+    .collect(<span class="nm">Collectors</span>.joining(<span class="str">", "</span>, <span class="str">"["</span>, <span class="str">"]"</span>)); <span class="cm">// [a, b, c]</span>
+
+<span class="cm">// REDUCE — custom accumulator</span>
+<span class="kw">Optional</span>&lt;<span class="nm">BigDecimal</span>&gt; total = transactions.stream()
+    .map(<span class="nm">Transaction</span>::getAmount)
+    .reduce(<span class="nm">BigDecimal</span>::add); <span class="cm">// returns Optional — stream could be empty</span>
+
+<span class="cm">// PARALLEL — use for CPU-bound, stateless, large data</span>
+<span class="kw">long</span> count = hugeList.parallelStream()
+    .filter(x -> expensiveCheck(x))
+    .count();</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Reusing a stream</strong> — streams are single-use. After a terminal op, the stream is closed. Calling any op on it throws <code>IllegalStateException: stream has already been operated upon or closed</code>. Always recreate from the source.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Side effects in map/filter</strong> — using <code>map()</code> to mutate external state (a list, a counter) is a code smell and breaks parallel stream safety. Use <code>forEach</code> for side-effects and keep map/filter pure.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Parallel stream on small data or I/O-bound tasks</strong> — parallel uses ForkJoinPool threads. I/O blocks threads, starving the pool. Parallelism overhead (splitting, merging) beats the gain for small lists. Benchmark before parallelising. The common pool is shared — blocking it hurts CompletableFuture too.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>forEach vs collect for building results</strong> — using <code>forEach</code> to add to an external list is not thread-safe in parallel and is a side-effect anti-pattern. Use <code>collect(toList())</code> — it's the correct, thread-safe, functional way to build a result list.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What is the difference between map and flatMap?<div class="qa">map applies a 1-to-1 function — each element becomes exactly one output element. flatMap applies a 1-to-many function — each element becomes a Stream of outputs, and flatMap concatenates all those streams into one. Example: if each Order has a List&lt;Item&gt;, stream.map(o -> o.getItems()) gives Stream&lt;List&lt;Item&gt;&gt; (nested). stream.flatMap(o -> o.getItems().stream()) gives Stream&lt;Item&gt; — flat. Rule: use flatMap whenever your mapping function returns a collection/stream that you want flattened.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Lazy</div>Why do streams use lazy evaluation and why does it matter?<div class="qa">Lazy evaluation means intermediate operations don't run until a terminal operation is called, and they run one element at a time through the pipeline (pull model). It matters because: (1) short-circuit ops (findFirst, limit) can stop processing after finding their answer — without processing the whole stream. (2) You can build infinite streams (Stream.generate, Stream.iterate) because only the elements you actually consume are computed. (3) Memory-efficient — elements aren't buffered between stages (except for stateful ops like sorted). A stream pipeline with no terminal op literally does nothing — this trips up beginners who don't see output.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Design</div>When would you use parallelStream() and when would you avoid it?<div class="qa">Use parallelStream when: (1) data is large (>10k elements as a rough guide), (2) operations are CPU-bound and stateless (no shared mutable state), (3) each operation is expensive enough to justify parallelism overhead. Avoid when: (1) tasks involve I/O (blocks ForkJoinPool threads, starves other tasks), (2) data is small (overhead of splitting/merging exceeds gain), (3) operations are ordered or have side effects (parallelism changes encounter order), (4) you're inside a web framework that manages its own thread pool. Always benchmark — premature parallelism is often slower than sequential.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain Collectors.groupingBy, toMap, and teeing with complex downstream collectors')">Advanced collectors</span>
+      <span class="chip" onclick="sendPrompt('Explain Stream.generate and Stream.iterate for infinite streams in Java')">Infinite streams</span>
+      <span class="chip" onclick="sendPrompt('Explain IntStream, LongStream, DoubleStream and when to use primitive streams')">Primitive streams</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T2: OPTIONAL ════════ -->
+<div class="tp" id="t2">
+  <div class="ttl">Optional</div>
+  <div class="sub">Why it exists · correct usage · anti-patterns that make things worse</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t2','s0')">Definition</button>
+    <button class="st" onclick="S('t2','s1')">Internals</button>
+    <button class="st" onclick="S('t2','s2')">Correct patterns</button>
+    <button class="st" onclick="S('t2','s3')">Anti-patterns</button>
+    <button class="st" onclick="S('t2','s4')">Interview</button>
+    <button class="st" onclick="S('t2','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t2-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def"><code>Optional&lt;T&gt;</code> is a container that may or may not hold a non-null value. Its purpose: make the possibility of absence explicit in the type system, forcing callers to handle the "no value" case instead of silently receiving null and potentially triggering a NullPointerException later.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlt"><div class="hn">Designed for</div>Return types of methods that legitimately may not have a result. Stream terminal ops (findFirst, min, max, reduce). Repository methods (findById). Never for parameters, fields, or collections.</div>
+      <div class="hl hlr"><div class="hn">Not designed for</div>Method parameters (just use overloading or null). Fields in classes (serialisation overhead, null is fine in private fields). Collections (use empty collection instead of Optional&lt;List&gt;).</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s1">
+    <div class="card"><div class="ct">API — every method, when to use it</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">get</div><div class="ft"><strong>orElse(default)</strong> — always evaluates the default. Use when the default is cheap (a literal, a constant). <strong>orElseGet(Supplier)</strong> — lazy default: only calls the supplier if empty. Use when the default is expensive (DB call, object construction). This is the most missed distinction in interviews.</div></div>
+        <div class="fs t"><div class="fn t">map</div><div class="ft"><strong>map(Function)</strong> — transform the value if present, return empty Optional if not. Returns <code>Optional&lt;U&gt;</code>. <strong>flatMap(Function)</strong> — when the function itself returns an Optional (avoids nested <code>Optional&lt;Optional&lt;T&gt;&gt;</code>). Same as Stream flatMap — unwraps one level.</div></div>
+        <div class="fs t"><div class="fn t">fil</div><div class="ft"><strong>filter(Predicate)</strong> — if present and predicate is true, return this Optional; else return empty. Useful for conditional extraction in a pipeline.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft"><strong>get()</strong> — throws <code>NoSuchElementException</code> if empty. The worst way to use Optional — defeats its purpose (you'd have the same risk as null). Only safe after <code>isPresent()</code> check, but even then: use <code>orElseThrow()</code> with a meaningful exception message.</div></div>
+        <div class="fs"><div class="fn">if</div><div class="ft"><strong>ifPresent(Consumer)</strong> — run a side-effect if value exists. <strong>ifPresentOrElse(Consumer, Runnable)</strong> (Java 9+) — handle both branches. <strong>or(Supplier&lt;Optional&gt;)</strong> (Java 9+) — chain Optional fallbacks.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s2">
+    <div class="card"><div class="ct">Correct usage patterns</div>
+<div class="cb"><span class="cm">// GOOD — return type signals "may not exist"</span>
+<span class="kw">public</span> <span class="nm">Optional</span>&lt;<span class="nm">User</span>&gt; findUser(<span class="nm">String</span> id) {
+    <span class="kw">return</span> userRepo.findById(id);  <span class="cm">// Spring Data returns Optional</span>
+}
+
+<span class="cm">// GOOD — pipeline without null checks</span>
+<span class="nm">String</span> city = findUser(id)
+    .map(<span class="nm">User</span>::getAddress)
+    .map(<span class="nm">Address</span>::getCity)
+    .orElse(<span class="str">"Unknown"</span>);
+
+<span class="cm">// GOOD — orElseGet for lazy expensive default</span>
+<span class="nm">User</span> user = findUser(id)
+    .orElseGet(() -> createDefaultUser(id)); <span class="cm">// only called if empty</span>
+
+<span class="cm">// GOOD — orElseThrow with meaningful exception</span>
+<span class="nm">User</span> user = findUser(id)
+    .orElseThrow(() -> <span class="kw">new</span> <span class="nm">UserNotFoundException</span>(<span class="str">"User not found: "</span> + id));
+
+<span class="cm">// GOOD — flatMap when inner call also returns Optional</span>
+<span class="nm">Optional</span>&lt;<span class="nm">String</span>&gt; email = findUser(id)
+    .flatMap(<span class="nm">User</span>::getOptionalEmail); <span class="cm">// avoids Optional&lt;Optional&lt;String&gt;&gt;</span>
+
+<span class="cm">// GOOD — filter + ifPresent</span>
+findUser(id)
+    .filter(<span class="nm">User</span>::isPremium)
+    .ifPresent(u -> sendPremiumOffer(u));</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s3">
+    <div class="card"><div class="ct">Anti-patterns — what NOT to do</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Using Optional as a method parameter</strong> — <code>void process(Optional&lt;String&gt; name)</code>. Forces callers to wrap values in Optional.of(). Just use overloading or @Nullable. Optional is a return type container, not a parameter type.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Calling get() without checking</strong> — <code>optional.get()</code> throws if empty — you're back to the same risk as a null dereference. Use <code>orElse</code>, <code>orElseGet</code>, <code>orElseThrow</code>, or <code>ifPresent</code>.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Optional.of(null)</strong> — throws NullPointerException immediately. Use <code>Optional.ofNullable(value)</code> when the value may be null. <code>Optional.of()</code> is only for values you're certain aren't null.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Storing Optional in a field</strong> — Optional is not Serializable (it's deliberately not). Storing it in an entity/DTO field breaks serialisation. Use nullable fields in domain objects; wrap in Optional only in return types.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Optional&lt;List&gt;</strong> — use an empty list to represent "no results". Optional.empty() means "there was no list at all" — a different semantic. <code>return Collections.emptyList()</code> is clearer and avoids wrapping.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What is the difference between orElse and orElseGet?<div class="qa">orElse(T) always evaluates its argument — even if the Optional is present. orElseGet(Supplier&lt;T&gt;) only calls the supplier if the Optional is empty (lazy). Use orElse for cheap defaults like literals. Use orElseGet when the default requires a computation, DB call, or object construction — to avoid unnecessary work. This is a frequent senior interview question and the answer signals whether you understand eager vs lazy evaluation.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Design</div>When should you NOT use Optional?<div class="qa">Don't use Optional for: (1) method parameters — forces callers to wrap, use overloading instead, (2) fields in entities/DTOs — not Serializable, adds overhead, (3) collections — return empty collection instead of Optional&lt;List&gt;, (4) primitives — use OptionalInt/OptionalLong instead of Optional&lt;Integer&gt; to avoid boxing. Optional's single correct use: as the return type of a method that legitimately may not produce a result. It's a documentation tool that makes absence explicit at the type level.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('How does Spring Data JPA use Optional for repository methods?')">Spring Data Optional</span>
+      <span class="chip" onclick="sendPrompt('Explain the Null Object pattern vs Optional in Java')">Null Object pattern</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T3: METHOD REFERENCES ════════ -->
+<div class="tp" id="t3">
+  <div class="ttl">Method references</div>
+  <div class="sub">Four types — when each applies and what the compiler does</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t3','s0')">Definition</button>
+    <button class="st" onclick="S('t3','s1')">Four types</button>
+    <button class="st" onclick="S('t3','s2')">Code</button>
+    <button class="st" onclick="S('t3','s3')">Mistakes</button>
+    <button class="st" onclick="S('t3','s4')">Interview</button>
+    <button class="st" onclick="S('t3','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t3-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A method reference is a shorthand lambda that refers to an existing method instead of writing a new body. Syntax: <code>ClassName::methodName</code> or <code>instance::methodName</code>. The compiler converts it into a lambda that calls the referenced method. They're cleaner than equivalent lambdas when the lambda does nothing but call a single method.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s1">
+    <div class="card"><div class="ct">All four types — what they mean and when to use</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Static method reference</strong> — <code>ClassName::staticMethod</code>. Lambda equivalent: <code>(args) -> ClassName.staticMethod(args)</code>. Example: <code>Integer::parseInt</code> = <code>s -> Integer.parseInt(s)</code>. Use when the method takes all the parameters the functional interface needs.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>Instance method on arbitrary instance (unbound)</strong> — <code>ClassName::instanceMethod</code>. Lambda equivalent: <code>(instance, args) -> instance.instanceMethod(args)</code>. The first lambda parameter becomes the target instance. Example: <code>String::toUpperCase</code> = <code>s -> s.toUpperCase()</code>. Most used in stream pipelines.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Instance method on specific instance (bound)</strong> — <code>object::instanceMethod</code>. Lambda equivalent: <code>(args) -> object.instanceMethod(args)</code>. The target instance is fixed at reference creation time. Example: <code>System.out::println</code> = <code>s -> System.out.println(s)</code>.</div></div>
+        <div class="fs a"><div class="fn a">4</div><div class="ft"><strong>Constructor reference</strong> — <code>ClassName::new</code>. Lambda equivalent: <code>(args) -> new ClassName(args)</code>. Matches <code>Supplier</code>, <code>Function</code>, <code>BiFunction</code>, etc. depending on how many params the constructor takes. Example: <code>ArrayList::new</code> as <code>Supplier&lt;ArrayList&gt;</code>.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s2">
+    <div class="card"><div class="ct">Code — all four in context</div>
+<div class="cb"><span class="cm">// 1. Static method reference</span>
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt; strs = <span class="nm">List</span>.of(<span class="str">"1"</span>,<span class="str">"2"</span>,<span class="str">"3"</span>);
+<span class="nm">List</span>&lt;<span class="nm">Integer</span>&gt; ints = strs.stream()
+    .map(<span class="nm">Integer</span>::parseInt)    <span class="cm">// same as s -> Integer.parseInt(s)</span>
+    .collect(<span class="nm">Collectors</span>.toList());
+
+<span class="cm">// 2. Unbound instance method (ClassName::method)</span>
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt; upper = strs.stream()
+    .map(<span class="nm">String</span>::toUpperCase)  <span class="cm">// same as s -> s.toUpperCase()</span>
+    .collect(<span class="nm">Collectors</span>.toList());
+
+strs.stream()
+    .sorted(<span class="nm">String</span>::compareToIgnoreCase) <span class="cm">// BiFunction: (s1,s2) -> s1.compareToIgnoreCase(s2)</span>
+    .forEach(<span class="nm">System</span>.out::println);
+
+<span class="cm">// 3. Bound instance method (instance::method)</span>
+<span class="nm">String</span> prefix = <span class="str">"hello"</span>;
+<span class="nm">Predicate</span>&lt;<span class="nm">String</span>&gt; startsWith = prefix::startsWith; <span class="cm">// fixed target</span>
+strs.stream().filter(startsWith).forEach(<span class="nm">System</span>.out::println);
+
+<span class="cm">// 4. Constructor reference</span>
+<span class="nm">Function</span>&lt;<span class="nm">String</span>, <span class="nm">User</span>&gt; factory = <span class="nm">User</span>::<span class="kw">new</span>; <span class="cm">// String constructor</span>
+<span class="nm">List</span>&lt;<span class="nm">User</span>&gt; users = names.stream()
+    .map(<span class="nm">User</span>::<span class="kw">new</span>)
+    .collect(<span class="nm">Collectors</span>.toList());
+
+<span class="cm">// Stream toList() with constructor ref — very common pattern</span>
+<span class="nm">List</span>&lt;<span class="nm">Thread</span>&gt; threads = tasks.stream()
+    .map(<span class="nm">Thread</span>::<span class="kw">new</span>)  <span class="cm">// Runnable -> Thread constructor</span>
+    .collect(<span class="nm">Collectors</span>.toList());</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s3">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Using a method reference when a lambda is clearer</strong> — if you're doing more than calling one method, or you need to adapt parameters, write a lambda. Method references shine for single-method delegation. <code>x -> someMethod(x, extraParam)</code> cannot be a simple method reference — it needs a lambda.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Confusing unbound and bound instance references</strong> — <code>String::toUpperCase</code> (unbound) takes a String as first arg (the instance). <code>myString::toUpperCase</code> (bound) takes no args — the instance is fixed. They satisfy different functional interfaces.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Four types</div>List the four types of method references with examples.<div class="qa">(1) Static: Integer::parseInt — equivalent to s -> Integer.parseInt(s). (2) Unbound instance: String::toUpperCase — s -> s.toUpperCase(). The lambda parameter becomes the method target. (3) Bound instance: System.out::println — s -> System.out.println(s). The target is a specific fixed instance. (4) Constructor: ArrayList::new — () -> new ArrayList() or (n) -> new ArrayList(n) depending on functional interface arity. The key distinction between 2 and 3: unbound takes the instance as the first lambda arg; bound has the instance baked in.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain Comparator.comparing and how it uses method references')">Comparator.comparing</span>
+      <span class="chip" onclick="sendPrompt('How do method references work with Collectors.toMap and groupingBy?')">Collectors with refs</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T4: FUNCTIONAL INTERFACES ════════ -->
+<div class="tp" id="t4">
+  <div class="ttl">Functional interfaces</div>
+  <div class="sub">Predicate · Function · Consumer · Supplier · BiFunction — the core six</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t4','s0')">Definition</button>
+    <button class="st" onclick="S('t4','s1')">All six + composition</button>
+    <button class="st" onclick="S('t4','s2')">Code</button>
+    <button class="st" onclick="S('t4','s3')">Mistakes</button>
+    <button class="st" onclick="S('t4','s4')">Interview</button>
+    <button class="st" onclick="S('t4','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t4-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A functional interface has exactly one abstract method (SAM — Single Abstract Method). This makes it the target type for lambdas and method references. <code>@FunctionalInterface</code> is an optional annotation that tells the compiler to enforce this rule. The <code>java.util.function</code> package provides the standard set for all common function shapes.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s1">
+    <div class="card"><div class="ct">The six core functional interfaces</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="fi-card">
+          <div style="font-weight:500;font-size:13px;color:var(--color-text-primary)">Predicate&lt;T&gt;</div>
+          <div class="fi-sig">boolean test(T t)</div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Test a condition. Returns boolean. Composable: <code>.and()</code>, <code>.or()</code>, <code>.negate()</code>. Used in: stream filter, removeIf, anyMatch/allMatch.</div>
+        </div>
+        <div class="fi-card">
+          <div style="font-weight:500;font-size:13px;color:var(--color-text-primary)">Function&lt;T, R&gt;</div>
+          <div class="fi-sig">R apply(T t)</div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Transform T into R. Composable: <code>.andThen()</code>, <code>.compose()</code>. Used in: stream map, computeIfAbsent, Optional.map.</div>
+        </div>
+        <div class="fi-card">
+          <div style="font-weight:500;font-size:13px;color:var(--color-text-primary)">Consumer&lt;T&gt;</div>
+          <div class="fi-sig">void accept(T t)</div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Consume T with side effect, return nothing. Composable: <code>.andThen()</code>. Used in: stream forEach, ifPresent, ThreadLocal.</div>
+        </div>
+        <div class="fi-card">
+          <div style="font-weight:500;font-size:13px;color:var(--color-text-primary)">Supplier&lt;T&gt;</div>
+          <div class="fi-sig">T get()</div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Produce a T with no input. Used for lazy evaluation, default factories. Used in: orElseGet, computeIfAbsent, orElseThrow.</div>
+        </div>
+        <div class="fi-card">
+          <div style="font-weight:500;font-size:13px;color:var(--color-text-primary)">BiFunction&lt;T, U, R&gt;</div>
+          <div class="fi-sig">R apply(T t, U u)</div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Two inputs, one output. BinaryOperator&lt;T&gt; is a specialised BiFunction where both inputs and output are same type T. Used in: Map.merge, reduce.</div>
+        </div>
+        <div class="fi-card">
+          <div style="font-weight:500;font-size:13px;color:var(--color-text-primary)">UnaryOperator&lt;T&gt;</div>
+          <div class="fi-sig">T apply(T t)</div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Specialised Function where input and output are same type. Used in: List.replaceAll, stream map when type doesn't change.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s2">
+    <div class="card"><div class="ct">Code — composition and real usage</div>
+<div class="cb"><span class="cm">// Predicate composition</span>
+<span class="nm">Predicate</span>&lt;<span class="nm">String</span>&gt; notBlank  = s -> !s.isBlank();
+<span class="nm">Predicate</span>&lt;<span class="nm">String</span>&gt; maxLength = s -> s.length() <= 50;
+<span class="nm">Predicate</span>&lt;<span class="nm">String</span>&gt; valid     = notBlank.and(maxLength);
+<span class="nm">Predicate</span>&lt;<span class="nm">String</span>&gt; invalid   = valid.negate();
+
+<span class="cm">// Function composition — andThen vs compose</span>
+<span class="nm">Function</span>&lt;<span class="nm">String</span>, <span class="nm">Integer</span>&gt; parse = <span class="nm">Integer</span>::parseInt;
+<span class="nm">Function</span>&lt;<span class="nm">Integer</span>, <span class="nm">Integer</span>&gt; doubl = x -> x * 2;
+
+<span class="nm">Function</span>&lt;<span class="nm">String</span>, <span class="nm">Integer</span>&gt; parseDouble = parse.andThen(doubl); <span class="cm">// parse then double</span>
+<span class="nm">Function</span>&lt;<span class="nm">String</span>, <span class="nm">Integer</span>&gt; doubleParse = doubl.compose(parse); <span class="cm">// same result, different perspective</span>
+parseDouble.apply(<span class="str">"5"</span>); <span class="cm">// 10</span>
+
+<span class="cm">// Supplier for lazy default</span>
+<span class="nm">Supplier</span>&lt;<span class="nm">Connection</span>&gt; connFactory = () -> dataSource.getConnection();
+<span class="nm">Connection</span> conn = cache.computeIfAbsent(<span class="str">"main"</span>, k -> connFactory.get());
+
+<span class="cm">// Consumer chaining — log then save</span>
+<span class="nm">Consumer</span>&lt;<span class="nm">Order</span>&gt; logOrder  = o -> log.info(<span class="str">"Processing: "</span> + o.id());
+<span class="nm">Consumer</span>&lt;<span class="nm">Order</span>&gt; saveOrder = o -> repo.save(o);
+<span class="nm">Consumer</span>&lt;<span class="nm">Order</span>&gt; pipeline  = logOrder.andThen(saveOrder);
+orders.forEach(pipeline);
+
+<span class="cm">// Custom functional interface</span>
+<span class="kw">@FunctionalInterface</span>
+<span class="kw">interface</span> <span class="nm">TriFunction</span>&lt;<span class="nm">A</span>,<span class="nm">B</span>,<span class="nm">C</span>,<span class="nm">R</span>&gt; {
+    <span class="nm">R</span> apply(<span class="nm">A</span> a, <span class="nm">B</span> b, <span class="nm">C</span> c);
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s3">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Confusing Function.andThen vs Function.compose</strong> — <code>f.andThen(g)</code> = <code>g(f(x))</code>: f first, then g. <code>f.compose(g)</code> = <code>f(g(x))</code>: g first, then f. andThen reads left-to-right — much more intuitive. Prefer andThen for pipelines.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Not using primitive functional interfaces</strong> — <code>IntPredicate</code>, <code>IntFunction&lt;R&gt;</code>, <code>ToIntFunction&lt;T&gt;</code> etc. avoid boxing overhead. If you're working with <code>int</code> in a hot loop, <code>Predicate&lt;Integer&gt;</code> boxes each int. Use <code>IntPredicate</code> instead.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Distinguish</div>What is the difference between Supplier and Function with no arguments?<div class="qa">Conceptually both produce a value, but they serve different roles. Supplier&lt;T&gt; = () -> T: no input, produces output. It represents a deferred factory or lazy initialiser — the caller doesn't provide any input, the Supplier knows how to produce the value internally. Function&lt;Void, T&gt; is technically possible but awkward — you'd have to call f.apply(null). Supplier is the idiomatic choice for "produce a T without any input". In practice: orElseGet takes Supplier (you're providing a fallback producer), computeIfAbsent takes Function&lt;K,V&gt; (the missing key is passed as input).</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Composition</div>How do Predicate's and/or/negate work internally?<div class="qa">These are default methods on the Predicate interface that return new Predicate instances wrapping the original. Predicate.and(other) returns a new Predicate whose test() calls this.test(t) && other.test(t). It uses short-circuit evaluation — if this.test() returns false, other.test() is never called. or() uses ||, negate() returns !this.test(t). This is the classic decorator pattern applied to functional interfaces — each composition wraps the previous in a new layer.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain how Spring uses functional interfaces in @Bean definitions and conditional beans')">Spring functional beans</span>
+      <span class="chip" onclick="sendPrompt('Explain the difference between Comparator and Comparable in Java with examples')">Comparator vs Comparable</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T5: RECORDS ════════ -->
+<div class="tp" id="t5">
+  <div class="ttl">Java records</div>
+  <div class="sub"><span class="ver-badge">Java 16+</span> Immutable data carriers — what the compiler generates</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t5','s0')">Definition</button>
+    <button class="st" onclick="S('t5','s1')">What compiler generates</button>
+    <button class="st" onclick="S('t5','s2')">Code</button>
+    <button class="st" onclick="S('t5','s3')">Limitations</button>
+    <button class="st" onclick="S('t5','s4')">Interview</button>
+    <button class="st" onclick="S('t5','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t5-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A record is a concise class declaration for immutable data carriers. One line replaces 20+ lines of boilerplate: the compiler generates the constructor, accessors, <code>equals</code>, <code>hashCode</code>, and <code>toString</code> automatically. Records are transparent — all their data is exposed via their component accessors.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlt"><div class="hn">Without records (pre-Java 16)</div>Private final fields, all-args constructor, getters, equals/hashCode overrides, toString — 25+ lines for 3-field DTO.</div>
+      <div class="hl hlp"><div class="hn">With records</div><code>record Point(int x, int y) {}</code> — 1 line, generates everything. The component list is the canonical constructor's parameter list.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s1">
+    <div class="card"><div class="ct">What the compiler generates from record Point(int x, int y)</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">1</div><div class="ft"><strong>Final fields</strong> — <code>private final int x; private final int y;</code> Auto-generated, cannot be changed. Records are implicitly immutable for their components.</div></div>
+        <div class="fs t"><div class="fn t">2</div><div class="ft"><strong>Canonical constructor</strong> — <code>public Point(int x, int y) { this.x = x; this.y = y; }</code> You can override it (compact constructor syntax) to add validation without repeating the assignments.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Accessors (not getters)</strong> — <code>public int x() { return x; }</code> and <code>public int y() { return y; }</code>. Note: no <code>getX()</code> — records use the component name directly. This breaks JavaBean conventions — be aware if frameworks like Jackson need configuration.</div></div>
+        <div class="fs t"><div class="fn t">4</div><div class="ft"><strong>equals/hashCode</strong> — structural equality based on all components. Two records with same component values are equal. This is the correct semantic for value objects.</div></div>
+        <div class="fs t"><div class="fn t">5</div><div class="ft"><strong>toString</strong> — <code>Point[x=1, y=2]</code>. Readable, component-based output automatically.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft"><strong>Records extend java.lang.Record implicitly</strong> — like enums extend Enum. They cannot extend any other class (but can implement interfaces). They are implicitly final — cannot be subclassed.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s2">
+    <div class="card"><div class="ct">Code — records in practice</div>
+<div class="cb"><span class="cm">// Basic record</span>
+<span class="kw">record</span> <span class="nm">Point</span>(<span class="kw">int</span> x, <span class="kw">int</span> y) {}
+
+<span class="nm">Point</span> p = <span class="kw">new</span> <span class="nm">Point</span>(3, 4);
+p.x();          <span class="cm">// accessor — NOT getX()</span>
+p.y();
+p.toString();   <span class="cm">// Point[x=3, y=4]</span>
+
+<span class="cm">// Compact canonical constructor — validation without repeating assignments</span>
+<span class="kw">record</span> <span class="nm">Money</span>(<span class="kw">long</span> amount, <span class="nm">String</span> currency) {
+    <span class="nm">Money</span> {   <span class="cm">// compact constructor — params implicitly assigned at the end</span>
+        <span class="kw">if</span> (amount < 0) <span class="kw">throw new</span> <span class="nm">IllegalArgumentException</span>(<span class="str">"Negative amount"</span>);
+        currency = currency.toUpperCase(); <span class="cm">// normalize before assignment</span>
+    }
+}
+
+<span class="cm">// Custom methods on records</span>
+<span class="kw">record</span> <span class="nm">Range</span>(<span class="kw">int</span> start, <span class="kw">int</span> end) {
+    <span class="kw">public boolean</span> contains(<span class="kw">int</span> value) { <span class="kw">return</span> value >= start && value <= end; }
+    <span class="kw">public int</span> size() { <span class="kw">return</span> end - start; }
+}
+
+<span class="cm">// Records as DTOs with Jackson (needs @JsonProperty or jackson-module-parameter-names)</span>
+<span class="kw">record</span> <span class="nm">UserDto</span>(<span class="nm">String</span> id, <span class="nm">String</span> name, <span class="nm">String</span> email) {}
+
+<span class="cm">// Pattern matching with records (Java 21+)</span>
+<span class="kw">if</span> (shape <span class="kw">instanceof</span> <span class="nm">Circle</span>(var radius)) {
+    <span class="nm">System</span>.out.println(<span class="str">"Area: "</span> + <span class="nm">Math</span>.PI * radius * radius);
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s3">
+    <div class="card"><div class="ct">Limitations to know</div>
+      <table class="tbl">
+        <thead><tr><th>Cannot do</th><th>Reason / workaround</th></tr></thead>
+        <tbody>
+          <tr><td>Extend another class</td><td>Already extends java.lang.Record. Implement interfaces instead.</td></tr>
+          <tr><td>Be subclassed</td><td>Records are implicitly final. Use sealed interfaces for type hierarchies.</td></tr>
+          <tr><td>Have mutable state</td><td>All components are final. Add separate non-component mutable fields (discouraged).</td></tr>
+          <tr><td>Use as JPA entity</td><td>JPA needs no-arg constructor and mutable fields. Use @Embeddable or projections instead.</td></tr>
+          <tr><td>Jackson getters by default</td><td>Accessors are x() not getX(). Configure ObjectMapper or add jackson-module-parameter-names.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What does the Java compiler generate for a record?<div class="qa">For record Point(int x, int y): (1) private final fields x and y, (2) canonical constructor assigning both, (3) accessors x() and y() (not JavaBean getX/getY), (4) equals() using all components for structural equality, (5) hashCode() consistent with equals, (6) toString() as "Point[x=1, y=2]". The class implicitly extends java.lang.Record, is implicitly final, and cannot extend other classes. You can add custom constructors, methods, and static members — you just can't make it mutable or subclassable.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Spring</div>Can you use a record as a Spring Bean or JPA Entity?<div class="qa">As a @Bean: yes — records can implement interfaces and be registered as Spring beans, especially for configuration properties (@ConfigurationProperties with Java 16+). As a JPA @Entity: no — JPA spec requires a no-arg constructor and mutable state. Use records for DTOs and value objects, not for JPA entities. Workaround: use a record as a JPA @Embeddable for embedded value types with some configuration, or use interface-based projections from Spring Data which can project onto records.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain sealed classes and how they combine with records for algebraic data types in Java')">Sealed + records ADT</span>
+      <span class="chip" onclick="sendPrompt('How does Lombok @Value compare to Java records?')">Lombok vs records</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T6: SEALED CLASSES ════════ -->
+<div class="tp" id="t6">
+  <div class="ttl">Sealed classes</div>
+  <div class="sub"><span class="ver-badge">Java 17+</span> Controlled inheritance · exhaustive pattern matching · ADTs in Java</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t6','s0')">Definition</button>
+    <button class="st" onclick="S('t6','s1')">Internals</button>
+    <button class="st" onclick="S('t6','s2')">Code</button>
+    <button class="st" onclick="S('t6','s3')">Pattern matching</button>
+    <button class="st" onclick="S('t6','s4')">Interview</button>
+    <button class="st" onclick="S('t6','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t6-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">A sealed class restricts which classes can extend or implement it, using a <code>permits</code> clause. The permitted subclasses must be in the same compilation unit (or explicitly listed). This closes the class hierarchy — the compiler knows every possible subtype, enabling <strong>exhaustive pattern matching</strong> in switch expressions without a default case.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlp"><div class="hn">Before sealed</div>An interface or abstract class could be extended by anyone. Pattern matching switch needed a default branch — the compiler couldn't know all cases.</div>
+      <div class="hl hlt"><div class="hn">With sealed</div>Compiler knows every permitted subtype. Switch on sealed type can omit default — the compiler verifies exhaustiveness at compile time. Missing a case = compile error.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s1">
+    <div class="card"><div class="ct">Internals — permitted subclasses and their constraints</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>permits clause</strong> — <code>sealed interface Shape permits Circle, Rectangle, Triangle</code>. Only these three can implement Shape. Any other class attempting to extend Shape gets a compile error. Permitted subclasses must be in the same package or module.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Subclass must be final, sealed, or non-sealed</strong> — every permitted subclass must declare one of: (a) <code>final</code> — no further extension, (b) <code>sealed</code> — extends the hierarchy, (c) <code>non-sealed</code> — opens the hierarchy back up (escape hatch). You can't leave a permitted subclass without one of these — compile error.</div></div>
+        <div class="fs t"><div class="fn t">3</div><div class="ft"><strong>Algebraic data types (ADT)</strong> — sealed + records = Haskell/Scala-style ADTs in Java. A sealed interface is a "sum type" (OR — can be any of these variants). A record is a "product type" (AND — has all of these fields). Together they express domain types like <code>Result = Success(value) | Failure(error)</code> with compiler-enforced exhaustiveness.</div></div>
+        <div class="fs t"><div class="fn t">4</div><div class="ft"><strong>Compiler-enforced exhaustiveness</strong> — when you switch on a sealed type and cover all permitted subtypes, the compiler verifies no case is missing. Add a new permitted subtype → every switch that was exhaustive now fails to compile until you add the new case. No more forgotten branches.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s2">
+    <div class="card"><div class="ct">Code — sealed interface + pattern switch + ADT result type</div>
+<div class="cb"><span class="cm">// Sealed interface with permitted subtypes</span>
+<span class="kw">sealed interface</span> <span class="nm">Shape</span> <span class="kw">permits</span> <span class="nm">Circle</span>, <span class="nm">Rectangle</span>, <span class="nm">Triangle</span> {}
+
+<span class="kw">record</span> <span class="nm">Circle</span>(<span class="kw">double</span> radius)           <span class="kw">implements</span> <span class="nm">Shape</span> {}
+<span class="kw">record</span> <span class="nm">Rectangle</span>(<span class="kw">double</span> w, <span class="kw">double</span> h)   <span class="kw">implements</span> <span class="nm">Shape</span> {}
+<span class="kw">final class</span> <span class="nm">Triangle</span>                     <span class="kw">implements</span> <span class="nm">Shape</span> { ... }
+
+<span class="cm">// Exhaustive switch — no default needed (compiler verifies)</span>
+<span class="kw">double</span> area = <span class="kw">switch</span> (shape) {
+    <span class="kw">case</span> <span class="nm">Circle</span>(var r)        -> <span class="nm">Math</span>.PI * r * r;
+    <span class="kw">case</span> <span class="nm">Rectangle</span>(var w, var h) -> w * h;
+    <span class="kw">case</span> <span class="nm">Triangle</span> t           -> t.area();
+    <span class="cm">// No default — compiler knows all 3 cases are covered</span>
+};
+
+<span class="cm">// ADT Result type — Railway-oriented error handling</span>
+<span class="kw">sealed interface</span> <span class="nm">Result</span>&lt;<span class="nm">T</span>&gt; <span class="kw">permits</span> <span class="nm">Result</span>.<span class="nm">Success</span>, <span class="nm">Result</span>.<span class="nm">Failure</span> {
+    <span class="kw">record</span> <span class="nm">Success</span>&lt;<span class="nm">T</span>&gt;(<span class="nm">T</span> value)    <span class="kw">implements</span> <span class="nm">Result</span>&lt;<span class="nm">T</span>&gt; {}
+    <span class="kw">record</span> <span class="nm">Failure</span>&lt;<span class="nm">T</span>&gt;(<span class="nm">String</span> err) <span class="kw">implements</span> <span class="nm">Result</span>&lt;<span class="nm">T</span>&gt; {}
+}
+
+<span class="nm">Result</span>&lt;<span class="nm">User</span>&gt; result = userService.getUser(id);
+<span class="nm">String</span> response = <span class="kw">switch</span> (result) {
+    <span class="kw">case</span> <span class="nm">Result</span>.<span class="nm">Success</span>&lt;<span class="nm">User</span>&gt;(var user)  -> <span class="str">"Hello, "</span> + user.name();
+    <span class="kw">case</span> <span class="nm">Result</span>.<span class="nm">Failure</span>&lt;?&gt;(var err)    -> <span class="str">"Error: "</span> + err;
+};</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s3">
+    <div class="card"><div class="ct">Pattern matching features (Java 21+)</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">G</div><div class="ft"><strong>Guarded patterns</strong> — <code>case Circle c when c.radius() > 10 -> "large"</code>. Add conditions to case branches using <code>when</code> keyword. Enables fine-grained discrimination within a type.</div></div>
+        <div class="fs"><div class="fn">D</div><div class="ft"><strong>Deconstruction patterns</strong> — <code>case Circle(var r)</code>. Extract record components directly in the case label. Removes manual accessor calls. Works with nested records too.</div></div>
+        <div class="fs"><div class="fn">N</div><div class="ft"><strong>null handling</strong> — switch on sealed types can now have an explicit <code>case null</code> — finally making null-handling explicit in switch rather than a surprise NullPointerException before the switch.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Why</div>What problem do sealed classes solve?<div class="qa">They restore the ability to do exhaustive analysis on a type hierarchy. Before sealed classes: any code anywhere could add a new subclass of an interface, so the compiler could never know if a switch or if-else chain covered all cases. With sealed: the permitted subclasses are part of the type's definition. The compiler uses this to verify switch exhaustiveness — adding a new permitted subtype breaks all existing switches that were previously exhaustive, forcing you to update them. This eliminates the "forgotten branch" bug pattern and enables the ADT (algebraic data type) pattern from functional languages in Java.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Design</div>How would you model a payment status with sealed classes?<div class="qa">sealed interface PaymentStatus permits PaymentStatus.Pending, PaymentStatus.Completed, PaymentStatus.Failed, PaymentStatus.Refunded. Each is a record with relevant data: record Completed(String transactionId, Instant at) implements PaymentStatus {}. record Failed(String reason, int retryCount) implements PaymentStatus {}. Then anywhere you process a PaymentStatus, the switch is exhaustive — add Disputed later and every unhandled switch becomes a compile error. This is the correct Java 17+ alternative to string-based status enums for complex domain states.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Compare Java sealed classes with Kotlin sealed classes and Scala case classes')">Kotlin sealed classes</span>
+      <span class="chip" onclick="sendPrompt('Explain Railway Oriented Programming (Result type) in Java using sealed classes')">Result type / ROP</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ════════ T7: VAR ════════ -->
+<div class="tp" id="t7">
+  <div class="ttl">var keyword</div>
+  <div class="sub"><span class="ver-badge">Java 10+</span> Local type inference — what the compiler does, where var is banned</div>
+  <div class="stabs">
+    <button class="st on" onclick="S('t7','s0')">Definition</button>
+    <button class="st" onclick="S('t7','s1')">Rules</button>
+    <button class="st" onclick="S('t7','s2')">Code</button>
+    <button class="st" onclick="S('t7','s3')">Anti-patterns</button>
+    <button class="st" onclick="S('t7','s4')">Interview</button>
+    <button class="st" onclick="S('t7','s5')">Connects to</button>
+  </div>
+
+  <div class="sc vis" id="t7-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def"><code>var</code> is a reserved type name (not a keyword) that asks the compiler to infer the type of a local variable from its initialiser. The inferred type is fixed at compile time — <code>var</code> is not dynamic typing (no JavaScript-style type changes). At runtime, there is no <code>var</code> — the class file contains the concrete type.</p>
+    </div>
+    <div class="two">
+      <div class="hl hlt"><div class="hn">What var IS</div>Compile-time type inference for local variables. The type is determined once at declaration and is as strong and static as an explicit type declaration.</div>
+      <div class="hl hlr"><div class="hn">What var is NOT</div>Dynamic typing. A keyword (it's a reserved type name — you can still name a variable "var"). Available for fields, method params, or return types.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s1">
+    <div class="card"><div class="ct">Where var is allowed vs forbidden</div>
+      <div class="flow">
+        <div class="fs t"><div class="fn t">OK</div><div class="ft"><strong>Local variables with initialiser</strong> — <code>var list = new ArrayList&lt;String&gt;();</code> Compiler infers <code>ArrayList&lt;String&gt;</code>. The type is fixed from that point.</div></div>
+        <div class="fs t"><div class="fn t">OK</div><div class="ft"><strong>For-each loop variable</strong> — <code>for (var user : users)</code>. Type inferred from the collection's element type.</div></div>
+        <div class="fs t"><div class="fn t">OK</div><div class="ft"><strong>Try-with-resources variable</strong> — <code>try (var conn = dataSource.getConnection())</code>. Inferred from the expression type.</div></div>
+        <div class="fs r"><div class="fn r">NO</div><div class="ft"><strong>Method parameters</strong> — <code>void process(var x)</code> is illegal. The compiler needs explicit types for method signatures (used by callers and overriding). Exception: lambda parameters in Java 11+ can use var for annotation support: <code>(@NonNull var s) -> s.toUpperCase()</code>.</div></div>
+        <div class="fs r"><div class="fn r">NO</div><div class="ft"><strong>Fields</strong> — instance and static fields cannot use var. Fields are part of the class API and need explicit types for reflection, serialisation, and documentation.</div></div>
+        <div class="fs r"><div class="fn r">NO</div><div class="ft"><strong>Return types</strong> — method return types must be explicit. Callers need to know the return type without seeing the implementation.</div></div>
+        <div class="fs r"><div class="fn r">NO</div><div class="ft"><strong>Without initialiser</strong> — <code>var x;</code> is illegal. The compiler has nothing to infer from. Also: <code>var x = null;</code> is illegal — null has no type.</div></div>
+        <div class="fs a"><div class="fn a">!</div><div class="ft"><strong>Inferred type can be surprising</strong> — <code>var list = new ArrayList&lt;&gt;();</code> infers <code>ArrayList&lt;Object&gt;</code> (not <code>ArrayList&lt;String&gt;</code>) because the diamond operator has nothing to infer from. Always provide a type argument with diamond when using var: <code>var list = new ArrayList&lt;String&gt;();</code></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s2">
+    <div class="card"><div class="ct">Code — good uses and what to avoid</div>
+<div class="cb"><span class="cm">// GOOD — removes obvious redundancy</span>
+<span class="kw">var</span> users = userService.findAll();              <span class="cm">// type clear from method name</span>
+<span class="kw">var</span> map   = <span class="kw">new</span> <span class="nm">HashMap</span>&lt;<span class="nm">String</span>, <span class="nm">List</span>&lt;<span class="nm">Order</span>&gt;&gt;(); <span class="cm">// avoids repeating long type</span>
+<span class="kw">var</span> entry = map.entrySet().iterator().next();   <span class="cm">// type is unimportant here</span>
+
+<span class="cm">// GOOD — for-each loop</span>
+<span class="kw">for</span> (<span class="kw">var</span> user : users) {
+    process(user);
+}
+
+<span class="cm">// GOOD — try-with-resources</span>
+<span class="kw">try</span> (<span class="kw">var</span> conn = ds.getConnection();
+     <span class="kw">var</span> stmt = conn.prepareStatement(sql)) {
+    stmt.executeQuery();
+}
+
+<span class="cm">// BAD — type is not obvious from RHS</span>
+<span class="kw">var</span> result = process();      <span class="cm">// what type is this? Forces reader to check</span>
+
+<span class="cm">// BAD — loses helpful interface type</span>
+<span class="kw">var</span> list = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;<span class="nm">String</span>&gt;(); <span class="cm">// inferred as ArrayList, not List</span>
+<span class="cm">// list.sort() works, but you've coupled to ArrayList implementation</span>
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt; list2 = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;(); <span class="cm">// prefer — programs to interface</span>
+
+<span class="cm">// Lambda param var — only useful for annotations (Java 11+)</span>
+<span class="nm">Function</span>&lt;<span class="nm">String</span>,<span class="nm">String</span>&gt; f = (@<span class="nm">NonNull</span> <span class="kw">var</span> s) -> s.toUpperCase();</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s3">
+    <div class="card"><div class="ct">Anti-patterns</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Using var when the type isn't obvious</strong> — <code>var x = compute();</code>. The reader has to look up what <code>compute()</code> returns. Use var only when the type is clear from the right-hand side or completely irrelevant.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>var with raw generics</strong> — <code>var list = new ArrayList&lt;&gt;();</code> infers <code>ArrayList&lt;Object&gt;</code>. You lose all generic type safety. Always specify the type parameter when using var with generics: <code>var list = new ArrayList&lt;String&gt;();</code></div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>var instead of interface type</strong> — <code>var list = new ArrayList&lt;String&gt;();</code> infers <code>ArrayList</code>, not <code>List</code>. You're now coupled to the concrete implementation. For local-only variables this is minor, but be aware you're losing the interface contract.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Concept</div>Is var dynamic typing? What does the compiler do with it?<div class="qa">No — var is static typing with local type inference. The compiler infers the concrete type from the initialiser at compile time. The inferred type is permanent — you can't assign a value of a different type later (same rules as explicit type). The generated class file contains the fully explicit type — var doesn't exist at runtime. It's syntactic sugar for reducing verbosity, not a dynamic type system like JavaScript's var or Python's duck typing.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Limitations</div>Where can you NOT use var?<div class="qa">Cannot use var for: (1) method parameters — callers and overriders need explicit types, (2) method return types — callers need to know without reading the body, (3) fields — part of class API, needed for reflection/serialisation, (4) local variables without an initialiser — nothing to infer from, (5) null literal — null has no type. Can use for: local variables with initialisers, for-each loop variables, try-with-resources variables, and (Java 11+) lambda parameters when annotations are needed.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t7-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('What other modern Java features should I know for a senior Java interview — Java 21 highlights?')">Java 21 modern features</span>
+      <span class="chip" onclick="sendPrompt('Explain text blocks in Java and when to use them')">Text blocks</span>
+    </div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function T(i){
+  document.querySelectorAll('.tp').forEach((p,j)=>p.classList.toggle('vis',j===i));
+  document.querySelectorAll('.nb').forEach((b,j)=>b.classList.toggle('on',j===i));
+  var tp=document.querySelectorAll('.tp')[i];
+  if(tp){var st=tp.querySelector('.st');if(st)st.click();}
+}
+function S(tid,sid){
+  var tp=document.getElementById(tid);
+  if(!tp)return;
+  tp.querySelectorAll('.sc').forEach(s=>s.classList.remove('vis'));
+  var sc=document.getElementById(tid+'-'+sid);
+  if(sc)sc.classList.add('vis');
+  var sids=['s0','s1','s2','s3','s4','s5','s6'];
+  tp.querySelectorAll('.st').forEach((b,i)=>b.classList.toggle('on',sids[i]===sid));
+}
+function A(el){
+  var a=el.querySelector('.qa');
+  if(a)a.style.display=a.style.display==='block'?'none':'block';
+}
+</script>
