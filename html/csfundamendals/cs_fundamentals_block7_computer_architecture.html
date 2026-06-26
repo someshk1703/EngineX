@@ -1,0 +1,433 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+.shell{display:flex;height:700px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:224px;min-width:224px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 8px;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 10px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin-bottom:2px;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-secondary)}
+.nav-num{font-size:11px;color:var(--color-text-tertiary);min-width:16px}
+.nav-item.active .nav-num{color:var(--color-text-secondary)}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic-tag{display:inline-block;font-size:11px;font-weight:500;color:var(--color-text-info);background:var(--color-background-info);padding:3px 10px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.topic-title{font-size:22px;font-weight:500;margin-bottom:8px}
+.topic-oneliner{font-size:15px;color:var(--color-text-secondary);line-height:1.6;border-left:2px solid var(--color-border-secondary);padding-left:12px;margin-bottom:24px}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.sec{margin-bottom:28px}
+.body{font-size:14px;line-height:1.75}
+.body p{margin-bottom:10px}
+.body p:last-child{margin-bottom:0}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.steps li::before{content:counter(s);min-width:22px;height:22px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-top:2px;flex-shrink:0}
+.card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px;background:var(--color-background-primary)}
+.card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.card-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;margin-top:6px;white-space:pre}
+.analogy{background:var(--color-background-secondary);border-left:2px solid var(--color-border-info);border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:12px 16px;font-size:14px;color:var(--color-text-secondary);line-height:1.7;font-style:italic}
+.iq{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:6px}
+.iq .q{font-size:13px;font-weight:500;margin-bottom:4px}
+.iq .a{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.bad{display:flex;gap:10px;margin-bottom:8px;font-size:13px;line-height:1.6}
+.bad .ic{color:var(--color-text-danger);font-size:15px;margin-top:1px;flex-shrink:0}
+.connects{display:flex;flex-wrap:wrap;gap:6px}
+.cp{font-size:12px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+table.ct{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.ct th{text-align:left;font-weight:500;padding:6px 10px;border-bottom:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+table.ct td{padding:6px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5;font-size:12px}
+table.ct tr:last-child td{border-bottom:none}
+</style>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sidebar-title">Block 7 — Computer Architecture</div>
+  <div class="nav-item active" onclick="show(0,this)"><span class="nav-num">01</span>CPU Architecture</div>
+  <div class="nav-item" onclick="show(1,this)"><span class="nav-num">02</span>Cache Memory</div>
+  <div class="nav-item" onclick="show(2,this)"><span class="nav-num">03</span>CPU Pipelines</div>
+  <div class="nav-item" onclick="show(3,this)"><span class="nav-num">04</span>Memory Hierarchy</div>
+  <div class="nav-item" onclick="show(4,this)"><span class="nav-num">05</span>NUMA</div>
+  <div class="nav-item" onclick="show(5,this)"><span class="nav-num">06</span>ISA — RISC vs CISC</div>
+</nav>
+<main class="content" id="content"></main>
+</div>
+
+<script>
+const T=[
+
+// 01 — CPU Architecture
+{tag:"Computer Architecture",title:"CPU Architecture",
+oneliner:"A CPU executes instructions by coordinating an ALU (arithmetic logic), registers (ultra-fast on-chip storage), a control unit (instruction sequencing), and a cache hierarchy that bridges the speed gap between processor and RAM.",
+secs:[
+{l:"Core components",b:`<div class="code">CPU Die (simplified):
+  ┌──────────────────────────────────────────────────┐
+  │  Core 0                       Core 1             │
+  │  ┌──────────────────────┐   ┌────────────────┐  │
+  │  │ Registers (< 1ns)    │   │   Registers    │  │
+  │  │  rax,rbx,rcx...      │   │                │  │
+  │  │ ALU / FPU / SIMD     │   │   ALU / FPU    │  │
+  │  │ L1 I-cache (32KB)    │   │   L1 (32KB)    │  │
+  │  │ L1 D-cache (32KB)    │   │   L1 (32KB)    │  │
+  │  │ L2 cache (256KB-1MB) │   │   L2 (256KB)   │  │
+  │  └──────────────────────┘   └────────────────┘  │
+  │         Shared L3 cache (8–64MB)                 │
+  │         Memory controller                        │
+  │         PCIe controller                          │
+  └──────────────────────────────────────────────────┘
+            ↕ DDR5 memory bus
+          [ RAM — GBs, ~100ns ]</div>`},
+{l:"Registers",b:`<p>Registers are the CPU's working scratchpad — a small set of ultra-fast storage cells built directly into the processor die. x86-64 has 16 general-purpose 64-bit registers (RAX, RBX, RCX, RDX, RSI, RDI, RSP, RBP, R8–R15), plus specialised registers: RIP (instruction pointer), RFLAGS (condition codes), XMM/YMM/ZMM (SIMD — 128/256/512-bit vector registers for parallel float/int operations).</p>
+<p>Access time: ~0 additional latency (already in the execution unit). Capacity: ~1KB total across all registers. The compiler's register allocator decides which variables live in registers vs spill to the stack (RAM). A tight inner loop that keeps all working data in registers runs 10-100x faster than one that constantly reloads from memory.</p>`},
+{l:"ALU, FPU, and SIMD units",b:`<div class="card"><div class="card-name">ALU — Arithmetic Logic Unit</div><div class="card-desc">Performs integer arithmetic (add, sub, mul, div), bitwise operations (AND, OR, XOR, shift), and comparisons. Modern CPUs have multiple ALUs per core — superscalar execution allows issuing several ALU operations per clock cycle on independent data.</div></div>
+<div class="card"><div class="card-name">FPU — Floating Point Unit</div><div class="card-desc">Dedicated hardware for IEEE 754 floating-point operations. Separate from the ALU — float and int pipelines are independent. FP division is the slowest FP operation (~20 cycles). Modern CPUs also have fused multiply-add (FMA) units — a*b+c in one instruction with higher precision.</div></div>
+<div class="card"><div class="card-name">SIMD — Single Instruction Multiple Data</div><div class="card-desc">Execute the same operation on multiple data elements in one instruction. AVX-512 on modern x86: one instruction processes 16 floats (512 bits) simultaneously. Used by: NumPy, video codecs, database column scans, ML kernels. The difference between a naïve loop and a vectorised loop is often 8-16x throughput on numeric workloads.</div></div>`},
+{l:"Clock speed vs IPC — why GHz is not the whole story",b:`<div class="code">CPU Performance = Clock Speed × IPC × Core Count
+
+Clock speed (GHz): cycles per second. Higher = faster clock ticks.
+  Modern CPUs: 3-5 GHz base, 5-6 GHz boost (thermal-limited).
+  
+IPC (Instructions Per Cycle): how many instructions complete each tick.
+  This is where modern CPUs differ most from older ones.
+  
+  1980s (in-order, single-issue): IPC ≈ 0.5–1
+  2000s (out-of-order, superscalar): IPC ≈ 2–4
+  Modern (Apple M-series, Intel Raptor Lake): IPC ≈ 5–8
+  
+  Apple M4: 4.4 GHz × IPC ~7 = effectively ~30 "useful" operations/cycle
+  Intel i9-13900K: 5.8 GHz × IPC ~5 = similar effective throughput
+  
+IPC improvements come from:
+  - Wider superscalar (issue more ops per cycle)
+  - Deeper out-of-order execution window (more instructions in flight)
+  - Better branch prediction (fewer pipeline flushes)
+  - Larger caches (fewer memory stalls)
+  - Improved instruction fusion (2 micro-ops merged into 1)</div>`},
+{l:"Multicore and SMT (Hyperthreading)",b:`<p>Modern CPUs have 4–64 physical cores. Each core is an independent execution unit with its own registers, L1, L2 cache, and pipeline. SMT (Simultaneous Multithreading / Intel's Hyperthreading): each physical core exposes 2 logical cores to the OS. The physical core's execution units are shared — when one logical core stalls waiting for memory, the other logical core's instructions can use the idle execution units. Typical SMT benefit: 20-30% throughput improvement on memory-latency-bound workloads. For pure compute-bound (no stalls): SMT provides negligible benefit since execution units are already saturated.</p>`},
+{l:"Mental model",b:`<div class="analogy">The CPU is a high-performance kitchen. Registers are the cutting board — directly in the chef's hands, zero reach time, but tiny (only a few items fit). The ALU and FPU are specialist chefs — one for integers, one for decimals. SIMD is a chef who chops 16 carrots simultaneously with one stroke instead of one at a time. Clock speed is how fast the chef moves; IPC is how many things they can do in each movement. A faster clock with low IPC is a fast but single-tasking chef. High IPC is an efficient chef who does multiple things per motion, even at a slightly lower speed.</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>More GHz = faster program. Wrong. A 3.0 GHz CPU with IPC=8 outperforms a 5.0 GHz CPU with IPC=3. Apple Silicon's dominance in benchmarks came from IPC improvements, not clock speed — M-series clocks are lower than contemporary Intel/AMD.</div></div>
+<div class="bad"><span class="ic">✕</span><div>More cores = linearly faster. Amdahl's Law: if 5% of a program is serial, maximum speedup with infinite cores is 20x. The serial bottleneck dominates. Single-threaded performance still matters enormously for most real workloads.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why does a loop that processes an array of floats run much faster when vectorised?</div><div class="a">SIMD (AVX-512 on x86): one instruction processes 16 floats simultaneously instead of one at a time. A loop summing 1000 floats takes 1000 scalar cycles vs ~63 SIMD cycles. Modern compilers auto-vectorise many loops. Requirements for auto-vectorisation: loop body must be independent (no loop-carried dependency), array must be aligned (or handle unaligned), no complex branching. NumPy, BLAS, and database column scan engines are built on explicit SIMD to achieve near-hardware-maximum throughput.</div></div>
+<div class="iq"><div class="q">Why doesn't doubling the clock frequency double performance?</div><div class="a">Performance = clock × IPC × cores. IPC (instructions per clock) is fixed by architecture. Memory latency is measured in nanoseconds, not cycles — doubling the clock doesn't halve the memory wait time in nanoseconds, only in cycles. A program bottlenecked on memory latency sees almost no benefit from a faster clock. Additionally: power scales as voltage² × frequency, so doubling frequency requires more than 2x power — thermal limits cap clock speed around 5-6 GHz with current silicon technology.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Cache Memory (L1/L2/L3 in the CPU die)</span><span class="cp">CPU Pipelines (ALU is one pipeline stage)</span><span class="cp">Memory Hierarchy (registers at the top)</span><span class="cp">NUMA (multi-socket multicore)</span><span class="cp">JVM Escape Analysis (register allocation)</span></div>`}
+]},
+
+// 02 — Cache Memory
+{tag:"Computer Architecture",title:"Cache Memory",
+oneliner:"CPU caches exploit the locality of reference in programs — keeping recently and nearby-accessed data close to execution units — turning the 100ns RAM latency problem into an effective ~1-10ns average access time.",
+secs:[
+{l:"Why caches are necessary",b:`<p>The processor-memory speed gap: a modern CPU executes an instruction every ~0.3ns at 3 GHz. Fetching data from RAM takes ~100ns — 300 clock cycles of stalling. Without caches, every memory access would pause execution for 300 cycles. Caches exist to absorb this gap by exploiting a fundamental property of programs: they tend to access the same data repeatedly (temporal locality) and access data near what they just accessed (spatial locality).</p>`},
+{l:"Locality of reference",b:`<div class="card"><div class="card-name">Temporal locality</div><div class="card-desc">If a memory location is accessed, it will likely be accessed again soon. A loop variable, a frequently-called method, a hot configuration value. Cache exploits this by keeping the recently accessed item available in fast memory. Once in L1, subsequent accesses cost ~1ns instead of ~100ns.</div></div>
+<div class="card"><div class="card-name">Spatial locality</div><div class="card-desc">If a memory location is accessed, nearby memory locations will likely be accessed soon. Array elements, struct fields, sequential instruction execution. Cache exploits this via cache lines: when you access one byte, the CPU fetches an entire 64-byte block (cache line) from RAM in one bus transfer. The next 63 bytes are already in cache.</div></div>
+<div class="code">// High spatial locality — accesses sequential memory addresses
+// Cache line loaded once, 8 doubles served from it
+double sum = 0;
+for (int i = 0; i < N; i++) sum += array[i];   // sequential → ~1 cache miss/8 ops
+
+// Low spatial locality — random access, every access may miss
+for (int i = 0; i < N; i++) sum += array[rand[i]];  // random → 1 cache miss/op
+
+// 10x+ performance difference on large arrays that don't fit in cache</div>`},
+{l:"Cache lines",b:`<div class="code">Cache line = 64 bytes (x86, ARM). The minimum unit of transfer between cache levels.
+
+When you access array[0] (8 bytes / double):
+  CPU fetches cache line containing array[0..7] into L1 (~4ns from L2)
+  array[1] through array[7]: already in L1, ~1ns each
+  array[8]: loads the next cache line
+
+Implications for data structure design:
+  struct of arrays (SoA) vs array of structs (AoS):
+  
+  AoS (bad for SIMD, mixed cache lines):
+  struct Particle { float x, y, z, mass; }  // 16 bytes per particle
+  Particle particles[1000];
+  // Iterating only x: loads x+y+z+mass into cache, wastes 75% of cache line
+  
+  SoA (good for SIMD, pure cache lines):
+  float x[1000], y[1000], z[1000], mass[1000];
+  // Iterating only x: every cache line has 16 x-values → 100% cache utilisation
+  // Database column stores (Parquet, ClickHouse) use this principle</div>`},
+{l:"Cache hierarchy — sizes, latencies, associativity",b:`<div class="code">Level    Size        Latency    Shared?          Notes
+L1-I     32KB        ~1ns (4cy) Per core         Instructions only
+L1-D     32-64KB     ~1ns (4cy) Per core         Data only. Split L1 is key
+L2       256KB-2MB   ~5ns(12cy) Per core         Unified (I+D together)
+L3       4-64MB      ~20ns(40cy)All cores/socket  Last level cache (LLC)
+
+Cache hit ratios:
+  Well-behaved workload: L1 ~95% hit, L2 ~4%, L3 ~0.9%, RAM ~0.1%
+  This gives effective latency ≈ 0.95×1 + 0.04×5 + 0.009×20 + 0.001×100 ≈ 1.3ns
+
+Set-associativity:
+  Direct-mapped: each RAM address maps to exactly one cache slot → conflict misses
+  N-way set associative: each address can go in N slots within its set → fewer conflicts
+  Fully associative: any address can go anywhere → hardware cost too high for large caches
+  Modern: L1 is 8-way, L2 is 16-way, L3 is 16-32-way set associative</div>`},
+{l:"False sharing",b:`<div class="code">Problem: two threads on different cores update DIFFERENT variables
+         that happen to reside on the SAME 64-byte cache line.
+
+struct Counter {
+    int a;  // thread 0 updates this
+    int b;  // thread 1 updates this
+};  // Both fit in one 64-byte cache line!
+
+Thread 0 writes a → cache line on Core 0 goes MODIFIED
+Thread 1 reads  b → must fetch from Core 0 (MODIFIED line) → cache invalidation!
+Thread 1 writes b → cache line on Core 1 goes MODIFIED
+Thread 0 reads  a → must fetch from Core 1 (MODIFIED line) → cache invalidation!
+Repeat: cores constantly invalidate each other's cache lines
+         even though they're accessing DIFFERENT data.
+Result: 10-100x slower than non-shared counters.
+
+Fix: padding to separate cache lines
+struct Counter {
+    int a;
+    char padding[60];  // push b to the next cache line
+    int b;
+};
+// Or: Java @Contended annotation (JVM handles padding automatically)
+// Or: thread-local counters merged at the end (best for counters)</div>`},
+{l:"Cache coherence (MESI protocol)",b:`<p>When multiple cores have the same cache line, they must agree on its value. The MESI protocol tags each cache line with one of four states: <strong>M</strong>odified (only this cache has it, it's dirty), <strong>E</strong>xclusive (only this cache has it, clean), <strong>S</strong>hared (multiple caches have clean copies), <strong>I</strong>nvalid (this cache's copy is stale). When Core 0 writes to a Shared line, all other cores' copies are invalidated via the interconnect. This coherence traffic is the root cause of false sharing overhead.</p>`},
+{l:"Mental model",b:`<div class="analogy">Cache is a chef's mise en place — ingredients staged at the workstation before cooking. L1 is what's on the cutting board (instant access, tiny). L2 is the shelf above the stove (a few steps, larger). L3 is the walk-in fridge (a short walk, much larger). RAM is the grocery store (expensive trip, huge selection). A well-organized chef (cache-friendly code) preps everything in the right order so the cutting board always has what they need next. False sharing is two chefs constantly snatching the same prep tray from each other even though they're working on different dishes — they're fighting over the container, not the food.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why is iterating over a 2D array row-by-row faster than column-by-column in C/Java?</div><div class="a">Row-major storage: C and Java store 2D arrays row by row in memory. array[0][0], array[0][1], ..., array[0][N-1] are contiguous. Row-by-row access is sequential → excellent spatial locality → one cache line covers 8 doubles → high hit rate. Column-by-column: array[0][0], array[1][0], ... are N*sizeof(double) apart — each access is a new cache line fetch from RAM → 10-100x slower for large arrays that don't fit in L3. A classic: naive matrix multiplication has bad cache behaviour for the inner-product loop — cache-oblivious algorithms and cache-blocking (tiling) fix this.</div></div>
+<div class="iq"><div class="q">What is false sharing and how do you fix it?</div><div class="a">Two threads on different cores write to different variables that share a 64-byte cache line. Every write by either thread invalidates the other core's copy via MESI protocol, causing constant cache coherence traffic — even though the threads are accessing different data. Fix: pad the struct so each variable occupies its own cache line (60 bytes of padding). In Java: @Contended annotation (JVM inserts padding). Better: use thread-local state and merge at the end — eliminate sharing entirely rather than just padding it.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">CPU Architecture (cache in the die)</span><span class="cp">Memory Hierarchy (cache is layer 1-3)</span><span class="cp">CPU Pipelines (cache miss = pipeline stall)</span><span class="cp">NUMA (cache coherence across sockets)</span><span class="cp">Java Memory Model (volatile + cache)</span><span class="cp">GC (cache-friendly GC layout)</span></div>`}
+]},
+
+// 03 — CPU Pipelines
+{tag:"Computer Architecture",title:"CPU Pipelines",
+oneliner:"A CPU pipeline overlaps the execution of multiple instructions — splitting each instruction into stages (fetch, decode, execute, writeback) so that while one instruction executes, the next is being decoded and the one after that is being fetched.",
+secs:[
+{l:"Why pipelines exist",b:`<p>Without pipelining: execute instruction 1 fully (4 stages, 4 cycles), then instruction 2, then 3. Throughput: 1 instruction per 4 cycles. With pipelining: instruction 1 in execute, instruction 2 in decode, instruction 3 in fetch — all simultaneously. Throughput: 1 instruction per 1 cycle (in the steady state). The pipeline is the assembly line for instructions.</p>`},
+{l:"The classic 5-stage pipeline",b:`<div class="code">Cycle:   1    2    3    4    5    6    7    8
+Instr 1: [IF] [ID] [EX] [MA] [WB]
+Instr 2:      [IF] [ID] [EX] [MA] [WB]
+Instr 3:           [IF] [ID] [EX] [MA] [WB]
+Instr 4:                [IF] [ID] [EX] [MA] [WB]
+
+IF  = Instruction Fetch:  read instruction from L1-I cache
+ID  = Instruction Decode: decode opcode, read registers from register file
+EX  = Execute:            ALU/FPU operation, address calculation
+MA  = Memory Access:      read/write data cache (L1-D) — only load/store instructions
+WB  = Write Back:         write result to destination register
+
+5 instructions in 9 cycles vs 5×5=25 cycles without pipeline
+Steady-state throughput: 1 instruction per cycle</div>`},
+{l:"Pipeline stalls — hazards",b:`<div class="card"><div class="card-name">Data hazard (RAW — Read After Write)</div><div class="card-desc">Instruction 2 needs a result that Instruction 1 hasn't finished computing yet. Without intervention: ID reads a stale register value. Solutions: forwarding (bypass — pipe the result directly from EX output to EX input of the next instruction without waiting for WB) or stall (insert NOPs until result is available). Compilers reorder independent instructions to fill stall slots.</div></div>
+<div class="card"><div class="card-name">Control hazard (branch hazard)</div><div class="card-desc">A branch instruction (if, while) changes the PC. By the time the branch outcome is known (end of EX), 2-3 instructions after the branch have already been fetched and decoded. If the branch is taken, those instructions are WRONG — pipeline must be flushed (wasted cycles). Branch misprediction penalty: 15-20 cycles on modern deep pipelines.</div></div>
+<div class="card"><div class="card-name">Structural hazard</div><div class="card-desc">Two instructions need the same hardware resource simultaneously (e.g. only one memory port but both want to access memory in the same cycle). Rare in modern CPUs which duplicate units, but can occur with single-port caches or specific FPU configurations.</div></div>`},
+{l:"Branch prediction",b:`<div class="code">Modern CPUs predict the branch outcome BEFORE computing it.
+They fetch and execute along the predicted path speculatively.
+If prediction correct: no penalty (seamless execution).
+If prediction wrong:  flush pipeline, fetch correct path → 15-20 cycle penalty.
+
+Prediction accuracy on modern CPUs: 95-99% on typical workloads.
+
+Prediction algorithms:
+  1-bit predictor: remember last outcome → poor on alternating patterns
+  2-bit saturating counter: STRONGLY NOT TAKEN / NOT TAKEN / TAKEN / STRONGLY TAKEN
+                            One wrong prediction doesn't flip immediately → hysteresis
+  Perceptron predictor (modern): neural-network-inspired, uses history of up to 62 branches
+  TAGE (Tag-based Geometric history length): state-of-the-art in modern CPUs (Intel, AMD)
+
+Loop branch: "jump back if i < N" → taken N times, not-taken once.
+  Predictor: quickly learns "almost always taken" → ~99% accuracy.
+
+if (x > 0): depends on data distribution.
+  Sorted data: predictor learns → ~99% accurate.
+  Random data: ~50% accurate → constant mispredictions → branch-unfriendly code.</div>`},
+{l:"Speculative execution and Spectre",b:`<p>The CPU speculatively executes instructions past a branch before knowing if the branch was correct. This is how modern CPUs achieve high IPC — speculating ahead of dependencies. Spectre (2018): the speculative execution leaves traces in the cache (cache side channel). An attacker can measure cache timing to infer what data was speculatively accessed, even if the speculative path was rolled back. The values computed speculatively are discarded from registers — but cache state persists. This is why speculative execution mitigations (IBRS, IBPB, Retpoline) hurt performance by 5-30% on some workloads — they limit or flush speculative state.</p>`},
+{l:"Out-of-order execution",b:`<p>Modern CPUs don't execute instructions in program order. The out-of-order engine maintains a window of ~200-800 instructions, finds all that are ready to execute (operands available), and issues them to execution units in any order that is correct. Instructions are committed (made visible) in program order (the reorder buffer handles this). Result: if instruction 3 is a long-latency memory load, instructions 4, 5, 6 that don't depend on instruction 3 execute in parallel during the load's latency. This is how a memory-bound loop achieves effective memory bandwidth close to theoretical peak.</p>`},
+{l:"Mental model",b:`<div class="analogy">A CPU pipeline is an automotive assembly line. Without pipelining: one car at a time through the entire factory — the welding station is idle while painting happens. With pipelining: car 1 is being painted while car 2 is being welded while car 3 is getting its frame assembled — all simultaneously. A branch hazard is discovering mid-production that you've been assembling the wrong car model. You scrap 15 cars already in progress (pipeline flush) and restart with the correct model. Branch prediction is a supervisor who guesses which model is next and pre-stages materials — right 97% of the time, saving the flush penalty.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why does sorting an array before filtering it make the filtering loop faster?</div><div class="a">Branch prediction. An unsorted array where ~50% of elements pass the condition creates ~50% branch misprediction on the conditional check inside the loop. Each misprediction = 15-20 cycle penalty. A sorted array means: first N elements fail the condition (predictor learns "not taken"), then M elements pass (predictor learns "taken"). ~1 misprediction at the transition point instead of ~N/2. On a large array, the sorting overhead is small compared to the cumulative misprediction savings. Alternatively: branchless filtering (using SIMD masks or conditional moves) eliminates the branch entirely.</div></div>
+<div class="iq"><div class="q">What is out-of-order execution and why does it matter for performance?</div><div class="a">OOO execution dynamically reorders instructions within a window (~200-800 instructions) to execute any that are ready (operands available), independent of program order. Results are committed in order. Benefit: while a cache-miss load is waiting 100ns, the OOO engine can find and execute 300+ independent instructions from the window — hiding much of the memory latency. This is why a well-structured loop with independent iterations can achieve near-theoretical memory bandwidth even on a single core. The program appears sequential; execution is aggressively parallel within the OOO window.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Cache Memory (L1-I for instruction fetch)</span><span class="cp">CPU Architecture (pipeline in the core)</span><span class="cp">Memory Hierarchy (cache miss = stall)</span><span class="cp">RISC vs CISC (pipeline depth)</span><span class="cp">JVM JIT (code optimised for pipeline)</span></div>`}
+]},
+
+// 04 — Memory Hierarchy
+{tag:"Computer Architecture",title:"Memory Hierarchy — Latency Numbers Every Engineer Should Know",
+oneliner:"The memory hierarchy is a tiered system where each level trades capacity for speed — registers are fastest but smallest, HDDs are slowest but largest — and understanding the latency gaps explains most performance intuition in systems engineering.",
+secs:[
+{l:"The hierarchy",b:`<div class="code">Level          Size        Latency          Bandwidth         Cost/GB
+──────────────────────────────────────────────────────────────────────
+Registers      ~1KB        0.3ns (~1 cy)     ~10 TB/s          ∞
+L1 cache       32-64KB     1ns   (~4 cy)     ~1 TB/s           ∞
+L2 cache       256KB-2MB   5ns   (~12 cy)    ~400 GB/s         ∞
+L3 cache       4-64MB      20-40ns (~40 cy)  ~100 GB/s         ∞
+RAM (DDR5)     8GB-1TB     ~80-100ns         ~50-100 GB/s      ~$4/GB
+NVMe SSD       100GB-8TB   ~100µs (100,000ns)~7 GB/s           ~$0.08/GB
+SATA SSD       100GB-8TB   ~100µs            ~0.5 GB/s         ~$0.05/GB
+HDD            1TB-20TB    ~5-10ms           ~0.1-0.2 GB/s     ~$0.02/GB
+Network (LAN)  ∞           ~0.1ms (100µs)    ~12.5 GB/s (100G) n/a
+Network (WAN)  ∞           ~10-100ms         ~1-10 GB/s        n/a
+──────────────────────────────────────────────────────────────────────
+Key ratios:
+  L1 → RAM:  100x latency gap
+  RAM → SSD: 1000x latency gap  
+  SSD → HDD: 100x latency gap
+  RAM → HDD: 100,000x latency gap</div>`},
+{l:"Numbers Jeff Dean made famous (scaled to human time)",b:`<div class="code">If 1 CPU cycle = 1 second:
+
+L1 cache hit:         4 seconds
+L2 cache hit:         12 seconds
+L3 cache hit:         40 seconds
+RAM access:           6 minutes
+NVMe SSD:             2 days
+SATA SSD:             2 days
+HDD seek:             16 weeks (!)
+Cross-datacenter:     4 years (!!)
+
+These numbers make intuitive the cost of:
+  A cache miss: you wait 6 minutes instead of 40 seconds
+  A system call:   ~300 CPU cycles → 5 minutes
+  A DB query (uncached): at least 6 minutes (RAM), often 2 days (disk I/O)
+  A WAN API call:  if 150ms → 150 × 52 weeks = years</div>`},
+{l:"System design implications",b:`<div class="card"><div class="card-name">Caching tier (Redis, Memcached)</div><div class="card-desc">Keeping hot data in RAM (100ns) vs recomputing from disk (100µs-10ms) is a 1,000-100,000x speedup. This is the entire justification for caching layers — not code complexity, but the latency cliff between RAM and disk.</div></div>
+<div class="card"><div class="card-name">Sequential vs random I/O</div><div class="card-desc">HDDs: random I/O means ~5-10ms per seek (mechanical arm movement). Sequential reads: 0.1-0.2 GB/s. SSDs eliminate mechanical seek but still have ~100µs random read latency (flash page granularity, FTL overhead). Log-structured systems (LSM trees, Kafka) convert all writes to sequential I/O to maximise throughput. Never random-write to HDD in a hot path.</div></div>
+<div class="card"><div class="card-name">Memory bandwidth saturation</div><div class="card-desc">Even though RAM has "only" 100ns latency, a single DDR5 channel provides ~50 GB/s bandwidth. At 64 bytes per cache line, that's 780 million cache lines per second. Modern workloads (ML inference, columnar database scans) often hit this bandwidth wall before hitting latency limits — SIMD and prefetching are the tools to approach the limit.</div></div>`},
+{l:"Hardware prefetching",b:`<p>The CPU's prefetch engine detects sequential or strided access patterns and proactively fetches cache lines before they're needed. A sequential array scan: prefetcher detects the stride=1 pattern within ~3-4 accesses and begins fetching ahead by 4-8 cache lines. By the time your code needs the data, it's already in L1. This is why sequential access to a large array can approach RAM bandwidth (50 GB/s) even though RAM latency is 100ns — the prefetcher hides the latency by fetching ahead. Software prefetch instructions (PREFETCHNTA, __builtin_prefetch in GCC) can help for complex patterns the hardware can't detect.</p>`},
+{l:"Memory bandwidth vs latency — the distinction",b:`<div class="code">Latency: time for ONE request to complete (serial access pattern)
+  DDR5: ~80ns per cache line fetch
+
+Bandwidth: data transferred per second (parallel/pipelined access)
+  DDR5: ~50 GB/s = delivering cache lines every ~1.3ns on average
+
+The trick: to achieve bandwidth, you need MANY outstanding requests in flight.
+  Memory controller can handle ~50-100 outstanding requests simultaneously.
+  One thread doing sequential access: prefetcher issues many requests → approaches bandwidth.
+  One thread doing random access: each request waits for the previous → limited by latency.
+
+DRAM modules: Row/Column address — accessing a different row costs an extra ~20ns
+              (row activation latency). Sequential access within a row is faster.
+              This is why memory access patterns matter at byte level.</div>`},
+{l:"Mental model",b:`<div class="analogy">The memory hierarchy is a workplace information system. Registers are what you have memorised — instant recall. L1 cache is your personal notepad on your desk — 1-second reach. L2 is your desk drawer — 5 seconds. L3 is the filing cabinet in the same room — 40 seconds. RAM is the storage room down the hall — 6 minutes. SSD is the archive in the basement — 2 hours. HDD is the off-site archive warehouse — a full workday. Network (WAN) is a consultant in another country — weeks of lead time. Every engineer should internalise these ratios: the difference between reading from RAM vs disk is not 2x, it's 1,000x — the entire justification for every caching system ever built.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why is Redis so much faster than a database for cache lookups?</div><div class="a">Latency levels. Redis data lives in RAM: ~100ns per lookup + ~0.1ms network round-trip = ~200µs total. A database query going to disk: at least 100µs per random SSD read, often multiple reads for index traversal + data page, plus query parsing overhead = 1-10ms. That's 5-50x faster for Redis, and the gap widens to 1000x if the DB hits spinning disk. Redis also avoids disk I/O, SQL parsing, transaction overhead, and connection pooling latency. The fundamental reason is the RAM vs disk latency cliff.</div></div>
+<div class="iq"><div class="q">A service is slow. How do you use knowledge of the memory hierarchy to diagnose?</div><div class="a">Profile at each hierarchy level. Is it CPU-bound (perf stat: check IPC, cache miss rate)? L3 miss rate > 5% → data working set exceeds L3 → restructure data layout, add caching. Is it memory-bandwidth-bound (DRAM bandwidth near 50 GB/s max)? Use vectorisation and prefetching. Is it I/O-bound (iostat shows high %iowait)? Sequential or random? If random I/O on HDD: catastrophic. Solutions: SSD, in-memory caching, LSM-based storage. Is it network-bound? Which hop — LAN (<0.1ms) or WAN (10-100ms)? CDN, read replicas near users, batching calls.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Cache Memory (L1-L3 detailed)</span><span class="cp">CPU Architecture (top of hierarchy)</span><span class="cp">Virtual Memory (RAM is paged)</span><span class="cp">File Systems (SSD/HDD layer)</span><span class="cp">System Design (Redis, CDN = hierarchy shortcuts)</span><span class="cp">B-tree vs LSM (optimise for disk latency)</span></div>`}
+]},
+
+// 05 — NUMA
+{tag:"Computer Architecture",title:"NUMA — Non-Uniform Memory Access",
+oneliner:"NUMA describes multiprocessor systems where memory access latency depends on whether a CPU accesses memory attached to its own socket (local) or another socket (remote) — a factor of 2-4x latency difference that dominates performance in multi-socket servers.",
+secs:[
+{l:"Why NUMA exists",b:`<p>Scaling beyond one CPU socket by sharing a single memory bus creates a bottleneck — all CPUs contend for the same bus. NUMA solves this by giving each socket its own local memory, connected by a high-speed interconnect (Intel UPI, AMD Infinity Fabric). Local memory accesses are fast; remote memory accesses cross the interconnect and are slower. Modern cloud server: 2-socket server with 32 cores per socket, 256GB RAM per socket = 512GB total, but with asymmetric access costs.</p>`},
+{l:"NUMA topology",b:`<div class="code">NUMA system (2 sockets, 2 NUMA nodes):
+
+Socket 0 (NUMA node 0):          Socket 1 (NUMA node 1):
+  Core 0-15                        Core 16-31
+  L1/L2 per core                   L1/L2 per core
+  Shared L3 (32MB)                 Shared L3 (32MB)
+  Memory controller                Memory controller
+  Local RAM: 256GB                 Local RAM: 256GB
+         ↕                                ↕
+      [Intel UPI / AMD Infinity Fabric — ~100ns cross-NUMA]
+
+Access latency:
+  Core 0 → Node 0 RAM:  ~80ns    (local)
+  Core 0 → Node 1 RAM:  ~150ns   (remote — 2x slower)
+  Core 0 → Node 0 L3:  ~30ns    (local last-level cache)
+  Core 0 → Node 1 L3:  ~80ns    (remote LLC access)
+
+$ numactl --hardware      # Linux: show NUMA topology
+$ numastat                # show per-node allocation statistics</div>`},
+{l:"NUMA in production — where it bites",b:`<div class="card"><div class="card-name">Memory allocation on wrong NUMA node</div><div class="card-desc">If a process's memory is allocated on NUMA node 1 but the thread runs on node 0, every memory access pays remote latency. Linux default: "local allocation" — memory is allocated on the node where the allocating thread runs. Problem: if threads migrate between nodes (default OS scheduler), their memory doesn't follow. Fix: NUMA-aware allocation with numactl --membind=0 --cpunodebind=0 to pin process to node 0.</div></div>
+<div class="card"><div class="card-name">Database systems</div><div class="card-desc">PostgreSQL, MySQL, Redis: typically NUMA-unaware — the buffer pool and connection threads may span NUMA nodes. For high-performance deployments: pin database process to one NUMA node (numactl --membind). PostgreSQL with huge_pages and NUMA binding can improve throughput by 30-50% on dual-socket servers by eliminating remote memory accesses to the buffer pool.</div></div>
+<div class="card"><div class="card-name">JVM on NUMA servers</div><div class="card-desc">JVM has NUMA-aware heap allocation since Java 8: -XX:+UseNUMA flag. The JVM allocates Eden space preferentially on the NUMA node local to the allocating thread. Since most objects are short-lived (Eden allocation → minor GC), this localises most allocations. Significant improvement for allocation-heavy Java workloads on multi-socket servers.</div></div>`},
+{l:"False NUMA — within-die NUMA",b:`<p>Modern many-core CPUs (AMD EPYC, AWS Graviton) use a chiplet design: multiple CPU chiplets connected by an intra-chip fabric. Within a single physical CPU socket, different chiplets have different memory latencies — creating "NUMA within a socket" (sub-NUMA clustering). AMD EPYC 4th gen (Genoa): 12 chiplets, each with 8 cores and a shared L3 slice. Accessing memory attached to a different chiplet costs 10-30ns extra. This means NUMA awareness matters even on single-socket servers with modern chiplet CPUs.</p>`},
+{l:"NUMA-aware programming",b:`<div class="code">// Linux: numactl command-line tool
+numactl --cpunodebind=0 --membind=0 ./myapp   # run only on node 0
+
+// Linux: libnuma API
+#include &lt;numa.h&gt;
+void* buf = numa_alloc_onnode(size, 0);   // allocate on NUMA node 0
+
+// Java: -XX:+UseNUMA flag
+// JVM automatically uses NUMA-aware allocation for the young generation
+
+// Checking NUMA topology:
+$ lscpu | grep NUMA                   # number of NUMA nodes
+$ numactl --hardware                  # distances between nodes
+$ lstopo                              # graphical topology view (hwloc)
+
+Redis on NUMA: recommended to run one Redis instance per NUMA node
+              and use client-side sharding to spread load, rather than
+              one Redis crossing NUMA boundaries for all access</div>`},
+{l:"Mental model",b:`<div class="analogy">NUMA is like a large office building with two wings connected by a single corridor. Each wing has its own supply cabinet (local memory). Workers in the left wing (CPU socket 0) can grab supplies from their cabinet instantly (local memory access). To get supplies from the right wing's cabinet, they walk down the corridor (cross-NUMA interconnect) — 2x slower. A smart office manager (NUMA-aware OS/application) assigns workers to tasks whose supplies are in their wing, and stocks each wing's cabinet with the supplies needed for that wing's tasks.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is NUMA and how does it affect database performance on cloud servers?</div><div class="a">NUMA: multi-socket servers where each CPU socket has local memory. Local access ~80ns; remote (other socket's memory) ~150ns. On a 2-socket server, if the database buffer pool is allocated on socket 1's memory but query-processing threads run on socket 0, every buffer page access pays remote latency. Fix: bind the database process to one NUMA node (numactl --membind=0 --cpunodebind=0 postgres). AWS instances with NUMA: even single-socket instances on chiplet designs (AMD EPYC, Graviton) have sub-NUMA clustering — same principle applies.</div></div>
+<div class="iq"><div class="q">Why does Java's -XX:+UseNUMA flag improve throughput on multi-socket servers?</div><div class="a">Without UseNUMA: the JVM heap is allocated on one NUMA node. Threads on the other socket pay remote latency for every heap access (object allocation, GC scan). With UseNUMA: the JVM divides Eden space across NUMA nodes, allocating from the node local to the allocating thread. Since 90%+ of allocations die in Eden (minor GC), most allocations and GC work happen on the thread's local NUMA node. Reduces remote memory traffic significantly. The benefit scales with: number of NUMA nodes × allocation rate × remote memory fraction.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Cache Memory (L3 cache is per-socket)</span><span class="cp">Memory Hierarchy (NUMA adds latency tier)</span><span class="cp">CPU Architecture (multicore layout)</span><span class="cp">JVM GC (UseNUMA flag)</span><span class="cp">System Design (DB deployment on multi-socket)</span></div>`}
+]},
+
+// 06 — RISC vs CISC
+{tag:"Computer Architecture",title:"ISA — RISC vs CISC",
+oneliner:"An ISA (Instruction Set Architecture) is the contract between software and hardware — RISC designs use a small set of simple fixed-width instructions that execute in one cycle, while CISC designs use complex variable-width instructions that may do more per instruction but take multiple cycles.",
+secs:[
+{l:"What an ISA is",b:`<p>The ISA is the set of instructions a CPU understands — the machine code interface. It defines: available instructions and their encodings, registers (names, widths, count), memory addressing modes, data types (int widths, float formats), calling conventions, exception handling. The ISA is the abstraction that lets the same software run on different hardware implementations (different microarchitectures) as long as they implement the same ISA. x86-64 code runs on Intel, AMD, and (via Rosetta) Apple Silicon because they all implement x86-64 semantics, even if internally the circuits are completely different.</p>`},
+{l:"RISC — Reduced Instruction Set Computer",b:`<div class="card"><div class="card-name">RISC principles (ARM, RISC-V, MIPS, PowerPC)</div><div class="card-desc">Fixed-width instructions (4 bytes each). Small number of instruction types (~50-100 core instructions). Load/Store architecture: only LOAD and STORE instructions access memory; all other operations work on registers. Simple instructions that execute in one cycle. Easier to pipeline deeply (uniform decode stage). Relies on compiler to generate efficient instruction sequences. Modern ARM processors implement ARM ISA externally but use RISC-inspired internal micro-ops.</div></div>
+<div class="code">ARM64 (AArch64) — RISC:
+  LDR X0, [X1]        // Load: X0 = memory[X1]   (load/store)
+  LDR X1, [X1, #8]    // Load: X1 = memory[X1+8]
+  ADD X0, X0, X1      // X0 = X0 + X1             (register-only)
+  STR X0, [X2]        // Store: memory[X2] = X0
+
+All instructions: fixed 32-bit encoding, simple decode, pipeline-friendly</div>`},
+{l:"CISC — Complex Instruction Set Computer",b:`<div class="card"><div class="card-name">CISC principles (x86, x86-64)</div><div class="card-desc">Variable-width instructions (1-15 bytes on x86-64). Many addressing modes: ADD can add a register to a memory location in one instruction. Instructions can take multiple cycles. Historically: fewer instructions per program, important when memory was expensive. Modern x86: a vast instruction set accumulated over 50 years (x86 → 286 → 386 → Pentium → x86-64 → SSE/AVX → AVX-512). Backward compatibility with 1978 8086 instructions is maintained.</div></div>
+<div class="code">x86-64 — CISC:
+  MOV RAX, [RBX]         // Load: RAX = memory[RBX]   (memory operand in ALU op)
+  ADD RAX, [RBX+8]       // ADD directly from memory: RAX += memory[RBX+8]
+  MOV [RCX], RAX         // Store
+
+x86 ADD can operate on: register+register, register+immediate,
+                         register+memory, memory+register
+ARM ADD: only register+register or register+immediate
+
+x86 instruction lengths: 1 byte (NOP) to 15 bytes (prefix + opcode + ModRM + SIB + disp + imm)
+Decode complexity: ~20% of chip area on modern x86 CPUs is decoder logic</div>`},
+{l:"The RISC vs CISC convergence",b:`<p>Modern CPUs of both types have converged internally. x86 CPUs (Intel, AMD) translate variable-length x86 instructions into fixed-width internal micro-ops (µops) before pipelining. The x86 ISA is maintained for software compatibility, but internally the CPU runs a RISC-like µop stream. Intel's Ivy Bridge: each x86 instruction is decoded into 1-4 µops; complex instructions (like REPMOVSB) into dozens. The CISC/RISC distinction today is primarily an ISA encoding concern, not an implementation principle.</p>
+<div class="code">Intel x86 execution model:
+  x86 instruction → Frontend (fetch + decode) → µops → OOO Engine
+  
+  ADD [mem], reg → decoded into:
+    LOAD  t1, [mem]    // µop 1
+    ADD   t2, t1, reg  // µop 2
+    STORE [mem], t2    // µop 3
+  
+  The OOO engine works entirely with µops — RISC-like internally.
+  The x86 ISA is the "assembly language" for the µop translator.</div>`},
+{l:"ARM vs x86 — the modern battle",b:`<table class="ct"><tr><th></th><th>ARM (RISC)</th><th>x86-64 (CISC)</th></tr>
+<tr><td>Instruction width</td><td>Fixed 32-bit (ARM64)</td><td>Variable 1-15 bytes</td></tr>
+<tr><td>Registers</td><td>31 general purpose (64-bit)</td><td>16 general purpose (64-bit)</td></tr>
+<tr><td>Decode complexity</td><td>Low (~simple circuits)</td><td>High (~20% die area)</td></tr>
+<tr><td>Power efficiency</td><td>Excellent</td><td>Moderate</td></tr>
+<tr><td>Performance/watt</td><td>Leading (Apple M-series)</td><td>High (Raptor Lake)</td></tr>
+<tr><td>Ecosystem</td><td>Mobile, embedded, server (AWS Graviton)</td><td>Desktop, laptop, server dominance</td></tr>
+<tr><td>Peak performance</td><td>Comparable (M4 Pro)</td><td>Comparable (i9-14900K)</td></tr>
+<tr><td>Extensions</td><td>NEON (SIMD), SVE/SVE2</td><td>SSE4.2, AVX2, AVX-512</td></tr></table>`},
+{l:"RISC-V — the open ISA",b:`<div class="card"><div class="card-name">RISC-V</div><div class="card-desc">Open-source, royalty-free ISA specification released by UC Berkeley (2010). Base instruction set: 47 instructions. Modular extensions: M (multiply/divide), A (atomics), F (float), D (double), C (compressed 16-bit instructions), V (vector). Used in: embedded systems (SiFive chips), NVIDIA GPU controllers, Western Digital drives, academic research CPUs, and growing data centre interest. No licensing fees — attractive for custom silicon. ARM charges per-chip royalties; RISC-V is free. China semiconductor industry has adopted RISC-V heavily for geopolitical reasons.</div></div>`},
+{l:"Mental model",b:`<div class="analogy">RISC vs CISC is like two types of kitchen knives. RISC is a Japanese santoku: one blade, one job per stroke, simple and predictable. You need more strokes to prepare a dish, but each stroke is precise and fast. Your assistant (compiler) choreographs the sequence. CISC is a Swiss Army knife: one tool with many attachments that can do complex tasks in one motion — but each "motion" involves unfolding, adjusting, and refolding mechanism. Modern CPUs solve this by having the Swiss Army knife (x86 ISA) immediately unfold into component operations (µops) inside the knife itself — externally complex, internally RISC.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why does Apple Silicon outperform Intel CPUs in performance-per-watt?</div><div class="a">ARM ISA (RISC) advantages: fixed-width 32-bit instructions decode in simple, parallel hardware — much less decode complexity than variable-width x86 (1-15 bytes). ARM64 has 31 general-purpose registers vs x86's 16 — better register allocation, fewer memory spills. Unified memory architecture (M-series): CPU, GPU, and Neural Engine share one pool of high-bandwidth RAM — no discrete GPU VRAM bottleneck. Apple custom silicon designs for specific workload mix and power envelope. Intel has been designing for backward x86 compatibility for 50 years — the x86 decoder is genuinely expensive in power and die area.</div></div>
+<div class="iq"><div class="q">If RISC CPUs have simpler instructions, why don't they require more memory to store programs?</div><div class="a">Modern programs in memory are already in compiled machine code, not human-readable assembly. Compilers generate the instruction sequence; the number of instructions is transparent to the developer. RISC programs are somewhat larger (more instructions to express the same logic), but memory is cheap — program code is a tiny fraction of total memory. Additionally, ARM64's 32-bit fixed-width instructions are more predictable for instruction cache (every instruction is 4 bytes vs x86's variable 1-15 bytes), making L1-I cache utilisation more efficient. Compressed instruction extensions (ARM Thumb/Thumb2, RISC-V "C" extension) provide 16-bit encodings for common instructions to reduce code size in embedded contexts.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">CPU Pipelines (RISC = simpler pipeline stages)</span><span class="cp">CPU Architecture (ISA defines register count)</span><span class="cp">JVM Bytecode (another ISA — for the JVM)</span><span class="cp">Compilation Pipeline (compiler targets ISA)</span><span class="cp">System Design (ARM Graviton for cloud cost)</span></div>`}
+]},
+];
+
+function show(idx,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');render(idx);
+}
+function render(idx){
+  const t=T[idx];
+  let h=`<span class="topic-tag">${t.tag}</span><div class="topic-title">${t.title}</div><div class="topic-oneliner">${t.oneliner}</div>`;
+  for(const s of t.secs)h+=`<div class="sec"><div class="sec-label">${s.l}</div><div class="body">${s.b}</div></div>`;
+  const c=document.getElementById('content');
+  c.innerHTML=h;c.scrollTop=0;
+}
+render(0);
+</script>

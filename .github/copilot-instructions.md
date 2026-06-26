@@ -62,6 +62,22 @@ EngineX/
 4. **Tasks**: `/speckit.tasks` creates executable task breakdown
 5. **Implementation**: Execute tasks with comprehensive testing
 
+### Architecture Documentation Rule
+
+> **MANDATORY**: After every confirmed and committed change to the application, update `docs/app-architecture.md`.
+
+This applies whenever any of the following change:
+- Component tree (new, removed, or renamed components)
+- Routing / view state machine (new views or navigation paths)
+- Data model (new fields in `topics.js`, `docsMap.js`, or any data file)
+- `localStorage` keys (new, removed, or renamed keys)
+- Services (`claudeService.js`, `supabaseClient.js`, or new service files)
+- New files or directories added to `src/`, `html/`, `docs/`, or project root
+- Dependencies added/removed in `package.json`
+- Planned features section (move items from Planned → implemented when done)
+
+The `Last updated` date in `docs/app-architecture.md` must match the commit date.
+
 ---
 
 ## Quality Gates

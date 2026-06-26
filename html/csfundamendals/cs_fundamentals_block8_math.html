@@ -1,0 +1,720 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+.shell{display:flex;height:700px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:224px;min-width:224px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 8px;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 10px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin-bottom:2px;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-secondary)}
+.nav-num{font-size:11px;color:var(--color-text-tertiary);min-width:16px}
+.nav-item.active .nav-num{color:var(--color-text-secondary)}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic-tag{display:inline-block;font-size:11px;font-weight:500;color:var(--color-text-info);background:var(--color-background-info);padding:3px 10px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.topic-title{font-size:22px;font-weight:500;margin-bottom:8px}
+.topic-oneliner{font-size:15px;color:var(--color-text-secondary);line-height:1.6;border-left:2px solid var(--color-border-secondary);padding-left:12px;margin-bottom:24px}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.sec{margin-bottom:28px}
+.body{font-size:14px;line-height:1.75}
+.body p{margin-bottom:10px}
+.body p:last-child{margin-bottom:0}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.steps li::before{content:counter(s);min-width:22px;height:22px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-top:2px;flex-shrink:0}
+.card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px;background:var(--color-background-primary)}
+.card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.card-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;margin-top:6px;white-space:pre}
+.analogy{background:var(--color-background-secondary);border-left:2px solid var(--color-border-info);border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:12px 16px;font-size:14px;color:var(--color-text-secondary);line-height:1.7;font-style:italic}
+.iq{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:6px}
+.iq .q{font-size:13px;font-weight:500;margin-bottom:4px}
+.iq .a{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.bad{display:flex;gap:10px;margin-bottom:8px;font-size:13px;line-height:1.6}
+.bad .ic{color:var(--color-text-danger);font-size:15px;margin-top:1px;flex-shrink:0}
+.connects{display:flex;flex-wrap:wrap;gap:6px}
+.cp{font-size:12px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+table.ct{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.ct th{text-align:left;font-weight:500;padding:6px 10px;border-bottom:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+table.ct td{padding:6px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5;font-size:12px}
+table.ct tr:last-child td{border-bottom:none}
+</style>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sidebar-title">Block 8 — Math for CS</div>
+  <div class="nav-item active" onclick="show(0,this)"><span class="nav-num">01</span>Big-O Notation</div>
+  <div class="nav-item" onclick="show(1,this)"><span class="nav-num">02</span>Logarithms in CS</div>
+  <div class="nav-item" onclick="show(2,this)"><span class="nav-num">03</span>Probability Basics</div>
+  <div class="nav-item" onclick="show(3,this)"><span class="nav-num">04</span>Graph Theory</div>
+  <div class="nav-item" onclick="show(4,this)"><span class="nav-num">05</span>Combinatorics</div>
+  <div class="nav-item" onclick="show(5,this)"><span class="nav-num">06</span>Modular Arithmetic</div>
+</nav>
+<main class="content" id="content"></main>
+</div>
+
+<script>
+const T=[
+
+// 01 — Big-O
+{tag:"Complexity Theory",title:"Big-O Notation",
+oneliner:"Big-O describes the asymptotic upper bound on an algorithm's resource usage — how running time or memory grows relative to input size n as n approaches infinity, ignoring constant factors and lower-order terms.",
+secs:[
+{l:"Formal definition",b:`<div class="code">f(n) = O(g(n)) if there exist constants c > 0 and n₀ > 0 such that:
+  f(n) ≤ c · g(n)  for all n ≥ n₀
+
+"f grows no faster than g beyond some input size."
+
+Companions:
+  Ω(g(n)) — lower bound:  f(n) ≥ c · g(n) for all n ≥ n₀  ("at least this fast")
+  Θ(g(n)) — tight bound:  f is both O(g) AND Ω(g)         ("exactly this order")
+
+Common abuse: O(n) when we really mean Θ(n). Technically:
+  Bubble sort is O(n³) — the definition allows loose upper bounds.
+  The correct statement is Θ(n²) — the tight bound.
+
+Why ignore constants?
+  O(2n) = O(n) = O(100n). The constant factor depends on hardware, compiler,
+  specific operations. Big-O captures algorithmic behaviour independent of machine.
+  A constant factor of 2 vs 1 disappears when n grows large. An O(n²) vs O(n log n)
+  difference does not — it dominates at scale.</div>`},
+{l:"Common complexities — the growth table",b:`<div class="code">Complexity   Name           n=10    n=100   n=1000    n=1M        Example
+──────────────────────────────────────────────────────────────────────────────
+O(1)         Constant       1       1       1         1           HashMap.get()
+O(log n)     Logarithmic    3       7       10        20          Binary search
+O(n)         Linear         10      100     1,000     1,000,000   Linear scan
+O(n log n)   Linearithmic   33      664     10,000    20,000,000  Merge sort
+O(n²)        Quadratic      100     10,000  1,000,000 10¹²        Bubble sort
+O(n³)        Cubic          1,000   10⁶     10⁹       10¹⁸        Matrix multiply (naive)
+O(2ⁿ)        Exponential    1,024   10³⁰    10³⁰¹     💀           Subset enumeration
+O(n!)        Factorial      3.6M    💀       💀         💀           Permutation brute force
+
+Practical ceiling:
+  n = 10⁸   → O(n) is borderline (1 second at 10⁸ ops/sec)
+  n = 10⁶   → O(n log n) is fine (~20 million ops)
+  n = 10⁴   → O(n²) is fine (~10⁸ ops)
+  n > 30     → O(2ⁿ) is dead (2³⁰ ≈ 10⁹, barely runnable)</div>`},
+{l:"Amortised analysis",b:`<p>Amortised analysis gives the average cost per operation over a sequence of operations, even when individual operations vary in cost. It's not average-case (which deals with probabilistic inputs) — it's worst-case averaged over a sequence, accounting for expensive-but-rare operations paid for by cheap-and-frequent ones.</p>
+<div class="code">Dynamic array (ArrayList) — push_back():
+  Most pushes: O(1) — just write to the next slot.
+  Occasional push when full: O(n) — allocate 2x array, copy all n elements.
+  
+  Analysis: start with capacity 1, double each time.
+  Capacities: 1, 2, 4, 8, 16, ..., n
+  Copy costs: 1 + 2 + 4 + ... + n/2 = n-1   (geometric series)
+  Total copies for n pushes: < 2n
+  Amortised cost per push: 2n / n = O(1)
+  
+  Intuition: each element pays "2 coins" when inserted:
+    1 coin for itself, 1 coin banked for future copying.
+    When array doubles, each copy is paid by a banked coin.
+    Each push is amortised O(1). ✓
+
+Other examples:
+  Hash table resize: amortised O(1) insert despite occasional O(n) resize
+  Stack with multi-pop: amortised O(1) per operation (each element pushed once, popped once)
+  Fibonacci heap decrease-key: amortised O(1) — used to prove Dijkstra's O(E + V log V)</div>`},
+{l:"Space complexity",b:`<div class="code">Space complexity = total memory used as a function of n
+
+Auxiliary space = extra space beyond input (what most interviewers mean)
+
+Examples:
+  Merge sort:    O(n) auxiliary (needs a temporary array for merging)
+  Quicksort:     O(log n) auxiliary (recursion stack depth, average case)
+  Heapsort:      O(1) auxiliary (in-place)
+  DFS (graph):   O(V) auxiliary (recursion stack + visited set)
+  BFS (graph):   O(V) auxiliary (queue can hold V nodes)
+  HashMap:       O(n) space for n entries
+
+In-place does NOT mean O(1) space:
+  Quicksort is "in-place" (modifies array in place) but uses O(log n) stack space.
+  Only truly O(1) aux space: heapsort, insertion sort, bubble sort.</div>`},
+{l:"Recurrence relations — Master Theorem",b:`<div class="code">Divide-and-conquer algorithms have the form:
+  T(n) = a · T(n/b) + f(n)
+  
+  a = number of subproblems
+  b = factor by which input shrinks
+  f(n) = cost of work done outside recursive calls
+
+Master Theorem (simplified):
+  Compare f(n) to n^(log_b a):
+
+  Case 1: f(n) = O(n^(log_b a - ε)) → T(n) = Θ(n^log_b a)   [recursive work dominates]
+  Case 2: f(n) = Θ(n^log_b a)       → T(n) = Θ(n^log_b a · log n) [balanced]
+  Case 3: f(n) = Ω(n^(log_b a + ε)) → T(n) = Θ(f(n))         [combining work dominates]
+
+Examples:
+  Merge sort:  T(n) = 2T(n/2) + O(n)  → a=2, b=2, log_2(2)=1, f(n)=O(n)=n^1 → Case 2 → Θ(n log n)
+  Binary search: T(n) = T(n/2) + O(1)  → a=1, b=2, log_2(1)=0, f(n)=O(1)=n^0 → Case 2 → Θ(log n)
+  Strassen:    T(n) = 7T(n/2) + O(n²) → a=7, b=2, log_2(7)≈2.81, n²<n^2.81  → Case 1 → Θ(n^2.81)</div>`},
+{l:"Mental model",b:`<div class="analogy">Big-O is the fuel efficiency rating of an algorithm. O(1) is an electric scooter — uses the same fuel regardless of how far you go. O(n) is a car — fuel scales with distance. O(n²) is a car that drives every possible pair of streets — fuel explodes when the city grows. Amortised analysis is a gas station loyalty card: most fill-ups cost $1, but every 10th fill-up costs $10 and earns points that pay for the others. Average out over 10 fill-ups: effectively $1 each, even though the individual costs varied.</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>O(n log n) always beats O(n²). For tiny n, an O(n²) algorithm with a small constant factor beats an O(n log n) algorithm with large constants. Insertion sort beats merge sort for n < ~16. Java's Arrays.sort uses insertion sort for small sub-arrays precisely for this reason.</div></div>
+<div class="bad"><span class="ic">✕</span><div>"Average case" and "amortised" are the same. Average case assumes input comes from a distribution. Amortised is a worst-case guarantee over a sequence of operations — no probability involved. Quicksort's O(n log n) average case uses probability; ArrayList's O(1) amortised push uses accounting.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is the time complexity of appending to a Python list? Justify your answer.</div><div class="a">Amortised O(1). Python lists are dynamic arrays. Most appends write to a pre-allocated slot — O(1). Occasionally the array is full: allocate ~1.125x new array, copy all elements — O(n). Over n appends: total copy work = sum of geometric series = O(n). Amortised cost = O(n)/n = O(1) per append. The same logic applies to Java's ArrayList and C++'s std::vector (which doubles, giving exactly 2n total work).</div></div>
+<div class="iq"><div class="q">You have an O(n²) algorithm and an O(n log n) algorithm for the same problem. When is O(n²) acceptable?</div><div class="a">When n is small (n < ~1000, constant factors can make O(n²) faster), when the O(n log n) algorithm has high memory overhead (merge sort's O(n) aux space vs insertion sort's O(1)), when the O(n log n) algorithm has complex cache behaviour vs the O(n²) algorithm's simplicity, or when the data is nearly sorted (insertion sort is O(n) on nearly-sorted data). In practice: profile. Theoretical complexity is a starting point, not the final answer.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Logarithms (why log n appears)</span><span class="cp">DSA — all algorithm analysis</span><span class="cp">Combinatorics (counting operations)</span><span class="cp">B-tree depth (O(log n))</span><span class="cp">Sorting algorithms</span></div>`}
+]},
+
+// 02 — Logarithms
+{tag:"Mathematics",title:"Logarithms in CS",
+oneliner:"log₂(n) is the number of times you can halve n before reaching 1 — this is why any algorithm that halves its problem size each step is O(log n), and why data structures that branch k-ways are only log_k(n) levels deep.",
+secs:[
+{l:"The definition — what a logarithm is",b:`<div class="code">log_b(n) = x  means  b^x = n
+
+  log₂(8)  = 3   because  2³ = 8
+  log₂(1024) = 10  because  2¹⁰ = 1024
+  log₂(1,000,000) ≈ 20   because  2²⁰ ≈ 10⁶
+  log₁₀(1,000,000) = 6   (base 10)
+  ln(e)    = 1   (natural log, base e ≈ 2.718)
+
+Big-O rule: log base doesn't matter (all logs differ by a constant factor)
+  log₂(n) = log₁₀(n) / log₁₀(2) ≈ 3.32 · log₁₀(n)
+  In Big-O: O(log₂ n) = O(log₁₀ n) = O(log n)  — drop the base
+
+Key insight: logs grow EXTREMELY slowly.
+  log₂(1)          = 0
+  log₂(1000)       ≈ 10
+  log₂(1,000,000)  ≈ 20
+  log₂(10⁹)        ≈ 30
+  log₂(10¹⁸)       ≈ 60
+  
+  A billion-element array → only 30 comparisons in binary search. 60-bit key → 60-level trie.</div>`},
+{l:"Why binary search is O(log n)",b:`<div class="code">Binary search on a sorted array of n elements:
+
+Step 0: search space = n
+Step 1: halve → n/2
+Step 2: halve → n/4
+Step 3: halve → n/8
+...
+Step k: search space = n/2^k
+
+Stop when search space = 1: n/2^k = 1 → 2^k = n → k = log₂(n)
+
+So binary search makes at most log₂(n) comparisons. ✓
+
+Generalisation:
+  Any algorithm that reduces its problem by a constant fraction each step is O(log n).
+  Reduce by half:  O(log₂ n)
+  Reduce by 1/3:  O(log₃ n) = O(log n)  (same Big-O, different constant)
+  Reduce by 1/10: O(log₁₀ n) = O(log n)</div>`},
+{l:"Why B-trees are shallow",b:`<div class="code">B-tree node: stores up to k keys, has up to k+1 children.
+  For a B-tree of order k (branching factor k):
+  
+  Level 0 (root): 1 node, up to k keys
+  Level 1:        k+1 nodes
+  Level 2:        (k+1)² nodes
+  Level h:        (k+1)^h nodes
+
+  Total nodes in a full tree of height h:  (k+1)^(h+1) - 1 ≈ (k+1)^h
+  
+  Given n keys: height h = log_{k+1}(n)
+  
+  With k = 100 (common for disk-based B-trees, fitting ~100 keys per 4KB page):
+  n = 1,000,000 → h = log₁₀₁(10⁶) ≈ 3  layers!
+  n = 10⁹       → h ≈ 4-5 layers
+  
+  Each layer = one disk I/O. 3-5 I/Os to find any record in a 1-billion-row table.
+  This is why database indexes are B-trees: large branching factor → tiny height → minimal disk I/Os.
+  
+  Compare to binary search tree (k=2):
+  n = 10⁶ → height = log₂(10⁶) ≈ 20. Still O(log n) but 20 disk I/Os vs 3. B-tree wins.</div>`},
+{l:"Log in algorithm complexity — pattern recognition",b:`<div class="code">Algorithm pattern → why log appears:
+
+Binary search:    halves search space each step → log₂ n steps
+Merge sort:       splits in half log n times, each split O(n) → O(n log n)
+Heap operations:  heap height = log₂ n (n nodes, binary tree) → O(log n) per insert/extract
+BST operations:   balanced tree height = log₂ n → O(log n) per op
+Trie depth:       alphabet size a, max depth = log_a(n) for n distinct strings
+Bit operations:   n-bit integer → log₂(n) bits to represent n → O(log n) for bit-level ops
+Exponentiation:   fast power a^n: square log n times → O(log n) multiplications
+GCD (Euclid):     each step reduces larger number by at least half → O(log(min(a,b)))
+
+The log pattern: any time you can halve (or reduce by constant fraction)
+                 the remaining work at each step, you get O(log n).</div>`},
+{l:"Logarithm identities used in CS",b:`<div class="code">Product rule:    log(a · b) = log(a) + log(b)
+                 → Turning multiplication into addition (log-space arithmetic in probability)
+                 → Why n! has O(n log n) bits (Stirling: log(n!) ≈ n log n)
+
+Quotient rule:   log(a/b) = log(a) - log(b)
+                 → Information gain in decision trees
+
+Power rule:      log(aⁿ) = n · log(a)
+                 → RSA key security: 2^256 requires 256-bit representation
+                 → Why SHA-256 collision resistance needs 2^128 operations
+                    (birthday bound: collision found after 2^(256/2) = 2^128 tries)
+
+Change of base:  log_b(n) = log_a(n) / log_a(b)
+                 → All logs are proportional → Big-O drops the base
+
+Useful value:    log₂(n) ≈ 3.32 · log₁₀(n)
+                 log₂(e) ≈ 1.44    (natural log conversion)</div>`},
+{l:"Mental model",b:`<div class="analogy">A logarithm is the answer to "how many times can you fold this piece of paper?" Fold once: 2 layers. Fold 10 times: 2¹⁰ = 1024 layers. Inversely: if you have 1024 layers, it took 10 folds. Binary search is unfolding — each comparison eliminates half the remaining possibilities. Starting with a billion items: 10 billion = 2³⁰, so 30 comparisons. The reason O(log n) algorithms feel magical is that doubling the input only adds ONE step — and most real problems fit in 20-60 steps even at internet scale.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why is a balanced BST O(log n) for search but a B-tree is still O(log n) — why bother with B-trees?</div><div class="a">Both are O(log n), but the constant inside the log matters enormously for disk-based storage. BST: height = log₂(n) = 20 for n=10⁶. Each level = one disk I/O. 20 disk I/Os × 100µs = 2ms. B-tree with branching factor 100: height = log₁₀₀(n) ≈ 3. Only 3 disk I/Os × 100µs = 0.3ms. Same asymptotic complexity, 7x fewer disk I/Os. The B-tree node is designed to fit exactly one disk page (4KB), so each I/O fetches as much data as possible — amortising disk seek cost across 100 keys per read.</div></div>
+<div class="iq"><div class="q">Why does merge sort cost O(n log n) rather than O(n)?</div><div class="a">Merge sort splits the array into halves log₂(n) times (each level of recursion halves the problem). At each level, merging all the sub-arrays takes O(n) total work (every element is touched once per level). Levels × work per level = log(n) × O(n) = O(n log n). You can't sort a general comparison-based sequence in better than O(n log n) — the information-theoretic lower bound: there are n! possible orderings, and each comparison gives 1 bit of information. You need log₂(n!) ≥ n log₂(n) - n comparisons minimum (Stirling's approximation). This is a fundamental lower bound — merge sort is optimal.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Big-O (log n is one complexity class)</span><span class="cp">B-tree (depth = log_k(n))</span><span class="cp">Binary Search DSA</span><span class="cp">Hash collisions (birthday bound 2^(n/2))</span><span class="cp">Cryptography (RSA key sizes in bits)</span></div>`}
+]},
+
+// 03 — Probability
+{tag:"Mathematics",title:"Probability Basics",
+oneliner:"Probability quantifies uncertainty — expected value, the birthday problem, and Bayes' theorem are the three concepts that explain hash collisions, consistent hashing load distribution, cache hit rates, and randomised algorithm analysis.",
+secs:[
+{l:"Expected value",b:`<div class="code">Expected value E[X] = Σ x · P(X = x)  for all outcomes x
+
+Intuition: the long-run average value of a random variable over many trials.
+
+Example — dice:
+  Fair six-sided die: E[roll] = 1·(1/6) + 2·(1/6) + ... + 6·(1/6) = 21/6 = 3.5
+  
+Example — hash table probes (linear probing, load factor α):
+  Expected probes for a successful lookup: ≈ 1/(1-α)
+  At α = 0.5: E[probes] = 2   (good)
+  At α = 0.9: E[probes] = 10  (degraded)
+  At α = 1.0: E[probes] = ∞   (fully full, infinite loop)
+  → Why HashMap maintains load factor ≤ 0.75 and resizes
+
+Linearity of expectation (crucial property):
+  E[X + Y] = E[X] + E[Y]   — even if X and Y are NOT independent!
+  
+  This simplifies analysis enormously:
+  Expected number of comparisons in quicksort with random pivot:
+    E[total comparisons] = Σ_{i<j} P(element i compared to element j)
+    = Σ_{i<j} 2/(j-i+1)   ← linearity of expectation applied to each pair
+    = O(n log n)           ← result without needing independence</div>`},
+{l:"The Birthday Problem — collisions",b:`<div class="code">Classic: How many people do you need in a room before two share a birthday?
+Answer: Only 23 people for >50% probability. 70 people for >99.9%.
+
+The formula:
+  P(no collision among k people) = (365/365) × (364/365) × (363/365) × ... × ((365-k+1)/365)
+  
+  Approximation: P(collision) ≈ 1 - e^(-k²/2n)   where n = number of possible values
+  50% collision probability when k ≈ 1.18 · √n
+
+Generalisation — the birthday bound:
+  With n possible hash values, you expect your first collision after ≈ √n hashes.
+  
+  SHA-256: n = 2^256 outputs → first collision after ≈ 2^128 hashes
+  MD5: n = 2^128 outputs → first collision after ≈ 2^64 hashes  (feasible with GPUs!)
+  UUID v4: n = 2^122 → first collision after ≈ 2^61 ≈ 2.3 × 10^18 UUIDs
+  
+  Hash table with n slots, m keys:
+  E[collisions] ≈ m²/(2n)   → keep m << √n to avoid frequent collisions
+  
+  Why this matters:
+    Cryptography: birthday bound defines effective security bits
+    Hash tables: load factor determines collision probability
+    Distributed IDs: need enough bits so birthday bound >> expected keys generated</div>`},
+{l:"Consistent hashing — probability of reassignment",b:`<div class="code">Naive hashing: key → node_id = hash(key) % N servers
+  Add/remove server: almost ALL keys reassigned (N-1)/N ≈ 100% remapping → cache stampede
+
+Consistent hashing: servers and keys mapped to a circle [0, 2^32)
+  Key assigned to first server clockwise on the circle.
+  Add server S_new: only keys between S_new's predecessor and S_new reassign
+  
+  With N servers uniformly distributed:
+  Expected fraction of keys remapped when adding 1 server:
+    1/(N+1)   — only ~1/(N+1) of keys need to move, not all of them!
+    
+  With 10 servers: only ~9% of keys reassign on adding server 11.
+  With 100 servers: only ~1% reassign.
+  
+  Virtual nodes (each server appears multiple times on ring):
+  With k virtual nodes per server: improves load balance.
+  Standard deviation of load across servers ≈ O(1/√(k·N))
+  k = 150: load imbalance within ~10% across servers</div>`},
+{l:"Probability in randomised algorithms",b:`<div class="card"><div class="card-name">Quicksort with random pivot</div><div class="card-desc">Choose pivot uniformly at random. E[comparisons] = O(n log n). P(worst case O(n²)) is exponentially small. Any deterministic adversary would need to know your random pivot in advance to construct a bad input — impossible with true randomness.</div></div>
+<div class="card"><div class="card-name">Skip lists</div><div class="card-desc">Each node is promoted to the next level with probability p (typically 0.5). E[height] = log_{1/p}(n). E[operations] = O(log n). The probabilistic balancing achieves the same expected performance as balanced BST without the complex rotation logic. Used by: Redis sorted sets (ZSet), LevelDB memtable.</div></div>
+<div class="card"><div class="card-name">Bloom filters</div><div class="card-desc">m-bit array, k hash functions, n inserted elements. False positive probability ≈ (1 - e^(-kn/m))^k, minimised when k = (m/n) · ln(2). At m/n = 10 bits per element, k=7: false positive rate ≈ 0.8%. Zero false negatives. Used by: Cassandra (avoid disk reads for missing keys), Chrome (malicious URL filter), Postgres (query optimisation).</div></div>`},
+{l:"Bayes' theorem — intuition",b:`<div class="code">P(A|B) = P(B|A) · P(A) / P(B)
+
+"The probability of A given B equals how likely B is given A,
+ times how likely A is, divided by how likely B is overall."
+
+Classic example — spam filter:
+  P(spam) = 0.3          (30% of emails are spam — prior)
+  P("free" | spam) = 0.7 (70% of spam contains "free")
+  P("free" | not spam) = 0.05 (5% of legit email contains "free")
+  P("free") = 0.7×0.3 + 0.05×0.7 = 0.245  (law of total probability)
+  
+  P(spam | "free") = (0.7 × 0.3) / 0.245 = 0.857
+  
+  An email with "free" is 86% likely to be spam!
+
+CS applications:
+  Naive Bayes classifier (spam, sentiment analysis)
+  Medical diagnosis systems
+  A/B test interpretation (what's the probability this variant is truly better?)
+  Anomaly detection (update beliefs about system health as metrics arrive)</div>`},
+{l:"Mental model",b:`<div class="analogy">Expected value is what a casino knows that gamblers forget: it doesn't matter what happens on any single spin — over millions of spins, the house always collects its edge. The birthday problem is the intuition breaker: we think "how could only 23 people out of 365 possible birthdays cause a collision?" — but we're comparing every pair, not one person to all others. 23 people = C(23,2) = 253 pairs — quite a few chances for a match. Bloom filters are the bouncer who occasionally lets through an innocent person (false positive) but never turns away someone on the guest list (no false negatives) — and you only need a small list to cover millions of checks.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why does a HashMap resize at 75% load factor rather than 100%?</div><div class="a">Expected probes with linear probing at load factor α: ≈ 1/(1-α). At α=0.75: E[probes] ≈ 4. At α=0.9: E[probes] ≈ 10. At α=1.0: ∞. Also: birthday problem. With m keys in n slots, expected collisions ≈ m²/2n. At 75%: m=0.75n, expected collisions = (0.75n)²/2n ≈ 0.28n — manageable. At 90%: ≈ 0.4n collisions — chains grow long. The 0.75 threshold is an empirically tuned sweet spot: acceptable collision rate while not wasting too much memory on empty slots.</div></div>
+<div class="iq"><div class="q">How many bits does a UUID need to avoid collisions when generating 1 billion UUIDs?</div><div class="a">Birthday bound: collision expected after ≈ √(2ⁿ) = 2^(n/2) UUIDs. For 10⁹ IDs: need 2^(n/2) >> 10⁹ → n/2 >> 30 → n >> 60 bits. UUID v4 uses 122 random bits → birthday bound ≈ 2^61 ≈ 2.3×10^18. You'd need to generate 2.3 quintillion UUIDs before expecting a collision. 10⁹ is utterly safe. For distributed ID systems (Snowflake IDs): use 41 bits timestamp + 10 bits machine ID + 12 bits sequence → no collision by construction (not probabilistic at all).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Hash Functions (birthday bound = collision security)</span><span class="cp">Consistent Hashing (System Design)</span><span class="cp">Bloom Filters (DSA)</span><span class="cp">Logarithms (log appears in birthday bound)</span><span class="cp">Big-O (expected case analysis)</span></div>`}
+]},
+
+// 04 — Graph Theory
+{tag:"Mathematics",title:"Graph Theory — Formal Definitions",
+oneliner:"A graph G = (V, E) is a set of vertices and edges — the mathematical structure that models networks, dependencies, state machines, social connections, and every system where relationships between objects matter.",
+secs:[
+{l:"Core vocabulary",b:`<div class="code">G = (V, E)
+  V = vertices (nodes) — the objects
+  E = edges — the relationships between objects
+  
+  |V| = n (number of vertices)
+  |E| = m (number of edges)
+
+Undirected edge: {u, v} — relationship is symmetric (u↔v)
+Directed edge (arc): (u, v) — relationship is one-way (u→v)
+
+Degree:
+  Undirected: deg(v) = number of edges incident to v
+  Directed: in-degree = edges coming IN, out-degree = edges going OUT
+  Handshaking lemma: Σ deg(v) = 2|E|  (each edge contributes 2 to degree sum)
+  
+Adjacency:
+  u and v are adjacent if {u,v} ∈ E (undirected) or (u,v) ∈ E (directed)
+  Neighbor set N(v) = {u : {u,v} ∈ E}  — all vertices adjacent to v
+  
+Weight: w(e) for weighted graphs — distance, cost, capacity of an edge</div>`},
+{l:"Paths and cycles",b:`<div class="code">Walk: a sequence of vertices v₁, v₂, ..., vₖ where {vᵢ, vᵢ₊₁} ∈ E
+      (vertices and edges may repeat)
+
+Path: a walk with no repeated vertices
+  Simple path: each vertex visited at most once (the standard meaning in CS)
+
+Cycle: a path that starts and ends at the same vertex (v₁ = vₖ, k > 3)
+  Simple cycle: no repeated vertices except the start/end
+
+Path length: number of edges in the path (unweighted)
+             sum of edge weights (weighted)
+
+Shortest path algorithms:
+  Unweighted:    BFS         O(V + E)
+  Non-negative:  Dijkstra    O((V + E) log V) with binary heap
+  Negative edges: Bellman-Ford O(VE)
+  All pairs:     Floyd-Warshall O(V³)
+  DAG:           Topological sort + DP  O(V + E)</div>`},
+{l:"Connectivity",b:`<div class="card"><div class="card-name">Connected graph (undirected)</div><div class="card-desc">There is a path between every pair of vertices. A graph with n vertices and n-1 edges that is connected is a tree. Find connected components: BFS/DFS from each unvisited node → O(V + E). Union-Find (DSU) data structure: O(α(n)) per union/find — nearly O(1).</div></div>
+<div class="card"><div class="card-name">Strongly connected components (directed)</div><div class="card-desc">SCC: a maximal set of vertices where every vertex can reach every other. A directed graph with one SCC is strongly connected. Algorithms: Kosaraju's (2 DFS passes, O(V+E)), Tarjan's (1 DFS with low-link values, O(V+E)). Applications: finding circular dependencies in build systems, detecting cycles in task scheduling.</div></div>
+<div class="card"><div class="card-name">Bridges and articulation points</div><div class="card-desc">Bridge: an edge whose removal disconnects the graph. Articulation point: a vertex whose removal disconnects the graph. Found by Tarjan's bridge-finding algorithm (O(V+E)). Applications: network reliability (critical links), circuit board analysis.</div></div>`},
+{l:"DAG — Directed Acyclic Graph",b:`<div class="code">DAG: directed graph with NO cycles.
+
+Properties:
+  Has at least one source (in-degree = 0) and one sink (out-degree = 0)
+  Has a topological ordering: a linear ordering of vertices such that
+    for every edge (u,v), u appears before v in the ordering
+  (Topological order exists ↔ graph is a DAG — equivalence)
+
+Topological sort algorithms:
+  Kahn's (BFS-based): start with all nodes of in-degree 0,
+    process each, decrement neighbors' in-degrees, add newly 0-degree nodes
+    O(V + E). Detects cycles (if not all nodes processed → cycle exists).
+  DFS-based: DFS, append to result in post-order, reverse → O(V + E)
+
+Applications of DAGs:
+  Build systems (Makefile, Bazel, Gradle): tasks are nodes, dependencies are edges
+  Package managers (npm, pip): topological sort for install order
+  Git commits: each commit points to parent → DAG of commits
+  Kubernetes job dependencies: run job B only after job A completes
+  Neural networks: computation graph (forward/backward pass = DAG traversal)
+  Course prerequisites: "take CS101 before CS201"</div>`},
+{l:"Bipartite graphs",b:`<div class="code">Bipartite: vertices can be split into two sets L and R such that
+           ALL edges go between L and R (no edges within L or within R).
+
+Test: a graph is bipartite ↔ it contains no ODD-LENGTH cycle
+Algorithm: 2-color BFS — assign alternating colors, return false on conflict → O(V+E)
+
+Examples:
+  Users ─ Products (users on left, products on right, edges = purchases)
+  Students ─ Courses (enrollment relationship)
+  Machines ─ Jobs (assignment problems)
+  
+Matching in bipartite graphs:
+  Maximum bipartite matching: max set of edges with no shared vertices
+  Hungarian algorithm: O(V·E)
+  Hopcroft-Karp: O(E·√V)
+  Application: job-candidate assignment, task scheduling, image segmentation
+
+Complete bipartite graph K_{m,n}: every node in L connected to every node in R
+  |E| = m × n. Used in: network topologies, combinatorics analysis.</div>`},
+{l:"Graph representations",b:`<div class="code">Adjacency Matrix: n×n matrix where A[i][j] = 1 if edge (i,j) exists
+  Space: O(n²)
+  Edge lookup: O(1)
+  Neighbor iteration: O(n)
+  Best for: dense graphs (|E| close to n²), frequent edge queries
+
+Adjacency List: array of n lists, where list[i] contains neighbors of i
+  Space: O(V + E)
+  Edge lookup: O(degree(v)) — scan the list
+  Neighbor iteration: O(degree(v))
+  Best for: sparse graphs (|E| << n²) — which is most real graphs
+
+Edge List: list of all (u, v) pairs
+  Space: O(E)
+  Used in: Kruskal's MST (sort edges), graph input parsing
+
+Real-world graphs are almost always sparse:
+  Social network: 1B users, avg 200 friends → |E| = 200B << |V|² = 10^18
+  Road network: n intersections, avg degree ~3 → |E| ≈ 3n/2 → very sparse</div>`},
+{l:"Mental model",b:`<div class="analogy">A graph is a map of relationships. Vertices are cities; edges are roads. A path is a route between cities. A cycle is a round trip. Connectivity is whether you can get anywhere from anywhere. A DAG is a one-way city where you can never go backwards — like a waterfall where water only flows down. Bipartite graphs are like a dating app: left side (users), right side (potential matches), and edges only go between the two groups — never user-to-user or match-to-match.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How do you detect a cycle in a directed graph?</div><div class="a">DFS with three-colour marking: WHITE (unvisited), GRAY (in current DFS path / recursion stack), BLACK (fully processed). If DFS reaches a GRAY node → back edge → cycle detected. O(V+E). Alternative: Kahn's topological sort — if topological sort doesn't process all V nodes, a cycle exists (nodes in the cycle have no in-degree 0 state to reach).</div></div>
+<div class="iq"><div class="q">What is a topological sort and when do you use it?</div><div class="a">A linear ordering of vertices in a DAG such that for every directed edge (u→v), u comes before v. Exists if and only if the graph is a DAG (no cycles). Use cases: build dependency resolution (compile A before B if A imports B), course scheduling (prerequisites), Kubernetes workflow ordering, any "task A must happen before task B" problem. If a cycle exists, topological sort fails — and that cycle represents a deadlock/circular dependency that must be resolved.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">DSA — Graph algorithms (BFS, DFS, Dijkstra)</span><span class="cp">Combinatorics (counting paths)</span><span class="cp">Distributed Systems (DAG of tasks)</span><span class="cp">System Design (dependency graphs)</span><span class="cp">Consistent Hashing (circular ring)</span></div>`}
+]},
+
+// 05 — Combinatorics
+{tag:"Mathematics",title:"Combinatorics",
+oneliner:"Combinatorics counts structured arrangements — permutations count ordered selections, combinations count unordered selections — and these counting techniques appear directly in algorithm complexity analysis, probability calculations, and NP-hard problem proofs.",
+secs:[
+{l:"Fundamental counting principle",b:`<div class="code">If task A can be done in m ways and task B can be done in n ways:
+  Sequentially (A then B): m × n ways   (multiplication principle)
+  Alternatively (A or B):  m + n ways   (addition principle)
+
+Example:
+  Password: 26 lowercase + 26 uppercase + 10 digits = 62 characters
+  8-character password: 62⁸ ≈ 2.18 × 10¹⁴ possible passwords
+  
+  Cracking at 10⁹ attempts/second: 62⁸ / 10⁹ ≈ 218,000 seconds ≈ 2.5 days
+  12-character: 62¹² ≈ 3 × 10²¹ → 10⁵ years at same rate  ← exponential cliff</div>`},
+{l:"Permutations — ordered selection",b:`<div class="code">Permutation: ordered arrangement of r items from n distinct items
+  P(n, r) = n! / (n-r)!  = n · (n-1) · (n-2) · ... · (n-r+1)
+  
+  All n items:  n! = n · (n-1) · ... · 1
+  
+Example — 5 items from 10:
+  P(10, 5) = 10 × 9 × 8 × 7 × 6 = 30,240
+
+n! grows faster than exponential:
+  10! = 3,628,800
+  20! = 2.4 × 10¹⁸
+  30! ≈ 2.7 × 10³²
+  
+This is why brute-force permutation search (TSP, scheduling) is infeasible:
+  Travelling Salesman with n cities: (n-1)!/2 distinct tours
+  n=20: 60,822,550,204,416,000 tours — impossible to enumerate
+
+Stirling's approximation:
+  n! ≈ √(2πn) · (n/e)ⁿ
+  log(n!) ≈ n·log(n) - n = O(n log n)   ← why comparison sort lower bound is O(n log n)</div>`},
+{l:"Combinations — unordered selection",b:`<div class="code">Combination: unordered selection of r items from n distinct items
+  C(n, r) = "n choose r" = n! / (r! · (n-r)!)  = P(n,r) / r!
+  
+  (divide permutations by r! to eliminate ordering — r items can be arranged r! ways)
+
+Pascal's triangle identity:
+  C(n, r) = C(n-1, r-1) + C(n-1, r)   ← base of dynamic programming
+
+Examples:
+  Poker hand (5 cards from 52): C(52, 5) = 2,598,960
+  Lottery (6 from 49): C(49, 6) = 13,983,816
+  Subsets of n items: 2ⁿ  (each item either included or not → 2 choices per item)
+  
+  Proof: Σ_{r=0}^{n} C(n,r) = 2ⁿ  (sum of all combination counts = all subsets)
+
+In algorithms:
+  Subset enumeration: O(2ⁿ) — one state per subset
+  Choosing k elements from n for brute-force: O(C(n,k)) 
+  DP over subsets (bitmask DP): O(2ⁿ · n) — TSP with DP</div>`},
+{l:"Stars and bars — distributing objects",b:`<div class="code">How many ways to distribute n identical balls into k distinct bins?
+  Answer: C(n + k - 1, k - 1)
+
+Application in CS:
+  How many ways can n requests be distributed to k servers?
+  C(n + k - 1, k - 1) — massive for large n, k
+  
+  How many integer solutions to x₁ + x₂ + ... + xₖ = n where xᵢ ≥ 0?
+  C(n + k - 1, k - 1) — same problem restated
+  
+  Multiset coefficient (choose r items from n types WITH replacement):
+  C(n + r - 1, r)</div>`},
+{l:"Combinatorics in algorithm complexity",b:`<div class="code">Why the comparison sort lower bound is Ω(n log n):
+  n elements can be in n! orderings.
+  Each comparison distinguishes two orderings → gives 1 bit of information.
+  You need at least log₂(n!) comparisons to determine the correct ordering.
+  By Stirling: log₂(n!) ≈ n log₂(n) - n/ln(2) = Ω(n log n)
+  Therefore: ANY comparison-based sort needs Ω(n log n) comparisons. ✓
+
+Why subset-sum is NP: 2ⁿ subsets to check brute-force.
+Why TSP is NP: (n-1)!/2 tours to check brute-force.
+Why k-clique is hard: C(n,k) subsets to check.
+
+Pigeonhole principle (from combinatorics):
+  If n+1 items go into n boxes, at least one box has ≥ 2 items.
+  
+  Applications:
+  Hash table with n slots and n+1 keys → guaranteed collision
+  Birthday problem formalisation
+  Proof that any lossless compression can't compress all inputs
+    (there are 2ⁿ n-bit strings but only 2ⁿ-1 shorter strings)
+  Proof that some sorting networks need Ω(n log n) comparators</div>`},
+{l:"The Binomial theorem connection",b:`<div class="code">(x + y)ⁿ = Σ_{k=0}^{n} C(n,k) · x^k · y^(n-k)
+
+C(n,k) are called binomial coefficients.
+Probability application:
+  P(exactly k successes in n Bernoulli trials with success prob p):
+  P(X = k) = C(n,k) · p^k · (1-p)^(n-k)  ← Binomial distribution
+
+Example — packet loss:
+  n=100 packets, p=0.01 loss rate
+  P(exactly 0 lost) = C(100,0) · 0.01⁰ · 0.99¹⁰⁰ ≈ 0.366
+  P(1 lost)         = C(100,1) · 0.01¹ · 0.99⁹⁹  ≈ 0.370
+  P(≥2 lost)        ≈ 1 - 0.366 - 0.370 = 0.264  (26% chance — not negligible!)</div>`},
+{l:"Mental model",b:`<div class="analogy">Permutations are arranging books on a shelf in order — the order of the books matters, so blue-red-green is different from red-blue-green. Combinations are choosing which books to take on a trip — you don't care about their order in the bag, just which ones you have. The difference: n items chosen 3 at a time has P(n,3) ordered selections but only C(n,3) = P(n,3)/6 unordered ones (since 3! = 6 orderings of 3 items are all the same selection). The pigeonhole principle is the observation that if you have 5 pigeonholes and 6 pigeons, you can't avoid a double-occupancy — a trivial but surprisingly powerful proof technique.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why is the brute-force solution to the Travelling Salesman Problem O(n!)?</div><div class="a">You need to try every permutation of n cities to find the shortest tour. There are (n-1)!/2 distinct tours (fix starting city, permute remaining n-1, divide by 2 for direction). Using Stirling: (n-1)! ≈ ((n-1)/e)^(n-1). This grows faster than any polynomial or exponential — it's super-exponential. For n=20: ~60 quadrillion tours, infeasible to enumerate. Dynamic programming (Held-Karp algorithm) reduces this to O(2ⁿ · n²) — still exponential but tractable for n up to ~25 in practice.</div></div>
+<div class="iq"><div class="q">How does the pigeonhole principle prove that hash collisions are inevitable?</div><div class="a">A hash function maps an arbitrary-size input space (effectively infinite) to a fixed-size output space (e.g. 2³²  = 4 billion slots). Since the input space is larger than the output space, by the pigeonhole principle at least two different inputs must map to the same output — collision is unavoidable. This is why hash functions can only minimise collision probability, not eliminate it. The birthday bound gives us: with √(output_space) inputs, we expect a collision with 50% probability — which for SHA-256 is still astronomically large (2^128).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Big-O (O(2ⁿ), O(n!) complexity classes)</span><span class="cp">Probability (birthday problem)</span><span class="cp">Hash Functions (pigeonhole = collisions)</span><span class="cp">DSA — DP on subsets (bitmask DP)</span><span class="cp">NP-hardness intuition</span></div>`}
+]},
+
+// 06 — Modular Arithmetic
+{tag:"Mathematics",title:"Modular Arithmetic",
+oneliner:"Modular arithmetic performs arithmetic on remainders — a mod m is the remainder when a is divided by m — enabling cyclic structures, wrap-around ID spaces, cryptographic number theory, and efficient hashing.",
+secs:[
+{l:"Definition and notation",b:`<div class="code">a mod m = r   where r is the remainder when a is divided by m
+              0 ≤ r < m
+
+a ≡ b (mod m)  means  m divides (a - b)  — "a is congruent to b mod m"
+  17 ≡ 5 (mod 6)  because  6 divides (17 - 5) = 12  ✓
+  
+Properties (arithmetic in Z/mZ):
+  (a + b) mod m = ((a mod m) + (b mod m)) mod m
+  (a · b) mod m = ((a mod m) · (b mod m)) mod m
+  
+  These allow us to keep numbers bounded during computation:
+  Without: computing 2^1000 mod 7 would require an astronomically large integer
+  With:    we can take mod at each step, keeping numbers small
+
+Visualisation: the number line wraps around a circle of circumference m.
+  10 mod 3:  0 → 1 → 2 → 0 → 1 → 2 → 0 → 1 → 2 → 0 → 1    → answer: 1
+  17 mod 12: think clock — 17 hours after midnight is 5:00 AM</div>`},
+{l:"Modular arithmetic in hashing",b:`<div class="code">Hash table with n buckets:
+  bucket = hash(key) % n
+  
+  This maps any hash value (potentially huge) into [0, n-1].
+  
+  Choosing n as a prime number:
+    If n is prime and the hash function distributes uniformly,
+    keys map to buckets more uniformly than with composite n.
+    Reason: composite n shares factors with certain key patterns → clustering.
+    E.g. n = 16 (2⁴): keys that are multiples of 2 all map to even buckets.
+    n = 17 (prime): no such clustering.
+  
+Polynomial rolling hash (used in Rabin-Karp, Java String.hashCode()):
+  hash("abc") = a·p² + b·p + c (mod M)
+  
+  Java String.hashCode():
+    s[0]·31^(n-1) + s[1]·31^(n-2) + ... + s[n-1]   (mod 2³²)
+    31 chosen: prime, close to 2⁵ = 32 → multiplication can be implemented as
+    (hash << 5) - hash (bit shift instead of multiply — fast)
+    
+Rabin-Karp sliding window hash:
+  hash(s[i..i+k]) = (hash(s[i-1..i+k-1]) - s[i-1]·p^k) · p + s[i+k]  (mod M)
+  Update in O(1): subtract old leftmost char, shift, add new rightmost char
+  Enables O(n) average-case substring search (string matching)</div>`},
+{l:"Modular arithmetic in cryptography",b:`<div class="code">RSA key generation and encryption:
+  Choose large primes p and q
+  n = p · q  (public modulus, ~2048 bits)
+  φ(n) = (p-1)(q-1)  (Euler's totient — count of numbers coprime to n)
+  Choose e coprime to φ(n)  (public exponent, typically 65537)
+  d = e⁻¹ mod φ(n)          (private exponent — modular inverse)
+  
+  Encrypt: C = M^e mod n
+  Decrypt: M = C^d mod n   (because (M^e)^d ≡ M (mod n) by Euler's theorem)
+  
+  Security: factoring n = p·q is computationally hard (no known poly-time algorithm)
+            without knowing p,q you can't compute φ(n) → can't compute d
+
+Diffie-Hellman key exchange:
+  Public: prime p, generator g
+  Alice:  chooses private a, sends g^a mod p
+  Bob:    chooses private b, sends g^b mod p
+  Shared secret: (g^b)^a mod p = g^(ab) mod p = (g^a)^b mod p
+  Eve sees: g^a mod p, g^b mod p — computing g^(ab) from these is the
+            Discrete Logarithm Problem — computationally hard
+
+Fermat's little theorem (crucial for fast modular exponentiation):
+  If p is prime: a^(p-1) ≡ 1 (mod p)
+  → a^(p-2) ≡ a⁻¹ (mod p)  — modular inverse via exponentiation</div>`},
+{l:"Fast modular exponentiation — repeated squaring",b:`<div class="code">Computing a^n mod m naively: n-1 multiplications → O(n) → infeasible for n = 2^2048
+
+Repeated squaring: O(log n) multiplications
+
+Algorithm:
+  result = 1
+  base = a mod m
+  while n > 0:
+    if n is odd:
+      result = (result * base) mod m
+    base = (base * base) mod m
+    n = n >> 1  // divide by 2
+  return result
+
+Example: 3^13 mod 7
+  13 in binary: 1101
+  3^1 mod 7 = 3  (bit 0 = 1 → multiply result: result = 3)
+  3^2 mod 7 = 2  (bit 1 = 0 → skip)
+  3^4 mod 7 = 4  (bit 2 = 1 → multiply result: result = 3·4 mod 7 = 5)
+  3^8 mod 7 = 2  (bit 3 = 1 → multiply result: result = 5·2 mod 7 = 3)
+  Answer: 3^13 mod 7 = 3  ✓  (verify: 3^13 = 1594323, 1594323 mod 7 = 3)
+
+RSA encryption with e=65537:  log₂(65537) ≈ 16 squarings only — very fast!</div>`},
+{l:"Chinese Remainder Theorem",b:`<div class="code">CRT: if m₁, m₂, ..., mₖ are pairwise coprime (gcd(mᵢ, mⱼ) = 1 for i ≠ j):
+  x ≡ a₁ (mod m₁)
+  x ≡ a₂ (mod m₂)
+  ...
+  x ≡ aₖ (mod mₖ)
+  
+  Has a unique solution mod M where M = m₁ · m₂ · ... · mₖ
+
+Applications:
+  RSA decryption optimisation: compute d mod (p-1) and d mod (q-1) separately,
+  then combine with CRT → 4x speedup over computing d mod n directly.
+  
+  Distributed ID generation: assign each server a unique residue class.
+  Server 0: generates IDs 0, 3, 6, 9, ... (ID mod 3 = 0)
+  Server 1: generates IDs 1, 4, 7, 10,... (ID mod 3 = 1)
+  Server 2: generates IDs 2, 5, 8, 11,... (ID mod 3 = 2)
+  No coordination needed — IDs are guaranteed unique across servers.</div>`},
+{l:"Modular arithmetic in ID generation",b:`<div class="code">Snowflake ID (Twitter):
+  64-bit integer:
+  [1 bit sign][41 bits timestamp ms][10 bits machine ID][12 bits sequence]
+  
+  sequence = (sequence + 1) mod 4096   ← modular arithmetic!
+  When sequence wraps to 0 in the same millisecond → wait for next ms.
+  
+  This gives: 4096 IDs per millisecond per machine × 1024 machines
+  = 4,194,304 IDs/ms globally = 4 billion IDs/second.
+  
+Consistent hashing ring:
+  Map servers and keys to [0, 2³²) using hash(id) mod 2³²
+  The "mod 2³²" is modular arithmetic defining the ring topology.
+  
+LCG (Linear Congruential Generator) — simple pseudorandom numbers:
+  x_{n+1} = (a · x_n + c) mod m
+  With good constants (Hull-Dobell theorem), generates full-period sequence.
+  Used in Java's java.util.Random (m = 2⁴⁸, NOT cryptographically secure).</div>`},
+{l:"Mental model",b:`<div class="analogy">Modular arithmetic is clock arithmetic. Hours go 1-12 and then wrap back to 1. 15:00 on a 12-hour clock is 3:00 — 15 mod 12 = 3. Days of the week cycle mod 7. The number line is wound into a circle of circumference m. Addition moves you clockwise; multiplication is repeated clockwise movement. The key insight: because of the wrap-around, large numbers become small and manageable — a 2048-bit RSA computation never actually operates on a number larger than n=p·q, because we take mod n at every step. This is what makes RSA computationally feasible despite astronomically large exponents.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why do hash table implementations often choose a prime number for the table size?</div><div class="a">When the hash table size m is composite, keys that are multiples of m's factors tend to cluster into a subset of buckets. E.g. m=16 (= 2⁴): any key that's even hashes to an even bucket; odd keys to odd buckets — automatic 50% imbalance if keys have a bias toward even numbers. A prime m shares no factors with typical key values, so hash(key) mod m distributes more uniformly. Secondary: prime m interacts better with the probing sequences in linear/quadratic probing, reducing secondary clustering. Java's HashMap uses powers of 2 (for fast bitwise AND instead of modulo) but combats clustering with a better mixing hash function.</div></div>
+<div class="iq"><div class="q">How does RSA use modular arithmetic to encrypt and decrypt?</div><div class="a">RSA arithmetic lives in Z/nZ where n = p·q. Encryption: C = M^e mod n. Decryption: M = C^d mod n = (M^e)^d mod n = M^(ed) mod n. By Euler's theorem: M^(φ(n)) ≡ 1 (mod n) when gcd(M,n)=1. Since ed ≡ 1 (mod φ(n)), we have ed = 1 + k·φ(n) for some k, so M^(ed) = M^(1 + k·φ(n)) = M · (M^φ(n))^k ≡ M · 1^k = M (mod n). Security: without p and q you can't compute φ(n) = (p-1)(q-1), so you can't find d from e — factoring n is computationally hard.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Hash Functions (mod in table indexing)</span><span class="cp">Cryptography — RSA, Diffie-Hellman</span><span class="cp">Distributed ID generation (Snowflake)</span><span class="cp">Consistent Hashing (ring is mod 2³²)</span><span class="cp">Logarithms (discrete log problem)</span></div>`}
+]},
+];
+
+function show(idx,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');render(idx);
+}
+function render(idx){
+  const t=T[idx];
+  let h=`<span class="topic-tag">${t.tag}</span><div class="topic-title">${t.title}</div><div class="topic-oneliner">${t.oneliner}</div>`;
+  for(const s of t.secs)h+=`<div class="sec"><div class="sec-label">${s.l}</div><div class="body">${s.b}</div></div>`;
+  const c=document.getElementById('content');
+  c.innerHTML=h;c.scrollTop=0;
+}
+render(0);
+</script>

@@ -1,0 +1,596 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+.shell{display:flex;height:700px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:224px;min-width:224px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 8px;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 10px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin-bottom:2px;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-secondary)}
+.nav-num{font-size:11px;color:var(--color-text-tertiary);min-width:16px}
+.nav-item.active .nav-num{color:var(--color-text-secondary)}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic-tag{display:inline-block;font-size:11px;font-weight:500;color:var(--color-text-info);background:var(--color-background-info);padding:3px 10px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.topic-title{font-size:22px;font-weight:500;margin-bottom:8px}
+.topic-oneliner{font-size:15px;color:var(--color-text-secondary);line-height:1.6;border-left:2px solid var(--color-border-secondary);padding-left:12px;margin-bottom:24px}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.sec{margin-bottom:28px}
+.body{font-size:14px;line-height:1.75}
+.body p{margin-bottom:10px}
+.body p:last-child{margin-bottom:0}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.steps li::before{content:counter(s);min-width:22px;height:22px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-top:2px;flex-shrink:0}
+.card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px;background:var(--color-background-primary)}
+.card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.card-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;margin-top:6px;white-space:pre}
+.analogy{background:var(--color-background-secondary);border-left:2px solid var(--color-border-info);border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:12px 16px;font-size:14px;color:var(--color-text-secondary);line-height:1.7;font-style:italic}
+.iq{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:6px}
+.iq .q{font-size:13px;font-weight:500;margin-bottom:4px}
+.iq .a{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.bad{display:flex;gap:10px;margin-bottom:8px;font-size:13px;line-height:1.6}
+.bad .ic{color:var(--color-text-danger);font-size:15px;margin-top:1px;flex-shrink:0}
+.connects{display:flex;flex-wrap:wrap;gap:6px}
+.cp{font-size:12px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.pill{font-size:12px;padding:4px 10px;border-radius:20px;border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);background:var(--color-background-secondary)}
+.pill.ok{color:var(--color-text-success);background:var(--color-background-success);border-color:var(--color-border-success)}
+.pill.bad2{color:var(--color-text-danger);background:var(--color-background-danger);border-color:var(--color-border-danger)}
+.pill.info{color:var(--color-text-info);background:var(--color-background-info);border-color:var(--color-border-info)}
+table.ct{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.ct th{text-align:left;font-weight:500;padding:6px 10px;border-bottom:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+table.ct td{padding:6px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5}
+table.ct tr:last-child td{border-bottom:none}
+</style>
+
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Block 3 — Databases: 10-topic interactive reference covering relational model through CAP theorem</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sidebar-title">Block 3 — Databases</div>
+  <div class="nav-item active" onclick="show(0,this)"><span class="nav-num">01</span>Relational Model</div>
+  <div class="nav-item" onclick="show(1,this)"><span class="nav-num">02</span>Normalization</div>
+  <div class="nav-item" onclick="show(2,this)"><span class="nav-num">03</span>SQL Execution Order</div>
+  <div class="nav-item" onclick="show(3,this)"><span class="nav-num">04</span>Query Optimisation</div>
+  <div class="nav-item" onclick="show(4,this)"><span class="nav-num">05</span>ACID Properties</div>
+  <div class="nav-item" onclick="show(5,this)"><span class="nav-num">06</span>Isolation Levels</div>
+  <div class="nav-item" onclick="show(6,this)"><span class="nav-num">07</span>B-tree vs LSM Tree</div>
+  <div class="nav-item" onclick="show(7,this)"><span class="nav-num">08</span>WAL</div>
+  <div class="nav-item" onclick="show(8,this)"><span class="nav-num">09</span>MVCC</div>
+  <div class="nav-item" onclick="show(9,this)"><span class="nav-num">10</span>CAP & BASE</div>
+</nav>
+<main class="content" id="content"></main>
+</div>
+
+<script>
+const T=[
+
+// 01 — Relational Model
+{tag:"Foundations",title:"Relational Model",
+oneliner:"The relational model organises data as a set of relations (tables) where each relation is a set of tuples (rows) with typed attributes (columns), governed by integrity constraints.",
+secs:[
+{l:"Why it exists",b:`<p>Before the relational model (E.F. Codd, 1970), databases were navigational — programs had to traverse pointer-linked records manually. If data layout changed, every program broke. Codd's insight: separate the logical description of data from its physical storage. Programs query relations mathematically; the DB engine figures out how to fetch them.</p>`},
+{l:"Core vocabulary",b:`<div class="code">Relation   = a table (mathematically: a set of tuples, no duplicates, no order)
+Tuple      = one row in the table (an ordered list of attribute values)
+Attribute  = a column with a name and a domain (allowed data types)
+Domain     = the set of valid values for an attribute (INT, VARCHAR(255), etc.)
+Schema     = the structure definition: relation name + attribute names + domains
+Instance   = the actual data (tuples) at a point in time
+
+Example:
+  Relation: Employee
+  Schema:   Employee(emp_id INT, name VARCHAR, dept_id INT, salary DECIMAL)
+  Tuple:    (1, 'Somesh', 3, 85000.00)</div>`},
+{l:"Keys",b:`<div class="card"><div class="card-name">Superkey</div><div class="card-desc">Any set of attributes that uniquely identifies a tuple. {emp_id}, {emp_id, name} — both are superkeys.</div></div>
+<div class="card"><div class="card-name">Candidate key</div><div class="card-desc">Minimal superkey — no proper subset is also a superkey. {emp_id} is a candidate key; {emp_id, name} is not (removing name still gives uniqueness).</div></div>
+<div class="card"><div class="card-name">Primary key</div><div class="card-desc">The chosen candidate key. Must be NOT NULL. Uniquely identifies each tuple. Creates a clustered B-tree index in InnoDB (MySQL).</div></div>
+<div class="card"><div class="card-name">Foreign key</div><div class="card-desc">An attribute (or set) in one relation that references the primary key of another. Enforces referential integrity: you can't have an Employee.dept_id that doesn't exist in Department.dept_id. ON DELETE CASCADE / SET NULL / RESTRICT controls what happens when the referenced row is deleted.</div></div>`},
+{l:"Relational algebra — the theoretical engine",b:`<div class="code">SELECT    → σ (sigma)    — filter tuples: σ(salary > 50000)(Employee)
+PROJECT   → π (pi)       — keep columns: π(name, salary)(Employee)
+JOIN      → ⋈            — combine relations on condition
+UNION     → ∪            — combine tuples from two compatible relations
+DIFFERENCE→ −            — tuples in R but not S
+PRODUCT   → ×            — Cartesian product (every combo of tuples)
+
+SQL is relational algebra with bags (duplicates allowed) not sets.
+That is why you need DISTINCT — SQL tables can have duplicate rows.</div>`},
+{l:"Referential integrity in practice",b:`<div class="code">CREATE TABLE Department (
+  dept_id   INT PRIMARY KEY,
+  dept_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Employee (
+  emp_id  INT PRIMARY KEY,
+  name    VARCHAR(100),
+  dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES Department(dept_id)
+    ON DELETE CASCADE   -- delete employee if dept deleted
+    ON UPDATE CASCADE   -- update emp.dept_id if dept_id changes
+);</div>`},
+{l:"Mental model",b:`<div class="analogy">A relation is a perfectly organised spreadsheet where every column has a strict type, no two rows are identical, and the column order doesn't matter — only the column names do. Foreign keys are the contracts between spreadsheets: "this cell must reference a value that exists in that other spreadsheet's key column." The query engine is the smart assistant who can cross-reference any combination of spreadsheets without you specifying how.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is the difference between a primary key and a unique constraint?</div><div class="a">Both enforce uniqueness. Primary key additionally prohibits NULL — you must always have a value. A table can have one primary key but multiple unique constraints. In InnoDB, the primary key is the physical clustering key (rows stored in PK order) — choosing a bad PK (UUID vs auto-increment) has real I/O implications.</div></div>
+<div class="iq"><div class="q">What is referential integrity and what does ON DELETE CASCADE do?</div><div class="a">Referential integrity: every FK value must exist as a PK in the referenced table. ON DELETE CASCADE: when a parent row is deleted, all child rows referencing it are automatically deleted. Dangerous in production without careful thought — one DELETE can cascade through millions of rows. RESTRICT (default) prevents deletion if children exist.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Normalization (building on keys)</span><span class="cp">SQL Execution Order</span><span class="cp">B-tree index (PK implementation)</span><span class="cp">ACID (referential integrity = consistency)</span></div>`}
+]},
+
+// 02 — Normalization
+{tag:"Foundations",title:"Normalization",
+oneliner:"Normalization decomposes relations into smaller ones to eliminate redundancy and update anomalies — each normal form removes a specific class of dependency violation.",
+secs:[
+{l:"Why it exists — anomalies",b:`<p>Without normalization, the same fact is stored in multiple places. When data changes, you update some copies but miss others — inconsistency. Three anomaly types drive normalization:</p>
+<div class="code">Un-normalized table: Order(order_id, customer_name, customer_email, product, price)
+
+Insert anomaly:  Can't record a customer without an order
+Update anomaly:  Customer changes email → must update every order row
+Delete anomaly:  Delete the last order → lose the customer's data entirely</div>`},
+{l:"1NF — First Normal Form",b:`<div class="card"><div class="card-name">Rule: atomic attributes + no repeating groups</div><div class="card-desc">Every column must hold a single indivisible value. No arrays, sets, or comma-separated lists in a cell. Each row must be unique (have a primary key).</div></div>
+<div class="code">VIOLATES 1NF:
+Order(order_id, customer, products)
+(1, 'Somesh', 'phone,charger,case')  ← comma list in one column
+
+SATISFIES 1NF:
+OrderItem(order_id, item_num, customer, product)
+(1, 1, 'Somesh', 'phone')
+(1, 2, 'Somesh', 'charger')  ← atomic, PK = (order_id, item_num)</div>`},
+{l:"2NF — Second Normal Form",b:`<div class="card"><div class="card-name">Rule: 1NF + no partial dependencies (applies only when PK is composite)</div><div class="card-desc">Every non-key attribute must depend on the WHOLE primary key, not just part of it.</div></div>
+<div class="code">Violates 2NF (composite PK = order_id + product_id):
+OrderItem(order_id, product_id, product_name, qty, unit_price)
+         ↑ PK part 1  ↑ PK part 2  ↑ depends on product_id ONLY — partial!
+
+product_name depends only on product_id, not on (order_id, product_id) together.
+If product name changes → update many OrderItem rows.
+
+Fix: decompose
+OrderItem(order_id, product_id, qty, unit_price)  ← full PK dependency
+Product(product_id, product_name)                  ← product_name on its own PK</div>`},
+{l:"3NF — Third Normal Form",b:`<div class="card"><div class="card-name">Rule: 2NF + no transitive dependencies</div><div class="card-desc">Non-key attributes must not depend on other non-key attributes. No A → B → C where A is PK, B is non-key, C depends on B (not A directly).</div></div>
+<div class="code">Violates 3NF:
+Employee(emp_id, dept_id, dept_name)
+         ↑ PK                ↑ depends on dept_id (non-key), not emp_id directly
+Transitive: emp_id → dept_id → dept_name
+
+Update anomaly: dept renames → update every employee row.
+
+Fix: decompose
+Employee(emp_id, dept_id)
+Department(dept_id, dept_name)  ← dept_name on its own PK</div>`},
+{l:"BCNF — Boyce-Codd Normal Form",b:`<div class="card"><div class="card-name">Rule: for every functional dependency X → Y, X must be a superkey</div><div class="card-desc">Stricter than 3NF. Handles edge cases where a relation has multiple overlapping candidate keys. BCNF implies 3NF but not vice versa. Most practical schemas aim for 3NF; BCNF is theoretically cleaner but can prevent lossless decomposition in rare cases.</div></div>
+<div class="code">Table: CourseTeacher(student, course, teacher)
+FDs: (student, course) → teacher
+     teacher → course           ← teacher determines course (teacher is not superkey)
+
+(student, course) and (student, teacher) are both candidate keys.
+teacher → course violates BCNF because teacher is not a superkey.
+
+Fix: decompose into:
+TeacherCourse(teacher, course)
+StudentTeacher(student, teacher)</div>`},
+{l:"Denormalization — when to break the rules",b:`<p>Normalization optimises for write correctness. Read-heavy analytical workloads pay the cost of many joins. Strategic denormalization: store the department name on the employee row to avoid a join in every query. Trade-off: write anomaly risk in exchange for read speed. Data warehouses (OLAP) use intentionally denormalized star/snowflake schemas.</p>`},
+{l:"Mental model",b:`<div class="analogy">1NF: each drawer in a filing cabinet holds exactly one document — no folders-within-folders, no stapled stacks. 2NF: the drawer label fully describes what's inside — not "drawer 3A has the company logo" when drawer 3A's primary purpose is customer invoices. 3NF: each fact is stored in exactly one place — the customer's address lives in the customer file, not photocopied into every invoice.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Explain 3NF with an example. Why does it matter?</div><div class="a">Employee(emp_id, dept_id, dept_name): dept_name depends on dept_id, not emp_id. Updating the department name requires touching every employee row — update anomaly. Fix: separate Department table. 3NF matters because update anomalies create inconsistent data at write time, which is far harder to fix than adding a join at read time.</div></div>
+<div class="iq"><div class="q">When would you intentionally denormalize?</div><div class="a">Read-heavy OLAP queries where joins dominate query time. Also: in NoSQL (Cassandra, DynamoDB) where joins don't exist — you denormalize by design to match your access patterns. The trade-off is explicit: accept write duplication to remove read-time joins.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Relational Model (FKs enable decomposition)</span><span class="cp">Query Optimisation (joins needed post-normalization)</span><span class="cp">CAP/BASE (NoSQL denormalizes by design)</span><span class="cp">System Design (star schema, data warehouse)</span></div>`}
+]},
+
+// 03 — SQL Execution Order
+{tag:"Query Processing",title:"SQL Execution Order",
+oneliner:"SQL is declarative — you state what you want, not how to get it. The engine logically processes clauses in a fixed order that differs from the written order: FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → DISTINCT → ORDER BY → LIMIT.",
+secs:[
+{l:"Why this matters",b:`<p>Writing SQL without knowing execution order leads to classic bugs: using a SELECT alias in a WHERE clause (fails — alias doesn't exist yet), filtering on an aggregate in WHERE instead of HAVING, misunderstanding which rows GROUP BY operates on. Knowing the order lets you reason about what's available at each step.</p>`},
+{l:"Step-by-step execution",b:`<ol class="steps">
+<li><strong>FROM + JOIN</strong> — build the working set. Joins are applied here (cross product then filter on join condition). All subsequent steps operate on this result set.</li>
+<li><strong>WHERE</strong> — filter individual rows. Aggregate functions (SUM, COUNT) are NOT yet available — they haven't been computed. Column aliases from SELECT don't exist yet.</li>
+<li><strong>GROUP BY</strong> — collapse rows into groups. Each group becomes one row in subsequent steps. Non-grouped, non-aggregated columns are now meaningless (illegal in standard SQL, though MySQL historically allowed it).</li>
+<li><strong>HAVING</strong> — filter groups (after aggregation). This is the only place to filter on aggregate values: HAVING COUNT(*) > 5.</li>
+<li><strong>SELECT</strong> — compute the output columns. Aliases are defined here. Expressions and aggregate functions are evaluated now.</li>
+<li><strong>DISTINCT</strong> — remove duplicate rows from SELECT output.</li>
+<li><strong>ORDER BY</strong> — sort the result. Can use SELECT aliases because SELECT ran before ORDER BY.</li>
+<li><strong>LIMIT / OFFSET</strong> — return a page of results. Happens last — full sort must complete first (unless index enables early termination).</li>
+</ol>`},
+{l:"Practical examples of order-dependent bugs",b:`<div class="code">-- BUG: alias used in WHERE (alias doesn't exist at WHERE time)
+SELECT salary * 1.1 AS new_salary
+FROM Employee
+WHERE new_salary > 100000;   -- ERROR: column "new_salary" does not exist
+
+-- FIX: repeat the expression, or use a subquery
+WHERE salary * 1.1 > 100000;
+
+-- BUG: aggregate in WHERE
+SELECT dept_id, COUNT(*) 
+FROM Employee
+WHERE COUNT(*) > 5          -- ERROR: aggregate not allowed in WHERE
+GROUP BY dept_id;
+
+-- FIX: move to HAVING
+HAVING COUNT(*) > 5;
+
+-- WORKS: alias in ORDER BY (SELECT runs before ORDER BY)
+SELECT salary * 1.1 AS new_salary
+FROM Employee
+ORDER BY new_salary DESC;   -- OK!</div>`},
+{l:"Window functions — a special case",b:`<p>Window functions (ROW_NUMBER, RANK, LAG, LEAD, SUM OVER PARTITION) execute after WHERE, GROUP BY, and HAVING but before ORDER BY. They see the filtered, grouped result set and can compute running totals, rankings, and comparisons between rows without collapsing them into groups.</p>
+<div class="code">SELECT 
+    name,
+    dept_id,
+    salary,
+    RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS rank_in_dept
+FROM Employee
+WHERE salary > 40000;
+-- RANK() runs after WHERE filters, before ORDER BY sorts final output</div>`},
+{l:"Mental model",b:`<div class="analogy">SQL is like writing a recipe in the order you want to serve the dish, but the kitchen prepares it differently. You write "serve 10 guests the highest-paid per department" — the kitchen first gathers all ingredients (FROM), washes them (WHERE), groups by dish type (GROUP BY), throws out bad batches (HAVING), plates them (SELECT), and finally brings only 10 plates to the table (LIMIT). The kitchen's order, not your serving description, is what matters for debugging.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why can't you use a SELECT alias in a WHERE clause?</div><div class="a">WHERE executes before SELECT in the logical processing order. The alias is defined during SELECT — it simply doesn't exist yet when WHERE runs. You must repeat the expression, use a subquery, or use a CTE. Note: some databases (BigQuery, MySQL loosely) have extensions that allow alias in HAVING — but this is non-standard and unreliable.</div></div>
+<div class="iq"><div class="q">What is the difference between WHERE and HAVING?</div><div class="a">WHERE filters individual rows before grouping — operates on raw table data. HAVING filters groups after GROUP BY — is the only place you can filter on aggregate results. You can use both in one query: WHERE narrows the rows fed into groups; HAVING narrows the groups kept in output.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Query Optimisation (planner reorders this)</span><span class="cp">Indexes (WHERE/JOIN use them)</span><span class="cp">MVCC (which snapshot WHERE sees)</span></div>`}
+]},
+
+// 04 — Query Optimisation
+{tag:"Query Processing",title:"Query Optimisation",
+oneliner:"The query optimiser transforms a declarative SQL query into an efficient physical execution plan by evaluating multiple equivalent plans and choosing the one with the lowest estimated cost.",
+secs:[
+{l:"The pipeline",b:`<ol class="steps">
+<li><strong>Parser</strong> — SQL text → parse tree (checks syntax)</li>
+<li><strong>Binder/Analyser</strong> — resolves table/column names, checks semantics, type-checks</li>
+<li><strong>Logical planner</strong> — converts to relational algebra tree; applies logical rewrites (push predicates down, eliminate redundant subqueries)</li>
+<li><strong>Cost-based optimiser (CBO)</strong> — enumerates equivalent physical plans using statistics (table row counts, column cardinality, histogram of values); assigns each a cost (I/O + CPU); picks minimum cost plan</li>
+<li><strong>Physical planner</strong> — selects algorithms: hash join vs nested loop vs merge join; index scan vs sequential scan</li>
+<li><strong>Executor</strong> — runs the plan, often as a volcano/iterator model (pull-based) or vectorised execution (modern)</li>
+</ol>`},
+{l:"EXPLAIN — reading a query plan",b:`<div class="code">-- PostgreSQL
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 42;
+
+Seq Scan on orders  (cost=0.00..1845.00 rows=12 width=64)
+                        ↑ estimated startup ↑ total  ↑ rows ↑ bytes/row
+  Filter: (customer_id = 42)
+Planning Time: 0.4 ms
+Execution Time: 14.3 ms
+
+-- After adding index ON orders(customer_id):
+Index Scan using idx_orders_customer on orders
+  (cost=0.43..16.47 rows=12 width=64)
+  Index Cond: (customer_id = 42)
+Execution Time: 0.2 ms  ← 70x faster
+
+Key fields to check:
+  Seq Scan on large table → missing index
+  Hash Join with large outer → memory spill risk (work_mem)
+  cost ≠ actual rows by 10x+ → stale statistics → run ANALYZE</div>`},
+{l:"Join algorithms",b:`<div class="card"><div class="card-name">Nested Loop Join</div><div class="card-desc">For each row in outer table, scan inner table for matches. O(n×m). Only good when outer is small or inner has an index. Default for small tables.</div></div>
+<div class="card"><div class="card-name">Hash Join</div><div class="card-desc">Build phase: load smaller table into a hash map (key = join column). Probe phase: stream larger table, probe hash map. O(n+m). Excellent for large equi-joins. Requires memory (work_mem in Postgres). If hash table exceeds memory → spills to disk (Grace hash join) → much slower.</div></div>
+<div class="card"><div class="card-name">Merge Join (Sort-Merge)</div><div class="card-desc">Both inputs must be sorted on join key. Merge like merge-sort. O(n log n + m log m). Best when both sides are already sorted (index scan provides sorted output). The only join that works efficiently for range join conditions.</div></div>`},
+{l:"Index usage — when the planner uses one",b:`<div class="code">USES index:
+  WHERE indexed_col = value           ← equality (B-tree, hash)
+  WHERE indexed_col BETWEEN a AND b   ← range (B-tree)
+  ORDER BY indexed_col LIMIT 10       ← index provides sort order
+  JOIN ON t1.id = t2.foreign_key_id   ← FK usually indexed
+
+IGNORES index (full table scan instead):
+  WHERE LOWER(name) = 'somesh'        ← function on column breaks index
+  WHERE name LIKE '%kannan'           ← leading wildcard
+  WHERE indexed_col != value          ← negation usually not selective
+  WHERE indexed_col + 1 = 5          ← arithmetic on column
+  small table → sequential scan cheaper than random index I/O</div>`},
+{l:"Statistics and cardinality estimation",b:`<p>The CBO estimates plan cost using statistics: n_distinct (number of unique values in a column), histogram (distribution of values), table row count. If statistics are stale (table grew 10x since last ANALYZE), estimates are wrong → bad plan chosen. Always run ANALYZE after large data loads. pg_statistic in Postgres, information_schema.statistics in MySQL.</p>`},
+{l:"Mental model",b:`<div class="analogy">The query optimiser is a GPS planning a route. You say "get me from A to B" (the SQL). It knows the road network (schema + indexes), traffic data (statistics on row counts and distributions), and the cost of each road type (index scan = highway, seq scan = dirt road). It tries many routes and picks the cheapest estimated one — but if the traffic data is wrong (stale stats), it might route you through a traffic jam.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">A query is slow. Walk me through how you'd diagnose it.</div><div class="a">EXPLAIN ANALYZE: check for Seq Scan on large tables (→ missing index), large row estimate mismatches (→ run ANALYZE), hash join spilling to disk (→ increase work_mem or add index). Check slow query log. Profile at the index level: is the index being used? Is it selective? Composite index column order correct? LIKE '%prefix' won't use a B-tree index.</div></div>
+<div class="iq"><div class="q">When does PostgreSQL choose a sequential scan over an index scan?</div><div class="a">When the planner estimates that > ~5-10% of rows will be returned. Random I/O for each index entry is more expensive than one sequential pass through the table. The CBO weighs seq_page_cost vs random_page_cost (configurable). For SSDs: lower random_page_cost → more index scans chosen.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">B-tree index (physical structure)</span><span class="cp">MVCC (which rows planner sees)</span><span class="cp">SQL Execution Order (what planner optimises)</span><span class="cp">System Design (read replica, query routing)</span></div>`}
+]},
+
+// 05 — ACID
+{tag:"Transactions",title:"ACID Properties",
+oneliner:"ACID guarantees that database transactions are Atomic, Consistent, Isolated, and Durable — together they ensure correct behaviour even in the presence of crashes, errors, and concurrency.",
+secs:[
+{l:"Why transactions exist",b:`<p>Without transactions: a bank transfer (debit account A, credit account B) could crash halfway — money disappears. A concurrent read during the transfer could see an inconsistent state. A system crash could corrupt partial writes. Transactions bundle multiple operations into a single unit with four guarantees.</p>`},
+{l:"Atomicity — all or nothing",b:`<div class="card"><div class="card-name">Atomicity</div><div class="card-desc">Either every operation in the transaction commits, or none do. Partial execution is impossible from the outside world's perspective.</div></div>
+<div class="code">BEGIN;
+  UPDATE accounts SET balance = balance - 1000 WHERE id = 1;  -- debit
+  UPDATE accounts SET balance = balance + 1000 WHERE id = 2;  -- credit
+COMMIT;   -- both happen
+-- or: ROLLBACK;  -- neither happened (undo log applied)
+
+Implementation: undo log (MySQL InnoDB) / MVCC rollback (Postgres).
+If the system crashes after debit but before credit:
+  Recovery replays WAL, sees uncommitted transaction, applies undo log → rollback.</div>`},
+{l:"Consistency — valid state to valid state",b:`<div class="card"><div class="card-name">Consistency</div><div class="card-desc">A transaction takes the database from one valid state to another valid state, never violating defined integrity constraints (FK, CHECK, NOT NULL, triggers). Consistency is partly the DB's job (enforce constraints), partly the application's job (write correct transactions).</div></div>
+<p>Note: In ACID, Consistency is the weakest property — it's essentially "the other three properties plus your application correctness guarantee consistency." This is why Brewer dropped it from CAP (the C means something different there).</p>`},
+{l:"Isolation — transactions don't interfere",b:`<div class="card"><div class="card-name">Isolation</div><div class="card-desc">Concurrent transactions appear to execute serially. The intermediate state of a transaction is invisible to others. Implementation: MVCC (Postgres), locking (MySQL InnoDB with various lock granularities). Full isolation = Serializable (expensive). Practical isolation = weaker levels with known anomaly trade-offs.</div></div>`},
+{l:"Durability — committed data survives crashes",b:`<div class="card"><div class="card-name">Durability</div><div class="card-desc">Once a transaction commits, it remains committed — even if the system immediately crashes. Implemented via WAL (Write-Ahead Log): the commit record is fsynced to disk before the COMMIT returns to the client. The data page itself can be written later (buffer pool flush). On crash, WAL replay restores all committed transactions.</div></div>
+<div class="code">Durability implementation:
+  1. Transaction modifies buffer pool (in-memory pages)
+  2. WAL record written + fsynced to disk (commit record)
+  3. COMMIT returned to client ← durability guaranteed from here
+  4. Buffer pool eventually writes dirty pages to disk (background)
+  5. Crash before step 4: WAL replay on restart recreates step 4</div>`},
+{l:"How each is implemented",b:`<table class="ct"><tr><th>Property</th><th>Mechanism</th></tr>
+<tr><td>Atomicity</td><td>Undo log (InnoDB) / MVCC version rollback (Postgres)</td></tr>
+<tr><td>Consistency</td><td>Constraint checking (DB) + correct application logic</td></tr>
+<tr><td>Isolation</td><td>MVCC + lock manager (row/table/predicate locks)</td></tr>
+<tr><td>Durability</td><td>WAL (fsync on commit) + crash recovery (redo log)</td></tr></table>`},
+{l:"Mental model",b:`<div class="analogy">A bank ATM transaction. Atomicity: the machine either fully completes the withdrawal (dispenses cash + debits account) or reverses it — never dispenses cash without debiting. Consistency: account can't go negative (check constraint). Isolation: if two people hit ATMs simultaneously on the same account, each sees the correct balance as if they went one after the other. Durability: once the receipt prints (COMMIT), even if the ATM loses power immediately, the bank's records are updated.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How is durability actually implemented? What guarantees it survives a crash?</div><div class="a">WAL (Write-Ahead Log). Before any data page is modified on disk, the change is written to a sequential log file and fsynced. On COMMIT, a commit record is fsynced. If the system crashes: WAL is replayed on startup — all committed changes are redone, uncommitted changes are rolled back using undo information. The log is the source of truth, not the data files.</div></div>
+<div class="iq"><div class="q">Why is "C" in ACID considered the odd one out?</div><div class="a">Atomicity, Isolation, and Durability are pure DB engine guarantees. Consistency is a joint property: the DB enforces constraints, but the application must write correct business logic. A transaction that passes all constraints but moves money from the wrong account is "consistent" by ACID definition but wrong. This is why CAP uses C to mean something entirely different (linearizability).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Isolation Levels (how much isolation)</span><span class="cp">WAL (durability mechanism)</span><span class="cp">MVCC (isolation mechanism)</span><span class="cp">CAP/BASE (what NoSQL relaxes)</span></div>`}
+]},
+
+// 06 — Isolation Levels
+{tag:"Transactions",title:"Isolation Levels",
+oneliner:"Isolation levels are a spectrum from READ UNCOMMITTED to SERIALIZABLE that trade consistency for concurrency — each level prevents specific anomalies while permitting others.",
+secs:[
+{l:"The three anomalies",b:`<div class="card"><div class="card-name">Dirty Read</div><div class="card-desc">Transaction T1 reads data written by uncommitted transaction T2. If T2 rolls back, T1 has read data that never officially existed.</div></div>
+<div class="card"><div class="card-name">Non-Repeatable Read</div><div class="card-desc">T1 reads a row, T2 updates and commits it, T1 re-reads the same row and gets a different value. The same SELECT returns different data within one transaction.</div></div>
+<div class="card"><div class="card-name">Phantom Read</div><div class="card-desc">T1 runs a range query (WHERE age > 30), T2 inserts a new row matching that range and commits, T1 re-runs the same query and gets an extra row. New rows "appear" in the result set.</div></div>`},
+{l:"The four levels",b:`<table class="ct">
+<tr><th>Level</th><th>Dirty Read</th><th>Non-Repeatable</th><th>Phantom</th><th>Implementation</th></tr>
+<tr><td>READ UNCOMMITTED</td><td style="color:var(--color-text-danger)">possible</td><td style="color:var(--color-text-danger)">possible</td><td style="color:var(--color-text-danger)">possible</td><td>No read locks at all</td></tr>
+<tr><td>READ COMMITTED</td><td style="color:var(--color-text-success)">prevented</td><td style="color:var(--color-text-danger)">possible</td><td style="color:var(--color-text-danger)">possible</td><td>Read latest committed snapshot</td></tr>
+<tr><td>REPEATABLE READ</td><td style="color:var(--color-text-success)">prevented</td><td style="color:var(--color-text-success)">prevented</td><td style="color:var(--color-text-danger)">possible*</td><td>Snapshot at txn start (MVCC)</td></tr>
+<tr><td>SERIALIZABLE</td><td style="color:var(--color-text-success)">prevented</td><td style="color:var(--color-text-success)">prevented</td><td style="color:var(--color-text-success)">prevented</td><td>Predicate locks / SSI</td></tr>
+</table>
+<p style="font-size:13px;color:var(--color-text-secondary);margin-top:8px">* Postgres REPEATABLE READ also prevents phantoms via MVCC. MySQL InnoDB uses gap locks at REPEATABLE READ to prevent phantoms.</p>`},
+{l:"READ COMMITTED — default for most DBs",b:`<div class="code">-- Session 1 (T1)                  -- Session 2 (T2)
+BEGIN;                              BEGIN;
+SELECT balance FROM acct WHERE id=1;  -- reads 1000
+                                    UPDATE acct SET balance=500 WHERE id=1;
+                                    COMMIT;
+SELECT balance FROM acct WHERE id=1;  -- reads 500! Different value.
+COMMIT;
+-- Non-repeatable read: same query, different result in one transaction.
+-- PostgreSQL default. Oracle default. SQL Server default.</div>`},
+{l:"REPEATABLE READ — MySQL InnoDB default",b:`<div class="code">-- T1 takes a snapshot at BEGIN time. All reads see this snapshot.
+-- Session 1 (T1)                  -- Session 2 (T2)
+BEGIN;                              BEGIN;
+SELECT balance FROM acct WHERE id=1;  -- reads 1000
+                                    UPDATE acct SET balance=500;
+                                    INSERT INTO acct(id,balance) VALUES(99,200);
+                                    COMMIT;
+SELECT balance FROM acct WHERE id=1;  -- still reads 1000 (MVCC snapshot)
+SELECT * FROM acct WHERE balance>0;   -- MySQL: reads original snapshot (no phantom)
+COMMIT;</div>`},
+{l:"SERIALIZABLE — strongest guarantee",b:`<p>Transactions appear to execute one at a time in some serial order. Implemented two ways:</p>
+<div class="card"><div class="card-name">Two-Phase Locking (2PL)</div><div class="card-desc">Acquire all locks before releasing any. Growing phase (lock), shrinking phase (unlock). Predicate locks for range queries prevent phantoms. Deadlock-prone. High contention under load.</div></div>
+<div class="card"><div class="card-name">Serializable Snapshot Isolation (SSI)</div><div class="card-desc">Postgres 9.1+ uses SSI. Optimistic: let transactions run at snapshot isolation, track dependencies, detect serialisation anomalies, abort the minimum set. Much better concurrency than 2PL with same guarantees.</div></div>`},
+{l:"Write skew — an anomaly REPEATABLE READ doesn't catch",b:`<div class="code">-- Constraint: at least one doctor on call at all times.
+-- Two doctors (Alice, Bob) simultaneously decide to go off-call.
+-- Both read: 2 doctors on call (OK to go off)
+-- Alice updates: doctors_on_call -= 1 → 1
+-- Bob updates:   doctors_on_call -= 1 → 0  (violation!)
+-- Both COMMIT. Constraint violated even with REPEATABLE READ.
+-- Fix: SERIALIZABLE (SSI detects the read-write cycle) or SELECT FOR UPDATE.</div>`},
+{l:"Mental model",b:`<div class="analogy">Isolation levels are like reading a live document. READ UNCOMMITTED: you see every draft the other person is typing, even mid-sentence. READ COMMITTED: you only see sentences they've finished and saved. REPEATABLE READ: you got a PDF snapshot of the document when you sat down — it doesn't change even if they keep editing. SERIALIZABLE: you've locked the document — nobody else can change it while you're reading (or the DB detects conflicts and asks one of you to try again).</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What isolation level does PostgreSQL use by default? What anomalies does it prevent?</div><div class="a">READ COMMITTED. Prevents dirty reads (you only see committed data). Allows non-repeatable reads (same row read twice may return different values if another transaction committed between reads) and phantom reads (new rows can appear). For financial transactions requiring consistency within a transaction: use REPEATABLE READ or SERIALIZABLE.</div></div>
+<div class="iq"><div class="q">What is write skew and which isolation level prevents it?</div><div class="a">Two transactions each read a shared value, make decisions based on it, and write to different rows — both writes are individually valid but together violate a constraint. Not caught by REPEATABLE READ (each sees consistent snapshot independently). Only SERIALIZABLE (via SSI or 2PL with predicate locks) detects the dependency cycle and prevents it.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">ACID (isolation property)</span><span class="cp">MVCC (implements snapshot isolation)</span><span class="cp">Deadlock (2PL causes)</span><span class="cp">Distributed isolation (distributed transactions)</span></div>`}
+]},
+
+// 07 — B-tree vs LSM
+{tag:"Storage Engines",title:"B-tree vs LSM Tree",
+oneliner:"B-trees optimise for read performance (O(log n) lookups, good for point reads) while LSM trees optimise for write throughput (sequential writes, with background compaction trading read amplification for write speed).",
+secs:[
+{l:"The fundamental tension",b:`<p>Random writes to disk are 100-1000x slower than sequential writes (true for HDD; still significant for SSD due to erase cycles). B-trees update data in-place — writes touch scattered disk locations. LSM trees buffer all writes sequentially in memory, flushing to sorted immutable files — maximising disk write throughput at the cost of more complex reads.</p>`},
+{l:"B-tree — how it works",b:`<div class="code">B-tree node (page, typically 4KB-16KB):
+┌────────────────────────────────────────┐
+│ [key1|ptr] [key2|ptr] ... [keyN|ptr]  │  ← internal node
+└────────────────────────────────────────┘
+         ↓              ↓
+  [leaf page]     [leaf page]
+  actual rows     actual rows (clustered index in InnoDB)
+
+Properties:
+  Height: typically 3-4 levels for millions of rows (branching factor ~100-1000)
+  Read: O(log n) — traverse 3-4 pages → 3-4 I/Os
+  Write (point update): find page (O(log n)) → modify in-place → write dirty page
+  
+Problem: random write I/O on update
+  UPDATEing 1 row touches potentially 4 different disk pages (internal + leaf)
+  Each at a different disk location → random I/O → slow on HDD, erase amplification on SSD</div>`},
+{l:"LSM tree — how it works",b:`<ol class="steps">
+<li><strong>MemTable (L0)</strong> — writes go to an in-memory sorted structure (red-black tree or skip list). Also written to WAL for durability. Lightning fast (RAM write).</li>
+<li><strong>Flush (L0 → L1)</strong> — when MemTable reaches size threshold, it's flushed to disk as an immutable SSTable (Sorted String Table). Sequential write = fast.</li>
+<li><strong>SSTables</strong> — each is a sorted, immutable file with a Bloom filter (fast "key doesn't exist" check) and a sparse index (find key's approximate position fast).</li>
+<li><strong>Compaction</strong> — background merge of multiple SSTables (like merge-sort). Removes deleted/overwritten keys, reclaims space, reduces the number of files to search on read.</li>
+<li><strong>Read</strong> — check MemTable → search L0 SSTables → L1 → L2 → … Stop when key found. Each level may need 1+ file reads → read amplification.</li>
+</ol>
+<div class="code">Write amplification: 1 user write → 1 WAL write + many compaction rewrites
+Read amplification:  1 user read → check multiple SSTables across levels
+Space amplification: deleted/old versions exist until compacted</div>`},
+{l:"Compaction strategies",b:`<div class="card"><div class="card-name">Size-tiered (Cassandra default)</div><div class="card-desc">Merge SSTables of similar size. Good write throughput. High space amplification — multiple versions coexist longer. Read can scan many SSTables.</div></div>
+<div class="card"><div class="card-name">Leveled (RocksDB, LevelDB default)</div><div class="card-desc">L1 contains one sorted range; when L1 reaches size limit, compact into L2 (which is 10x larger), etc. Lower read and space amplification. Higher write amplification. Better for read-heavy workloads using LSM. Postgres-inspired systems like CockroachDB use this.</div></div>`},
+{l:"Comparison",b:`<table class="ct"><tr><th></th><th>B-tree (InnoDB, Postgres)</th><th>LSM tree (RocksDB, Cassandra, HBase)</th></tr>
+<tr><td>Write speed</td><td>Random I/O — slower</td><td>Sequential I/O — faster</td></tr>
+<tr><td>Read speed</td><td>O(log n), predictable</td><td>Multi-file scan, variable</td></tr>
+<tr><td>Space</td><td>Low amplification</td><td>High (until compaction)</td></tr>
+<tr><td>Range scans</td><td>Excellent (sorted pages)</td><td>Good (SSTables sorted)</td></tr>
+<tr><td>Use cases</td><td>OLTP, mixed workloads</td><td>Write-heavy, time-series, event logging</td></tr>
+<tr><td>Examples</td><td>MySQL InnoDB, Postgres</td><td>RocksDB, Cassandra, LevelDB, ScyllaDB</td></tr></table>`},
+{l:"Bloom filters in LSM",b:`<p>Before searching an SSTable on disk, the Bloom filter (a probabilistic data structure) can answer "this key is definitely NOT in this SSTable" with zero false negatives. This avoids reading SSTables that don't contain the key — critical for LSM read performance. False positive rate tunable; RocksDB defaults to ~1%.</p>`},
+{l:"Mental model",b:`<div class="analogy">B-tree is a perfectly organised filing cabinet. To update a record, you pull the right folder, change it in place. Fast to find anything, but pulling and replacing folders is physical effort (random I/O). LSM tree is a series of intake baskets (MemTable), then cardboard boxes (SSTables). New records go into the basket instantly. Overnight, the team sorts and boxes them (compaction). Reading requires checking the basket plus potentially many boxes — but writing never required touching the boxes at all.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why would you choose RocksDB (LSM) over MySQL InnoDB (B-tree) for a logging system?</div><div class="a">Logging is almost entirely sequential writes. LSM tree converts all writes to sequential disk I/O via MemTable flush — orders of magnitude faster write throughput than B-tree's random I/O. Reads are rare and can tolerate higher latency. Also: LSM compresses better (sorted data). InnoDB's B-tree would waste write bandwidth updating pages in random disk locations for every log entry.</div></div>
+<div class="iq"><div class="q">What is write amplification and why does it matter for SSDs?</div><div class="a">Write amplification = bytes written to storage / bytes in the original write. LSM compaction rewrites data multiple times as it moves between levels. SSDs have limited erase cycles — high write amplification reduces SSD lifespan. Leveled compaction has higher write amplification but better read performance; size-tiered has lower write amplification. This is why RocksDB offers multiple compaction strategies.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">WAL (both use it for durability)</span><span class="cp">Query Optimisation (index type affects planner)</span><span class="cp">CAP/BASE (Cassandra uses LSM)</span><span class="cp">System Design (storage engine choice)</span></div>`}
+]},
+
+// 08 — WAL
+{tag:"Storage Engines",title:"WAL — Write-Ahead Log",
+oneliner:"WAL is the database's sequential journal of all changes, written before the data pages are modified, enabling crash recovery, replication, and change data capture.",
+secs:[
+{l:"The core insight",b:`<p>Writing to arbitrary disk locations (data pages) is slow and non-atomic — a crash mid-page write corrupts data. WAL turns all writes into two sequential operations: (1) append to a sequential log file (fast), then (2) modify data pages (can be deferred). Sequential writes are the fastest disk operation. The log is the source of truth; data pages are a cache.</p>`},
+{l:"Crash recovery",b:`<ol class="steps">
+<li>Every change (INSERT/UPDATE/DELETE) is first written as a WAL record (before/after image of the changed data)</li>
+<li>On COMMIT: a commit record is fsynced to WAL. COMMIT returns to client only after fsync confirms.</li>
+<li>Data pages are written to disk lazily (background checkpoint process)</li>
+<li>On crash: on restart, DB reads WAL from last checkpoint</li>
+<li>Redo phase: replay all WAL records of committed transactions (bring data pages to correct state)</li>
+<li>Undo phase: roll back any uncommitted transactions (using undo log / WAL undo records)</li>
+</ol>
+<div class="code">WAL record structure (Postgres pg_wal):
+  LSN (Log Sequence Number)  — unique, monotonically increasing position in WAL
+  Transaction ID
+  Resource manager (heap, index, btree, ...)
+  Record type (INSERT/UPDATE/DELETE/COMMIT/ABORT)
+  Before image (undo)
+  After image (redo)
+
+Checkpoint: periodically flush dirty buffer pool pages to disk, record checkpoint LSN.
+Recovery only replays WAL from last checkpoint → bounded recovery time.</div>`},
+{l:"Replication via WAL streaming",b:`<p>Postgres streaming replication sends WAL records from primary to standby in real time. The standby continuously applies WAL records — its data pages mirror the primary's. Zero re-engineering: the same mechanism used for crash recovery is used for replication.</p>
+<div class="code">Primary:  WAL → [WAL sender] ──────────────→ [WAL receiver] → Standby applies
+                  (network stream of LSN records)
+
+Synchronous replication: primary waits for standby to confirm WAL receipt before COMMIT
+  → zero data loss on primary failure, higher write latency
+Asynchronous replication: primary commits, streams WAL at best effort
+  → potential data loss on primary failure, no write latency penalty</div>`},
+{l:"Change Data Capture (CDC)",b:`<p>CDC systems (Debezium, AWS DMS) read the WAL as a stream of changes and publish them to Kafka or other event buses. Any INSERT/UPDATE/DELETE becomes an event. Used for: keeping search indexes (Elasticsearch) in sync, populating data warehouses, cache invalidation, microservice event streaming. Zero impact on the primary — reads a logical replication slot, not the transactional path.</p>
+<div class="code">Postgres logical replication (CDC pipeline):
+  DB: UPDATE orders SET status='shipped' WHERE id=123
+      ↓ WAL record written
+  Debezium reads logical decoding output:
+    { op: "u", table: "orders", before: {status: "pending"},
+      after: {status: "shipped"}, lsn: "0/16B3748" }
+  → Published to Kafka topic "db.orders"
+  → Consumed by: Elasticsearch (update index), Redis (invalidate cache), analytics</div>`},
+{l:"WAL in MySQL (InnoDB)",b:`<p>MySQL InnoDB uses two logs for ACID: the redo log (WAL equivalent — sequential, for durability/crash recovery) and the undo log (for rollback and MVCC snapshot reads). The binary log (binlog) is MySQL's separate logical log used for replication and point-in-time recovery — it records SQL statements or row-level changes, written after InnoDB's redo log. Both must be written for full durability in replicated setups.</p>`},
+{l:"Mental model",b:`<div class="analogy">WAL is a kitchen order ticket system. Before the chef changes anything in the kitchen (data pages), the order is written on a ticket and clipped to the rail (WAL, sequential). If the kitchen catches fire (crash), you rebuild the state by replaying all ticket orders from the last inventory count (checkpoint). Other restaurants (replicas) get a copy of the tickets and run the same orders — without any extra effort from the chef.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How does a database guarantee durability without writing data pages on every commit?</div><div class="a">WAL. The commit record is fsynced to the sequential log. Data pages can be written later by background processes. On crash, WAL replay brings pages to the correct committed state. The log is the single source of truth — data files are just a performance optimisation (avoid replaying the entire log from the beginning).</div></div>
+<div class="iq"><div class="q">How would you build a real-time search index that stays in sync with your database?</div><div class="a">CDC via logical replication (Debezium + Postgres logical decoding). Every DB change generates a WAL event → Kafka → Elasticsearch consumer applies the change. No polling, no batch jobs, near-real-time (seconds lag). Handles schema changes, deletes, and updates correctly. Alternative: dual writes from application (harder to keep consistent on partial failures).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">ACID (durability implementation)</span><span class="cp">MVCC (uses undo portion of WAL)</span><span class="cp">B-tree vs LSM (both use WAL)</span><span class="cp">System Design (CDC, replication lag)</span><span class="cp">Event-driven architecture (WAL as event stream)</span></div>`}
+]},
+
+// 09 — MVCC
+{tag:"Concurrency",title:"MVCC — Multi-Version Concurrency Control",
+oneliner:"MVCC keeps multiple versions of each row, allowing readers to see a consistent snapshot of the database without blocking writers — reads never block writes, writes never block reads.",
+secs:[
+{l:"The problem it solves",b:`<p>Without MVCC: to give a reader a consistent view, you must lock the rows being read so no writer can change them. Under high concurrency, readers and writers queue behind each other constantly. MVCC's insight: instead of blocking, let readers see an older version of the data that was consistent at their transaction start time.</p>`},
+{l:"How Postgres implements MVCC",b:`<div class="code">Every row has two hidden system columns:
+  xmin  — transaction ID that inserted this row version
+  xmax  — transaction ID that deleted/updated this row version (0 if current)
+
+INSERT (xid=100):   row {name='Alice', xmin=100, xmax=0}
+UPDATE (xid=105):   old row {name='Alice', xmin=100, xmax=105}  ← now "deleted"
+                    new row {name='Alicia', xmin=105, xmax=0}   ← new version
+
+A transaction with snapshot_xid=102 sees:
+  old row: xmin=100 ≤ 102 ✓, xmax=105 > 102 ✓ → VISIBLE (Alice)
+  new row: xmin=105 > 102 → NOT VISIBLE
+
+A transaction with snapshot_xid=110 sees:
+  old row: xmax=105 < 110 → NOT VISIBLE (deleted)
+  new row: xmin=105 ≤ 110 ✓, xmax=0 ✓ → VISIBLE (Alicia)</div>`},
+{l:"Snapshot isolation",b:`<p>When a transaction begins (at READ COMMITTED: each statement; at REPEATABLE READ: once at BEGIN), Postgres takes a snapshot: records the current transaction IDs in progress. Any row version committed by a transaction older than the snapshot and not deleted by any transaction visible to the snapshot is included in this transaction's view.</p>
+<p>This means: a long-running read-only transaction (like a reporting query) can read a consistent snapshot of the database from when it started, even as thousands of writes happen concurrently. Zero read locks acquired. Writers don't wait for readers.</p>`},
+{l:"VACUUM — the cost of MVCC",b:`<div class="code">Problem: dead row versions accumulate
+  After UPDATE: old row version with xmax set stays on disk
+  After DELETE: row marked with xmax, not actually removed
+  → table bloat, slower sequential scans, index bloat
+
+VACUUM:
+  Scans table for dead tuples (xmax is set AND the deleting transaction is committed
+  AND no active snapshot can see the old version)
+  Marks space as reusable (without rewriting the file — VACUUM FULL rewrites)
+  Updates visibility map (tracks pages with no dead tuples → index-only scans)
+  Updates pg_class.reltuples (statistics)
+
+AUTOVACUUM: Postgres runs this automatically in background
+  Tune: autovacuum_vacuum_scale_factor, autovacuum_vacuum_threshold
+  High-update tables (like queues, counters): need aggressive autovacuum</div>`},
+{l:"MVCC in MySQL InnoDB",b:`<p>InnoDB stores row versions differently: the current version is in the clustered B-tree; old versions are in the undo log (a separate structure). Reading an old version requires following an undo log pointer chain. Reads that need old versions incur extra I/O proportional to how many versions back they need to go — a long-running transaction on a busy system may need to chase a very long undo chain.</p>`},
+{l:"Mental model",b:`<div class="analogy">MVCC is like Git for your database rows. Every commit (transaction) creates a new version. Each reader checks out the snapshot at a specific commit hash (their transaction start). They see the world as it was at that moment, regardless of what's been committed since. Writers create new commits without disturbing readers' checkouts. The only cost: git history (old versions) accumulates and needs periodic cleanup (VACUUM = git gc).</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>MVCC doesn't eliminate all locking. Writes still lock rows against other writers (not readers). SELECT FOR UPDATE acquires explicit row locks. SERIALIZABLE mode adds predicate locks.</div></div>
+<div class="bad"><span class="ic">✕</span><div>MVCC doesn't prevent write skew at REPEATABLE READ (in most implementations). See isolation levels topic.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How does Postgres allow reads and writes to proceed concurrently without blocking each other?</div><div class="a">MVCC. Each row has xmin/xmax transaction IDs. Readers see a snapshot — they evaluate visibility of each row version against their snapshot. Older versions satisfy reads without needing locks. Writers create new row versions without touching the version the reader is looking at. The critical insight: readers need no locks, writers don't block readers.</div></div>
+<div class="iq"><div class="q">What is table bloat in Postgres and how is it caused?</div><div class="a">Dead tuples — old row versions no longer visible to any active snapshot — remain on disk until VACUUM removes them. High-update tables accumulate thousands of dead tuples per page. Bloat: table takes 5x more disk space than live data, sequential scans read all that dead data. Fix: tune autovacuum aggressively, or for extreme cases VACUUM FULL (rewrites the table, requires access exclusive lock).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Isolation Levels (snapshot isolation)</span><span class="cp">ACID (isolation implementation)</span><span class="cp">WAL (undo log used by MVCC)</span><span class="cp">Query Optimisation (visibility checks affect planner)</span></div>`}
+]},
+
+// 10 — CAP & BASE
+{tag:"Distributed Systems",title:"CAP Theorem & BASE",
+oneliner:"CAP proves that a distributed system cannot simultaneously guarantee Consistency, Availability, and Partition Tolerance — so during a network partition, you must choose between consistency and availability.",
+secs:[
+{l:"CAP — the formal claim",b:`<p>Eric Brewer's CAP theorem (2000, proved by Gilbert & Lynch 2002): in the presence of a network partition, a distributed system must choose between:</p>
+<div class="card"><div class="card-name">Consistency (C) — linearizability</div><div class="card-desc">Every read returns the most recent write or an error. All nodes see the same data at the same time. NOT the same C as ACID consistency. This is linearizability — the strongest consistency guarantee for distributed systems.</div></div>
+<div class="card"><div class="card-name">Availability (A)</div><div class="card-desc">Every request receives a response (not an error), though it may not reflect the most recent write. The system keeps serving requests even if it can't guarantee their freshness.</div></div>
+<div class="card"><div class="card-name">Partition Tolerance (P)</div><div class="card-desc">The system continues operating when network messages are dropped or delayed between nodes. In a real distributed system, partitions happen — P is not optional. Therefore the real choice is always C vs A during a partition.</div></div>`},
+{l:"The real trade-off — CP vs AP",b:`<div class="code">Network partition occurs (Node A and Node B can't communicate):
+
+CP system (choose Consistency):
+  → Stop accepting writes on the partition minority side
+  → Return errors to clients on that side
+  → When partition heals: resume with fresh consistent state
+  Examples: ZooKeeper, etcd, HBase, Spanner (using TrueTime)
+
+AP system (choose Availability):
+  → Keep accepting reads and writes on both sides of partition
+  → Nodes diverge (different data on each side)
+  → When partition heals: reconcile conflicts (last-write-wins, CRDTs, etc.)
+  Examples: Cassandra, DynamoDB, CouchDB, DNS
+
+CA (no partition tolerance): only possible in a single-node system.
+  Not a real distributed option — networks always partition eventually.</div>`},
+{l:"PACELC — the better model",b:`<p>Daniel Abadi's PACELC (2012): extends CAP to cover the non-partition case. Even when there's no partition, distributed systems face a latency vs consistency trade-off.</p>
+<div class="code">PACELC: If Partition → A or C; Else → L (latency) or C (consistency)
+
+DynamoDB:  PA/EL — AP during partition, low latency (eventual) normally
+Spanner:   PC/EC — CP during partition, consistent (but higher latency) normally
+Cassandra: PA/EL — tunable, but defaults to availability and low latency
+Postgres:  —/EC  — single node, no partition question; reads always consistent
+
+The latency-consistency trade-off exists ALWAYS in distributed systems,
+not just during partitions — PACELC is more practically useful than CAP.</div>`},
+{l:"BASE — the NoSQL philosophy",b:`<p>BASE is the alternative to ACID for systems that choose Availability over Consistency:</p>
+<div class="card"><div class="card-name">Basically Available</div><div class="card-desc">System guarantees availability — reads and writes always succeed, even if data may not be current. Partial failures are acceptable.</div></div>
+<div class="card"><div class="card-name">Soft State</div><div class="card-desc">The state of the system may change over time even without input — due to eventual consistency propagating updates. You can't assume data stays the same between reads.</div></div>
+<div class="card"><div class="card-name">Eventually Consistent</div><div class="card-desc">Given enough time with no new updates, all replicas will converge to the same value. Not immediate — could be milliseconds or seconds depending on topology and load.</div></div>`},
+{l:"How NoSQL databases implement eventual consistency",b:`<div class="code">Cassandra example (AP/tunable):
+  Replication factor: 3 (3 copies of each row)
+  
+  Write: write to W nodes before acknowledging (W=1: fast, W=3: consistent)
+  Read:  read from R nodes, return latest version (R=1: fast, R=3: consistent)
+  
+  Tunable: W + R > N → strong consistency (every read sees latest write)
+    W=2, R=2, N=3: quorum — strong consistency, tolerates 1 node failure
+    W=1, R=1, N=3: eventual — fastest, risks stale reads
+
+  Conflict resolution on diverged writes: 
+    Last-write-wins (LWW) using client timestamp (risk: clock skew)
+    CRDTs (Conflict-free Replicated Data Types) — mathematically mergeable structures
+    Application-level reconciliation (shopping cart merge)</div>`},
+{l:"Eventual consistency in practice",b:`<p>DNS is the canonical eventually consistent system you use every day: when you update a DNS record, the change propagates to resolvers worldwide over minutes to hours (TTL-governed). You can still query DNS during propagation — you might get an old answer. That's AP: always available, not always consistent.</p>
+<p>DynamoDB's global tables, Cassandra cross-datacenter replication, and Redis Cluster all follow the same pattern. The key design implication: your application must be written to tolerate stale reads and handle conflict resolution.</p>`},
+{l:"Mental model",b:`<div class="analogy">CAP partition scenario: a bank with two branches loses phone lines between them (partition). CP bank: Branch B stops all transactions until line is restored — "sorry, please come back later." AP bank: Branch B keeps serving customers, allowing withdrawals, even though it doesn't know Branch A may have already emptied the account. When the line is restored, the bank reconciles the mess. No branch can be both fully available AND guarantee the other branch's transactions were included — that's CAP.</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>"You choose 2 of 3 in CAP." You don't choose CA — partitions always happen in real networks. The real choice is CP vs AP. "CA" only applies to single-node systems.</div></div>
+<div class="bad"><span class="ic">✕</span><div>"NoSQL is always eventually consistent." MongoDB with write concern majority and read concern linearizable is strongly consistent. Cassandra with W+R > N is strongly consistent. Eventual consistency is a choice, not a NoSQL law.</div></div>
+<div class="bad"><span class="ic">✕</span><div>"The C in CAP = C in ACID." Completely different. CAP-C = linearizability (all nodes agree on latest value at all times). ACID-C = data satisfies application-defined constraints (referential integrity, business rules).</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">In CAP theorem, why is partition tolerance not really a choice?</div><div class="a">Networks partition — cables fail, switches crash, cloud availability zones lose connectivity. A system that can't handle partitions simply goes down. So P is mandatory for any real distributed system. The actual design choice is: during a partition, do we return errors (CP) or potentially stale data (AP)? "CA" only describes a single-node system that can't survive node failures.</div></div>
+<div class="iq"><div class="q">How would you design a distributed counter for a "likes" feature that handles millions of updates per second?</div><div class="a">AP approach: CRDT counter (G-Counter) — each node increments its own shard, reads merge all shards. Eventually consistent, no coordination on writes, scales linearly. Or: Cassandra counter column (built-in CRDT). Strong consistency (CP) here is overkill — a like count of 1,000,247 vs 1,000,249 is acceptable. Reserve CP for: account balances, inventory, seat reservations.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">ACID (what distributed systems relax)</span><span class="cp">Isolation Levels (distributed isolation)</span><span class="cp">System Design (Cassandra, DynamoDB choices)</span><span class="cp">Distributed Systems Block (consensus, Raft)</span><span class="cp">WAL replication (async = eventual consistency)</span></div>`}
+]},
+];
+
+function show(idx,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');render(idx);
+}
+function render(idx){
+  const t=T[idx];
+  let h=`<span class="topic-tag">${t.tag}</span><div class="topic-title">${t.title}</div><div class="topic-oneliner">${t.oneliner}</div>`;
+  for(const s of t.secs)h+=`<div class="sec"><div class="sec-label">${s.l}</div><div class="body">${s.b}</div></div>`;
+  const c=document.getElementById('content');
+  c.innerHTML=h;c.scrollTop=0;
+}
+render(0);
+</script>

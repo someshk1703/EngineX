@@ -1,0 +1,844 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans,system-ui);background:transparent;color:var(--color-text-primary)}
+.wrap{padding:0.5rem 0 2.5rem}
+.nav-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem}
+.nav-btn{padding:6px 13px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12.5px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all 0.15s}
+.nav-btn:hover{background:var(--color-background-secondary)}
+.nav-btn.active{background:#EEEDFE;border-color:#534AB7;color:#3C3489;font-weight:500}
+.tp{display:none}.tp.on{display:block}
+.ttl{font-size:20px;font-weight:500;margin-bottom:3px}
+.tsub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.25rem}
+.stabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:1.25rem;padding-bottom:10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.st{padding:5px 12px;font-size:12px;border-radius:16px;cursor:pointer;border:none;background:transparent;color:var(--color-text-secondary);transition:all 0.15s}
+.st:hover{background:var(--color-background-secondary)}
+.st.active{background:#EEEDFE;color:#3C3489;font-weight:500}
+.sc{display:none}.sc.on{display:block}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.def{font-size:15px;line-height:1.7}
+code{font-family:var(--font-mono,monospace);font-size:0.92em}
+.cb{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:.9rem 1rem;overflow-x:auto;font-size:12px;line-height:1.75;margin-bottom:1rem;white-space:pre;font-family:var(--font-mono,monospace)}
+.kw{color:#534AB7;font-weight:500}.cm{color:var(--color-text-secondary)}.st2{color:#085041}.nm{color:#993C1D}
+.flow{display:flex;flex-direction:column;gap:8px}
+.fs{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:8px;background:var(--color-background-secondary);border-left:3px solid #AFA9EC}
+.fn{width:22px;height:22px;border-radius:50%;background:#EEEDFE;color:#3C3489;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ft{font-size:13.5px;line-height:1.6}
+.mi{display:flex;gap:10px;padding:9px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.mi:last-child{border-bottom:none}
+.mico{width:22px;height:22px;border-radius:50%;background:#FCEBEB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:13px}
+.mt{font-size:13.5px;line-height:1.6}
+.mt strong{font-weight:500;color:#A32D2D}
+.qi{padding:10px 12px;border-radius:8px;background:var(--color-background-secondary);margin-bottom:8px;font-size:13.5px;line-height:1.6;cursor:pointer;border:.5px solid var(--color-border-tertiary);transition:all .15s}
+.qi:hover{border-color:#AFA9EC;background:#EEEDFE}
+.ql{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.qa{font-size:13px;color:var(--color-text-secondary);margin-top:6px;padding-top:6px;border-top:.5px solid var(--color-border-tertiary);display:none;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:5px 13px;border-radius:16px;font-size:13px;background:#EEEDFE;color:#3C3489;border:.5px solid #AFA9EC;cursor:pointer}
+.chip:hover{background:#CECBF6}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;margin-right:3px}
+.bp{background:#EEEDFE;color:#3C3489}
+.bt{background:#E1F5EE;color:#085041}
+.ba{background:#FAEEDA;color:#633806}
+.br{background:#FCEBEB;color:#A32D2D}
+.bg{background:#EAF3DE;color:#3B6D11}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hl-box{border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.6;border:.5px solid var(--color-border-tertiary)}
+.hl-p{background:#EEEDFE;border-color:#AFA9EC;color:#3C3489}
+.hl-t{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.hl-a{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.hl-c{background:#FAECE7;border-color:#F0997B;color:#712B13}
+.hl-g{background:#EAF3DE;border-color:#97C459;color:#3B6D11}
+.hl-b{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.hl-name{font-weight:500;font-size:12px;margin-bottom:4px}
+.vis-wrap{background:var(--color-background-secondary);border-radius:10px;padding:1rem;margin-bottom:1rem;overflow-x:auto}
+.arr-cell{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:1.5px solid #AFA9EC;border-radius:6px;font-size:13px;font-weight:500;background:#EEEDFE;color:#3C3489;margin-right:3px;vertical-align:middle;position:relative}
+.arr-cell.empty{background:var(--color-background-primary);border-color:var(--color-border-tertiary);color:var(--color-text-secondary)}
+.arr-cell.head{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.arr-cell.tail{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.arr-cell.hot{background:#FCEBEB;border-color:#F09595;color:#A32D2D}
+.arr-idx{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--color-text-secondary);white-space:nowrap}
+.arr-row{display:flex;align-items:center;flex-wrap:nowrap;gap:2px;margin-bottom:24px;padding-bottom:6px}
+.bucket-row{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.bkt{min-width:90px}
+.bkt-hdr{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:4px;text-align:center}
+.bkt-cell{background:#EEEDFE;border:1px solid #AFA9EC;border-radius:6px;padding:5px 8px;font-size:12px;color:#3C3489;text-align:center;margin-bottom:3px;font-family:var(--font-mono,monospace)}
+.bkt-cell.chain{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.bkt-cell.empty-bkt{background:var(--color-background-primary);border:.5px dashed var(--color-border-tertiary);color:var(--color-text-secondary)}
+.heap-grid{display:grid;gap:4px;justify-items:center}
+.heap-node{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-size:13px;font-weight:500;border:2px solid #AFA9EC;background:#EEEDFE;color:#3C3489}
+.heap-node.min{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.deque-cell{display:inline-flex;align-items:center;justify-content:center;width:46px;height:38px;border:1.5px solid #AFA9EC;border-radius:4px;font-size:13px;font-weight:500;background:#EEEDFE;color:#3C3489;margin-right:2px}
+.deque-cell.ptr{background:#FAEEDA;border-color:#EF9F27;color:#633806}
+.deque-cell.empty-d{background:var(--color-background-primary);border:.5px dashed var(--color-border-tertiary);color:var(--color-text-secondary);font-size:11px}
+.rbt-node{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px;font-weight:500;color:#fff;width:36px;height:36px}
+.rbt-r{background:#D85A30}
+.rbt-b{background:#185FA5}
+.comp-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.comp-tbl th{text-align:left;padding:7px 10px;background:var(--color-background-secondary);color:var(--color-text-secondary);font-weight:500;border-bottom:.5px solid var(--color-border-tertiary)}
+.comp-tbl td{padding:7px 10px;border-bottom:.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5}
+.comp-tbl tr:last-child td{border-bottom:none}
+</style>
+
+<div class="wrap">
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Java Collections Framework Visual Bible — 7 data structures with interactive sections</h2>
+
+<div style="margin-bottom:1.25rem"><p style="font-size:13px;color:var(--color-text-secondary)">Block 2 · Collections Framework · 7 structures · pick a topic, then a section</p></div>
+
+<div class="nav-bar" id="nav">
+  <button class="nav-btn active" onclick="T(0)">1 · ArrayList vs LinkedList</button>
+  <button class="nav-btn" onclick="T(1)">2 · HashMap internals</button>
+  <button class="nav-btn" onclick="T(2)">3 · LinkedHashMap vs TreeMap</button>
+  <button class="nav-btn" onclick="T(3)">4 · HashSet / TreeSet / LinkedHashSet</button>
+  <button class="nav-btn" onclick="T(4)">5 · PriorityQueue (min-heap)</button>
+  <button class="nav-btn" onclick="T(5)">6 · ArrayDeque</button>
+  <button class="nav-btn" onclick="T(6)">7 · Collections utility</button>
+</div>
+
+<!-- ══════════ TOPIC 0 — ArrayList vs LinkedList ══════════ -->
+<div class="tp on" id="t0">
+  <div class="ttl">ArrayList vs LinkedList</div>
+  <div class="tsub">Internal array · dynamic resizing · doubly-linked nodes · when to choose each</div>
+  <div class="stabs">
+    <button class="st active" onclick="S('t0','s0')">Definition</button>
+    <button class="st" onclick="S('t0','s1')">Internals</button>
+    <button class="st" onclick="S('t0','s2')">Visual</button>
+    <button class="st" onclick="S('t0','s3')">Code</button>
+    <button class="st" onclick="S('t0','s4')">Complexity</button>
+    <button class="st" onclick="S('t0','s5')">Mistakes</button>
+    <button class="st" onclick="S('t0','s6')">Interview</button>
+    <button class="st" onclick="S('t0','s7')">Connects To</button>
+  </div>
+
+  <div class="sc on" id="t0-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Both implement <code>List</code>. <code>ArrayList</code> stores elements in a contiguous <code>Object[]</code> — random access is O(1) but insertions may trigger a resize. <code>LinkedList</code> stores elements in doubly-linked <code>Node</code> objects — insertions at known positions are O(1) but random access is O(n) and cache performance is poor.</p>
+    </div>
+    <div class="two-col">
+      <div class="hl-box hl-p"><div class="hl-name">ArrayList — choose when</div>Mostly reads / random access. Appending to tail. Iterating sequentially. Memory-sensitive (no node overhead).</div>
+      <div class="hl-box hl-t"><div class="hl-name">LinkedList — choose when</div>Frequent insert/delete at head or in middle via iterator. Using as Deque (addFirst/removeLast). Rarely: very large elements where move cost dominates.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s1">
+    <div class="card"><div class="ct">Internals</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>ArrayList backing array</strong> — default initial capacity 10. When size exceeds capacity, a new array of <code>capacity × 1.5</code> is allocated and <code>Arrays.copyOf</code> runs — O(n) amortised cost, but rare. <code>ensureCapacity(n)</code> lets you pre-size to avoid this.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>ArrayList remove(i)</strong> — elements after index i shift left via <code>System.arraycopy</code> — O(n). That's a native memory-copy, very fast, but still linear.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>LinkedList node</strong> — each element is a heap-allocated <code>Node&lt;E&gt;{E item; Node prev; Node next}</code>. Three pointer fields = 24+ bytes overhead per element on 64-bit JVM (vs 4 bytes reference in ArrayList). Terrible cache locality — every node may be a TLB/cache miss.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>LinkedList get(i)</strong> — O(n/2) average — starts from head or tail (whichever is closer) and walks pointers. Never use indexed get in a loop on LinkedList — it's O(n²).</div></div>
+        <div class="fs"><div class="fn">5</div><div class="ft"><strong>Iterator-based removal</strong> — <code>iterator.remove()</code> on LinkedList is O(1) because the iterator holds a direct node reference. Same on ArrayList is O(n) (shift). This is the one case LinkedList wins in practice.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s2">
+    <div class="card"><div class="ct">Visual memory layout</div>
+      <div class="vis-wrap">
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px;font-weight:500">ArrayList — contiguous Object[] on heap</div>
+        <div class="arr-row">
+          <div class="arr-cell">"A"<div class="arr-idx">0</div></div>
+          <div class="arr-cell">"B"<div class="arr-idx">1</div></div>
+          <div class="arr-cell">"C"<div class="arr-idx">2</div></div>
+          <div class="arr-cell">"D"<div class="arr-idx">3</div></div>
+          <div class="arr-cell empty">null<div class="arr-idx">4</div></div>
+          <div class="arr-cell empty">null<div class="arr-idx">5</div></div>
+          <span style="font-size:12px;color:var(--color-text-secondary);margin-left:8px">size=4, cap=6</span>
+        </div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px;font-weight:500;margin-top:6px">LinkedList — scattered Node objects on heap</div>
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+          <div style="text-align:center"><div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:3px">head</div><div class="arr-cell head">A</div></div>
+          <div style="font-size:16px;color:#5DCAA5">⇄</div>
+          <div class="arr-cell">&nbsp;B&nbsp;</div>
+          <div style="font-size:16px;color:#5DCAA5">⇄</div>
+          <div class="arr-cell">&nbsp;C&nbsp;</div>
+          <div style="font-size:16px;color:#5DCAA5">⇄</div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:3px">tail</div><div class="arr-cell tail">D</div></div>
+          <span style="font-size:12px;color:var(--color-text-secondary);margin-left:8px">each node scattered in heap memory</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s3">
+    <div class="card"><div class="ct">Code</div>
+<div class="cb"><span class="kw">List</span>&lt;<span class="nm">String</span>&gt; al = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;(100); <span class="cm">// pre-size avoids resizes</span>
+al.add(<span class="st2">"x"</span>);        <span class="cm">// O(1) amortised</span>
+al.get(50);         <span class="cm">// O(1) — direct array index</span>
+al.remove(0);       <span class="cm">// O(n) — shifts 99 elements left</span>
+
+<span class="kw">List</span>&lt;<span class="nm">String</span>&gt; ll = <span class="kw">new</span> <span class="nm">LinkedList</span>&lt;&gt;();
+ll.addFirst(<span class="st2">"x"</span>);   <span class="cm">// O(1) — pointer swap only</span>
+ll.get(50);         <span class="cm">// O(n) — walks 50 nodes</span>
+
+<span class="cm">// WRONG — O(n²) total, kills performance</span>
+<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; ll.size(); i++) ll.get(i);
+
+<span class="cm">// RIGHT — O(n) via iterator (holds node ref)</span>
+<span class="kw">for</span> (<span class="nm">String</span> s : ll) process(s);
+
+<span class="cm">// Iterator-safe removal</span>
+<span class="nm">Iterator</span>&lt;<span class="nm">String</span>&gt; it = ll.iterator();
+<span class="kw">while</span> (it.hasNext()) {
+    <span class="kw">if</span> (it.next().startsWith(<span class="st2">"x"</span>)) it.remove(); <span class="cm">// O(1) on LL</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s4">
+    <div class="card"><div class="ct">Complexity at a glance</div>
+      <table class="comp-tbl">
+        <thead><tr><th>Operation</th><th>ArrayList</th><th>LinkedList</th></tr></thead>
+        <tbody>
+          <tr><td>get(i)</td><td><span class="badge bp">O(1)</span></td><td><span class="badge ba">O(n)</span></td></tr>
+          <tr><td>add(end)</td><td><span class="badge bp">O(1) amortised</span></td><td><span class="badge bp">O(1)</span></td></tr>
+          <tr><td>add(i)</td><td><span class="badge ba">O(n)</span></td><td><span class="badge bt">O(1) with iterator</span></td></tr>
+          <tr><td>remove(i)</td><td><span class="badge ba">O(n)</span></td><td><span class="badge bt">O(1) with iterator</span></td></tr>
+          <tr><td>Memory/element</td><td><span class="badge bt">4 bytes (ref)</span></td><td><span class="badge ba">24+ bytes (node)</span></td></tr>
+          <tr><td>Cache locality</td><td><span class="badge bt">Excellent</span></td><td><span class="badge br">Poor</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s5">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Indexed get in a loop on LinkedList</strong> — O(n²). Always iterate with for-each or iterator on LinkedList. This is a production performance killer.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Choosing LinkedList "for faster inserts" without benchmarking</strong> — ArrayList's <code>System.arraycopy</code> is a native memory move that beats pointer-chasing in practice. LinkedList is almost never faster in modern JVM benchmarks due to cache effects.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Not pre-sizing ArrayList</strong> — if you know you'll add 10k elements, <code>new ArrayList&lt;&gt;(10000)</code> eliminates all resize copies. Cheap and impactful.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Storing ArrayList as List field in a class but casting it</strong> — breaks encapsulation. Program to the <code>List</code> interface. Changing implementation later requires zero caller changes.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s6">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>When would you use LinkedList over ArrayList?<div class="qa">Almost never in modern Java. LinkedList wins only when: (1) you're doing frequent insert/delete via iterator in the middle and NOT random access, (2) you need it as a Deque. In practice, ArrayList's cache locality beats LinkedList even for mid-list inserts in benchmarks. The correct answer acknowledges cache effects — not just Big-O.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Depth</div>How does ArrayList resize and what is the amortised complexity?<div class="qa">When size == capacity, a new array of capacity * 1.5 is allocated and all elements are copied (Arrays.copyOf). This is O(n) for that single operation. But a sequence of n appends triggers at most O(log n) resizes, each doubling (roughly) the work. Total work across n appends = n + n/1.5 + n/1.5² + ... converges to O(n), so each append is O(1) amortised.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Follow-up</div>What is CopyOnWriteArrayList and when do you use it?<div class="qa">A thread-safe variant where every write (add, remove, set) creates a complete new copy of the underlying array. Reads are always lock-free and see a snapshot. Use when reads dominate writes — e.g., listener/subscriber lists. Never use if writes are frequent — O(n) per write.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t0-s7">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain CopyOnWriteArrayList and concurrent collections in Java')">CopyOnWriteArrayList</span>
+      <span class="chip" onclick="sendPrompt('Explain Java Iterator and ListIterator internals')">Iterator internals</span>
+      <span class="chip" onclick="sendPrompt('How does ArrayDeque compare to LinkedList for queue use?')">ArrayDeque vs LL</span>
+      <span class="chip" onclick="sendPrompt('Explain Java memory layout and cache locality effects on collections')">Cache locality</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════ TOPIC 1 — HashMap ══════════ -->
+<div class="tp" id="t1">
+  <div class="ttl">HashMap internals</div>
+  <div class="tsub">Hashing · buckets · chaining · treeification · load factor · rehashing</div>
+  <div class="stabs">
+    <button class="st active" onclick="S('t1','s0')">Definition</button>
+    <button class="st" onclick="S('t1','s1')">Internals</button>
+    <button class="st" onclick="S('t1','s2')">Visual</button>
+    <button class="st" onclick="S('t1','s3')">Code</button>
+    <button class="st" onclick="S('t1','s4')">Mistakes</button>
+    <button class="st" onclick="S('t1','s5')">Interview</button>
+    <button class="st" onclick="S('t1','s6')">Connects To</button>
+  </div>
+
+  <div class="sc on" id="t1-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def"><code>HashMap&lt;K,V&gt;</code> is a hash table that maps keys to values with O(1) average-case get/put. It computes a bucket index from <code>key.hashCode()</code>, stores entries in an array of linked lists (or trees for long chains), and automatically doubles when the load threshold is exceeded.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s1">
+    <div class="card"><div class="ct">Step-by-step internals</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Hash spreading</strong> — raw <code>key.hashCode()</code> is spread with <code>h ^ (h >>> 16)</code> to mix high bits into low bits. This reduces collisions when table size is a power of 2.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Bucket index</strong> — <code>index = (n-1) & hash</code> where n is always a power of 2. Equivalent to <code>hash % n</code> but via bitmasking — much faster.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>Collision resolution</strong> — bucket holds a singly-linked list of <code>Node&lt;K,V&gt;</code>. On get, walk the list comparing via <code>==</code> then <code>.equals()</code>.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>Treeification (Java 8+)</strong> — when a bucket chain reaches 8 nodes AND table capacity ≥ 64, the linked list is converted to a Red-Black tree. Tree lookup = O(log n) per bucket. Reverts to linked list when nodes drop to 6.</div></div>
+        <div class="fs"><div class="fn">5</div><div class="ft"><strong>Load factor &amp; rehash</strong> — default load factor 0.75. When <code>size > capacity × 0.75</code>, a new array of 2× size is allocated and every entry is re-hashed. This is O(n) but amortised O(1) per insertion.</div></div>
+        <div class="fs"><div class="fn">6</div><div class="ft"><strong>Null key</strong> — HashMap allows one null key (always stored in bucket 0). HashTable and ConcurrentHashMap do not allow null keys.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s2">
+    <div class="card"><div class="ct">Visual — buckets + chaining + treeification</div>
+      <div class="vis-wrap">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px">Table (capacity=8, load factor=0.75, threshold=6)</div>
+        <div class="bucket-row">
+          <div class="bkt"><div class="bkt-hdr">idx 0</div><div class="bkt-cell empty-bkt">null</div></div>
+          <div class="bkt"><div class="bkt-hdr">idx 1</div><div class="bkt-cell">"cat"→3</div></div>
+          <div class="bkt"><div class="bkt-hdr">idx 2</div><div class="bkt-cell">"ant"→1</div><div class="bkt-cell chain">"bat"→2</div><div style="font-size:10px;color:#085041;text-align:center">↑ chain (collision)</div></div>
+          <div class="bkt"><div class="bkt-hdr">idx 3</div><div class="bkt-cell empty-bkt">null</div></div>
+          <div class="bkt"><div class="bkt-hdr">idx 4</div><div class="bkt-cell">"dog"→4</div></div>
+          <div class="bkt"><div class="bkt-hdr">idx 5-7</div><div class="bkt-cell empty-bkt">null</div></div>
+          <div class="bkt"><div class="bkt-hdr">≥8 chain</div><div style="background:#FAECE7;border:1px solid #F0997B;border-radius:6px;padding:6px 8px;font-size:11px;color:#712B13;text-align:center">converts to<br>Red-Black tree</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s3">
+    <div class="card"><div class="ct">Code</div>
+<div class="cb"><span class="kw">Map</span>&lt;<span class="nm">String</span>, <span class="nm">Integer</span>&gt; map = <span class="kw">new</span> <span class="nm">HashMap</span>&lt;&gt;(32, 0.75f); <span class="cm">// pre-size</span>
+map.put(<span class="st2">"key"</span>, 1);       <span class="cm">// hash spread → bucket index → put node</span>
+map.get(<span class="st2">"key"</span>);          <span class="cm">// same hash → same bucket → walk & equals</span>
+map.getOrDefault(<span class="st2">"x"</span>, 0); <span class="cm">// safe null-avoiding get</span>
+
+<span class="cm">// Merge pattern — count word frequencies</span>
+map.merge(word, 1, <span class="nm">Integer</span>::sum);
+
+<span class="cm">// Compute pattern — safer than get+put</span>
+map.computeIfAbsent(<span class="st2">"grp"</span>, k -&gt; <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;()).add(<span class="st2">"item"</span>);
+
+<span class="cm">// Iteration — entrySet is fastest</span>
+<span class="kw">for</span> (<span class="nm">Map.Entry</span>&lt;<span class="nm">String</span>,<span class="nm">Integer</span>&gt; e : map.entrySet()) {
+    <span class="nm">System</span>.out.println(e.getKey() + <span class="st2">"="</span> + e.getValue());
+}
+
+<span class="cm">// DANGER: using mutable key</span>
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt; key = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;();
+map.put(key, 1);
+key.add(<span class="st2">"oops"</span>); <span class="cm">// hashCode changed → entry now lost!</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Mutable keys</strong> — if you mutate a key after insertion, its hashCode changes and the entry becomes unreachable. Always use immutable keys (String, Integer, record).</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Breaking the hashCode/equals contract</strong> — if <code>a.equals(b)</code> is true, <code>a.hashCode()</code> MUST equal <code>b.hashCode()</code>. Violation causes duplicate entries or unfindable entries. Override both or neither.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Not pre-sizing for known capacity</strong> — default capacity 16, load 0.75 → first resize at 12 entries. If you're adding 1000 entries: <code>new HashMap&lt;&gt;(1334)</code> (1000/0.75 + 1) avoids all rehashes.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Using HashMap in multithreaded code without sync</strong> — concurrent modifications cause infinite loops (Java 7) or data loss (Java 8+). Use <code>ConcurrentHashMap</code>.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What happens when two keys have the same hashCode?<div class="qa">They land in the same bucket. The bucket holds a linked list; each new node is appended. On lookup, the list is walked using equals() to find the right key. Java 8+: if the chain length hits 8 and table capacity >= 64, the chain converts to a Red-Black tree for O(log n) bucket lookup instead of O(n).</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Depth</div>Why does HashMap always use a power-of-2 capacity?<div class="qa">Because then bucket_index = hash & (capacity-1) is equivalent to hash % capacity, but via a single bitwise AND — much faster than modulo. Every resize doubles capacity (stays power of 2). The hash spreading (h ^ h>>>16) also assumes power-of-2 so high bits contribute to bucket selection.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Concurrency</div>How is ConcurrentHashMap different from HashMap?<div class="qa">Java 8+: ConcurrentHashMap uses CAS (compare-and-swap) on individual bucket heads and synchronized blocks only when modifying a bucket. No global lock. Reads are always lock-free. Null keys/values are forbidden (can't distinguish missing vs null in concurrent scenarios). Offers atomic compute, merge, forEach operations.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t1-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain ConcurrentHashMap internals in Java 8')">ConcurrentHashMap</span>
+      <span class="chip" onclick="sendPrompt('What is the hashCode and equals contract in Java?')">hashCode/equals</span>
+      <span class="chip" onclick="sendPrompt('Explain Red-Black tree properties and why Java uses it in HashMap')">Red-Black tree</span>
+      <span class="chip" onclick="sendPrompt('How does LinkedHashMap maintain insertion order internally?')">LinkedHashMap</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════ TOPIC 2 — LinkedHashMap vs TreeMap ══════════ -->
+<div class="tp" id="t2">
+  <div class="ttl">LinkedHashMap vs TreeMap</div>
+  <div class="tsub">Insertion-order doubly-linked list · Red-Black BST for sorted keys</div>
+  <div class="stabs">
+    <button class="st active" onclick="S('t2','s0')">Definition</button>
+    <button class="st" onclick="S('t2','s1')">Internals</button>
+    <button class="st" onclick="S('t2','s2')">Visual</button>
+    <button class="st" onclick="S('t2','s3')">Code</button>
+    <button class="st" onclick="S('t2','s4')">Mistakes</button>
+    <button class="st" onclick="S('t2','s5')">Interview</button>
+    <button class="st" onclick="S('t2','s6')">Connects To</button>
+  </div>
+
+  <div class="sc on" id="t2-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def"><code>LinkedHashMap</code> extends HashMap and adds a doubly-linked list threading through all entries — preserving insertion (or access) order. <code>TreeMap</code> uses a Red-Black BST to keep keys in sorted order at all times, at the cost of O(log n) per operation instead of O(1).</p>
+    </div>
+    <div class="two-col">
+      <div class="hl-box hl-p"><div class="hl-name">LinkedHashMap — choose when</div>You need HashMap speed AND predictable iteration order. LRU cache (accessOrder=true). Maintaining the order items were inserted (API responses, ordered configs).</div>
+      <div class="hl-box hl-a"><div class="hl-name">TreeMap — choose when</div>Keys must stay sorted. You need range queries: <code>subMap</code>, <code>headMap</code>, <code>tailMap</code>, <code>floorKey</code>, <code>ceilingKey</code>. Leaderboards, interval trees, ordered event logs.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s1">
+    <div class="card"><div class="ct">Internals</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>LinkedHashMap</strong> — each <code>Entry</code> extends <code>HashMap.Node</code> with two extra pointers: <code>Entry before, after</code>. These form a doubly-linked list in insertion order (or access order if <code>accessOrder=true</code>). The hash table still provides O(1) lookup; the linked list provides ordered iteration.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>LRU cache trick</strong> — <code>new LinkedHashMap&lt;&gt;(cap, 0.75f, true)</code> uses access order. Override <code>removeEldestEntry</code> to return <code>size() > maxSize</code> and you have a complete O(1) LRU cache with zero extra code.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>TreeMap</strong> — backed by a Red-Black tree (self-balancing BST). Guarantees height ≤ 2 log(n+1). All operations — get, put, remove, floor, ceiling, subMap — are O(log n). Requires keys to be <code>Comparable</code> or a <code>Comparator</code> provided at construction.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>Red-Black tree rules</strong> — every node is Red or Black. Root is Black. Red node's children are Black. Every path from root to null has same number of Black nodes. These constraints keep the tree balanced after rotations.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s2">
+    <div class="card"><div class="ct">Visual — Red-Black BST (TreeMap with keys 10,20,30,15,25)</div>
+      <div class="vis-wrap">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+          <div style="display:flex;gap:0"><div class="rbt-node rbt-b">20</div></div>
+          <div style="display:flex;gap:60px">
+            <div class="rbt-node rbt-r">10</div>
+            <div class="rbt-node rbt-r">30</div>
+          </div>
+          <div style="display:flex;gap:12px">
+            <div style="width:36px"></div>
+            <div class="rbt-node rbt-b">15</div>
+            <div class="rbt-node rbt-b">25</div>
+            <div style="width:36px"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="rbt-node rbt-b" style="width:20px;height:20px;font-size:10px"></div><span style="color:var(--color-text-secondary)">Black node</span></div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px"><div class="rbt-node rbt-r" style="width:20px;height:20px;font-size:10px"></div><span style="color:var(--color-text-secondary)">Red node</span></div>
+          <span style="font-size:12px;color:var(--color-text-secondary)">· In-order traversal = sorted keys: 10, 15, 20, 25, 30</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s3">
+    <div class="card"><div class="ct">Code</div>
+<div class="cb"><span class="cm">// LRU cache with LinkedHashMap</span>
+<span class="kw">class</span> <span class="nm">LRUCache</span>&lt;<span class="nm">K</span>,<span class="nm">V</span>&gt; <span class="kw">extends</span> <span class="nm">LinkedHashMap</span>&lt;<span class="nm">K</span>,<span class="nm">V</span>&gt; {
+    <span class="kw">private final int</span> max;
+    <span class="nm">LRUCache</span>(<span class="kw">int</span> max) {
+        <span class="kw">super</span>(max, 0.75f, <span class="kw">true</span>); <span class="cm">// accessOrder=true</span>
+        <span class="kw">this</span>.max = max;
+    }
+    <span class="kw">protected boolean</span> removeEldestEntry(<span class="nm">Map.Entry</span> e) {
+        <span class="kw">return</span> size() &gt; max; <span class="cm">// evict LRU when over capacity</span>
+    }
+}
+
+<span class="cm">// TreeMap — range queries</span>
+<span class="nm">TreeMap</span>&lt;<span class="nm">Integer</span>,<span class="nm">String</span>&gt; tm = <span class="kw">new</span> <span class="nm">TreeMap</span>&lt;&gt;();
+tm.put(10,<span class="st2">"ten"</span>); tm.put(20,<span class="st2">"twenty"</span>); tm.put(30,<span class="st2">"thirty"</span>);
+tm.floorKey(25);      <span class="cm">// 20 — largest key ≤ 25</span>
+tm.ceilingKey(25);    <span class="cm">// 30 — smallest key ≥ 25</span>
+tm.subMap(10, 25);    <span class="cm">// {10=ten, 20=twenty}</span>
+tm.headMap(20);       <span class="cm">// {10=ten}</span>
+tm.firstKey();        <span class="cm">// 10 — minimum key, O(log n)</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Using TreeMap for O(1) lookups</strong> — every get/put is O(log n). If you don't need sorted order, use HashMap. Common in interview implementations where a plain HashMap would suffice.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Keys not implementing Comparable in TreeMap</strong> — throws ClassCastException at runtime, not compile time. Provide a Comparator at construction or ensure keys implement Comparable.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Forgetting accessOrder in LRU LinkedHashMap</strong> — default is insertion order. For LRU semantics you must pass <code>true</code> as the third constructor argument. Easy to forget, hard to debug.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Design</div>Implement an LRU cache in Java.<div class="qa">Two approaches: (1) LinkedHashMap with accessOrder=true and removeEldestEntry — 5 lines. (2) Manual: HashMap + doubly-linked list for O(1) get and move-to-front. Interviewers often want approach 2 to test your pointer manipulation. Know both. LinkedHashMap approach is production code; manual approach demonstrates you understand the mechanism.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Compare</div>HashMap vs TreeMap vs LinkedHashMap — when do you pick each?<div class="qa">HashMap: default choice — O(1), unordered. LinkedHashMap: when you need HashMap speed plus predictable iteration order (insertion or access). TreeMap: when keys must stay sorted or you need range/floor/ceiling operations. The ordering guarantee in TreeMap costs O(log n) everywhere.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Depth</div>What are Red-Black tree properties and why does Java use it?<div class="qa">5 properties: (1) nodes are Red or Black, (2) root is Black, (3) leaves (nulls) are Black, (4) red node has only black children, (5) all paths from a node to leaves have same number of black nodes. These guarantee height ≤ 2log(n+1) → O(log n) worst case. Java chose RB-tree over AVL because RB-tree requires fewer rotations on insert/delete — better write performance.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t2-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Implement LRU cache manually with HashMap and doubly linked list in Java')">LRU cache impl</span>
+      <span class="chip" onclick="sendPrompt('Explain Red-Black tree vs AVL tree — rotations and balance')">AVL vs RB tree</span>
+      <span class="chip" onclick="sendPrompt('What are NavigableMap and SortedMap interfaces in Java?')">NavigableMap</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════ TOPIC 3 — Set implementations ══════════ -->
+<div class="tp" id="t3">
+  <div class="ttl">HashSet · LinkedHashSet · TreeSet</div>
+  <div class="tsub">All backed by their Map counterparts — add null differences</div>
+  <div class="stabs">
+    <button class="st active" onclick="S('t3','s0')">Definition</button>
+    <button class="st" onclick="S('t3','s1')">Internals</button>
+    <button class="st" onclick="S('t3','s2')">Code</button>
+    <button class="st" onclick="S('t3','s3')">Mistakes</button>
+    <button class="st" onclick="S('t3','s4')">Interview</button>
+    <button class="st" onclick="S('t3','s5')">Connects To</button>
+  </div>
+
+  <div class="sc on" id="t3-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Sets hold unique elements — no duplicates, no key-value pairs. Java's three main Set implementations are thin wrappers around their Map counterparts: each stores elements as keys in the backing map with a shared dummy <code>PRESENT</code> object as the value.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:.5rem">
+      <div class="hl-box hl-p"><div class="hl-name">HashSet</div>Backed by HashMap. O(1) add/remove/contains. No order. Allows one null.</div>
+      <div class="hl-box hl-b"><div class="hl-name">LinkedHashSet</div>Backed by LinkedHashMap. O(1) operations + insertion-order iteration. One null allowed.</div>
+      <div class="hl-box hl-a"><div class="hl-name">TreeSet</div>Backed by TreeMap. O(log n). Always sorted. Null not allowed (no comparison possible).</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s1">
+    <div class="card"><div class="ct">Internals — the backing map trick</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Shared PRESENT sentinel</strong> — <code>private static final Object PRESENT = new Object()</code>. Every element added becomes <code>map.put(element, PRESENT)</code>. The value slot is wasted but the key set is exactly the elements.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>contains()</strong> — delegates directly to <code>map.containsKey()</code> — same O(1)/O(log n) as the backing map.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>Ordering contract</strong> — HashSet: no guarantee. LinkedHashSet: insertion order (same guarantees as LinkedHashMap). TreeSet: natural ordering or Comparator — same as TreeMap. TreeSet also implements <code>NavigableSet</code> giving <code>floor</code>, <code>ceiling</code>, <code>headSet</code>, <code>tailSet</code>.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s2">
+    <div class="card"><div class="ct">Code</div>
+<div class="cb"><span class="nm">Set</span>&lt;<span class="nm">String</span>&gt; hs = <span class="kw">new</span> <span class="nm">HashSet</span>&lt;&gt;(Arrays.asList(<span class="st2">"b"</span>,<span class="st2">"a"</span>,<span class="st2">"c"</span>));
+<span class="cm">// iteration order undefined — could be a, b, c or any order</span>
+
+<span class="nm">Set</span>&lt;<span class="nm">String</span>&gt; lhs = <span class="kw">new</span> <span class="nm">LinkedHashSet</span>&lt;&gt;(Arrays.asList(<span class="st2">"b"</span>,<span class="st2">"a"</span>,<span class="st2">"c"</span>));
+<span class="cm">// iteration: b, a, c — insertion order preserved</span>
+
+<span class="nm">TreeSet</span>&lt;<span class="nm">String</span>&gt; ts = <span class="kw">new</span> <span class="nm">TreeSet</span>&lt;&gt;(Arrays.asList(<span class="st2">"b"</span>,<span class="st2">"a"</span>,<span class="st2">"c"</span>));
+<span class="cm">// iteration: a, b, c — always sorted</span>
+ts.floor(<span class="st2">"bb"</span>);    <span class="cm">// "b"</span>
+ts.ceiling(<span class="st2">"ab"</span>);  <span class="cm">// "b"</span>
+ts.headSet(<span class="st2">"b"</span>);   <span class="cm">// [a]</span>
+
+<span class="cm">// Dedup a list while preserving order</span>
+<span class="nm">List</span>&lt;<span class="nm">Integer</span>&gt; deduped = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;(<span class="kw">new</span> <span class="nm">LinkedHashSet</span>&lt;&gt;(list));</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s3">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Mutable elements in HashSet</strong> — if you modify an element after adding it, its hashCode changes and it becomes "lost" in the set (same issue as HashMap mutable keys).</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Adding null to TreeSet</strong> — TreeSet calls compareTo on every add. null.compareTo() throws NullPointerException. The exception occurs on the second add, not the null add itself, which makes it confusing to debug.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Expecting consistent order from HashSet</strong> — iteration order can change between JVM versions, hash seeds, and even runs. Never depend on it. If order matters, use LinkedHashSet or TreeSet explicitly.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Internals</div>How does HashSet ensure uniqueness?<div class="qa">It delegates to HashMap.put(element, PRESENT). HashMap's put returns the old value if the key existed. HashSet.add() returns false if put returned non-null (meaning the element was already present). Uniqueness is enforced by the map's key uniqueness — no special logic needed.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Choose</div>How would you deduplicate a list while preserving insertion order?<div class="qa">new ArrayList&lt;&gt;(new LinkedHashSet&lt;&gt;(list)). LinkedHashSet preserves insertion order while removing duplicates. Wrapping back in ArrayList gives you a List. Time: O(n). Interviewers sometimes expect you to know this one-liner.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t3-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain NavigableSet and SortedSet interfaces in Java')">NavigableSet</span>
+      <span class="chip" onclick="sendPrompt('What is EnumSet in Java and why is it so fast?')">EnumSet internals</span>
+      <span class="chip" onclick="sendPrompt('How does HashSet handle hashCode and equals contract?')">hashCode/equals</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════ TOPIC 4 — PriorityQueue ══════════ -->
+<div class="tp" id="t4">
+  <div class="ttl">PriorityQueue (min-heap)</div>
+  <div class="tsub">Binary heap in an array · heapify · sift-up · sift-down · comparator</div>
+  <div class="stabs">
+    <button class="st active" onclick="S('t4','s0')">Definition</button>
+    <button class="st" onclick="S('t4','s1')">Internals</button>
+    <button class="st" onclick="S('t4','s2')">Visual</button>
+    <button class="st" onclick="S('t4','s3')">Code</button>
+    <button class="st" onclick="S('t4','s4')">Mistakes</button>
+    <button class="st" onclick="S('t4','s5')">Interview</button>
+    <button class="st" onclick="S('t4','s6')">Connects To</button>
+  </div>
+
+  <div class="sc on" id="t4-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def">Java's <code>PriorityQueue</code> is a min-heap — the element with the lowest priority value (natural order or comparator) is always at the head. Internally it's stored as a complete binary tree flattened into an <code>Object[]</code>. Peek is O(1); poll and offer are O(log n).</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s1">
+    <div class="card"><div class="ct">Internals — array-as-tree math</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Array mapping</strong> — for element at index <code>i</code>: left child = <code>2i+1</code>, right child = <code>2i+2</code>, parent = <code>(i-1)/2</code>. No pointers needed — pure arithmetic navigation.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>offer(e) — sift-up</strong> — add element at the next leaf position (end of array). Compare with parent; if smaller, swap. Repeat upward. O(log n).</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>poll() — sift-down</strong> — swap root with last element, remove last, sift-down from root: compare with both children, swap with smaller child, repeat. O(log n).</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>heapify (bulk build)</strong> — when constructing from a collection, sift-down from the last non-leaf backwards. O(n) — faster than n individual inserts (O(n log n)).</div></div>
+        <div class="fs"><div class="fn">5</div><div class="ft"><strong>No O(1) contains / remove(Object)</strong> — PriorityQueue is a heap, not a sorted list. <code>contains</code> and <code>remove(Object)</code> are O(n) linear scans. If you need fast removal by value, pair it with a HashMap tracking positions.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s2">
+    <div class="card"><div class="ct">Visual — min-heap [1,3,2,7,5,4] as array and tree</div>
+      <div class="vis-wrap">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px">Array representation</div>
+        <div class="arr-row">
+          <div class="arr-cell head">1<div class="arr-idx">i=0 (root)</div></div>
+          <div class="arr-cell">3<div class="arr-idx">i=1</div></div>
+          <div class="arr-cell">2<div class="arr-idx">i=2</div></div>
+          <div class="arr-cell">7<div class="arr-idx">i=3</div></div>
+          <div class="arr-cell">5<div class="arr-idx">i=4</div></div>
+          <div class="arr-cell">4<div class="arr-idx">i=5</div></div>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px;margin-top:6px">Tree view (parent ≤ both children)</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+          <div><div class="heap-node min" style="width:38px;height:38px">1</div></div>
+          <div style="display:flex;gap:56px">
+            <div class="heap-node" style="width:36px;height:36px">3</div>
+            <div class="heap-node" style="width:36px;height:36px">2</div>
+          </div>
+          <div style="display:flex;gap:12px">
+            <div class="heap-node" style="width:34px;height:34px;font-size:12px">7</div>
+            <div class="heap-node" style="width:34px;height:34px;font-size:12px">5</div>
+            <div class="heap-node" style="width:34px;height:34px;font-size:12px">4</div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--color-text-secondary);margin-top:10px">Min (1) is always at index 0. Children of i=0: indices 1 and 2. Children of i=1: indices 3 and 4.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s3">
+    <div class="card"><div class="ct">Code</div>
+<div class="cb"><span class="cm">// Default: min-heap (natural order)</span>
+<span class="nm">PriorityQueue</span>&lt;<span class="nm">Integer</span>&gt; minPQ = <span class="kw">new</span> <span class="nm">PriorityQueue</span>&lt;&gt;();
+minPQ.offer(5); minPQ.offer(1); minPQ.offer(3);
+minPQ.peek();   <span class="cm">// 1 — O(1), doesn't remove</span>
+minPQ.poll();   <span class="cm">// 1 — O(log n), removes min</span>
+
+<span class="cm">// Max-heap via reversed comparator</span>
+<span class="nm">PriorityQueue</span>&lt;<span class="nm">Integer</span>&gt; maxPQ =
+    <span class="kw">new</span> <span class="nm">PriorityQueue</span>&lt;&gt;(<span class="nm">Comparator</span>.reverseOrder());
+
+<span class="cm">// Custom comparator — task scheduling by priority</span>
+<span class="nm">PriorityQueue</span>&lt;<span class="nm">Task</span>&gt; taskQ =
+    <span class="kw">new</span> <span class="nm">PriorityQueue</span>&lt;&gt;(<span class="nm">Comparator</span>.comparingInt(<span class="nm">Task</span>::getPriority));
+
+<span class="cm">// K-th largest element — classic interview pattern</span>
+<span class="nm">PriorityQueue</span>&lt;<span class="nm">Integer</span>&gt; kth = <span class="kw">new</span> <span class="nm">PriorityQueue</span>&lt;&gt;(k);
+<span class="kw">for</span> (<span class="kw">int</span> n : nums) {
+    kth.offer(n);
+    <span class="kw">if</span> (kth.size() &gt; k) kth.poll(); <span class="cm">// evict smallest</span>
+}
+kth.peek(); <span class="cm">// k-th largest</span>
+
+<span class="cm">// WARNING: iteration is NOT sorted order</span>
+<span class="kw">for</span> (<span class="kw">int</span> x : minPQ) <span class="nm">System</span>.out.print(x); <span class="cm">// arbitrary heap order</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Iterating PriorityQueue expecting sorted output</strong> — the for-each iterator returns elements in heap array order, NOT sorted order. Use repeated <code>poll()</code> to drain in sorted order.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Calling remove(Object) for efficiency</strong> — it's O(n). If you need to update priorities (Dijkstra's with lazy deletion), don't remove old entries — mark them stale and skip when polled.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Forgetting to negate for max-heap on primitives</strong> — <code>new PriorityQueue&lt;&gt;((a,b) -> b-a)</code> works for small integers but overflows for large values. Use <code>Comparator.reverseOrder()</code> or <code>Integer.compare(b,a)</code> instead.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>Explain sift-up and sift-down in a binary heap.<div class="qa">Sift-up (insert): place new element at end, then repeatedly swap with parent while element < parent. O(log n). Sift-down (delete-min): move last element to root, then repeatedly swap with the smaller child while element > any child. O(log n). These two operations are the entire heap algorithm.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">DSA Pattern</div>How do you find the K-th largest element efficiently?<div class="qa">Min-heap of size K. Iterate all elements: offer each, then if heap size > K poll (remove the min). At the end the heap's min (peek()) is the K-th largest. Time O(n log k), space O(k). Common patterns: K closest points to origin (max-heap by distance), merge K sorted arrays (min-heap of heads), median from stream (two heaps).</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Depth</div>Why is building a heap from n elements O(n) and not O(n log n)?<div class="qa">Heapify sifts-down from the last non-leaf backwards. Leaves need 0 swaps. Nodes at height h need at most h swaps. Summing h * (n/2^h) for all heights gives a geometric series that converges to 2n = O(n). The insight: most nodes are near the bottom and need few swaps.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t4-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain Dijkstra algorithm using PriorityQueue in Java')">Dijkstra</span>
+      <span class="chip" onclick="sendPrompt('Explain median from stream using two heaps in Java')">Median from stream</span>
+      <span class="chip" onclick="sendPrompt('Explain merge K sorted arrays with min-heap in Java')">Merge K sorted</span>
+      <span class="chip" onclick="sendPrompt('What is a Fibonacci heap and when is it better than a binary heap?')">Fibonacci heap</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════ TOPIC 5 — ArrayDeque ══════════ -->
+<div class="tp" id="t5">
+  <div class="ttl">ArrayDeque</div>
+  <div class="tsub">Circular array · head/tail pointers · preferred over Stack and LinkedList</div>
+  <div class="stabs">
+    <button class="st active" onclick="S('t5','s0')">Definition</button>
+    <button class="st" onclick="S('t5','s1')">Internals</button>
+    <button class="st" onclick="S('t5','s2')">Visual</button>
+    <button class="st" onclick="S('t5','s3')">Code</button>
+    <button class="st" onclick="S('t5','s4')">Mistakes</button>
+    <button class="st" onclick="S('t5','s5')">Interview</button>
+    <button class="st" onclick="S('t5','s6')">Connects To</button>
+  </div>
+
+  <div class="sc on" id="t5-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def"><code>ArrayDeque</code> is a double-ended queue backed by a resizable circular array. It supports O(1) add/remove at both head and tail. It is the recommended replacement for both <code>Stack</code> (legacy, synchronised) and <code>LinkedList</code> (poor cache performance) when you need stack or queue semantics.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:.5rem">
+      <div class="hl-box hl-g"><div class="hl-name">Use as Stack</div><code>push</code> = addFirst, <code>pop</code> = removeFirst, <code>peek</code> = peekFirst. LIFO. No null elements.</div>
+      <div class="hl-box hl-b"><div class="hl-name">Use as Queue</div><code>offer</code> = addLast, <code>poll</code> = removeFirst, <code>peek</code> = peekFirst. FIFO. Preferred over LinkedList.</div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s1">
+    <div class="card"><div class="ct">Internals — circular array</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Backing structure</strong> — <code>Object[] elements</code> with <code>int head, tail</code> indices. Initial capacity 16 (always power of 2). Elements wrap around — it's a ring buffer.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>addFirst</strong> — <code>head = (head - 1) & (elements.length - 1)</code>; store at new head. The bitwise AND with (length-1) handles the wrap-around without a branch — power-of-2 trick again.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>addLast</strong> — store at tail, then <code>tail = (tail + 1) & (elements.length - 1)</code>. Both operations are O(1).</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>Resize</strong> — when head == tail (full), double the capacity, copy elements to a new array in linearised order starting at index 0. O(n) amortised once.</div></div>
+        <div class="fs"><div class="fn">5</div><div class="ft"><strong>Why no nulls</strong> — ArrayDeque uses null as a sentinel to detect the empty condition. Storing null would break this check, hence <code>NullPointerException</code> on null input.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s2">
+    <div class="card"><div class="ct">Visual — circular array (capacity=8, head=5, tail=2)</div>
+      <div class="vis-wrap">
+        <div class="arr-row">
+          <div class="arr-cell">"E"<div class="arr-idx">0</div></div>
+          <div class="arr-cell">"F"<div class="arr-idx">1</div></div>
+          <div class="arr-cell empty">·<div class="arr-idx">2 (tail)</div></div>
+          <div class="arr-cell empty">·<div class="arr-idx">3</div></div>
+          <div class="arr-cell empty">·<div class="arr-idx">4</div></div>
+          <div class="arr-cell head">"A"<div class="arr-idx">5 (head)</div></div>
+          <div class="arr-cell">"B"<div class="arr-idx">6</div></div>
+          <div class="arr-cell">"C"<div class="arr-idx">7</div></div>
+        </div>
+        <p style="font-size:12px;color:var(--color-text-secondary)">Logical order: A→B→C→E→F. Data wraps around — indices 5,6,7,0,1. No copying needed for head/tail add operations.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s3">
+    <div class="card"><div class="ct">Code</div>
+<div class="cb"><span class="nm">Deque</span>&lt;<span class="nm">Integer</span>&gt; dq = <span class="kw">new</span> <span class="nm">ArrayDeque</span>&lt;&gt;();
+
+<span class="cm">// Used as Stack (LIFO)</span>
+dq.push(1); dq.push(2); dq.push(3);
+dq.pop();   <span class="cm">// 3 — LIFO</span>
+
+<span class="cm">// Used as Queue (FIFO)</span>
+dq.offer(1); dq.offer(2); dq.offer(3);
+dq.poll();   <span class="cm">// 1 — FIFO</span>
+
+<span class="cm">// Monotonic stack pattern (common interview pattern)</span>
+<span class="nm">Deque</span>&lt;<span class="nm">Integer</span>&gt; mono = <span class="kw">new</span> <span class="nm">ArrayDeque</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="kw">int</span> x : arr) {
+    <span class="kw">while</span> (!mono.isEmpty() &amp;&amp; mono.peek() &lt; x)
+        mono.pop(); <span class="cm">// maintain decreasing monotonic stack</span>
+    mono.push(x);
+}
+
+<span class="cm">// Sliding window maximum (deque of indices)</span>
+<span class="nm">Deque</span>&lt;<span class="nm">Integer</span>&gt; window = <span class="kw">new</span> <span class="nm">ArrayDeque</span>&lt;&gt;();
+<span class="cm">// pollLast: remove smaller elements from back
+// peekFirst: get current window max</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s4">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Storing null in ArrayDeque</strong> — throws NullPointerException immediately. If you need nullable elements, use LinkedList (though that's rarely the right choice).</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Using Stack class</strong> — <code>java.util.Stack</code> extends Vector, so every operation is synchronised — unnecessary overhead in single-threaded use. Always prefer ArrayDeque for stack semantics.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Mixing Stack and Queue API names</strong> — ArrayDeque implements both Deque and Queue. push/pop are stack (LIFO); offer/poll are queue (FIFO). Mixing them on the same Deque produces confusing ordering bugs. Be consistent.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s5">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Why</div>Why is ArrayDeque preferred over Stack and LinkedList?<div class="qa">Over Stack: Stack is synchronised (inherits from Vector) — unnecessary overhead, and inheritance is a design mistake (Stack IS-A Vector? No.). Over LinkedList: ArrayDeque uses a contiguous circular array — much better cache locality. Both O(1) at head and tail, but ArrayDeque is consistently faster in benchmarks. No pointer overhead per element.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Pattern</div>What is a monotonic stack and name 2 problems it solves.<div class="qa">A stack that maintains elements in strictly increasing or decreasing order. When an element violates the monotonicity, pop until it doesn't, then push. Problems: (1) Next Greater Element — for each element, find the first element to its right that's larger. (2) Largest Rectangle in Histogram. (3) Sliding Window Maximum uses a monotonic deque. Pattern: O(n) solutions to problems that seem O(n²).</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t5-s6">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain the monotonic stack pattern with Next Greater Element problem in Java')">Monotonic stack</span>
+      <span class="chip" onclick="sendPrompt('Explain sliding window maximum using ArrayDeque in Java')">Sliding window max</span>
+      <span class="chip" onclick="sendPrompt('What is a circular buffer and how does ArrayDeque implement it?')">Ring buffer</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- ══════════ TOPIC 6 — Collections utility ══════════ -->
+<div class="tp" id="t6">
+  <div class="ttl">Collections utility class</div>
+  <div class="tsub">sort · binarySearch · reverse · frequency · unmodifiableList · synchronizedList</div>
+  <div class="stabs">
+    <button class="st active" onclick="S('t6','s0')">Definition</button>
+    <button class="st" onclick="S('t6','s1')">Key methods</button>
+    <button class="st" onclick="S('t6','s2')">Code</button>
+    <button class="st" onclick="S('t6','s3')">Mistakes</button>
+    <button class="st" onclick="S('t6','s4')">Interview</button>
+    <button class="st" onclick="S('t6','s5')">Connects To</button>
+  </div>
+
+  <div class="sc on" id="t6-s0">
+    <div class="card"><div class="ct">Definition</div>
+      <p class="def"><code>java.util.Collections</code> is a utility class of static methods that operate on or return collections. It provides algorithm implementations (sort, shuffle, binarySearch), transformation wrappers (unmodifiable, synchronized, singleton), and min/max/frequency helpers.</p>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s1">
+    <div class="card"><div class="ct">Key methods — what they do internally</div>
+      <div class="flow">
+        <div class="fs"><div class="fn">1</div><div class="ft"><strong>Collections.sort(list)</strong> — delegates to <code>list.sort(null)</code> which calls <code>Arrays.sort</code> on the backing array. Uses TimSort — a hybrid merge+insertion sort. O(n log n) worst case, O(n) best case (already sorted). Stable sort.</div></div>
+        <div class="fs"><div class="fn">2</div><div class="ft"><strong>Collections.binarySearch(list, key)</strong> — requires sorted list. Uses index-based binary search for RandomAccess lists (ArrayList), pointer-walking for others (O(n) — use an array instead). Returns insertion point if not found: <code>-(index+1)</code>.</div></div>
+        <div class="fs"><div class="fn">3</div><div class="ft"><strong>Collections.reverse(list)</strong> — swaps first with last, then second with second-to-last etc. O(n). Works in-place on the list.</div></div>
+        <div class="fs"><div class="fn">4</div><div class="ft"><strong>Collections.unmodifiableList(list)</strong> — returns a wrapper that throws <code>UnsupportedOperationException</code> on any mutating method. The underlying list is still mutable — callers who hold a reference to it can still modify it. This is a view, not a copy. For a truly immutable list use <code>List.copyOf()</code> (Java 10+) or <code>List.of()</code> (Java 9+).</div></div>
+        <div class="fs"><div class="fn">5</div><div class="ft"><strong>Collections.synchronizedList(list)</strong> — wraps every method with <code>synchronized(mutex)</code>. Safe for concurrent access but iteration must be manually synchronised: <code>synchronized(list) { for(x : list)... }</code>. Prefer <code>CopyOnWriteArrayList</code> for read-heavy, <code>ConcurrentLinkedQueue</code> for queues.</div></div>
+        <div class="fs"><div class="fn">6</div><div class="ft"><strong>Collections.frequency(coll, o)</strong> — O(n) linear scan counting elements equal to o. <strong>nCopies(n, o)</strong> — returns an immutable list of n copies of o in O(1) (backed by a view, not n actual copies). <strong>disjoint(c1,c2)</strong> — true if no common elements.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s2">
+    <div class="card"><div class="ct">Code</div>
+<div class="cb"><span class="nm">List</span>&lt;<span class="nm">Integer</span>&gt; nums = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;(Arrays.asList(3,1,4,1,5,9));
+
+<span class="nm">Collections</span>.sort(nums);                   <span class="cm">// [1,1,3,4,5,9] — TimSort</span>
+<span class="nm">Collections</span>.sort(nums, <span class="nm">Comparator</span>.reverseOrder()); <span class="cm">// [9,5,4,3,1,1]</span>
+<span class="nm">Collections</span>.reverse(nums);                <span class="cm">// [1,1,3,4,5,9]</span>
+<span class="nm">Collections</span>.shuffle(nums);                <span class="cm">// random order</span>
+<span class="nm">Collections</span>.frequency(nums, 1);           <span class="cm">// 2</span>
+<span class="nm">Collections</span>.min(nums);                    <span class="cm">// 1</span>
+<span class="nm">Collections</span>.max(nums);                    <span class="cm">// 9</span>
+
+<span class="kw">int</span> idx = <span class="nm">Collections</span>.binarySearch(nums, 4); <span class="cm">// list MUST be sorted first</span>
+
+<span class="cm">// Immutable views vs true immutability</span>
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt; orig = <span class="kw">new</span> <span class="nm">ArrayList</span>&lt;&gt;(Arrays.asList(<span class="st2">"a"</span>,<span class="st2">"b"</span>));
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt; view = <span class="nm">Collections</span>.unmodifiableList(orig);
+orig.add(<span class="st2">"c"</span>);      <span class="cm">// mutates orig AND view sees it!</span>
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt; safe = <span class="nm">List</span>.copyOf(orig);   <span class="cm">// true defensive copy, immutable</span>
+
+<span class="cm">// Efficient n-copy</span>
+<span class="nm">List</span>&lt;<span class="nm">String</span>&gt; zeros = <span class="nm">Collections</span>.nCopies(1000, <span class="st2">"0"</span>); <span class="cm">// O(1) memory</span></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s3">
+    <div class="card"><div class="ct">Common mistakes</div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>binarySearch on unsorted list</strong> — returns undefined/wrong results. No exception thrown. You will get a random answer and spend hours debugging. Always sort first, or better yet use a TreeSet if you need sorted search.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Thinking unmodifiableList makes the data immutable</strong> — it's a view. The original list can still be modified by whoever holds it. Use <code>List.of()</code> or <code>List.copyOf()</code> when you need a truly immutable snapshot.</div></div>
+      <div class="mi"><div class="mico">!</div><div class="mt"><strong>Iterating synchronizedList without external lock</strong> — individual operations are thread-safe but iteration is not atomic. Two threads can interleave during iteration → ConcurrentModificationException or missed elements. Wrap iteration in <code>synchronized(list) { }</code>.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s4">
+    <div class="card"><div class="ct">Interview questions</div>
+      <div class="qi" onclick="A(this)"><div class="ql">Classic</div>What is the difference between Collections.unmodifiableList and List.of?<div class="qa">unmodifiableList is a view around a mutable list — the underlying list can change and the view reflects it; throws UnsupportedOperationException on writes. List.of() (Java 9+) creates a brand new immutable list from the provided elements — no backing list to mutate, structurally immutable. List.copyOf() creates an immutable copy of an existing collection — safe from original-list mutations.</div></div>
+      <div class="qi" onclick="A(this)"><div class="ql">Algo</div>What sorting algorithm does Collections.sort use and why?<div class="qa">TimSort — a hybrid of merge sort and insertion sort. Advantages: (1) stable sort — equal elements maintain relative order, (2) O(n) best case on already-sorted or nearly-sorted input (common in real data), (3) O(n log n) worst case. Insertion sort is used for small sub-arrays (< 32 elements) because it has low overhead and good cache behaviour for small n.</div></div>
+    </div>
+  </div>
+
+  <div class="sc" id="t6-s5">
+    <div class="card"><div class="ct">Connects to</div><div class="chips">
+      <span class="chip" onclick="sendPrompt('Explain TimSort algorithm internals in detail')">TimSort internals</span>
+      <span class="chip" onclick="sendPrompt('Explain List.of vs List.copyOf vs Arrays.asList in Java')">List factory methods</span>
+      <span class="chip" onclick="sendPrompt('What are ConcurrentCollections in Java and when do you use each?')">Concurrent collections</span>
+    </div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function T(i){
+  document.querySelectorAll('.tp').forEach((p,j)=>p.classList.toggle('on',j===i));
+  document.querySelectorAll('.nav-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+}
+function S(tid,sid){
+  var tp=document.getElementById(tid);
+  tp.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
+  var sc=document.getElementById(tid+'-'+sid);
+  if(sc)sc.classList.add('on');
+  var stabs=tp.querySelectorAll('.st');
+  var sids=['s0','s1','s2','s3','s4','s5','s6','s7'];
+  stabs.forEach((b,i)=>b.classList.toggle('active',sids[i]===sid));
+}
+function A(el){
+  var a=el.querySelector('.qa');
+  if(a)a.style.display=a.style.display==='block'?'none':'block';
+}
+</script>

@@ -1,0 +1,762 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{display:flex;height:100vh;min-height:640px;overflow:hidden;font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.sidebar{width:210px;min-width:210px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 0;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.08em;padding:0 14px 8px}
+.tbtn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 14px;border:none;background:transparent;text-align:left;cursor:pointer;font-size:12.5px;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;line-height:1.4}
+.tbtn:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.tbtn.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left:2px solid #D85A30;font-weight:500}
+.tnum{font-size:11px;color:var(--color-text-tertiary);min-width:16px;flex-shrink:0}
+.main{flex:1;overflow-y:auto;padding:0;min-width:0}
+.stabs{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);padding:0 18px;position:sticky;top:0;background:var(--color-background-primary);z-index:10;overflow-x:auto;gap:0}
+.stab{padding:9px 11px;font-size:11.5px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.stab:hover{color:var(--color-text-primary)}
+.stab.active{color:#993C1D;border-bottom:2px solid #D85A30}
+.cnt{padding:18px}
+.th{font-size:19px;font-weight:500;margin-bottom:3px}
+.ts{font-size:12.5px;color:var(--color-text-secondary);margin-bottom:16px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-tertiary);margin-bottom:7px}
+.ct{font-size:13.5px;color:var(--color-text-secondary);line-height:1.7}
+.hl{background:var(--color-background-secondary);border-left:3px solid #D85A30;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:9px 13px;margin:8px 0;font-size:13px;color:var(--color-text-primary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;font-family:var(--font-mono);font-size:11.5px;line-height:1.6;color:var(--color-text-primary);overflow-x:auto;white-space:pre;margin:8px 0}
+.ctbl{width:100%;font-size:12.5px;border-collapse:collapse}
+.ctbl th{text-align:left;padding:5px 7px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.ctbl td{padding:6px 7px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);vertical-align:top;font-size:12.5px}
+.ctbl td:first-child{font-weight:500;color:var(--color-text-primary)}
+.og{color:#3B6D11;font-weight:500}.om{color:#854F0B;font-weight:500}.ob{color:#A32D2D;font-weight:500}
+.pc{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px;margin-bottom:9px}
+.pn{font-size:13.5px;font-weight:500;margin-bottom:4px}
+.trig{font-size:11.5px;color:#993C1D;background:#FAECE7;padding:3px 9px;border-radius:var(--border-radius-md);display:inline-block;margin:3px 0}
+.pw{font-size:12.5px;color:var(--color-text-secondary);margin-top:5px;line-height:1.6}
+.sr{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12.5px}
+.sr:last-child{border-bottom:none}
+.si{color:var(--color-text-tertiary);min-width:52px;font-size:10.5px;font-weight:500;text-transform:uppercase;padding-top:2px}
+.sth{color:#712B13;font-weight:500;min-width:130px}
+.sw{color:var(--color-text-secondary)}
+.prb{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:11px;margin-bottom:7px}
+.diff{font-size:11px;font-weight:500;padding:2px 7px;border-radius:var(--border-radius-md);display:inline-block;margin-bottom:5px}
+.easy{background:#EAF3DE;color:#27500A}.medium{background:#FAEEDA;color:#633806}.hard{background:#FAECE7;color:#712B13}
+.pname{font-size:13.5px;font-weight:500;margin-bottom:3px}
+.pmeta{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.ipill{display:flex;gap:7px;align-items:flex-start;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6}
+.dot{width:5px;height:5px;border-radius:50%;background:#D85A30;margin-top:7px;flex-shrink:0}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 7px;border-radius:var(--border-radius-md);margin:2px}
+.tp{background:#EEEDFE;color:#3C3489}.tt{background:#E1F5EE;color:#085041}.ta{background:#FAEEDA;color:#633806}.tc{background:#FAECE7;color:#712B13}
+</style>
+
+<h2 class="sr-only">Block 7: Greedy algorithms — interactive DSA study bible covering 6 greedy topics</h2>
+<div class="app">
+<div class="sidebar">
+  <div class="sidebar-title">Block 7 — Greedy</div>
+  <button class="tbtn active" onclick="sel(0)"><span class="tnum">1</span>Greedy Fundamentals</button>
+  <button class="tbtn" onclick="sel(1)"><span class="tnum">2</span>Activity Selection</button>
+  <button class="tbtn" onclick="sel(2)"><span class="tnum">3</span>Jump Game</button>
+  <button class="tbtn" onclick="sel(3)"><span class="tnum">4</span>Gas Station</button>
+  <button class="tbtn" onclick="sel(4)"><span class="tnum">5</span>Huffman Encoding</button>
+  <button class="tbtn" onclick="sel(5)"><span class="tnum">6</span>Task Scheduler</button>
+</div>
+<div class="main" id="main">
+  <div class="stabs" id="stabs"></div>
+  <div class="cnt" id="cnt"></div>
+</div>
+</div>
+
+<script>
+const TABS=["Definition","Mechanics","Complexity","Variants","Patterns","Smell→Pattern","Java Code","Worked Example","Practice","Interview"];
+
+const D=[
+{title:"Greedy Fundamentals",sub:"Greedy choice property · Optimal substructure · When greedy works",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">A greedy algorithm builds a solution step by step, always making the choice that looks best <strong>right now</strong>, never reconsidering past choices. Unlike DP, greedy never explores alternatives or backtracks. It works only when local optimal choices provably lead to a global optimum.</div></div>
+<div class="hl">Greedy = DP without the memo table, and without exploring alternatives. When it works, it's faster (often O(n log n) or O(n)) than the equivalent DP solution.</div>
+<div class="card"><div class="lbl">Two required properties</div><div class="ct"><strong>Greedy choice property:</strong> a globally optimal solution can be reached by making a locally optimal (greedy) choice at each step — you never need to revisit it.<br><strong>Optimal substructure:</strong> the optimal solution to the problem contains optimal solutions to subproblems (same property DP relies on, but here it's resolved without comparing alternatives).</div></div>`,
+
+`<div class="card"><div class="lbl">Why greedy can fail</div><div class="ct">Greedy makes an irrevocable choice at each step based on currently visible information. If a locally-best choice can block a better global outcome later, greedy fails. Classic counterexample: coin change with denominations [1,3,4], target=6. Greedy picks 4+1+1=3 coins. Optimal is 3+3=2 coins. Greedy assumed "biggest coin first" is always best — it isn't, unless denominations are structured specially (like standard currency).</div></div>
+<div class="code">// Proving greedy works — two standard techniques:
+// 1. EXCHANGE ARGUMENT: show that any optimal solution can be
+//    transformed into the greedy solution without making it worse.
+//    "If optimal solution differs from greedy at step i, swap them —
+//     result is no worse." Repeat until solutions match.
+//
+// 2. INDUCTION: show greedy choice at step 1 is part of SOME
+//    optimal solution. Then show the remaining subproblem
+//    (after removing that choice) is solved optimally by induction.</div>
+<div class="hl"><strong>Interview tip:</strong> If you can't articulate WHY the greedy choice is safe (via exchange argument or induction), it might not be safe. Test with a counterexample before committing.</div>`,
+
+`<table class="ctbl"><tr><th>Approach</th><th>Time</th><th>Space</th><th>When it applies</th></tr>
+<tr><td>Greedy</td><td class="og">O(n log n) typical</td><td class="og">O(1) to O(n)</td><td>Proven greedy-choice property</td></tr>
+<tr><td>DP (fallback)</td><td class="om">O(n²) or worse</td><td class="om">O(n) or worse</td><td>When greedy choice isn't provably safe</td></tr>
+<tr><td>Backtracking (fallback)</td><td class="ob">Exponential</td><td class="om">O(n)</td><td>When no greedy/DP structure exists</td></tr>
+</table>
+<div class="hl" style="margin-top:10px">Greedy is usually the FASTEST correct approach when applicable — often a single sort plus a linear scan. The hard part isn't implementation; it's the proof of correctness.</div>`,
+
+`<div class="pc"><div class="pn">Sort-then-scan greedy</div><div class="pw">Sort by a key (end time, ratio, deadline), then make one pass making the obvious choice at each step. Activity selection, interval scheduling.</div></div>
+<div class="pc"><div class="pn">Exchange-argument greedy</div><div class="pw">Prove that swapping any two adjacent elements in a non-greedy order doesn't improve the answer. Used for scheduling problems (e.g., minimize lateness).</div></div>
+<div class="pc"><div class="pn">Greedy with priority queue</div><div class="pw">Repeatedly extract the best current option (min/max) from a heap, process it, possibly insert new options. Huffman encoding, task scheduling, Dijkstra (graph block).</div></div>
+<div class="pc"><div class="pn">Local feasibility tracking</div><div class="pw">Track a running quantity (fuel, jump reach) and greedily extend it. If it goes negative/insufficient, problem is infeasible from current start. Gas station, jump game.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Sort + Greedy Scan</div><div class="trig">Mental trigger: "sort by some criterion, then make the obvious choice"</div><div class="pw">Sort first, then single pass. Most interval/scheduling problems. O(n log n) total.</div></div>
+<div class="pc"><div class="pn">2. Track Running Feasibility</div><div class="trig">Mental trigger: "running total goes negative → reset/fail"</div><div class="pw">Maintain a running sum/reach. When it breaks a constraint, that tells you something about the structure (new start point, infeasibility).</div></div>
+<div class="pc"><div class="pn">3. Always Pick Extreme (max/min) Available</div><div class="trig">Mental trigger: "always grab the best available option right now"</div><div class="pw">Priority queue greedy. Always process/merge the smallest or largest available item. Huffman, merge k lists by cost.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"maximize number of non-overlapping things"</span><span class="sw">→ Sort by end time, greedy select (activity selection)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"can you reach the end / min steps to reach end"</span><span class="sw">→ Track max reachable index greedily (jump game)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"circular route feasibility with fuel/resource"</span><span class="sw">→ Track running balance, reset start on deficit (gas station)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"build optimal prefix-free code / merge costs"</span><span class="sw">→ Min-heap greedy merge (Huffman encoding)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"schedule tasks with cooldown/constraint, minimize time"</span><span class="sw">→ Greedy with frequency count + math formula or heap</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">your greedy choice has a counterexample</span><span class="sw">→ Switch to DP — greedy choice property doesn't hold</span></div>
+</div>`,
+
+`<div class="code">// THE GREEDY VALIDATION CHECKLIST (apply before coding)
+//
+// 1. Can I sort the input by some criterion that reveals the
+//    "safe" choice at each step?
+// 2. Can I find a counterexample to my proposed greedy rule?
+//    Try small inputs by hand (n=2,3) FIRST.
+// 3. Can I justify with exchange argument: "if the optimal
+//    solution did something different at step 1, I can
+//    transform it to match greedy without making it worse"?
+// 4. Does the problem have a clean local signal (earliest
+//    deadline, smallest weight, largest ratio) that doesn't
+//    require knowing the future?
+//
+// If 1-4 all check out → greedy is safe. If you're unsure,
+// default to DP — it's never wrong, just maybe slower.
+
+// GENERIC GREEDY TEMPLATE:
+// 1. Sort input by key
+// 2. Initialize result/tracking variable
+// 3. Single pass: for each element, decide include/reject
+//    based on current state (no backtracking)
+// 4. Return result
+
+List&lt;Interval&gt; greedyTemplate(List&lt;Interval&gt; items) {
+    items.sort((a, b) -&gt; a.end - b.end);     // sort by criterion
+    List&lt;Interval&gt; result = new ArrayList&lt;&gt;();
+    int lastEnd = Integer.MIN_VALUE;
+    for (Interval item : items) {
+        if (item.start &gt;= lastEnd) {          // greedy feasibility check
+            result.add(item);
+            lastEnd = item.end;
+        }
+    }
+    return result;
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 455 — Assign Cookies (simplest greedy proof)</div><div class="card-text">Each child has a greed factor, each cookie has a size. Maximize satisfied children where cookie size ≥ greed factor.</div></div>
+<div class="hl"><strong>Why greedy works:</strong> Exchange argument — sort both arrays. Assign the smallest sufficient cookie to the least greedy unsatisfied child. If you assigned a bigger cookie instead, you could always swap it with a smaller sufficient one without losing satisfied children. So greedy is safe.</div>
+<div class="code">int findContentChildren(int[] g, int[] s) {
+    Arrays.sort(g); Arrays.sort(s);           // sort both
+    int child = 0, cookie = 0;
+    while (child &lt; g.length &amp;&amp; cookie &lt; s.length) {
+        if (s[cookie] &gt;= g[child]) child++;   // cookie satisfies child
+        cookie++;                              // always advance cookie
+    }
+    return child;
+}
+// Greedy: always try the smallest available cookie on the least
+// greedy child first. This never "wastes" a big cookie on a
+// small need.</div>`,
+
+`<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 455 — Assign Cookies</div><div class="pmeta"><strong>Why:</strong> Simplest greedy with clean exchange-argument proof.<br><strong>Key insight:</strong> Sort both arrays, match smallest sufficient cookie to least greedy child.</div></div>
+<div class="prb"><div class="diff easy">Easy</div><div class="pname">LC 860 — Lemonade Change</div><div class="pmeta"><strong>Why:</strong> Greedy with running state (bill counts).<br><strong>Key insight:</strong> Always give change using largest bills first to preserve flexibility.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 763 — Partition Labels</div><div class="pmeta"><strong>Why:</strong> Greedy partition using last-occurrence tracking.<br><strong>Key insight:</strong> Extend partition end to the last occurrence of any char seen so far.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 134 — Gas Station</div><div class="pmeta"><strong>Why:</strong> Classic feasibility-tracking greedy (covered in depth later).<br><strong>Key insight:</strong> If total gas ≥ total cost, a valid start always exists.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 135 — Candy</div><div class="pmeta"><strong>Why:</strong> Two-pass greedy. Left-to-right and right-to-left constraints combined.<br><strong>Key insight:</strong> Each direction enforces one inequality; take max of both passes per index.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you articulate WHY the greedy choice is safe (not just that it works on examples)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you test your greedy hypothesis against a small counterexample before coding?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you identify when a problem looks greedy but actually needs DP?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "I'll try a greedy approach: sort by [X], then at each step choose [Y]. Let me verify this is safe — if I swapped this choice with another, would the result get worse? [walk through exchange argument]. Since that holds, greedy is correct here. Time O(n log n) for the sort, O(n) for the scan."</div>`
+]},
+
+{title:"Activity Selection",sub:"Interval scheduling · Sort by end time",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Given a set of activities/intervals each with a start and end time, select the maximum number of non-overlapping activities. This is THE canonical greedy problem — the proof that "sort by end time, greedily pick" is optimal is the textbook example of the exchange argument.</div></div>
+<div class="hl">Greedy rule: sort by END time (not start, not duration). Always pick the activity with the earliest end time among remaining feasible options.</div>
+<div class="card"><div class="lbl">Why end time, not start time or duration?</div><div class="ct">Sorting by start time can lock you into a long activity that blocks many short ones later. Sorting by duration ignores position entirely. Sorting by END time guarantees: the activity you pick frees up the earliest possible time for future activities — maximizing the "room" left for everything else.</div></div>`,
+
+`<div class="card"><div class="lbl">Why end time works — the proof sketch</div></div>
+<div class="code">// Activities: (1,4) (3,5) (0,6) (5,7) (3,8) (5,9) (6,10) (8,11) (8,12) (2,13) (12,14)
+// Sort by END time:
+// (1,4) (3,5) (0,6) (5,7) (3,8) (5,9) (6,10) (8,11) (8,12) (2,13) (12,14)
+// already sorted by end here for illustration
+//
+// Greedy walk:
+// pick (1,4)  → lastEnd=4
+// (3,5): start=3 &lt; 4 → skip (overlaps)
+// (0,6): start=0 &lt; 4 → skip
+// (5,7): start=5 &gt;= 4 → pick! lastEnd=7
+// (3,8): skip (3&lt;7)
+// (5,9): skip (5&lt;7)
+// (6,10): skip (6&lt;7)
+// (8,11): start=8&gt;=7 → pick! lastEnd=11
+// (8,12): skip
+// (2,13): skip
+// (12,14): start=12&gt;=11 → pick! lastEnd=14
+// Result: (1,4),(5,7),(8,11),(12,14) — 4 activities, maximum possible</div>
+<div class="hl"><strong>Exchange argument:</strong> Suppose an optimal solution doesn't pick the earliest-ending activity first. Replace its first pick with the earliest-ending one — it still doesn't overlap with what follows (since it ends earlier), so the solution remains valid and equally sized. By induction, greedy matches optimal.</div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Activity Selection</td><td class="og">O(n log n)</td><td class="og">O(1) extra</td><td>Sort dominates; single greedy pass is O(n)</td></tr>
+<tr><td>Non-overlapping Intervals (min removals)</td><td class="og">O(n log n)</td><td class="og">O(1)</td><td>Same sort + scan, count removals instead of keeps</td></tr>
+<tr><td>Merge Intervals</td><td class="og">O(n log n)</td><td class="om">O(n)</td><td>Sort by start time (different criterion!), merge overlaps</td></tr>
+<tr><td>Meeting Rooms II (min rooms)</td><td class="og">O(n log n)</td><td class="om">O(n)</td><td>Heap of end times, or sweep line with sorted starts/ends</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">Maximum non-overlapping intervals (sort by end)</div><div class="pw">Activity Selection, Non-overlapping Intervals. Sort by end time. Track lastEnd. Pick if start ≥ lastEnd.</div></div>
+<div class="pc"><div class="pn">Merge overlapping intervals (sort by start)</div><div class="pw">Merge Intervals. Sort by START time. Merge current with next if they overlap (next.start ≤ current.end).</div></div>
+<div class="pc"><div class="pn">Minimum resources needed (sweep line / heap)</div><div class="pw">Meeting Rooms II. Sort starts and ends separately, sweep through chronologically tracking concurrent count. Or use min-heap of active end times.</div></div>
+<div class="pc"><div class="pn">Minimum arrows/points to cover intervals</div><div class="pw">Minimum Number of Arrows to Burst Balloons. Sort by end. Greedily place arrow at end of first interval; skip all intervals it covers.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Maximize count of non-overlapping</div><div class="trig">Mental trigger: "select max activities that don't conflict"</div><div class="pw">Sort by end time. lastEnd tracking. O(n log n).</div></div>
+<div class="pc"><div class="pn">2. Minimize removals to eliminate overlap</div><div class="trig">Mental trigger: "min intervals to remove so none overlap"</div><div class="pw">Same as activity selection inverted: removals = n - max_non_overlapping_kept.</div></div>
+<div class="pc"><div class="pn">3. Merge all overlapping ranges</div><div class="trig">Mental trigger: "combine overlapping intervals into one"</div><div class="pw">Sort by START (not end!). Different criterion because the goal is different — combining, not selecting.</div></div>
+<div class="pc"><div class="pn">4. Sweep-line resource counting</div><div class="trig">Mental trigger: "max concurrent intervals / min rooms needed"</div><div class="pw">Track +1 at start, -1 at end, sweep chronologically, track running max.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"max number of non-overlapping intervals"</span><span class="sw">→ Sort by END time, greedy pick if start≥lastEnd</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"min intervals to remove for no overlap"</span><span class="sw">→ n - (max non-overlapping kept), same sort by end</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"merge all overlapping intervals into one list"</span><span class="sw">→ Sort by START time, merge adjacent if overlapping</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"min rooms/resources for concurrent intervals"</span><span class="sw">→ Sweep line (separate sorted starts/ends) or min-heap of ends</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"min points/arrows to cover all intervals"</span><span class="sw">→ Sort by end, place point at end, skip covered intervals</span></div>
+</div>`,
+
+`<div class="code">// LC 435 — Non-overlapping Intervals (min removals)
+int eraseOverlapIntervals(int[][] intervals) {
+    if (intervals.length == 0) return 0;
+    Arrays.sort(intervals, (a, b) -&gt; a[1] - b[1]);  // sort by END
+    int count = 1;                 // first interval always kept
+    int lastEnd = intervals[0][1];
+    for (int i = 1; i &lt; intervals.length; i++) {
+        if (intervals[i][0] &gt;= lastEnd) {   // no overlap
+            count++;
+            lastEnd = intervals[i][1];
+        }
+        // else: overlap → skip this interval (it's removed)
+    }
+    return intervals.length - count;  // removals = total - kept
+}
+
+// LC 56 — Merge Intervals (different criterion: sort by START)
+int[][] merge(int[][] intervals) {
+    Arrays.sort(intervals, (a, b) -&gt; a[0] - b[0]);  // sort by START
+    List&lt;int[]&gt; result = new ArrayList&lt;&gt;();
+    for (int[] curr : intervals) {
+        if (result.isEmpty() || result.get(result.size()-1)[1] &lt; curr[0])
+            result.add(curr);                        // no overlap: new entry
+        else
+            result.get(result.size()-1)[1] =          // overlap: extend end
+                Math.max(result.get(result.size()-1)[1], curr[1]);
+    }
+    return result.toArray(new int[0][]);
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 435 — Non-overlapping Intervals walkthrough</div></div>
+<div class="hl"><strong>Key insight:</strong> Minimizing removals = maximizing what's kept. So this problem reduces exactly to Activity Selection — just report n minus the count kept.</div>
+<div class="code">// intervals = [[1,2],[2,3],[3,4],[1,3]]
+// Sort by end: [1,2],[2,3],[1,3],[3,4]
+//   (note: [2,3] and [1,3] both end at 3 — order between them
+//    doesn't affect correctness here)
+//
+// count=1, lastEnd=2 (picked [1,2])
+// [2,3]: start=2 &gt;= 2 → pick! count=2, lastEnd=3
+// [1,3]: start=1 &lt; 3 → skip (overlap, this gets removed)
+// [3,4]: start=3 &gt;= 3 → pick! count=3, lastEnd=4
+//
+// Total intervals=4, kept=3 → removals = 4-3 = 1 ✓
+// (removing [1,3] resolves all overlaps)</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 435 — Non-overlapping Intervals</div><div class="pmeta"><strong>Why:</strong> Direct activity selection application — min removals = n minus max kept.<br><strong>Key insight:</strong> Sort by end time, greedy keep if no overlap.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 56 — Merge Intervals</div><div class="pmeta"><strong>Why:</strong> Tests if you know sort criterion changes with goal (start, not end).<br><strong>Key insight:</strong> Merging requires chronological start order, not earliest-end order.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 452 — Minimum Number of Arrows to Burst Balloons</div><div class="pmeta"><strong>Why:</strong> Activity selection variant — minimize "points" covering all intervals.<br><strong>Key insight:</strong> Sort by end. Place arrow at end of first balloon; skip all overlapping ones.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 253 — Meeting Rooms II</div><div class="pmeta"><strong>Why:</strong> Sweep-line / heap greedy. Counts concurrent overlap, not max non-overlap.<br><strong>Key insight:</strong> Min-heap of active end times; if new meeting starts after heap-min ends, reuse that room.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1235 — Maximum Profit in Job Scheduling</div><div class="pmeta"><strong>Why:</strong> Activity selection + DP hybrid. Greedy sort, but DP for value optimization.<br><strong>Key insight:</strong> Sort by end time, binary search for last compatible job, DP on top.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Do you know to sort by END time specifically (not start, not duration)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you explain WHY end-time sorting is optimal (exchange argument)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you adapt the sort criterion when the goal changes (merge vs select)?</span></div>
+</div>
+<div class="hl"><strong>Common trap:</strong> Candidates often default to sorting by start time out of habit. Always ask: "does this problem need me to track overlap forward (start) or minimize occupied time (end)?" Activity selection needs end-time sorting; merge intervals needs start-time sorting.</div>`
+]},
+
+{title:"Jump Game",sub:"Can reach end · Minimum jumps",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Given an array where each element represents the maximum jump length from that position, determine if you can reach the last index (Jump Game I) or find the minimum number of jumps to reach it (Jump Game II). Both solved greedily by tracking the farthest reachable index without exploring all possible jump sequences.</div></div>
+<div class="hl">Greedy rule: track maxReach = the farthest index reachable so far. If current index ever exceeds maxReach, you're stuck — return false. No need to try every possible jump combination.</div>
+<div class="card"><div class="lbl">Jump Game I vs II</div><div class="ct"><strong>Jump Game I (LC 55):</strong> can you reach the last index at all? Track maxReach, single pass, O(n).<br><strong>Jump Game II (LC 45):</strong> minimum number of jumps to reach the last index. BFS-like greedy using "current jump boundary" and "farthest reachable" — increment jump count when boundary is exhausted.</div></div>`,
+
+`<div class="card"><div class="lbl">Jump Game I mechanics</div></div>
+<div class="code">// nums = [2, 3, 1, 1, 4]
+// maxReach starts at 0
+// i=0: maxReach = max(0, 0+2) = 2
+// i=1: i(1) &lt;= maxReach(2) ✓.  maxReach = max(2, 1+3) = 4
+// i=2: i(2) &lt;= maxReach(4) ✓.  maxReach = max(4, 2+1) = 4
+// i=3: i(3) &lt;= maxReach(4) ✓.  maxReach = max(4, 3+1) = 4
+// i=4: i(4) &lt;= maxReach(4) ✓.  Reached last index! return true
+//
+// If at any i, i &gt; maxReach → stuck, return false (no need
+// to continue — that position is unreachable, all subsequent
+// positions are unreachable too)</div>
+<div class="card"><div class="lbl">Jump Game II — BFS-level thinking</div><div class="ct">Think of positions reachable in k jumps as a "BFS level". currentEnd = farthest reachable in k jumps. farthest = farthest reachable in k+1 jumps (looking ahead while still in level k). When i reaches currentEnd, we've exhausted level k — increment jumps, move boundary to farthest.</div></div>
+<div class="code">// nums = [2,3,1,1,4]
+// jumps=0, currentEnd=0, farthest=0
+// i=0: farthest=max(0,0+2)=2. i==currentEnd(0) → jumps=1, currentEnd=2
+// i=1: farthest=max(2,1+3)=4. i&lt;currentEnd, continue
+// i=2: farthest=max(4,2+1)=4. i==currentEnd(2) → jumps=2, currentEnd=4
+// i=3: farthest=max(4,3+1)=4.
+// loop ends at n-1=4 (don't process last index)
+// Answer: 2 jumps</div>`,
+
+`<table class="ctbl"><tr><th>Problem</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Jump Game I (can reach)</td><td class="og">O(n)</td><td class="og">O(1)</td><td>Single pass, track maxReach</td></tr>
+<tr><td>Jump Game II (min jumps)</td><td class="og">O(n)</td><td class="og">O(1)</td><td>BFS-level greedy, single pass</td></tr>
+<tr><td>Jump Game III (graph reachability)</td><td class="om">O(n)</td><td class="om">O(n)</td><td>BFS/DFS — bidirectional jumps need graph traversal</td></tr>
+<tr><td>Naive backtracking (any variant)</td><td class="ob">O(2ⁿ)</td><td class="om">O(n)</td><td>Try all jump length choices at each position</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">Max-reach tracking (reachability)</div><div class="pw">Jump Game I. Single variable maxReach. If current index ever exceeds it, fail immediately. No DP table needed.</div></div>
+<div class="pc"><div class="pn">BFS-level greedy (min jumps)</div><div class="pw">Jump Game II. Two pointers: currentEnd (boundary of current jump count) and farthest (best reachable in next jump). Increment jump count at boundary crossing.</div></div>
+<div class="pc"><div class="pn">Graph BFS (bidirectional jumps)</div><div class="pw">Jump Game III/IV with both forward and backward jumps. Standard BFS needed — greedy alone doesn't capture bidirectional reachability.</div></div>`,
+
+`<div class="pc"><div class="pn">1. "Can I reach the end?"</div><div class="trig">Mental trigger: "feasibility check with forward-only jumps"</div><div class="pw">Track running maxReach. Fail fast if current position exceeds it.</div></div>
+<div class="pc"><div class="pn">2. "Minimum jumps/steps to reach end"</div><div class="trig">Mental trigger: "min hops, forward only, greedy BFS levels"</div><div class="pw">Track currentEnd + farthest. Increment count when boundary exhausted. Equivalent to BFS without an explicit queue.</div></div>
+<div class="pc"><div class="pn">3. "Jumps in both directions / through values"</div><div class="trig">Mental trigger: "jump by ±value, or jump to value-indexed positions"</div><div class="pw">Not pure greedy — use BFS/DFS with visited set. Jump Game III, IV, VII.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"can you reach last index, forward jumps only"</span><span class="sw">→ Track maxReach greedily, O(n) single pass</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"minimum jumps to reach end, forward only"</span><span class="sw">→ BFS-level greedy: currentEnd + farthest pointers</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"jumps can go forward AND backward"</span><span class="sw">→ Not greedy — use BFS/DFS with visited tracking</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"jump to index i+nums[i] or i-nums[i]"</span><span class="sw">→ Graph BFS (Jump Game III)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"jump within a range [i+1, i+maxJump], avoid certain cells"</span><span class="sw">→ BFS/DP, not pure greedy (Jump Game VII)</span></div>
+</div>`,
+
+`<div class="code">// LC 55 — Jump Game (can reach last index)
+boolean canJump(int[] nums) {
+    int maxReach = 0;
+    for (int i = 0; i &lt; nums.length; i++) {
+        if (i &gt; maxReach) return false;   // stuck — can't even reach i
+        maxReach = Math.max(maxReach, i + nums[i]);
+    }
+    return true;
+}
+
+// LC 45 — Jump Game II (minimum jumps)
+int jump(int[] nums) {
+    int jumps = 0, currentEnd = 0, farthest = 0;
+    for (int i = 0; i &lt; nums.length - 1; i++) {  // don't process last index
+        farthest = Math.max(farthest, i + nums[i]);
+        if (i == currentEnd) {           // exhausted current jump's range
+            jumps++;
+            currentEnd = farthest;       // move to next jump's range
+        }
+    }
+    return jumps;
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 45 — Jump Game II deep dive</div><div class="card-text">Find minimum jumps to reach the last index, given each nums[i] = max jump length from i.</div></div>
+<div class="hl"><strong>Brute force:</strong> Backtracking — try every possible jump length at each position, recurse, track min. O(2ⁿ) worst case (exponential branching).</div>
+<div class="code">// WHY GREEDY WORKS: think of positions as BFS "levels".
+// Level 0 = position 0. Level 1 = all positions reachable in
+// exactly 1 jump from level 0. Level 2 = all positions reachable
+// in 1 jump from ANY position in level 1. Etc.
+//
+// currentEnd = boundary of current level (max index in this level)
+// farthest = best reachable looking ahead into next level
+// When i crosses currentEnd, we've finished exploring this level
+// → increment jump count, set currentEnd = farthest (new boundary)
+//
+// This achieves the SAME result as BFS, but without a queue —
+// because the input guarantees monotonic structure (we always
+// move forward), letting us track the frontier with two integers
+// instead of a full BFS queue.</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 55 — Jump Game</div><div class="pmeta"><strong>Why:</strong> Cleanest reachability greedy. maxReach tracking.<br><strong>Key insight:</strong> Fail fast the moment current index exceeds maxReach.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 45 — Jump Game II</div><div class="pmeta"><strong>Why:</strong> BFS-level greedy without an explicit queue. Classic interview question.<br><strong>Key insight:</strong> currentEnd/farthest two-pointer technique = implicit BFS.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1306 — Jump Game III</div><div class="pmeta"><strong>Why:</strong> Bidirectional jumps break pure greedy — needs BFS/DFS.<br><strong>Key insight:</strong> From i, can jump to i+nums[i] or i-nums[i]. Visited set required.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1345 — Jump Game IV</div><div class="pmeta"><strong>Why:</strong> Jump to same-value indices anywhere in array — graph BFS with value buckets.<br><strong>Key insight:</strong> Group indices by value first, then BFS using value-based edges.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1340 — Jump Game V</div><div class="pmeta"><strong>Why:</strong> Jump within range with value constraint (must descend). DP + sort.<br><strong>Key insight:</strong> Sort indices by value ascending, DP on max reachable count.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you immediately see WHY tracking maxReach replaces exhaustive search?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you know the "BFS levels without a queue" trick for Jump Game II?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you correctly identify when greedy breaks (bidirectional jumps) and pivot to BFS?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "Since jumps only go forward, I can track the farthest index reachable so far in one pass — no need to explore every jump combination. If the current index ever exceeds that farthest reach, it's unreachable and I can return false immediately."</div>`
+]},
+
+{title:"Gas Station",sub:"Circular route feasibility",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Given a circular route of gas stations, each with a gas amount and a cost to travel to the next station, find the starting station from which you can complete the full circuit without running out of fuel (assuming tank starts empty and has unlimited capacity). Classic LC 134 problem solved with a clever greedy insight in O(n), no brute force needed.</div></div>
+<div class="hl">Key insight: if total gas ≥ total cost, a valid starting point ALWAYS exists, and it's unique (if all values are nonzero net). The greedy strategy finds it in one pass.</div>
+<div class="card"><div class="lbl">The greedy insight (why it works)</div><div class="ct">If you start at station 0 and run out of gas at station k, then NO station between 0 and k can be a valid start either. Why? Because starting at any station 1..k would arrive at that point with LESS OR EQUAL fuel than starting from 0 (since you'd skip the surplus, if any, accumulated from 0 to that point). So you can skip directly to station k+1 as your next candidate.</div></div>`,
+
+`<div class="card"><div class="lbl">Why intermediate stations can't be the answer</div></div>
+<div class="code">// gas =  [1,2,3,4,5]
+// cost = [3,4,5,1,2]
+// diff =[-2,-2,-2,3,3]
+//
+// Try start=0: tank=0
+//   at 0: tank += diff[0] = -2 → tank=-2 → FAIL, reset
+//   candidate moves to station 1
+// Try start=1: tank=0
+//   at 1: tank += diff[1] = -2 → tank=-2 → FAIL, reset
+//   candidate moves to station 2
+// Try start=2: tank=0
+//   at 2: tank += diff[2] = -2 → tank=-2 → FAIL, reset
+//   candidate moves to station 3
+// Try start=3: tank=0
+//   at 3: tank += diff[3] = 3 → tank=3 (ok, continue)
+//   at 4: tank += diff[4] = 3 → tank=6 (ok, continue)
+//   at 0: tank += diff[0] = -2 → tank=4 (ok)
+//   at 1: tank += diff[1] = -2 → tank=2 (ok)
+//   at 2: tank += diff[2] = -2 → tank=0 (ok, completed!)
+// Answer: start = station 3
+//
+// CRITICAL: we never re-tried stations 0,1,2 individually after
+// failing — we just kept accumulating and moved the candidate
+// forward. This single pass IS the full proof, not just a guess.</div>
+<div class="hl"><strong>The single-pass trick:</strong> keep a running tank total across the ENTIRE first pass (not resetting to 0 each retry — that's just for conceptual clarity above). When tank goes negative, reset tank=0 and move start candidate to next index. One O(n) pass solves it.</div>`,
+
+`<table class="ctbl"><tr><th>Approach</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Brute force (try every start)</td><td class="ob">O(n²)</td><td class="og">O(1)</td><td>For each of n starts, simulate full circuit O(n)</td></tr>
+<tr><td>Greedy single pass</td><td class="og">O(n)</td><td class="og">O(1)</td><td>One pass; failing stations are never valid starts (proven), skip them all at once</td></tr>
+</table>
+<div class="hl" style="margin-top:10px">This is one of the most elegant greedy proofs in interview prep — O(n²)→O(n) via a single structural insight, not a different algorithm family.</div>`,
+
+`<div class="pc"><div class="pn">Single-pass cumulative tracking</div><div class="pw">Track running tank total across one full pass. Reset start candidate (not the tank, conceptually — but practically reset tank to 0 too) whenever tank goes negative.</div></div>
+<div class="pc"><div class="pn">Total feasibility check first</div><div class="pw">If sum(gas) &lt; sum(cost), no solution exists at all — return -1 immediately without searching.</div></div>
+<div class="pc"><div class="pn">Two-pass / double-the-array trick</div><div class="pw">Alternative: duplicate the array (or iterate 2n times conceptually) to handle wraparound explicitly, with a sliding window of size n. Same complexity, different visualization.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Circular feasibility from any insufficient point</div><div class="trig">Mental trigger: "if I fail starting here, nothing before the failure point could've worked either"</div><div class="pw">Core gas station insight. Generalizes to any circular resource-balance problem.</div></div>
+<div class="pc"><div class="pn">2. Running balance reset</div><div class="trig">Mental trigger: "track a running sum; reset candidate when it goes negative"</div><div class="pw">Single O(n) pass replaces O(n²) brute force trying every start.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"circular route, find valid starting point"</span><span class="sw">→ Gas Station pattern: running balance, reset candidate on deficit</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"check total feasibility before searching"</span><span class="sw">→ Sum check first: if sum(gain)&lt;sum(cost), return -1/false immediately</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"if it fails at point k, all points before k also fail"</span><span class="sw">→ Single pass suffices — no need to re-try failed starting points</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"maximum subarray-like circular problems"</span><span class="sw">→ Consider Kadane's-style running sum with reset logic</span></div>
+</div>`,
+
+`<div class="code">// LC 134 — Gas Station
+int canCompleteCircuit(int[] gas, int[] cost) {
+    int totalGas = 0, totalCost = 0;
+    for (int i = 0; i &lt; gas.length; i++) {
+        totalGas += gas[i];
+        totalCost += cost[i];
+    }
+    if (totalGas &lt; totalCost) return -1;  // infeasible overall
+
+    int tank = 0, start = 0;
+    for (int i = 0; i &lt; gas.length; i++) {
+        tank += gas[i] - cost[i];
+        if (tank &lt; 0) {            // can't reach next station from start
+            start = i + 1;          // try next station as new candidate
+            tank = 0;                // reset accumulated tank
+        }
+    }
+    return start;   // guaranteed valid since totalGas &gt;= totalCost
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 134 — Gas Station deep dive</div></div>
+<div class="hl"><strong>Why we don't need to verify the answer:</strong> Once we know totalGas ≥ totalCost, the single forward pass mathematically guarantees that whatever "start" value survives to the end of the loop is valid — no need for a second verification pass. This is because the cumulative deficit before "start" is exactly offset by the cumulative surplus after it (since total ≥ 0 overall).</div>
+<div class="code">// Proof sketch (why intermediate stations between old-start and i
+// can never work once tank goes negative at i):
+//
+// Suppose we start at station 0 and tank goes negative at station i.
+// That means: gas[0]+...+gas[i] &lt; cost[0]+...+cost[i]
+//
+// Now suppose station j (0 &lt; j &lt;= i) were a valid start instead.
+// Arriving at station i from j means accumulating
+// gas[j]+...+gas[i] - cost[j]+...+cost[i]. But we know the PREFIX
+// gas[0..j-1] - cost[0..j-1] &gt;= 0 (didn't fail before j, by
+// definition we only just failed at i).
+// Removing a non-negative prefix can only keep the running total
+// the same or make it smaller — so j also fails at i.
+// Hence none of 1..i can be valid starts. Jump straight to i+1.</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 134 — Gas Station</div><div class="pmeta"><strong>Why:</strong> The canonical circular feasibility greedy. Must internalize the proof.<br><strong>Key insight:</strong> Single pass; failing at i eliminates all candidates from old-start to i.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1561 — Maximum Number of Coins You Can Get</div><div class="pmeta"><strong>Why:</strong> Greedy resource allocation with sorted structure.<br><strong>Key insight:</strong> Sort descending, give away smallest each round to "waste" optimally.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 871 — Minimum Number of Refueling Stops</div><div class="pmeta"><strong>Why:</strong> Similar fuel-tracking greedy but with a priority queue twist.<br><strong>Key insight:</strong> Greedily refuel using the largest available station passed so far (max-heap), only when stuck.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1029 — Two City Scheduling</div><div class="pmeta"><strong>Why:</strong> Greedy with cost-difference sorting — similar "running balance" intuition.<br><strong>Key insight:</strong> Sort by cost difference (cityA-cityB), assign first half to A, rest to B.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 42 — Trapping Rain Water</div><div class="pmeta"><strong>Why:</strong> Different problem, but shares "two-pointer running state" greedy flavor.<br><strong>Key insight:</strong> Track running max from both sides; water level bounded by the smaller max.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you explain why the single-pass result doesn't need verification?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you check the total-feasibility condition before running the main loop?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you walk through why failed intermediate stations are eliminated, not just assert it?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "First I'll check if total gas covers total cost — if not, no answer exists. Then I'll do one pass tracking a running tank. Whenever it goes negative, I know every station from my current candidate up to this point is invalid, so I'll move my candidate to the next station and reset. The survivor at the end is guaranteed valid given the total-feasibility check passed."</div>`
+]},
+
+{title:"Huffman Encoding",sub:"Frequency-based compression",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Huffman encoding is a greedy algorithm that builds an optimal prefix-free binary code for a set of characters based on their frequencies. More frequent characters get shorter codes, less frequent ones get longer codes — minimizing the total encoded length. It's the classic example of "always merge the two smallest items" greedy with a priority queue.</div></div>
+<div class="hl">Prefix-free property: no code is a prefix of another. This means a stream of bits can be decoded unambiguously left-to-right without delimiters.</div>
+<div class="card"><div class="lbl">Why greedy (smallest-two-merge) is optimal</div><div class="ct">Exchange argument: in any optimal prefix code tree, the two least frequent characters must be siblings at the deepest level (or can be rearranged to be so without increasing cost). So merging the two smallest frequencies first, treating the merged node as a new "virtual character" with combined frequency, and repeating, builds the optimal tree bottom-up.</div></div>`,
+
+`<div class="card"><div class="lbl">Huffman tree construction</div></div>
+<div class="code">// Characters: a(5), b(9), c(12), d(13), e(16), f(45)
+// Min-heap initial: [5,9,12,13,16,45]
+//
+// Step 1: pop 5,9 → merge=14. heap: [12,13,14,16,45]
+// Step 2: pop 12,13 → merge=25. heap: [14,16,25,45]
+// Step 3: pop 14,16 → merge=30. heap: [25,30,45]
+// Step 4: pop 25,30 → merge=55. heap: [45,55]
+// Step 5: pop 45,55 → merge=100. heap: [100] ← done, root
+//
+// Resulting tree depths determine code lengths:
+//        (100)
+//       /      \
+//     (45)f    (55)
+//             /    \
+//          (25)    (30)
+//         /   \    /   \
+//      a(5) b(9) c(12) d(13)... 
+// (exact shape depends on tie-breaking, but optimal total cost
+//  is deterministic: weighted sum of (frequency × depth) is minimized)
+//
+// Codes: f="0" (1 bit, most frequent!), a="1100" (4 bits, least frequent)</div>
+<div class="card"><div class="lbl">Decoding</div><div class="ct">Walk the tree from root using each bit (0=left, 1=right) until reaching a leaf — that's one decoded character. Repeat from root for the next character. The prefix-free property guarantees no ambiguity.</div></div>`,
+
+`<table class="ctbl"><tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Build frequency map</td><td class="og">O(n)</td><td class="og">O(k)</td><td>n=input length, k=distinct characters</td></tr>
+<tr><td>Build Huffman tree</td><td class="om">O(k log k)</td><td class="om">O(k)</td><td>k-1 merges, each heap op is O(log k)</td></tr>
+<tr><td>Generate codes (tree traversal)</td><td class="og">O(k)</td><td class="og">O(k)</td><td>One pass over the tree, depth = code length</td></tr>
+<tr><td>Encode full input</td><td class="og">O(n)</td><td class="om">O(n)</td><td>Look up each character's code, concatenate</td></tr>
+</table>
+<div class="hl" style="margin-top:10px">Overall: O(n + k log k). For typical text (k≤256 for ASCII), this is effectively O(n) — dominated by encoding the actual input.</div>`,
+
+`<div class="pc"><div class="pn">Standard Huffman (2-way merge)</div><div class="pw">Always merge the two smallest-frequency nodes. Min-heap based. Produces a binary tree, hence binary codes.</div></div>
+<div class="pc"><div class="pn">Adaptive Huffman</div><div class="pw">Builds/updates the tree dynamically as data streams in, without needing frequency counts upfront. Used when you can't pre-scan the whole input (e.g., live streaming compression).</div></div>
+<div class="pc"><div class="pn">n-ary Huffman</div><div class="pw">Generalizes to merging n smallest nodes at a time (not just 2), producing an n-ary tree. Used when the "alphabet" of the encoding isn't binary (e.g., ternary codes).</div></div>`,
+
+`<div class="pc"><div class="pn">1. Always merge two smallest (priority queue greedy)</div><div class="trig">Mental trigger: "build optimal tree/structure bottom-up by combining cheapest pairs"</div><div class="pw">Min-heap, repeatedly extract-min twice, merge, reinsert. Core Huffman mechanic — also appears in "minimum cost to connect ropes" style problems.</div></div>
+<div class="pc"><div class="pn">2. Frequency determines depth (cost-weighted optimization)</div><div class="trig">Mental trigger: "minimize sum of (weight × depth) in a tree"</div><div class="pw">More frequent → shallower in tree → shorter code. This generalizes to any "minimize weighted path length" problem.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"build optimal prefix code from frequencies"</span><span class="sw">→ Huffman: min-heap, repeatedly merge two smallest</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"minimum cost to combine/connect n items pairwise"</span><span class="sw">→ Same greedy merge pattern (e.g., min cost to connect ropes/sticks)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"minimize sum of weight × depth in a tree"</span><span class="sw">→ Huffman-style construction — greedy bottom-up merging</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">need to repeatedly grab the 2 smallest/largest values</span><span class="sw">→ Min-heap (or max-heap) — O(log n) extract + insert per step</span></div>
+</div>`,
+
+`<div class="code">// Huffman Encoding — full Java implementation
+class HuffmanNode implements Comparable&lt;HuffmanNode&gt; {
+    char ch;
+    int freq;
+    HuffmanNode left, right;
+    HuffmanNode(char ch, int freq) { this.ch = ch; this.freq = freq; }
+    HuffmanNode(int freq, HuffmanNode l, HuffmanNode r) {
+        this.freq = freq; this.left = l; this.right = r;
+    }
+    public int compareTo(HuffmanNode other) { return this.freq - other.freq; }
+}
+
+HuffmanNode buildHuffmanTree(Map&lt;Character, Integer&gt; freqMap) {
+    PriorityQueue&lt;HuffmanNode&gt; pq = new PriorityQueue&lt;&gt;();
+    for (var entry : freqMap.entrySet())
+        pq.offer(new HuffmanNode(entry.getKey(), entry.getValue()));
+
+    while (pq.size() &gt; 1) {
+        HuffmanNode left = pq.poll();    // smallest
+        HuffmanNode right = pq.poll();   // second smallest
+        HuffmanNode merged = new HuffmanNode(left.freq + right.freq, left, right);
+        pq.offer(merged);                // reinsert combined node
+    }
+    return pq.poll();                    // final root
+}
+
+void generateCodes(HuffmanNode node, String code, Map&lt;Character,String&gt; codes) {
+    if (node == null) return;
+    if (node.left == null &amp;&amp; node.right == null) {  // leaf = actual character
+        codes.put(node.ch, code.isEmpty() ? "0" : code); // edge case: single char
+        return;
+    }
+    generateCodes(node.left, code + "0", codes);
+    generateCodes(node.right, code + "1", codes);
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 1167 — Minimum Cost to Connect Sticks (Huffman-style)</div><div class="card-text">Connect n sticks into one, cost of connecting two = sum of their lengths. Minimize total cost.</div></div>
+<div class="hl"><strong>Why this IS Huffman:</strong> Connecting smaller sticks first means their combined cost gets "added again" fewer times in later merges. This is exactly the Huffman insight: minimize weighted depth by always combining the two cheapest available items first.</div>
+<div class="code">int connectSticks(int[] sticks) {
+    PriorityQueue&lt;Integer&gt; pq = new PriorityQueue&lt;&gt;();
+    for (int s : sticks) pq.offer(s);
+    int totalCost = 0;
+    while (pq.size() &gt; 1) {
+        int first = pq.poll();           // smallest
+        int second = pq.poll();          // second smallest
+        int cost = first + second;
+        totalCost += cost;               // pay to connect them
+        pq.offer(cost);                  // combined stick goes back in
+    }
+    return totalCost;
+}
+// Identical structure to Huffman tree building — just summing
+// costs directly instead of building a tree for code lengths.</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1167 — Minimum Cost to Connect Sticks</div><div class="pmeta"><strong>Why:</strong> Huffman merge pattern without the tree-building overhead.<br><strong>Key insight:</strong> Identical greedy structure: always combine two smallest.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 451 — Sort Characters By Frequency</div><div class="pmeta"><strong>Why:</strong> Frequency-based greedy ordering, conceptual precursor to Huffman.<br><strong>Key insight:</strong> Max-heap by frequency, build result string by extraction.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1898 — Maximum Number of Removable Characters</div><div class="pmeta"><strong>Why:</strong> Greedy + binary search hybrid (not pure Huffman, but tests priority-based greedy reasoning).<br><strong>Key insight:</strong> Binary search on number of removals; greedy/two-pointer check for subsequence validity.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 1647 — Minimum Deletions to Make Character Frequencies Unique</div><div class="pmeta"><strong>Why:</strong> Frequency-based greedy with descending adjustment.<br><strong>Key insight:</strong> Sort frequencies, greedily decrement duplicates to the next available value.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">Custom — Implement full Huffman encode/decode</div><div class="pmeta"><strong>Why:</strong> End-to-end mastery: build tree, generate codes, encode string, decode back.<br><strong>Key insight:</strong> Tree traversal for both code generation and decoding (walk bits root-to-leaf).</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Do you reach for a min-heap immediately when you see "repeatedly combine two smallest"?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you explain the exchange argument for why least-frequent-first is optimal?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you handle the single-character edge case (code = "0" since there's no merge needed)?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "I'll use a min-heap of frequencies. At each step, I'll extract the two smallest, merge them into a new node with their summed frequency, and reinsert. This greedy merge is optimal because the two least frequent characters should always end up deepest (and as siblings) in any optimal tree — merging them first locks that in without loss."</div>`
+]},
+
+{title:"Task Scheduler",sub:"CPU scheduling with cooldown",s:[
+`<div class="card"><div class="lbl">What it is</div><div class="ct">Given a list of CPU tasks (each represented by a type) and a cooldown period n (minimum gap required between two instances of the same task type), find the minimum total time (including idle slots) to execute all tasks. Solved either with a greedy math formula (frequency-based) or a max-heap simulation.</div></div>
+<div class="hl">Greedy insight: the most frequent task dictates the minimum schedule length — it forces idle slots if there aren't enough other distinct tasks to fill the cooldown gaps.</div>
+<div class="card"><div class="lbl">Two solution approaches</div><div class="ct"><strong>Math formula approach:</strong> compute based on max frequency and count of tasks tied at max frequency. O(n) — very fast, but requires deriving the formula.<br><strong>Max-heap simulation:</strong> simulate execution, always picking the most frequent available task, respecting cooldown via a queue. More intuitive, O(total_time × log k).</div></div>`,
+
+`<div class="card"><div class="lbl">The math formula derivation</div></div>
+<div class="code">// tasks = [A,A,A,B,B,B], n=2 (cooldown)
+// maxFreq = 3 (both A and B appear 3 times, but consider A as example)
+// numMaxFreq = 2 (both A and B tied at max frequency 3)
+//
+// Visualize the "frame" structure built around the most frequent task:
+// A _ _ A _ _ A   ← (maxFreq-1) groups of size (n+1), plus final task
+//   ^^^ this is one "slot group" of size (n+1)=3, repeated (maxFreq-1)=2 times
+//   then + 1 final occurrence of A
+//
+// Total frame size = (maxFreq-1) * (n+1) + numMaxFreq
+//                   = (3-1)*(2+1) + 2 = 6+2 = 8
+//
+// Fill frame:  A B _ A B _ A B
+// All tasks (6) fit within frame size 8, with 2 idle slots
+//
+// Answer = max(totalTasks, frameSize) = max(6, 8) = 8
+//
+// WHY max(): if there are enough OTHER distinct tasks to fill
+// every gap, no idle time is needed at all — frame shrinks
+// below totalTasks. In that case, the actual count of tasks wins.</div>
+<div class="hl"><strong>Why numMaxFreq matters:</strong> if multiple tasks tie for the highest frequency, ALL of them need to occupy the "trailing" slot in the frame — increasing total length by exactly the count of tied tasks.</div>`,
+
+`<table class="ctbl"><tr><th>Approach</th><th>Time</th><th>Space</th><th>Notes</th></tr>
+<tr><td>Math formula</td><td class="og">O(n)</td><td class="og">O(26) or O(k)</td><td>Single pass to count frequencies, then formula — fastest</td></tr>
+<tr><td>Max-heap simulation</td><td class="om">O(total_time · log k)</td><td class="om">O(k)</td><td>More intuitive; simulates actual schedule with cooldown queue</td></tr>
+<tr><td>Brute force scheduling search</td><td class="ob">Exponential</td><td class="om">O(n)</td><td>Try all task orderings — infeasible for real input sizes</td></tr>
+</table>`,
+
+`<div class="pc"><div class="pn">Frequency-frame math formula</div><div class="pw">Compute maxFreq and numMaxFreq. Frame = (maxFreq-1)*(n+1) + numMaxFreq. Answer = max(totalTasks, frame). O(n) — the fastest correct approach.</div></div>
+<div class="pc"><div class="pn">Max-heap + cooldown queue simulation</div><div class="pw">Max-heap of remaining counts. Each "tick": pop the most frequent available task, decrement, push to cooldown queue with release-time. Check queue each tick to release tasks back into heap.</div></div>
+<div class="pc"><div class="pn">Round-robin bucket filling</div><div class="pw">Conceptual variant: think of n+1 "buckets" cycling. Fill each bucket with the most frequent remaining tasks first, repeating across cycles.</div></div>`,
+
+`<div class="pc"><div class="pn">1. Frame size determined by most frequent item</div><div class="trig">Mental trigger: "bottleneck resource sets the minimum total time"</div><div class="pw">Identify maxFreq. Build a frame structure with gaps of size (cooldown+1). Most frequent task(s) define the skeleton.</div></div>
+<div class="pc"><div class="pn">2. Always execute most available task next (heap greedy)</div><div class="trig">Mental trigger: "schedule by always running whatever has the most remaining work, subject to constraints"</div><div class="pw">Max-heap simulation. Respect cooldown via temporary queue holding recently-used tasks.</div></div>
+<div class="pc"><div class="pn">3. max(actual work, structural lower bound)</div><div class="trig">Mental trigger: "answer is whichever constraint binds tighter"</div><div class="pw">Compare total task count vs frame size from cooldown constraint — take the larger, since that's the actual bottleneck.</div></div>`,
+
+`<div class="card"><div class="lbl">Problem smell → pattern map</div>
+<div class="sr"><span class="si">IF</span><span class="sth">"CPU tasks with cooldown between same type"</span><span class="sw">→ Task Scheduler formula: (maxFreq-1)*(n+1)+numMaxFreq</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"minimum total time given a bottleneck resource"</span><span class="sw">→ Frame-based formula, take max(totalWork, structuralFrame)</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"simulate scheduling with explicit cooldown tracking"</span><span class="sw">→ Max-heap + queue holding (task, releaseTime) pairs</span></div>
+<div class="sr"><span class="si">IF</span><span class="sth">"reorganize so no two adjacent items are the same"</span><span class="sw">→ Same max-heap greedy family (LC 767 Reorganize String)</span></div>
+</div>`,
+
+`<div class="code">// LC 621 — Task Scheduler (math formula approach)
+int leastInterval(char[] tasks, int n) {
+    int[] freq = new int[26];
+    for (char t : tasks) freq[t - 'A']++;
+    Arrays.sort(freq);                     // ascending; max is at end
+
+    int maxFreq = freq[25];
+    int idleSlots = (maxFreq - 1) * n;     // idle gaps before final occurrence
+
+    // Fill idle slots with OTHER tasks (from 2nd most frequent down)
+    for (int i = 24; i &gt;= 0 &amp;&amp; freq[i] &gt; 0; i--)
+        idleSlots -= Math.min(freq[i], maxFreq - 1);
+
+    idleSlots = Math.max(0, idleSlots);    // can't go negative
+    return tasks.length + idleSlots;
+}
+
+// Max-heap simulation approach (more intuitive, shows the "why")
+int leastIntervalHeap(char[] tasks, int n) {
+    int[] freq = new int[26];
+    for (char t : tasks) freq[t - 'A']++;
+    PriorityQueue&lt;Integer&gt; maxHeap = new PriorityQueue&lt;&gt;(Collections.reverseOrder());
+    for (int f : freq) if (f &gt; 0) maxHeap.offer(f);
+
+    int time = 0;
+    Queue&lt;int[]&gt; cooldown = new LinkedList&lt;&gt;();  // {remainingCount, readyTime}
+    while (!maxHeap.isEmpty() || !cooldown.isEmpty()) {
+        time++;
+        if (!maxHeap.isEmpty()) {
+            int count = maxHeap.poll() - 1;        // execute one instance
+            if (count &gt; 0) cooldown.offer(new int[]{count, time + n});
+        }
+        if (!cooldown.isEmpty() &amp;&amp; cooldown.peek()[1] == time)
+            maxHeap.offer(cooldown.poll()[0]);     // task's cooldown expired
+    }
+    return time;
+}</div>`,
+
+`<div class="card"><div class="lbl">LC 621 — Task Scheduler walkthrough (formula)</div></div>
+<div class="hl"><strong>Why the formula handles "enough other tasks" correctly:</strong> idleSlots starts as the maximum possible idle time assuming NO other tasks exist to fill gaps. Then we subtract however many other-task instances actually CAN fill those gaps (capped at maxFreq-1 per task, since each gap-group only fits once per task before the structure repeats).</div>
+<div class="code">// tasks = [A,A,A,A,B,B,B,C,C,D,D], n=2
+// freq sorted: [..., 2,2,3,3,4] → maxFreq=4 (task A)
+// idleSlots = (4-1)*2 = 6  (3 gaps of size 2, before A's last occurrence)
+//
+// Fill gaps with other tasks (B=3,C=2,D=2), each capped at maxFreq-1=3:
+//   B: min(3,3)=3 → idleSlots = 6-3 = 3
+//   C: min(2,3)=2 → idleSlots = 3-2 = 1
+//   D: min(2,3)=2 → idleSlots = 1-2 = -1 → capped at 0
+//
+// idleSlots = max(0, -1) = 0
+// Answer = totalTasks(11) + idleSlots(0) = 11
+// (enough variety of tasks to fill every cooldown gap — no idle needed)</div>`,
+
+`<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 621 — Task Scheduler</div><div class="pmeta"><strong>Why:</strong> The canonical frequency-frame greedy. Both formula and heap approaches worth knowing.<br><strong>Key insight:</strong> Answer = max(totalTasks, frame size from most frequent task).</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 767 — Reorganize String</div><div class="pmeta"><strong>Why:</strong> Same max-heap greedy family — no two adjacent same characters.<br><strong>Key insight:</strong> Max-heap by frequency; alternate placing most frequent remaining chars.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1953 — Maximum Number of Weeks for Which You Can Work</div><div class="pmeta"><strong>Why:</strong> Frequency-frame style reasoning, different formula derivation.<br><strong>Key insight:</strong> If max element &gt; sum of rest + 1, answer is bounded by 2*(sum of rest)+1.</div></div>
+<div class="prb"><div class="diff medium">Medium</div><div class="pname">LC 358 — Rearrange String k Distance Apart</div><div class="pmeta"><strong>Why:</strong> Generalized task scheduler — arbitrary k instead of fixed cooldown semantics.<br><strong>Key insight:</strong> Max-heap + queue tracking release positions, same as task scheduler heap method.</div></div>
+<div class="prb"><div class="diff hard">Hard</div><div class="pname">LC 1834 — Single-Threaded CPU</div><div class="pmeta"><strong>Why:</strong> Different scheduling flavor — min-heap by (processing time, index) with arrival time gating.<br><strong>Key insight:</strong> Sort by arrival time; use min-heap to always pick shortest available task.</div></div>`,
+
+`<div class="card"><div class="lbl">What interviewers test</div>
+<div class="ipill"><span class="dot"></span><span>Can you derive the frame-size formula from first principles (not just recite it)?</span></div>
+<div class="ipill"><span class="dot"></span><span>Do you know why the answer is max(totalTasks, frame), not just the frame?</span></div>
+<div class="ipill"><span class="dot"></span><span>Can you implement the heap-simulation alternative if asked to "show the actual schedule"?</span></div>
+</div>
+<div class="hl"><strong>Think-aloud script:</strong> "The most frequent task creates a minimum skeleton: it needs (maxFreq-1) gaps of size (cooldown+1), plus its own slots, plus however many other most-frequent-tied tasks. If I have enough OTHER distinct tasks to fill those gaps, the real bottleneck becomes just the total task count instead. So the answer is whichever of those two values is larger."</div>
+<div class="card"><div class="lbl">Block 7 — Complete pattern summary</div>
+<div class="sr"><span class="si">T1</span><span class="sth">Fundamentals</span><span class="sw">Greedy choice + optimal substructure; prove via exchange argument</span></div>
+<div class="sr"><span class="si">T2</span><span class="sth">Activity Select</span><span class="sw">Sort by END time, pick if start≥lastEnd</span></div>
+<div class="sr"><span class="si">T3</span><span class="sth">Jump Game</span><span class="sw">Track maxReach (I) or currentEnd/farthest BFS-levels (II)</span></div>
+<div class="sr"><span class="si">T4</span><span class="sth">Gas Station</span><span class="sw">Running tank; reset candidate on deficit; single pass suffices</span></div>
+<div class="sr"><span class="si">T5</span><span class="sth">Huffman</span><span class="sw">Min-heap, always merge two smallest, build bottom-up</span></div>
+<div class="sr"><span class="si">T6</span><span class="sth">Task Scheduler</span><span class="sw">max(totalTasks, frame from maxFreq); or max-heap+cooldown queue</span></div>
+</div>`
+]}
+];
+
+let CT=0, CS=0;
+
+function renderTabs(){
+  document.getElementById('stabs').innerHTML=TABS.map((t,i)=>`<button class="stab${i===CS?' active':''}" onclick="selS(${i})">${t}</button>`).join('');
+}
+
+function renderContent(){
+  const topic=D[CT];
+  document.getElementById('cnt').innerHTML=`<div class="th">${topic.title}</div><div class="ts">${topic.sub}</div>${topic.s[CS]||'<div class="card"><div class="ct">Content coming soon.</div></div>'}`;
+}
+
+function sel(idx){
+  CT=idx; CS=0;
+  document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  renderTabs(); renderContent();
+  document.getElementById('main').scrollTop=0;
+}
+
+function selS(idx){
+  CS=idx; renderTabs(); renderContent();
+  document.getElementById('main').scrollTop=0;
+}
+
+renderTabs(); renderContent();
+</script>

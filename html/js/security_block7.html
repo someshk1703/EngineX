@@ -1,0 +1,745 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.shell{display:flex;height:100vh;min-height:640px;overflow:hidden}
+.nav{width:232px;min-width:232px;border-right:0.5px solid var(--color-border-tertiary);padding:12px 0;overflow-y:auto;background:var(--color-background-secondary)}
+.nav-title{font-size:10px;font-weight:500;color:var(--color-text-tertiary);padding:6px 16px 4px;letter-spacing:.07em;text-transform:uppercase}
+.ni{display:block;padding:7px 16px;font-size:12.5px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent;line-height:1.4;transition:all .12s}
+.ni:hover{color:var(--color-text-primary);background:var(--color-background-primary)}
+.ni.active{color:var(--color-text-primary);border-left-color:#E24B4A;background:var(--color-background-primary);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:26px 30px}
+.topic{display:none}.topic.visible{display:block}
+h1.ttl{font-size:20px;font-weight:500;margin-bottom:4px}
+.tnum{font-size:11px;color:var(--color-text-tertiary);margin-bottom:12px}
+.tags{margin-bottom:12px}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin:0 3px 3px 0}
+.tg{background:#E1F5EE;color:#085041}.tp{background:#EEEDFE;color:#3C3489}.tw{background:#FAEEDA;color:#633806}.td{background:#FCEBEB;color:#791F1F}.ti{background:#E6F1FB;color:#0C447C}.tc{background:#FAECE7;color:#712B13}
+.sl{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin:18px 0 6px;display:flex;align-items:center;gap:6px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{font-weight:500;color:var(--color-text-primary)}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px}
+.g3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:7px}
+.sb{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.sb h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.sb p{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.cb{background:#1a1b26;border-radius:var(--border-radius-md);padding:13px 15px;margin:8px 0;overflow-x:auto}
+.cb pre{font-family:var(--font-mono);font-size:11.5px;line-height:1.75;color:#c0caf5;white-space:pre}
+.kw{color:#bb9af7}.fn{color:#7aa2f7}.cm{color:#565f89;font-style:italic}.str{color:#9ece6a}.num{color:#ff9e64}.vr{color:#f7768e}.cl{color:#e0af68}
+.mst{border-left:2px solid #E24B4A;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.tof{border-left:2px solid #EF9F27;padding:6px 10px;margin:5px 0;font-size:12.5px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.iq{font-size:12.5px;padding:8px 11px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin:5px 0;border:0.5px solid var(--color-border-tertiary)}
+.iq .q{font-weight:500;margin-bottom:2px}
+.iq .d{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.55}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pill{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:500}
+.pq{background:var(--color-background-info);color:var(--color-text-info)}
+.pc{background:#E1F5EE;color:#085041}
+.divline{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:26px 0}
+.divlabel{text-align:center;font-size:11px;color:var(--color-text-tertiary);margin:-10px 0 18px}
+.arch{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 13px;margin:5px 0}
+.arch h4{font-size:12.5px;font-weight:500;margin-bottom:3px}
+.arch p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.65}
+.flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:8px 0}
+.fbox{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 10px;font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.farr{font-size:13px;color:var(--color-text-tertiary)}
+.fbox.g{border-color:#1D9E75;background:#E1F5EE;color:#085041}
+.fbox.p{border-color:#534AB7;background:#EEEDFE;color:#3C3489}
+.fbox.a{border-color:#BA7517;background:#FAEEDA;color:#633806}
+.fbox.r{border-color:#A32D2D;background:#FCEBEB;color:#791F1F}
+.fbox.b{border-color:#185FA5;background:#E6F1FB;color:#0C447C}
+.stor-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+.stor-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;background:var(--color-background-primary)}
+.stor-card h4{font-size:13px;font-weight:500;margin-bottom:6px}
+.stor-card .row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:11.5px;border-top:0.5px solid var(--color-border-tertiary);margin-top:4px}
+.stor-card .row:first-of-type{border-top:none;margin-top:0}
+.stor-card .label{color:var(--color-text-secondary)}
+.yes{color:#085041;font-weight:500}.no{color:#791F1F;font-weight:500}.dep{color:#633806;font-weight:500}
+.attack-box{border-left:2px solid #E24B4A;padding:8px 12px;background:#FCEBEB;border-radius:0;margin:6px 0}
+.attack-box h4{font-size:12.5px;font-weight:500;color:#791F1F;margin-bottom:2px}
+.attack-box p{font-size:12px;color:#791F1F;line-height:1.55}
+.defend-box{border-left:2px solid #1D9E75;padding:8px 12px;background:#E1F5EE;border-radius:0;margin:6px 0}
+.defend-box h4{font-size:12.5px;font-weight:500;color:#085041;margin-bottom:2px}
+.defend-box p{font-size:12px;color:#085041;line-height:1.55}
+</style>
+
+<div class="shell">
+<nav class="nav">
+  <div class="nav-title">Block 7 — Security</div>
+  <div class="ni active" onclick="show(0,this)">1. XSS</div>
+  <div class="ni" onclick="show(1,this)">2. CSRF</div>
+  <div class="ni" onclick="show(2,this)">3. Clickjacking</div>
+  <div class="ni" onclick="show(3,this)">4. Content Security Policy</div>
+  <div class="ni" onclick="show(4,this)">5. Subresource integrity</div>
+  <div class="ni" onclick="show(5,this)">6. Authentication storage</div>
+  <div class="ni" onclick="show(6,this)">7. OAuth &amp; PKCE in the browser</div>
+</nav>
+
+<main class="content">
+
+<div class="topic visible" id="t0">
+  <div class="tnum">Topic 1 of 7 — Block 7: Security</div>
+  <h1 class="ttl">Cross-Site Scripting (XSS)</h1>
+  <div class="tags"><span class="tag td">Reflected</span><span class="tag td">Stored</span><span class="tag td">DOM-based</span><span class="tag tg">CSP</span><span class="tag tg">DOMPurify</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">XSS is an attack where an adversary injects malicious JavaScript into a page viewed by other users. Once the script runs in the victim's browser, it operates with full origin privileges: it can read cookies, localStorage, DOM content, make authenticated API requests, and exfiltrate data to attacker-controlled servers. XSS is the most prevalent web vulnerability precisely because it is caused by a single class of mistake — trusting user-controlled data and interpolating it into HTML or JS without sanitisation. There are three mechanically distinct variants, each requiring a different remediation.</p>
+
+  <div class="sl">The three variants</div>
+
+  <div class="attack-box">
+    <h4>Reflected XSS</h4>
+    <p>Malicious payload is in the URL (query param, path). Server reflects it directly into the response HTML without sanitisation. Victim must click a crafted link. The payload is not stored — it only executes when the URL is visited. Example: <code>https://site.com/search?q=&lt;script&gt;stealCookies()&lt;/script&gt;</code> rendered into the page as-is.</p>
+  </div>
+  <div class="attack-box">
+    <h4>Stored XSS (persistent)</h4>
+    <p>Payload is stored in the database (comment, profile bio, message). Every user who views the content executes the script. More dangerous than reflected — no crafted link needed, and it persists until the record is deleted. Example: a comment field that stores <code>&lt;img src=x onerror="stealCookies()"&gt;</code> and renders it to all page visitors.</p>
+  </div>
+  <div class="attack-box">
+    <h4>DOM-based XSS</h4>
+    <p>No server involvement — vulnerable JavaScript on the client reads attacker-controlled data (URL hash, postMessage, localStorage) and writes it unsafely to the DOM. The server response is clean; the exploit is entirely client-side. Example: <code>document.getElementById('output').innerHTML = location.hash.slice(1)</code> with URL <code>#&lt;img onerror=alert(1) src=x&gt;</code>. Most static site generators have this vulnerability class.</p>
+  </div>
+
+  <div class="sl">Dangerous sinks (DOM-based)</div>
+  <div class="g2">
+    <div class="sb"><h4>innerHTML / outerHTML</h4><p>Parses the string as HTML, executing any event handlers and script content. The most common DOM XSS sink. Use <code>textContent</code> instead when you need to display text. Only use innerHTML with trusted, sanitised content.</p></div>
+    <div class="sb"><h4>document.write</h4><p>Writes raw HTML into the document stream. Deprecated and dangerous — inserts unsanitised content directly into the DOM parser. Never use in modern code.</p></div>
+    <div class="sb"><h4>eval / Function()</h4><p>Executes strings as JavaScript. If any part of the string is attacker-controlled, arbitrary code executes. Includes: <code>setTimeout('string')</code>, <code>setInterval('string')</code>, template literal tag functions that eval.</p></div>
+    <div class="sb"><h4>src / href / action attributes</h4><p><code>javascript:</code> protocol in href/src executes JS: <code>&lt;a href="javascript:stealData()"&gt;</code>. Sanitise URL attributes to only allow http/https. React escapes this but only when using JSX attribute syntax — <code>dangerouslySetInnerHTML</code> bypasses all React escaping.</p></div>
+  </div>
+
+  <div class="sl">Defences</div>
+
+  <div class="defend-box">
+    <h4>Output encoding (primary defence)</h4>
+    <p>HTML-encode all user-controlled data before inserting into HTML context. <code>&lt;</code> → <code>&amp;lt;</code>, <code>&gt;</code> → <code>&amp;gt;</code>, <code>"</code> → <code>&amp;quot;</code>. The encoding context matters: HTML body, HTML attribute, JavaScript string, CSS, and URL each have different encoding requirements. React JSX encodes by default — <code>{userInput}</code> is always text, never HTML.</p>
+  </div>
+  <div class="defend-box">
+    <h4>DOMPurify (sanitisation)</h4>
+    <p>When you must render HTML (rich text editors, markdown output): sanitise with DOMPurify before insertion. <code>DOMPurify.sanitize(dirtyHTML)</code> parses the HTML in a sandboxed context, strips script tags, event handlers, and dangerous attributes (javascript: hrefs), and returns clean HTML. Use with innerHTML only after DOMPurify.</p>
+  </div>
+  <div class="defend-box">
+    <h4>Content Security Policy (CSP)</h4>
+    <p>Defence-in-depth: even if XSS payload is injected, CSP prevents inline script execution and restricts where scripts can load from. <code>script-src 'nonce-{random}'</code> blocks all scripts without the correct server-generated nonce, making most XSS payloads inert even after injection.</p>
+  </div>
+  <div class="defend-box">
+    <h4>HttpOnly cookies</h4>
+    <p>Mark session cookies as <code>HttpOnly</code> — JavaScript cannot read them via <code>document.cookie</code>. XSS cannot steal session tokens stored in HttpOnly cookies. This doesn't prevent XSS from making authenticated API requests (the cookie is still sent with fetch), but it eliminates the most valuable exfiltration target.</p>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// ❌ DOM-based XSS sink</span>
+<span class="kw">const</span> name = <span class="kw">new</span> <span class="cl">URLSearchParams</span>(location.search).<span class="fn">get</span>(<span class="str">'name'</span>);
+document.<span class="fn">getElementById</span>(<span class="str">'greeting'</span>).innerHTML = <span class="str">`Hello, ${name}`</span>;
+<span class="cm">// URL: ?name=&lt;img src=x onerror="fetch('/steal?c='+document.cookie)"&gt;</span>
+<span class="cm">// Attacker exfiltrates all non-HttpOnly cookies</span>
+
+<span class="cm">// ✅ textContent — never interprets as HTML</span>
+document.<span class="fn">getElementById</span>(<span class="str">'greeting'</span>).textContent = <span class="str">`Hello, ${name}`</span>;
+
+<span class="cm">// ✅ DOMPurify — when innerHTML is genuinely needed (rich text)</span>
+<span class="kw">import</span> <span class="cl">DOMPurify</span> <span class="kw">from</span> <span class="str">'dompurify'</span>;
+
+<span class="kw">function</span> <span class="fn">RichTextDisplay</span>({ htmlContent }) {
+  <span class="kw">const</span> clean = <span class="cl">DOMPurify</span>.<span class="fn">sanitize</span>(htmlContent, {
+    ALLOWED_TAGS: [<span class="str">'p'</span>, <span class="str">'b'</span>, <span class="str">'i'</span>, <span class="str">'ul'</span>, <span class="str">'li'</span>, <span class="str">'a'</span>],
+    ALLOWED_ATTR: [<span class="str">'href'</span>],                  <span class="cm">// Only href on &lt;a&gt;</span>
+    ALLOWED_URI_REGEXP: /^https?:\/\//i,       <span class="cm">// No javascript: hrefs</span>
+  });
+  <span class="kw">return</span> &lt;div dangerouslySetInnerHTML={{ __html: clean }} /&gt;;
+  <span class="cm">// dangerouslySetInnerHTML is the only legitimate use case</span>
+}
+
+<span class="cm">// React JSX encoding — safe by default</span>
+<span class="kw">const</span> payload = <span class="str">'&lt;script&gt;alert(1)&lt;/script&gt;'</span>;
+<span class="kw">return</span> &lt;div&gt;{payload}&lt;/div&gt;;
+<span class="cm">// Renders as text: "&lt;script&gt;alert(1)&lt;/script&gt;" — NOT executed</span>
+<span class="cm">// JSX compiles to React.createElement which uses textContent, not innerHTML</span>
+
+<span class="cm">// ❌ Bypasses React encoding:</span>
+<span class="kw">return</span> &lt;div dangerouslySetInnerHTML={{ __html: payload }} /&gt;; <span class="cm">// XSS!</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Trusting that React prevents all XSS — React escapes JSX expressions, but <code>dangerouslySetInnerHTML</code>, <code>eval()</code>, dynamic <code>href</code> with user input, and <code>document.write</code> from JS code all bypass React's protection entirely.</div>
+  <div class="mst">Sanitising on input (before storage) instead of on output (before rendering) — sanitisation should happen at the point of rendering, not storage. Sanitisation rules change; stored-clean content may be rendered in a new context with different rules. Store raw, sanitise on output.</div>
+  <div class="mst">Using a blocklist instead of allowlist for HTML sanitisation — trying to block <code>script</code> tags is trivially bypassed. Allowlist: permit only known-safe tags and attributes. DOMPurify uses an allowlist by default.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between stored, reflected, and DOM-based XSS?"</div><div class="d">Stored: payload persists in database, executes for every viewer. Reflected: payload in URL, reflected in server response, requires victim to click a crafted link. DOM-based: entirely client-side — vulnerable JS reads attacker-controlled data (URL hash, postMessage) and writes to a dangerous sink (innerHTML, eval). Server response is clean in DOM-based XSS — it cannot be caught by output encoding on the server.</div></div>
+  <div class="iq"><div class="q">"How does React prevent XSS and what bypasses its protection?"</div><div class="d">React JSX expressions ({value}) always produce text nodes via textContent — the value is never parsed as HTML. This prevents reflected and stored XSS in components that use JSX correctly. Bypasses: dangerouslySetInnerHTML (explicit bypass), dynamic href with javascript: URLs, eval/new Function with user input, DOM manipulation via refs that write innerHTML, or third-party libraries that use innerHTML directly.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">CSP (topic 4 — defence in depth against XSS)</span>
+    <span class="pill pq">HttpOnly cookies (topic 6 — limits XSS damage)</span>
+    <span class="pill pc">Browser sandbox (why XSS is dangerous — same-origin privileges)</span>
+    <span class="pill pc">React dangerouslySetInnerHTML (the escape hatch)</span>
+  </div>
+</div>
+
+<div class="topic" id="t1">
+  <div class="tnum">Topic 2 of 7 — Block 7: Security</div>
+  <h1 class="ttl">CSRF</h1>
+  <div class="tags"><span class="tag td">Cross-site forgery</span><span class="tag tg">SameSite</span><span class="tag tg">CSRF token</span><span class="tag tw">localStorage risk</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Cross-Site Request Forgery (CSRF) tricks an authenticated user's browser into making an unintended request to a target site on their behalf. The attack exploits the browser's automatic inclusion of cookies with every request to a domain — if the user is logged into <code>bank.com</code>, a malicious script on <code>evil.com</code> can trigger a state-changing request to <code>bank.com</code> using the victim's session cookie, without the victim knowing. The attacker doesn't need to read the response — they just need the side effect (transfer money, change email, post a message). CSRF attacks are fundamentally distinct from XSS: XSS executes scripts in the victim's browser; CSRF abuses the browser's cookie inclusion behaviour.</p>
+
+  <div class="sl">How the attack works</div>
+  <div class="flow">
+    <div class="fbox g">User logged into bank.com</div><div class="farr">→</div>
+    <div class="fbox r">Visits evil.com</div><div class="farr">→</div>
+    <div class="fbox a">evil.com JS fires: fetch('bank.com/transfer', {method:'POST', ...})</div><div class="farr">→</div>
+    <div class="fbox r">Browser auto-sends bank.com session cookie</div><div class="farr">→</div>
+    <div class="fbox r">Transfer executes as the victim</div>
+  </div>
+
+  <div class="sl">Defences</div>
+  <div class="g2">
+    <div class="sb"><h4>SameSite cookie attribute</h4><p>The primary modern defence. <code>SameSite=Strict</code>: cookie never sent on cross-site requests. <code>SameSite=Lax</code>: cookie sent on top-level navigation GET, but NOT on cross-origin subresource POST/fetch. <code>SameSite=None; Secure</code>: always sent cross-site (required for third-party auth). Lax is the default in modern browsers — this has largely eliminated CSRF for most sites.</p></div>
+    <div class="sb"><h4>CSRF token (synchronizer token pattern)</h4><p>Server generates a unique, secret, unpredictable token per session. Embeds it in every form/AJAX request as a hidden field or custom header (<code>X-CSRF-Token</code>). On state-changing requests, server validates the token. Attacker cannot read the token from a cross-origin page (SOP blocks it).</p></div>
+    <div class="sb"><h4>Double Submit Cookie</h4><p>Server sets a random token in a cookie (not HttpOnly). JS reads the cookie and sends it as a custom header. Server compares header value with cookie value. Attacker cannot set the custom header from evil.com (CORS blocks custom headers on cross-origin requests).</p></div>
+    <div class="sb"><h4>Origin / Referer header validation</h4><p>On state-changing requests, validate <code>Origin</code> or <code>Referer</code> header matches expected origin. Simpler than tokens but can fail when headers are stripped (privacy proxies). Defence-in-depth measure, not standalone.</p></div>
+  </div>
+
+  <div class="sl">Why JWT in localStorage is risky for CSRF (but risky for XSS)</div>
+  <p class="prose">This is a nuanced trade-off. Cookies are vulnerable to CSRF (browser auto-includes them cross-origin). localStorage tokens must be manually added by JS — cross-origin JS cannot read localStorage (SOP enforced), so CSRF is eliminated. However, localStorage tokens are fully readable by any JavaScript running on your origin — including XSS payloads. An XSS attack can <code>fetch('/api', { headers: { Authorization: 'Bearer ' + localStorage.getItem('token') } })</code> and exfiltrate data. With HttpOnly cookies, XSS cannot read the token at all. The security guidance: HttpOnly cookies + SameSite=Lax is the more secure choice. The CSRF risk with cookies is mitigated by SameSite; the XSS risk with localStorage has no mitigation.</p>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// CSRF attack scenario (simplified)</span>
+<span class="cm">// evil.com page contains:</span>
+&lt;form action=<span class="str">"https://bank.com/transfer"</span> method=<span class="str">"POST"</span> id=<span class="str">"f"</span>&gt;
+  &lt;input name=<span class="str">"to"</span> value=<span class="str">"attacker-account"</span> /&gt;
+  &lt;input name=<span class="str">"amount"</span> value=<span class="str">"10000"</span> /&gt;
+&lt;/form&gt;
+&lt;script&gt;document.getElementById(<span class="str">'f'</span>).submit()&lt;/script&gt;
+<span class="cm">// Bank.com's cookie is sent automatically — transfer executes</span>
+
+<span class="cm">// Defence 1: SameSite cookies (server sets this)</span>
+<span class="cm">Set-Cookie: session=abc123; SameSite=Lax; Secure; HttpOnly; Path=/</span>
+<span class="cm">// Lax: cookie NOT sent on cross-site POST — CSRF blocked</span>
+
+<span class="cm">// Defence 2: CSRF token (synchronizer token pattern)</span>
+<span class="kw">const</span> csrfToken = document.<span class="fn">querySelector</span>(<span class="str">'meta[name="csrf-token"]'</span>).content;
+
+<span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/api/transfer'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: {
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+    <span class="str">'X-CSRF-Token'</span>: csrfToken, <span class="cm">// Custom header — cross-origin JS can't set this</span>
+  },
+  body: <span class="cl">JSON</span>.<span class="fn">stringify</span>({ to: <span class="str">'recipient'</span>, amount: <span class="num">100</span> }),
+  credentials: <span class="str">'include'</span>,
+});
+<span class="cm">// Server validates: X-CSRF-Token header must match session's stored token</span>
+<span class="cm">// evil.com cannot read or forge this token — SOP prevents cross-origin reads</span>
+
+<span class="cm">// localStorage vs cookie: the security trade-off</span>
+<span class="cm">// localStorage: immune to CSRF (not auto-sent), vulnerable to XSS</span>
+localStorage.<span class="fn">setItem</span>(<span class="str">'token'</span>, jwt); <span class="cm">// XSS can: localStorage.getItem('token')</span>
+
+<span class="cm">// HttpOnly cookie: vulnerable to CSRF (auto-sent), immune to XSS read</span>
+<span class="cm">// Best practice: HttpOnly cookie + SameSite=Lax = both protections</span>
+<span class="cm">Set-Cookie: token=jwt; HttpOnly; SameSite=Lax; Secure</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Assuming CSRF only works via HTML forms — modern CSRF attacks work via fetch/XHR with simple request methods (GET, POST with non-JSON content types). Custom content types like <code>application/json</code> trigger a CORS preflight for cross-origin requests, which provides some protection — but don't rely on this alone.</div>
+  <div class="mst">Storing JWTs in localStorage and considering the auth "secure" — localStorage is fully XSS-readable. A single XSS vulnerability means the attacker has the JWT and can authenticate as the victim from anywhere, until token expiry. HttpOnly cookies limit XSS damage even when a vulnerability exists.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does CSRF work and how does SameSite=Lax prevent it?"</div><div class="d">CSRF exploits automatic cookie inclusion — browser sends session cookies with every request to a domain, including cross-site requests from evil.com. SameSite=Lax prevents the cookie being sent on cross-site subrequest POST/PATCH/DELETE (only allows it on top-level navigation GETs). Since CSRF attacks require triggering state-changing requests, Lax blocks them while preserving normal authentication flows (e.g. OAuth redirects back to the site).</div></div>
+  <div class="iq"><div class="q">"Why is storing a JWT in localStorage a security risk?"</div><div class="d">Any JavaScript running on your origin can read localStorage — including XSS payloads. An attacker who achieves XSS can steal the JWT, use it from any machine, and the session persists until token expiry. HttpOnly cookies prevent this: even with XSS, the cookie value is never accessible to JavaScript. The trade-off: cookies need CSRF protection (solved by SameSite=Lax), localStorage doesn't. Net recommendation: HttpOnly cookies win.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">XSS (topic 1 — XSS enables cookie theft, CSRF is different attack)</span>
+    <span class="pill pq">Authentication storage (topic 6 — cookies vs localStorage tradeoffs)</span>
+    <span class="pill pc">CORS (cross-origin fetch + credentials is the modern CSRF vector)</span>
+    <span class="pill pc">SOP (Same-Origin Policy — prevents token reading, enables CSRF)</span>
+  </div>
+</div>
+
+<div class="topic" id="t2">
+  <div class="tnum">Topic 3 of 7 — Block 7: Security</div>
+  <h1 class="ttl">Clickjacking</h1>
+  <div class="tags"><span class="tag td">iframe overlay</span><span class="tag tg">X-Frame-Options</span><span class="tag tg">frame-ancestors</span><span class="tag tp">UI redressing</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Clickjacking (UI redressing) is an attack where an attacker renders your site inside a transparent iframe overlaid on a decoy page. The victim thinks they're clicking the attacker's page but is actually clicking on hidden UI elements of your site — confirming a purchase, approving a permissions dialog, following an account, or performing any click-triggered action. The attack requires no code execution — it exploits the browser's ability to embed any page in an iframe and control its opacity and positioning via CSS.</p>
+
+  <div class="sl">How it works</div>
+  <div class="flow">
+    <div class="fbox r">evil.com renders victim's site in an &lt;iframe&gt;</div><div class="farr">→</div>
+    <div class="fbox a">iframe styled: opacity:0, position:absolute, z-index:high</div><div class="farr">→</div>
+    <div class="fbox">Victim sees evil.com's decoy UI (a game, a prize button)</div><div class="farr">→</div>
+    <div class="fbox r">Victim clicks "claim prize" → actually clicking "Delete Account" on the hidden iframe</div>
+  </div>
+
+  <div class="sl">Defences</div>
+  <div class="g2">
+    <div class="sb"><h4>X-Frame-Options (legacy)</h4><p><code>X-Frame-Options: DENY</code> — page cannot be embedded in any iframe. <code>X-Frame-Options: SAMEORIGIN</code> — only same-origin iframes allowed. Does not support allowlisting specific third-party origins. HTTP header, set by the server. Supported by all browsers including IE.</p></div>
+    <div class="sb"><h4>CSP frame-ancestors (modern)</h4><p><code>Content-Security-Policy: frame-ancestors 'none'</code> — equivalent to X-Frame-Options DENY. <code>frame-ancestors 'self'</code> — same-origin only. <code>frame-ancestors https://trusted.com</code> — allowlist specific origins. Supercedes X-Frame-Options. Use both for maximum compatibility.</p></div>
+    <div class="sb"><h4>frame-busting JS (deprecated)</h4><p>Old technique: <code>if (window !== window.top) window.top.location = window.location</code>. Bypassed by sandboxed iframes: <code>&lt;iframe sandbox="allow-scripts"&gt;</code> blocks navigation. Never rely on JS for clickjacking protection. HTTP headers only.</p></div>
+    <div class="sb"><h4>SameSite cookies</h4><p>If the site uses session cookies with SameSite=Strict/Lax, actions performed in the clickjacked iframe won't include session cookies (cross-site context). This limits damage to unauthenticated actions. Not a complete defence — some actions don't require authentication.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Server-side headers (Express.js) — set on every HTML response</span>
+app.<span class="fn">use</span>((req, res, next) => {
+  <span class="cm">// Legacy header — all browsers</span>
+  res.<span class="fn">setHeader</span>(<span class="str">'X-Frame-Options'</span>, <span class="str">'SAMEORIGIN'</span>);
+
+  <span class="cm">// CSP frame-ancestors — modern, more flexible (overrides X-Frame-Options)</span>
+  res.<span class="fn">setHeader</span>(
+    <span class="str">'Content-Security-Policy'</span>,
+    <span class="str">"frame-ancestors 'self' https://trusted-embed-partner.com"</span>
+  );
+  <span class="fn">next</span>();
+});
+
+<span class="cm">// Next.js — in next.config.js headers()</span>
+module.exports = {
+  <span class="kw">async</span> <span class="fn">headers</span>() {
+    <span class="kw">return</span> [{
+      source: <span class="str">'/(.*)'</span>,
+      headers: [
+        { key: <span class="str">'X-Frame-Options'</span>, value: <span class="str">'DENY'</span> },
+        { key: <span class="str">'Content-Security-Policy'</span>, value: <span class="str">"frame-ancestors 'none'"</span> },
+      ],
+    }];
+  },
+};
+
+<span class="cm">// ❌ Old frame-busting JS — DO NOT use</span>
+<span class="kw">if</span> (top !== self) { top.location = self.location; } <span class="cm">// Bypassed by sandbox attr</span>
+
+<span class="cm">// Test: DevTools → Application → Frames to see frame-ancestors enforcement</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using <code>X-Frame-Options: ALLOW-FROM</code> to allowlist origins — this directive is not supported in modern Chrome and Firefox. Use CSP <code>frame-ancestors</code> instead for origin allowlisting.</div>
+  <div class="mst">Relying on JavaScript frame-busting — trivially bypassed by the attacker adding <code>sandbox="allow-scripts allow-forms"</code> to their iframe element. The sandbox attribute prevents the framed page's JS from navigating the top frame.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is clickjacking and how do you prevent it?"</div><div class="d">Clickjacking embeds the target site in a transparent iframe overlaid on a decoy page — victim clicks "land mine" buttons on the real site without seeing them. Prevention: server-side HTTP headers. X-Frame-Options: DENY or SAMEORIGIN (legacy, all browsers). CSP frame-ancestors: 'none' or 'self' (modern, supercedes XFO, allows origin allowlisting). Never rely on JavaScript frame-busting — bypassed by iframe sandbox attribute.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">CSP (topic 4 — frame-ancestors is a CSP directive)</span>
+    <span class="pill pc">iframe sandbox attribute (how attackers bypass frame-busting JS)</span>
+    <span class="pill pq">SameSite cookies (partial defence — limits credentialed iframe actions)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 1–3 complete ───</div>
+
+<div class="topic" id="t3">
+  <div class="tnum">Topic 4 of 7 — Block 7: Security</div>
+  <h1 class="ttl">Content Security Policy</h1>
+  <div class="tags"><span class="tag tg">Directives</span><span class="tag tp">Nonces</span><span class="tag tw">Report-only</span><span class="tag tg">XSS mitigation</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Content Security Policy (CSP) is an HTTP response header that instructs the browser on what resources are permitted to load and what code is permitted to execute on a page. It is a defence-in-depth layer: even if an attacker succeeds in injecting a script (via XSS), CSP prevents it from executing if it doesn't match the policy. CSP operates as an allowlist — everything not explicitly permitted is blocked. A strict CSP can render most XSS payloads inert, even those the application's output encoding failed to catch.</p>
+
+  <div class="sl">Key directives</div>
+  <div class="g2">
+    <div class="sb"><h4>script-src</h4><p>Controls where scripts can load from and what inline scripts can execute. Most important directive. <code>'self'</code>: same-origin scripts only. <code>'nonce-{value}'</code>: scripts with matching nonce attribute only. <code>'strict-dynamic'</code>: scripts loaded by trusted scripts can load further scripts. <code>'unsafe-inline'</code>: allows all inline scripts — defeats XSS protection, avoid.</p></div>
+    <div class="sb"><h4>default-src</h4><p>Fallback for all resource types not explicitly configured. <code>default-src 'self'</code> is a safe base: only same-origin resources for everything unless a more specific directive overrides. Always set a default-src to prevent unintended resource loading.</p></div>
+    <div class="sb"><h4>connect-src</h4><p>Controls which origins JavaScript can connect to via fetch, XHR, WebSocket, EventSource. Restricts where data can be sent — limits exfiltration even if XSS occurs. <code>connect-src 'self' https://api.myapp.com</code></p></div>
+    <div class="sb"><h4>style-src</h4><p>Controls CSS loading. <code>'unsafe-inline'</code> allows inline style attributes (common in React-generated code). Without it, inline styles break. Often needs <code>'unsafe-inline'</code> for SPAs — CSS injection is less critical than script injection.</p></div>
+    <div class="sb"><h4>img-src</h4><p>Controls image sources. <code>img-src 'self' data: https://cdn.myapp.com</code>. Without <code>data:</code>, base64-encoded images break. Important: attackers can use image requests to exfiltrate data even without JS — limit img-src to trusted origins.</p></div>
+    <div class="sb"><h4>frame-ancestors</h4><p>Controls which origins can embed this page in an iframe. Replaces X-Frame-Options. <code>frame-ancestors 'none'</code>: clickjacking prevention. <code>frame-ancestors 'self'</code>: same-origin embeds allowed. (See topic 3.)</p></div>
+  </div>
+
+  <div class="sl">Nonces — the strict CSP approach</div>
+  <p class="prose">A nonce (number used once) is a cryptographically random value generated per HTTP response. The server includes it in the CSP header and on every legitimate <code>&lt;script&gt;</code> tag. The browser only executes scripts with a matching nonce. An attacker's injected <code>&lt;script&gt;</code> tag has no nonce and is blocked, even if it made it past output encoding. The nonce must be: cryptographically random (at least 128 bits), different on every response (never static), and never guessable. Nonce-based CSP combined with <code>'strict-dynamic'</code> is the recommended approach for modern SPAs.</p>
+
+  <div class="sl">Report-only mode</div>
+  <p class="prose"><code>Content-Security-Policy-Report-Only</code> header: apply the policy without enforcing it. Violations are reported to a <code>report-uri</code> endpoint but resources are still loaded. Critical for rolling out CSP incrementally — you discover what breaks without breaking production. Workflow: deploy in report-only → monitor violations → fix legitimate resources → tighten policy → switch to enforcing mode.</p>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Strict CSP with nonces — generated per request</span>
+<span class="kw">import</span> crypto <span class="kw">from</span> <span class="str">'crypto'</span>;
+
+<span class="kw">function</span> <span class="fn">generateNonce</span>() {
+  <span class="kw">return</span> crypto.<span class="fn">randomBytes</span>(<span class="num">16</span>).<span class="fn">toString</span>(<span class="str">'base64'</span>);
+}
+
+app.<span class="fn">use</span>((req, res, next) => {
+  <span class="kw">const</span> nonce = <span class="fn">generateNonce</span>();
+  res.locals.nonce = nonce; <span class="cm">// Pass to template</span>
+
+  res.<span class="fn">setHeader</span>(<span class="str">'Content-Security-Policy'</span>, [
+    <span class="str">`script-src 'nonce-${nonce}' 'strict-dynamic'`</span>,
+    <span class="cm">// nonce: only scripts with this nonce execute</span>
+    <span class="cm">// strict-dynamic: scripts loaded by nonce'd scripts can load further scripts</span>
+    <span class="cm">// (needed for bundlers that load chunks dynamically)</span>
+    <span class="str">"default-src 'self'"</span>,
+    <span class="str">"connect-src 'self' https://api.myapp.com wss://ws.myapp.com"</span>,
+    <span class="str">"img-src 'self' data: https://cdn.myapp.com"</span>,
+    <span class="str">"style-src 'self' 'unsafe-inline'"</span>, <span class="cm">// Needed for React inline styles</span>
+    <span class="str">"frame-ancestors 'none'"</span>,
+    <span class="str">"base-uri 'self'"</span>,         <span class="cm">// Prevent &lt;base&gt; tag injection</span>
+    <span class="str">"object-src 'none'"</span>,       <span class="cm">// Prevent Flash/plugin injection</span>
+    <span class="str">"upgrade-insecure-requests"</span>, <span class="cm">// Force HTTPS for all resources</span>
+    <span class="str">`report-uri /csp-report`</span>,  <span class="cm">// Collect violation reports</span>
+  ].<span class="fn">join</span>(<span class="str">';'</span>));
+  <span class="fn">next</span>();
+});
+
+<span class="cm">// HTML template uses the nonce on every script tag:</span>
+<span class="cm">&lt;script nonce="&lt;%= nonce %&gt;" src="/bundle.js"&gt;&lt;/script&gt;</span>
+<span class="cm">&lt;script nonce="&lt;%= nonce %&gt;"&gt;window.__INITIAL_STATE__ = {...};&lt;/script&gt;</span>
+<span class="cm">// Injected &lt;script&gt;...&lt;/script&gt; has no nonce → BLOCKED by browser</span>
+
+<span class="cm">// Report-only mode — monitor before enforcing</span>
+res.<span class="fn">setHeader</span>(
+  <span class="str">'Content-Security-Policy-Report-Only'</span>,
+  <span class="str">"script-src 'nonce-abc123'; report-uri /csp-report"</span>
+);
+<span class="cm">// Browser logs violations but doesn't block anything</span>
+<span class="cm">// Watch /csp-report for POST requests to find legitimate resources to allowlist</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using <code>'unsafe-inline'</code> in <code>script-src</code> — negates the XSS protection entirely. Any injected inline script now executes. If you need inline scripts, use nonces instead. <code>'unsafe-inline'</code> is ignored when a nonce or hash is present in the policy (nonce takes precedence).</div>
+  <div class="mst">Using a static nonce — a nonce must be cryptographically random and regenerated for every HTTP response. A static nonce embedded in your HTML template is effectively <code>'unsafe-inline'</code> — an attacker who reads your source code knows the nonce and can include it in injected scripts.</div>
+  <div class="mst">Not deploying in report-only first — a CSP that blocks your own scripts breaks the site. Report-only mode reveals violations without breaking users. Always go report-only → observe → fix → enforce.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does a CSP nonce prevent XSS even after an injection?"</div><div class="d">The server generates a random nonce per response and includes it in both the CSP header (script-src 'nonce-{value}') and on every legitimate script tag as a nonce attribute. The browser only executes scripts with a matching nonce. An XSS-injected script tag has no nonce (the attacker can't predict it) and is blocked. The nonce must be random per response — a static nonce is equivalent to no protection.</div></div>
+  <div class="iq"><div class="q">"What is the difference between CSP report-only mode and enforcement mode?"</div><div class="d">Report-only: the policy is evaluated and violations are sent to report-uri, but nothing is actually blocked. Used to discover what breaks before enforcement. Enforcement: violations are blocked and reported. You need report-only first to know what legitimate resources to add to the allowlist — jumping straight to enforcement breaks production.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">XSS (topic 1 — CSP is the mitigation layer)</span>
+    <span class="pill pq">Clickjacking (topic 3 — frame-ancestors is a CSP directive)</span>
+    <span class="pill pq">SRI (topic 5 — CDN scripts + CSP work together)</span>
+    <span class="pill pc">Next.js headers() config (where CSP is set)</span>
+  </div>
+</div>
+
+<div class="topic" id="t4">
+  <div class="tnum">Topic 5 of 7 — Block 7: Security</div>
+  <h1 class="ttl">Subresource Integrity (SRI)</h1>
+  <div class="tags"><span class="tag tg">Hash verification</span><span class="tag td">CDN trust</span><span class="tag tw">Supply chain</span><span class="tag ti">integrity attribute</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Subresource Integrity (SRI) allows browsers to verify that a resource fetched from a third-party CDN or origin has not been tampered with. You provide a cryptographic hash of the expected resource content in the HTML. Before executing the script or applying the stylesheet, the browser hashes the fetched content and compares it against your provided hash. If they don't match — because the CDN was compromised, served a different version, or a supply-chain attack injected malicious code — the browser refuses to execute the resource. SRI protects against the class of attacks where a CDN (cdnjs, unpkg, jsDelivr) is compromised and begins serving malicious scripts to millions of sites.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">You specify the <code>integrity</code> attribute on <code>&lt;script&gt;</code> or <code>&lt;link&gt;</code> tags with a hash in the format <code>algorithm-base64hash</code>. Supported algorithms: sha256, sha384, sha512 (sha384 recommended). The browser fetches the resource, computes the hash over the response body, and compares it to every hash in the integrity attribute. If any hash matches, the resource is accepted. If none match, the resource is blocked with a network error (similar to a CORS violation). The <code>crossorigin</code> attribute is required when using SRI for cross-origin resources — it enables CORS mode for the fetch so the response can be inspected.</p>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">&lt;!-- SRI on CDN script — browser verifies hash before executing --&gt;</span>
+&lt;script
+  src=<span class="str">"https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"</span>
+  integrity=<span class="str">"sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw=="</span>
+  crossorigin=<span class="str">"anonymous"</span>
+  referrerpolicy=<span class="str">"no-referrer"</span>
+&gt;&lt;/script&gt;
+<span class="cm">&lt;!-- crossorigin="anonymous": browser can inspect the response for hash verification --&gt;</span>
+<span class="cm">&lt;!-- If CDN serves different bytes: SHA mismatch → script blocked --&gt;</span>
+
+<span class="cm">&lt;!-- SRI on stylesheet --&gt;</span>
+&lt;link
+  rel=<span class="str">"stylesheet"</span>
+  href=<span class="str">"https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"</span>
+  integrity=<span class="str">"sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXholtQKqhGF1JKNT9ZkpOz8JaFOI/sw=="</span>
+  crossorigin=<span class="str">"anonymous"</span>
+/&gt;
+
+<span class="cm">// Generate SRI hash (Node.js)</span>
+<span class="kw">import</span> { createHash } <span class="kw">from</span> <span class="str">'crypto'</span>;
+<span class="kw">import</span> { readFileSync } <span class="kw">from</span> <span class="str">'fs'</span>;
+
+<span class="kw">function</span> <span class="fn">generateSRI</span>(filePath) {
+  <span class="kw">const</span> content = <span class="fn">readFileSync</span>(filePath);
+  <span class="kw">const</span> hash = <span class="fn">createHash</span>(<span class="str">'sha384'</span>).<span class="fn">update</span>(content).<span class="fn">digest</span>(<span class="str">'base64'</span>);
+  <span class="kw">return</span> <span class="str">`sha384-${hash}`</span>;
+}
+<span class="cm">// Or use: https://www.srihash.org for one-off generation</span>
+<span class="cm">// Or CLI: openssl dgst -sha384 -binary file.js | openssl base64 -A</span>
+
+<span class="cm">// CSP + SRI: belt-and-suspenders</span>
+<span class="cm">Content-Security-Policy: script-src 'self' https://cdnjs.cloudflare.com</span>
+<span class="cm">// CSP limits which CDNs can serve scripts</span>
+<span class="cm">// SRI verifies the exact content from the allowed CDN</span>
+<span class="cm">// Together: origin allowlisted AND content verified</span></pre></div>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>When SRI is required</h4><p>Any script/stylesheet loaded from a third-party origin you don't fully control: CDNs (cdnjs, jsDelivr, unpkg), Google Fonts, third-party widget scripts. If you self-host or use content hashing (Vite output), SRI is already implicit — the hash is in the filename.</p></div>
+    <div class="sb"><h4>Supply chain attack context</h4><p>Historical precedent: polyfill.io (June 2024) was acquired and began serving malicious JavaScript to 100k+ sites. Any site including it without SRI executed the malicious code. With SRI, the hash mismatch would have blocked execution immediately.</p></div>
+    <div class="sb"><h4>crossorigin attribute requirement</h4><p>SRI for cross-origin resources requires <code>crossorigin="anonymous"</code>. Without it, the browser fetches the resource without CORS, and the SRI hash cannot be computed over the response. The resource is loaded without verification. This is a silent failure mode.</p></div>
+    <div class="sb"><h4>Dynamic imports and SRI</h4><p>SRI cannot be applied to dynamically imported scripts (<code>import()</code>) — the module specifier in code doesn't support the integrity attribute. Use CSP <code>script-src</code> with origin allowlisting as a complement. Avoid dynamically importing from untrusted CDNs.</p></div>
+  </div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Omitting <code>crossorigin="anonymous"</code> on a cross-origin SRI tag — SRI silently fails to verify the hash and loads the resource without integrity checking. The attribute is mandatory for cross-origin SRI to function.</div>
+  <div class="mst">Pinning SRI hashes to a CDN URL that serves the "latest" version (without a specific version in the URL) — the CDN may update the file, changing the content and breaking the hash match. Always include an explicit version number in the URL when using SRI.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is Subresource Integrity and what attack does it protect against?"</div><div class="d">SRI adds an integrity attribute with a cryptographic hash to external script/link tags. The browser hashes the fetched content and compares it — mismatch blocks execution. Protects against CDN compromise (supply-chain attack): if a CDN starts serving malicious code, the hash mismatch prevents it executing. The polyfill.io attack (2024) is the canonical recent example — SRI would have blocked it entirely.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">CSP (topic 4 — works alongside SRI for CDN scripts)</span>
+    <span class="pill pc">Supply chain security (npm audits, lockfiles)</span>
+    <span class="pill pc">CORS (crossorigin attribute needed for SRI)</span>
+  </div>
+</div>
+
+<div class="topic" id="t5">
+  <div class="tnum">Topic 6 of 7 — Block 7: Security</div>
+  <h1 class="ttl">Authentication storage</h1>
+  <div class="tags"><span class="tag tg">HttpOnly</span><span class="tag tg">Secure flag</span><span class="tag tw">localStorage risk</span><span class="tag td">sessionStorage</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Where you store authentication tokens is one of the most consequential security decisions in a frontend architecture. The three options — cookies, localStorage, and sessionStorage — have fundamentally different security properties. The core tension: cookies are vulnerable to CSRF (automatically sent cross-origin) but protected from XSS with HttpOnly. localStorage is immune to CSRF (not automatically sent) but fully exposed to XSS. The right choice depends on your threat model and what mitigations you layer on top.</p>
+
+  <div class="stor-grid">
+    <div class="stor-card">
+      <h4>HttpOnly Cookie</h4>
+      <div class="row"><div class="label">XSS readable</div><div class="yes">No</div></div>
+      <div class="row"><div class="label">CSRF risk</div><div class="dep">Mitigated by SameSite</div></div>
+      <div class="row"><div class="label">Persistent</div><div class="yes">Yes (Expires/Max-Age)</div></div>
+      <div class="row"><div class="label">JS access</div><div class="yes">None (httpOnly)</div></div>
+      <div class="row"><div class="label">Server-set</div><div class="yes">Yes (Set-Cookie)</div></div>
+      <div class="row"><div class="label">Recommended for</div><div style="font-size:11px;color:var(--color-text-secondary)">Session tokens</div></div>
+    </div>
+    <div class="stor-card">
+      <h4>localStorage</h4>
+      <div class="row"><div class="label">XSS readable</div><div class="no">Yes — fully exposed</div></div>
+      <div class="row"><div class="label">CSRF risk</div><div class="yes">None (not auto-sent)</div></div>
+      <div class="row"><div class="label">Persistent</div><div class="yes">Yes (manual clear)</div></div>
+      <div class="row"><div class="label">JS access</div><div class="no">Full read/write</div></div>
+      <div class="row"><div class="label">Server-set</div><div class="no">No (JS only)</div></div>
+      <div class="row"><div class="label">Recommended for</div><div style="font-size:11px;color:var(--color-text-secondary)">Non-sensitive preferences</div></div>
+    </div>
+    <div class="stor-card">
+      <h4>sessionStorage</h4>
+      <div class="row"><div class="label">XSS readable</div><div class="no">Yes — fully exposed</div></div>
+      <div class="row"><div class="label">CSRF risk</div><div class="yes">None (not auto-sent)</div></div>
+      <div class="row"><div class="label">Persistent</div><div class="no">Tab session only</div></div>
+      <div class="row"><div class="label">JS access</div><div class="no">Full read/write</div></div>
+      <div class="row"><div class="label">Server-set</div><div class="no">No (JS only)</div></div>
+      <div class="row"><div class="label">Recommended for</div><div style="font-size:11px;color:var(--color-text-secondary)">Ephemeral sensitive state</div></div>
+    </div>
+  </div>
+
+  <div class="sl">Cookie flags — every flag matters</div>
+  <div class="g2">
+    <div class="sb"><h4>HttpOnly</h4><p>Cookie cannot be read or written by JavaScript — <code>document.cookie</code> returns it as empty. Protects against XSS token theft: even if XSS runs on your page, the session cookie is inaccessible. Critical for authentication cookies. No valid reason to omit this on session tokens.</p></div>
+    <div class="sb"><h4>Secure</h4><p>Cookie is only sent over HTTPS connections — never over plain HTTP. Without this, a token sent over HTTP is transmitted in plaintext and can be intercepted by network attackers. In production, every authentication cookie must have this flag.</p></div>
+    <div class="sb"><h4>SameSite=Lax</h4><p>Cookie is not sent on cross-site subrequest (POST, fetch). Prevents CSRF. Sent on top-level navigation GET — OAuth redirects and normal link following work. The default in modern browsers. Explicit declaration ensures consistent cross-browser behaviour.</p></div>
+    <div class="sb"><h4>SameSite=Strict</h4><p>Cookie never sent cross-site, including top-level GET navigation. User clicking a link from Google to your site won't be logged in until after the redirect. Maximum CSRF protection but breaks OAuth flows and external links landing with session. Use for highly sensitive admin surfaces.</p></div>
+    <div class="sb"><h4>SameSite=None; Secure</h4><p>Always sent cross-site — required for third-party auth (embedded widgets, iframes that need auth). Must be combined with Secure flag (HTTPS required). Requires explicit CSRF protection (CSRF tokens) since SameSite protection is opted out.</p></div>
+    <div class="sb"><h4>Path &amp; Domain</h4><p>Restrict which paths/subdomains receive the cookie. <code>Path=/api</code>: only sent to API paths, not the frontend. <code>Domain=.myapp.com</code>: sent to all subdomains. Narrowing Path and Domain limits exposure — a compromised subdomain can't steal cookies scoped to another subdomain.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Server sets the authentication cookie (Express.js)</span>
+app.<span class="fn">post</span>(<span class="str">'/auth/login'</span>, <span class="kw">async</span> (req, res) => {
+  <span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">validateCredentials</span>(req.body);
+  <span class="kw">const</span> token = <span class="fn">signJWT</span>({ userId: user.id });
+
+  res.<span class="fn">cookie</span>(<span class="str">'session'</span>, token, {
+    httpOnly: <span class="kw">true</span>,      <span class="cm">// JS cannot read this cookie</span>
+    secure: <span class="kw">true</span>,        <span class="cm">// HTTPS only</span>
+    sameSite: <span class="str">'lax'</span>,    <span class="cm">// CSRF protection</span>
+    maxAge: <span class="num">7</span> * <span class="num">24</span> * <span class="num">60</span> * <span class="num">60</span> * <span class="num">1000</span>, <span class="cm">// 7 days in ms</span>
+    path: <span class="str">'/'</span>,
+  });
+  res.<span class="fn">json</span>({ success: <span class="kw">true</span> }); <span class="cm">// No token in response body!</span>
+});
+
+<span class="cm">// ❌ Common insecure pattern: token in response body → stored in localStorage</span>
+<span class="cm">// Server:</span>
+res.<span class="fn">json</span>({ token: jwt });  <span class="cm">// Token in response body</span>
+<span class="cm">// Client:</span>
+localStorage.<span class="fn">setItem</span>(<span class="str">'token'</span>, response.token); <span class="cm">// XSS can steal this</span>
+<span class="fn">fetch</span>(<span class="str">'/api/me'</span>, {
+  headers: { <span class="str">'Authorization'</span>: <span class="str">`Bearer ${localStorage.getItem('token')}`</span> }
+}); <span class="cm">// XSS can replicate this exact call from anywhere</span>
+
+<span class="cm">// ✅ HttpOnly cookie: browser includes it automatically</span>
+<span class="fn">fetch</span>(<span class="str">'/api/me'</span>, { credentials: <span class="str">'include'</span> }); <span class="cm">// Cookie sent, invisible to JS</span>
+<span class="cm">// XSS can call this endpoint (cookie auto-included by browser)</span>
+<span class="cm">// BUT: XSS cannot exfiltrate the token itself — it never touches JS land</span>
+<span class="cm">// AND: XSS cannot replay from attacker's server — cookie is same-site only</span>
+
+<span class="cm">// Token refresh — short-lived access token + long-lived refresh token</span>
+<span class="cm">// Access token (15min): memory only or short-lived cookie</span>
+<span class="cm">// Refresh token (7 days): HttpOnly cookie only</span>
+<span class="cm">// When access token expires → POST /auth/refresh with refresh cookie</span>
+<span class="cm">// Server validates refresh cookie, issues new access token</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Not setting the <code>Secure</code> flag on auth cookies — on HTTP connections (dev without HTTPS, misconfigured production), the token is transmitted in plaintext. Any network observer (coffee shop Wi-Fi, ISP) can capture it. Always use Secure in combination with HttpOnly.</div>
+  <div class="mst">Storing long-lived refresh tokens in localStorage — if XSS occurs, the attacker has the refresh token and can generate access tokens indefinitely until the refresh token expires (days or weeks). Refresh tokens must be HttpOnly cookies. Access tokens can be in memory (lost on page refresh) or very short-lived cookies.</div>
+  <div class="mst">Thinking HttpOnly cookies make CSRF impossible — they prevent XSS token theft but CSRF still works (browser auto-includes cookies). SameSite=Lax is what prevents CSRF. Both protections must be applied together.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Where should you store a JWT and why?"</div><div class="d">HttpOnly, Secure, SameSite=Lax cookie. Reasoning: HttpOnly prevents XSS from reading the token (localStorage doesn't). SameSite=Lax prevents CSRF (the main cookie vulnerability). Secure ensures HTTPS only. The combination gives XSS protection AND CSRF protection. localStorage gives CSRF immunity but zero XSS protection — one XSS vulnerability and the attacker has the token permanently.</div></div>
+  <div class="iq"><div class="q">"What is the difference between HttpOnly and Secure cookie flags?"</div><div class="d">HttpOnly: prevents JavaScript access to the cookie — XSS cannot read it via document.cookie or JS APIs. Secure: cookie only transmitted over HTTPS — prevents cleartext interception over HTTP. They protect against different threats. Both must be set on authentication cookies. Omitting HttpOnly = XSS can steal it. Omitting Secure = network observer can steal it.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">CSRF (topic 2 — SameSite is what protects cookies from CSRF)</span>
+    <span class="pill pq">XSS (topic 1 — HttpOnly is why XSS can't steal the token)</span>
+    <span class="pill pq">OAuth/PKCE (topic 7 — where to store the access token after OAuth)</span>
+    <span class="pill pc">JWT (token format — separate from storage decision)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 4–6 complete ───</div>
+
+<div class="topic" id="t6">
+  <div class="tnum">Topic 7 of 7 — Block 7: Security</div>
+  <h1 class="ttl">OAuth &amp; PKCE in the browser</h1>
+  <div class="tags"><span class="tag tp">PKCE flow</span><span class="tag tg">Code verifier</span><span class="tag td">Implicit flow deprecated</span><span class="tag ti">SPA auth</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">OAuth 2.0 is a delegated authorisation framework — your app (the "client") requests access to a resource owned by a user, via an authorisation server (Google, GitHub, Auth0), without handling the user's credentials directly. In browser-based SPAs, the correct OAuth flow is <strong>Authorization Code Flow with PKCE</strong> (Proof Key for Code Exchange). PKCE is a security extension that protects the authorization code against interception attacks in public clients (browsers, mobile apps) where a client secret cannot be kept confidential. The older Implicit Flow (which returned tokens directly in the URL fragment) is deprecated — it exposed tokens in browser history, referrer headers, and server logs.</p>
+
+  <div class="sl">Why the implicit flow is deprecated</div>
+  <div class="g2">
+    <div class="sb"><h4>Tokens in URL fragment</h4><p>Implicit flow returned access tokens in the redirect URI's hash fragment: <code>https://app.com/callback#access_token=xyz</code>. Tokens leaked in: browser history, referrer headers sent to CDN and analytics, server access logs, and postMessage leaks in iframes. No way to revoke these exposures.</p></div>
+    <div class="sb"><h4>No refresh tokens</h4><p>Implicit flow spec prohibits refresh tokens (too risky in the browser). Short-lived access tokens require re-authorisation when they expire, causing poor UX. PKCE flow allows refresh tokens — the refresh token is stored in an HttpOnly cookie and used to silently obtain new access tokens.</p></div>
+    <div class="sb"><h4>No way to verify token recipient</h4><p>Implicit flow cannot prove the token was issued to the requesting client (no client secret). An attacker who intercepts the authorization code or token cannot be distinguished from the legitimate client. PKCE's code_challenge/code_verifier proves possession without a secret.</p></div>
+    <div class="sb"><h4>Authorization server fingerprinting</h4><p>Tokens returned in URL fragments are accessible to all scripts on the page at the time of redirect — any script with access to location.hash could steal the token. With PKCE, the code in the URL is useless without the code_verifier held in memory.</p></div>
+  </div>
+
+  <div class="sl">PKCE flow — step by step</div>
+  <div class="flow">
+    <div class="fbox b">1. Generate code_verifier (random 43-128 char string)</div>
+  </div>
+  <div class="flow">
+    <div class="fbox p">2. code_challenge = BASE64URL(SHA256(code_verifier))</div>
+  </div>
+  <div class="flow">
+    <div class="fbox">3. Redirect to AuthServer with: response_type=code, code_challenge, code_challenge_method=S256</div>
+  </div>
+  <div class="flow">
+    <div class="fbox g">4. User authenticates at AuthServer</div>
+  </div>
+  <div class="flow">
+    <div class="fbox">5. AuthServer redirects back with: ?code=AUTH_CODE (not a token — just a code)</div>
+  </div>
+  <div class="flow">
+    <div class="fbox a">6. App POSTs to AuthServer token endpoint: code + code_verifier</div>
+  </div>
+  <div class="flow">
+    <div class="fbox g">7. AuthServer verifies: SHA256(code_verifier) == stored code_challenge → issues tokens</div>
+  </div>
+  <div class="flow">
+    <div class="fbox b">8. App receives access_token (short-lived) + refresh_token (long-lived)</div>
+  </div>
+
+  <p class="prose" style="margin-top:10px">The security comes from step 7: only the client that initiated the flow has the <code>code_verifier</code>. Even if the authorization <code>code</code> in the URL is intercepted (in browser history, referrer header), an attacker cannot exchange it for tokens — they don't have the <code>code_verifier</code>. The code is useless without it.</p>
+
+  <div class="sl">Code example</div>
+  <div class="cb"><pre><span class="cm">// Complete PKCE flow implementation</span>
+<span class="kw">async function</span> <span class="fn">initiateOAuth</span>() {
+  <span class="cm">// Step 1: Generate cryptographically random code verifier</span>
+  <span class="kw">const</span> codeVerifier = <span class="cl">Array</span>.<span class="fn">from</span>(
+    crypto.<span class="fn">getRandomValues</span>(<span class="kw">new</span> <span class="cl">Uint8Array</span>(<span class="num">32</span>))
+  ).<span class="fn">map</span>(b => b.<span class="fn">toString</span>(<span class="num">36</span>)).<span class="fn">join</span>(<span class="str">''</span>);
+
+  <span class="cm">// Step 2: Hash it → code challenge</span>
+  <span class="kw">const</span> encoded = <span class="kw">new</span> <span class="cl">TextEncoder</span>().<span class="fn">encode</span>(codeVerifier);
+  <span class="kw">const</span> hashBuffer = <span class="kw">await</span> crypto.subtle.<span class="fn">digest</span>(<span class="str">'SHA-256'</span>, encoded);
+  <span class="kw">const</span> codeChallenge = btoa(
+    <span class="cl">String</span>.<span class="fn">fromCharCode</span>(...<span class="kw">new</span> <span class="cl">Uint8Array</span>(hashBuffer))
+  ).<span class="fn">replace</span>(/\+/g, <span class="str">'-'</span>).<span class="fn">replace</span>(/\//g, <span class="str">'_'</span>).<span class="fn">replace</span>(/=/g, <span class="str">''</span>);
+
+  <span class="cm">// Step 3: Store verifier (sessionStorage — ephemeral, tab-scoped)</span>
+  sessionStorage.<span class="fn">setItem</span>(<span class="str">'pkce_verifier'</span>, codeVerifier);
+  sessionStorage.<span class="fn">setItem</span>(<span class="str">'oauth_state'</span>, <span class="fn">generateState</span>()); <span class="cm">// CSRF protection</span>
+
+  <span class="cm">// Step 4: Redirect to authorization server</span>
+  <span class="kw">const</span> params = <span class="kw">new</span> <span class="cl">URLSearchParams</span>({
+    response_type: <span class="str">'code'</span>,          <span class="cm">// NOT 'token' (that's implicit flow)</span>
+    client_id: <span class="str">'my-spa-client'</span>,
+    redirect_uri: <span class="str">'https://myapp.com/callback'</span>,
+    scope: <span class="str">'openid profile email'</span>,
+    code_challenge: codeChallenge,
+    code_challenge_method: <span class="str">'S256'</span>,   <span class="cm">// SHA-256 hash</span>
+    state: sessionStorage.<span class="fn">getItem</span>(<span class="str">'oauth_state'</span>),
+  });
+  location.<span class="fn">assign</span>(<span class="str">`https://auth.provider.com/oauth/authorize?${params}`</span>);
+}
+
+<span class="kw">async function</span> <span class="fn">handleCallback</span>() {
+  <span class="kw">const</span> params = <span class="kw">new</span> <span class="cl">URLSearchParams</span>(location.search);
+  <span class="kw">const</span> code  = params.<span class="fn">get</span>(<span class="str">'code'</span>);
+  <span class="kw">const</span> state = params.<span class="fn">get</span>(<span class="str">'state'</span>);
+
+  <span class="cm">// Validate state (CSRF protection for the OAuth flow itself)</span>
+  <span class="kw">if</span> (state !== sessionStorage.<span class="fn">getItem</span>(<span class="str">'oauth_state'</span>)) {
+    <span class="kw">throw new</span> <span class="cl">Error</span>(<span class="str">'State mismatch — possible CSRF on OAuth callback'</span>);
+  }
+
+  <span class="kw">const</span> codeVerifier = sessionStorage.<span class="fn">getItem</span>(<span class="str">'pkce_verifier'</span>);
+  sessionStorage.<span class="fn">removeItem</span>(<span class="str">'pkce_verifier'</span>); <span class="cm">// One-time use</span>
+  sessionStorage.<span class="fn">removeItem</span>(<span class="str">'oauth_state'</span>);
+
+  <span class="cm">// Exchange code + verifier for tokens</span>
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'https://auth.provider.com/oauth/token'</span>, {
+    method: <span class="str">'POST'</span>,
+    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/x-www-form-urlencoded'</span> },
+    body: <span class="kw">new</span> <span class="cl">URLSearchParams</span>({
+      grant_type: <span class="str">'authorization_code'</span>,
+      code,
+      redirect_uri: <span class="str">'https://myapp.com/callback'</span>,
+      client_id: <span class="str">'my-spa-client'</span>,
+      code_verifier: codeVerifier, <span class="cm">// The proof — attacker doesn't have this</span>
+    }),
+  });
+  <span class="kw">const</span> { access_token, refresh_token } = <span class="kw">await</span> res.<span class="fn">json</span>();
+
+  <span class="cm">// Store access token in memory (short-lived, ~15min)</span>
+  <span class="cm">// Store refresh token via BFF (Backend for Frontend) as HttpOnly cookie</span>
+  <span class="cm">// Best practice: use auth libraries (Auth0 SPA SDK, oidc-client-ts)</span>
+  <span class="cm">// They handle PKCE, token storage, and silent refresh automatically</span>
+}</pre></div>
+
+  <div class="sl">Backend for Frontend (BFF) pattern</div>
+  <div class="arch"><h4>Why BFF is the most secure SPA auth architecture</h4><p>The BFF pattern routes all OAuth token exchange through a server you control. The SPA redirects to the BFF for login. The BFF handles the PKCE exchange with the auth server, receives the tokens, stores the refresh token in an HttpOnly cookie, and gives the access token only to the SPA in memory. The SPA makes API calls via the BFF, which attaches the access token server-side. The result: no tokens are ever accessible from browser JavaScript. XSS cannot steal tokens. CSRF is handled by SameSite cookies. This is the approach recommended by the OAuth 2.0 Security Best Current Practice (BCP) for SPAs.</p></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using the Implicit Flow (response_type=token) in new applications — it is explicitly deprecated in OAuth 2.0 Security BCP (RFC 9700). All new SPA implementations must use Authorization Code + PKCE. Many auth libraries (Auth0 SDK, Google Identity) have already removed implicit flow support.</div>
+  <div class="mst">Storing access tokens or refresh tokens in localStorage after receiving them from the token endpoint — the token endpoint exchange should ideally happen server-side (BFF). If client-side, access tokens should live in memory only (lost on page refresh), and refresh tokens should be in HttpOnly cookies, not localStorage.</div>
+  <div class="mst">Not validating the <code>state</code> parameter on the OAuth callback — the state parameter is a CSRF token for the OAuth flow itself. Without validating it, an attacker can trick a user into completing an OAuth flow that the attacker initiated, associating the victim's account with the attacker's authorization code.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Why is the OAuth implicit flow deprecated for SPAs?"</div><div class="d">Implicit flow returns access tokens directly in the URL fragment (#access_token=...). Tokens are exposed in browser history, referrer headers to third-party scripts, server logs, and postMessage leaks. No refresh tokens allowed. Cannot verify token recipient. PKCE fixes this: issues only an authorization code (useless without the code_verifier), exchanges it server-side (or client-side with the verifier), tokens never appear in the URL.</div></div>
+  <div class="iq"><div class="q">"How does PKCE protect against authorization code interception?"</div><div class="d">PKCE: generate a random code_verifier, hash it to code_challenge, send the challenge to the auth server with the authorization request. Auth server stores the challenge. Client receives the code in the redirect URL. Client POSTs code + original verifier to the token endpoint. Auth server hashes the verifier and compares to stored challenge — must match. An attacker who intercepts the code cannot exchange it without the verifier, which was never transmitted over the network.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Authentication storage (topic 6 — where to put the token after OAuth)</span>
+    <span class="pill pc">PKCE RFC 7636 / OAuth 2.0 Security BCP RFC 9700</span>
+    <span class="pill pq">BFF pattern (most secure SPA auth architecture)</span>
+    <span class="pill pc">CSRF (state parameter protects OAuth callback)</span>
+    <span class="pill pc">JWT (access token format — separate from flow)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── All 7 topics complete · Block 7 done ───</div>
+
+</main>
+</div>
+
+<script>
+function show(idx,el){
+  document.querySelectorAll('.topic').forEach(t=>t.classList.remove('visible'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('t'+idx).classList.add('visible');
+  el.classList.add('active');
+  document.querySelector('.content').scrollTop=0;
+}
+</script>

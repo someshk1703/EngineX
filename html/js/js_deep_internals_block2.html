@@ -1,0 +1,917 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.shell{display:flex;height:100vh;min-height:640px;overflow:hidden}
+.nav{width:228px;min-width:228px;border-right:0.5px solid var(--color-border-tertiary);padding:12px 0;overflow-y:auto;background:var(--color-background-secondary)}
+.nav-title{font-size:10px;font-weight:500;color:var(--color-text-tertiary);padding:6px 16px 4px;letter-spacing:.07em;text-transform:uppercase}
+.nav-item{display:block;padding:7px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent;line-height:1.4;transition:all .12s}
+.nav-item:hover{color:var(--color-text-primary);background:var(--color-background-primary)}
+.nav-item.active{color:var(--color-text-primary);border-left-color:#534AB7;background:var(--color-background-primary);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic{display:none}
+.topic.visible{display:block}
+h1.ttl{font-size:20px;font-weight:500;margin-bottom:4px}
+.tnum{font-size:12px;color:var(--color-text-tertiary);margin-bottom:14px}
+.tags{margin-bottom:14px}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin-right:4px}
+.tv{background:#EEEDFE;color:#3C3489}
+.tp{background:#E1F5EE;color:#085041}
+.tw{background:#FAEEDA;color:#633806}
+.tc{background:#E6F1FB;color:#0C447C}
+.sl{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin:20px 0 6px;display:flex;align-items:center;gap:6px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:14px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{font-weight:500;color:var(--color-text-primary)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sb{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:11px 13px}
+.sb h4{font-size:13px;font-weight:500;margin-bottom:3px}
+.sb p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.6}
+.code-block{background:#1e1e2e;border-radius:var(--border-radius-md);padding:14px 16px;margin:10px 0;overflow-x:auto}
+.code-block pre{font-family:var(--font-mono);font-size:12px;line-height:1.75;color:#cdd6f4;white-space:pre}
+.kw{color:#cba6f7}.fn{color:#89b4fa}.cm{color:#6c7086;font-style:italic}.str{color:#a6e3a1}.num{color:#fab387}.vr{color:#f38ba8}.cl{color:#f9e2af}
+.mst{border-left:2px solid #E24B4A;padding:6px 10px;margin:6px 0;font-size:13px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.tof{border-left:2px solid #EF9F27;padding:6px 10px;margin:6px 0;font-size:13px;color:var(--color-text-secondary);line-height:1.6;border-radius:0}
+.iq{font-size:13px;padding:9px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin:5px 0;border:0.5px solid var(--color-border-tertiary)}
+.iq .q{font-weight:500;margin-bottom:3px}
+.iq .d{font-size:12px;color:var(--color-text-tertiary);line-height:1.5}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500}
+.pq{background:var(--color-background-info);color:var(--color-text-info)}
+.pc{background:#E1F5EE;color:#085041}
+.divline{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:28px 0}
+.divlabel{text-align:center;font-size:11px;color:var(--color-text-tertiary);margin:-12px 0 20px}
+.arch{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:11px 14px;margin:6px 0}
+.arch h4{font-size:13px;font-weight:500;margin-bottom:3px}
+.arch p{font-size:13px;color:var(--color-text-secondary);line-height:1.65}
+</style>
+
+<div class="shell">
+<nav class="nav">
+  <div class="nav-title">Block 2 — JS Deep Internals</div>
+  <div class="nav-item active" onclick="show(0,this)">1. Execution context &amp; scope chain</div>
+  <div class="nav-item" onclick="show(1,this)">2. Closures</div>
+  <div class="nav-item" onclick="show(2,this)">3. Prototypal inheritance</div>
+  <div class="nav-item" onclick="show(3,this)">4. this binding</div>
+  <div class="nav-item" onclick="show(4,this)">5. Event delegation</div>
+  <div class="nav-item" onclick="show(5,this)">6. Promises &amp; microtask queue</div>
+  <div class="nav-item" onclick="show(6,this)">7. Async/await</div>
+  <div class="nav-item" onclick="show(7,this)">8. Web Workers</div>
+  <div class="nav-item" onclick="show(8,this)">9. WeakMap &amp; WeakRef</div>
+  <div class="nav-item" onclick="show(9,this)">10. Symbols &amp; iterators</div>
+</nav>
+
+<main class="content">
+
+<div class="topic visible" id="t0">
+  <div class="tnum">Topic 1 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">Execution context &amp; scope chain</h1>
+  <div class="tags"><span class="tag tv">Hoisting</span><span class="tag tv">Lexical scope</span><span class="tag tp">TDZ</span><span class="tag tc">V8 internals</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">An <strong>execution context (EC)</strong> is the abstract environment V8 creates every time code is about to run — whether that's the global script, a function call, or an <code>eval()</code>. It holds three things: the <strong>Variable Environment</strong> (bindings for <code>var</code> declarations and function declarations), the <strong>Lexical Environment</strong> (bindings for <code>let</code>/<code>const</code>, the outer reference, and <code>this</code>), and a <strong>this binding</strong>. ECs live on the call stack. When a function is called, a new EC is pushed. When it returns, it's popped. The <strong>scope chain</strong> is the linked list of Lexical Environments from the current EC outward to the global EC — this is how identifier resolution works: V8 walks the chain upward until it finds the binding or hits the global scope.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">V8 runs each EC in two phases. <strong>Creation phase:</strong> allocates memory for all identifiers in the current scope. <code>var</code> declarations are initialized to <code>undefined</code> (hoisted). Function declarations are fully hoisted (the entire function object is allocated). <code>let</code>/<code>const</code> are placed into the Lexical Environment but remain in the <strong>Temporal Dead Zone (TDZ)</strong> — any access before their declaration line throws a <code>ReferenceError</code>. <strong>Execution phase:</strong> code runs line-by-line, assignments write into the bindings. Identifier lookup during execution traverses the scope chain: current Lexical Environment → outer Lexical Environment → … → global. Each function's Lexical Environment has a hidden <code>[[OuterEnv]]</code> slot pointing to the environment where it was <em>defined</em> (not where it's called) — this is what makes lexical scoping work and closures possible.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Global execution context</h4><p>Created once. <code>this</code> = <code>window</code> (browser) or <code>global</code> (Node). Houses all top-level var/function declarations. Never popped from the call stack.</p></div>
+    <div class="sb"><h4>Function execution context</h4><p>Created per call (not per function definition). Each call gets its own EC and its own <code>arguments</code> object. Recursive calls = N ECs on the stack simultaneously.</p></div>
+    <div class="sb"><h4>Block scope (ES6)</h4><p><code>let</code>/<code>const</code> create a new Lexical Environment per block <code>{}</code>. The block's env's outer reference is the enclosing function/global env. <code>var</code> ignores blocks — scopes to the nearest function.</p></div>
+    <div class="sb"><h4>Temporal Dead Zone</h4><p>The zone between the start of a block scope and the <code>let</code>/<code>const</code> declaration line. Binding exists (unlike undeclared) but reading it throws. Prevents "use before init" bugs silently allowed by <code>var</code>.</p></div>
+    <div class="sb"><h4>Hoisting</h4><p><code>var</code> + function declarations hoisted in creation phase. <code>let</code>/<code>const</code> hoisted to TDZ. Class declarations hoisted to TDZ too — a class is not accessible before its definition line.</p></div>
+    <div class="sb"><h4>Lexical vs dynamic scope</h4><p>JS uses lexical scope — scope determined by where code is written, not where it's called. <code>this</code> is the only exception (it's dynamically bound unless arrow functions are used).</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// Creation phase demo — hoisting</span>
+<span class="fn">greet</span>();                        <span class="cm">// Works! Function fully hoisted</span>
+console.<span class="fn">log</span>(x);               <span class="cm">// undefined — var hoisted, not value</span>
+<span class="cm">// console.log(y);             // ReferenceError — let in TDZ</span>
+
+<span class="kw">function</span> <span class="fn">greet</span>() { <span class="kw">return</span> <span class="str">'hi'</span>; }
+<span class="kw">var</span> x = <span class="num">1</span>;
+<span class="kw">let</span> y = <span class="num">2</span>;
+
+<span class="cm">// Scope chain resolution</span>
+<span class="kw">const</span> outer = <span class="num">10</span>;            <span class="cm">// Global Lexical Env</span>
+<span class="kw">function</span> <span class="fn">parent</span>() {
+  <span class="kw">const</span> mid = <span class="num">20</span>;             <span class="cm">// parent's Lexical Env</span>
+  <span class="kw">function</span> <span class="fn">child</span>() {
+    <span class="kw">const</span> inner = <span class="num">30</span>;
+    <span class="cm">// V8 resolves `outer`: child env → parent env → global env ✓</span>
+    console.<span class="fn">log</span>(inner + mid + outer); <span class="cm">// 60</span>
+  }
+  <span class="fn">child</span>();
+}
+
+<span class="cm">// Block scope — let creates new env per block</span>
+<span class="kw">let</span> i = <span class="str">'outer'</span>;
+{
+  <span class="kw">let</span> i = <span class="str">'inner'</span>;     <span class="cm">// New binding in block's Lexical Env</span>
+  console.<span class="fn">log</span>(i);     <span class="cm">// 'inner'</span>
+}
+console.<span class="fn">log</span>(i);       <span class="cm">// 'outer' — block env is gone</span>
+
+<span class="cm">// Classic var-in-loop bug (scope chain explains it)</span>
+<span class="kw">for</span> (<span class="kw">var</span> j = <span class="num">0</span>; j < <span class="num">3</span>; j++) {
+  <span class="fn">setTimeout</span>(() => console.<span class="fn">log</span>(j), <span class="num">0</span>); <span class="cm">// 3,3,3 — one j in function scope</span>
+}
+<span class="kw">for</span> (<span class="kw">let</span> k = <span class="num">0</span>; k < <span class="num">3</span>; k++) {
+  <span class="fn">setTimeout</span>(() => console.<span class="fn">log</span>(k), <span class="num">0</span>); <span class="cm">// 0,1,2 — new k per iteration block</span>
+}</pre></div>
+
+  <div class="sl">Real-world use case</div>
+  <div class="arch"><h4>Module systems and scope isolation</h4><p>ES Modules create their own Lexical Environment per module file — top-level bindings are module-scoped, not global. This is why two modules both declaring <code>const x = 1</code> don't conflict. The module's env has <code>[[OuterEnv]] = null</code> (not global), making globals inaccessible unless explicitly imported. In Vite/Webpack, tree-shaking works by statically analyzing the scope chain of module bindings to determine what's reachable.</p></div>
+
+  <div class="sl">Trade-offs</div>
+  <div class="tof">Avoiding <code>var</code> entirely (<code>let</code>/<code>const</code> only) is correct practice — but TDZ errors in complex initialization order can be harder to debug than the silent <code>undefined</code> from var hoisting. The error is still correct; it just requires understanding TDZ.</div>
+  <div class="tof">Deeply nested functions with long scope chains add lookup overhead. V8 optimizes monomorphic access patterns, but excessively deep nesting (10+ levels) is rarely necessary and signals an architecture smell.</div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Expecting <code>var</code> inside a block (if, for, while) to be block-scoped — it isn't. <code>var</code> hoists to the nearest enclosing function or global scope. The for-loop-closure bug is the canonical failure case.</div>
+  <div class="mst">Assuming classes are not hoisted — they are, but into TDZ. A <code>class Foo</code> declaration before its line throws a ReferenceError, unlike function declarations which are fully hoisted.</div>
+  <div class="mst">Confusing lexical scope (determined at write-time) with <code>this</code> (determined at call-time). <code>this</code> does NOT follow the scope chain — it has its own binding rules entirely.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the Temporal Dead Zone?"</div><div class="d">The period between scope entry and the <code>let</code>/<code>const</code> declaration line where the binding exists but accessing it throws. Exists because of the creation-phase hoisting but deferred initialization. Distinguish from undeclared (which throws "is not defined").</div></div>
+  <div class="iq"><div class="q">"Why does the classic for-loop closure print the wrong value with var but not let?"</div><div class="d">With <code>var</code>, one binding for <code>j</code> in the function scope — all closures share it. With <code>let</code>, a new Lexical Environment per iteration — each closure captures its own <code>k</code>. Interviewers want you to explain this via scope chain, not just "let fixes it".</div></div>
+  <div class="iq"><div class="q">"What happens during the creation phase of an execution context?"</div><div class="d">Memory allocation for all identifiers. var → undefined. Function declarations → full function object. let/const → TDZ. this binding set. Outer env reference linked. Execution hasn't started yet.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">Closures (next topic — directly built on this)</span>
+    <span class="pill pc">V8 hidden classes (property layout = EC binding layout)</span>
+    <span class="pill pq">Module bundlers (Vite, Webpack scope isolation)</span>
+    <span class="pill pc">Call stack mechanics</span>
+    <span class="pill pc">Hoisting interview traps</span>
+  </div>
+</div>
+
+<div class="topic" id="t1">
+  <div class="tnum">Topic 2 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">Closures</h1>
+  <div class="tags"><span class="tag tv">Scope capture</span><span class="tag tp">Memory</span><span class="tag tv">Practical patterns</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">A <strong>closure</strong> is a function that retains access to its enclosing Lexical Environment even after the outer function has returned and its EC has been popped from the call stack. It is not a special syntax — it's a consequence of lexical scoping. Every function in JS is a closure over the scope in which it was defined. The inner function holds a reference to the <code>[[OuterEnv]]</code> slot of the outer EC, preventing that environment (and its bindings) from being garbage collected as long as the inner function is reachable.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">When V8 pops a function's EC from the call stack, it would normally be eligible for GC. But if any inner function was created within that EC, V8 allocated the outer function's Lexical Environment on the <strong>heap</strong> (not the stack), so it survives the function's return. The inner function's <code>[[OuterEnv]]</code> slot points to this heap-allocated environment object. As long as the inner function is reachable (held by a variable, stored in an array, passed as a callback), the entire chain of heap-allocated environments it references remains reachable and will not be GC'd. V8 performs <strong>context variable analysis</strong> at parse time — if a variable is never referenced by any inner function, it's not placed into the heap-allocated context object, staying on the stack frame instead. This means closures only "close over" variables that are actually used.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Module pattern</h4><p>Immediately invoked function that returns a public API while keeping private state in the closure. Foundation of pre-ES6 module systems. Still relevant for plugin APIs and IIFEs.</p></div>
+    <div class="sb"><h4>Partial application / currying</h4><p>A function that returns a function with some arguments pre-bound via closure. Enables reusable, configurable function factories without classes.</p></div>
+    <div class="sb"><h4>Memoization</h4><p>Cache results of expensive calls in a closure-captured Map. The cache lives between calls because it's in the outer environment, not reinitialized per call.</p></div>
+    <div class="sb"><h4>Event handler factories</h4><p>Creating handlers with captured context (e.g., which button was clicked, which user ID applies). Avoids passing extra arguments through DOM event system.</p></div>
+    <div class="sb"><h4>Stale closure (memory + bug risk)</h4><p>React hooks stale closure: a callback captures a value from render time; by the time it runs, state has updated but the closure still holds the old value. Canonical React bug.</p></div>
+    <div class="sb"><h4>Memory leak via closure</h4><p>A large object captured in a closure that's held indefinitely (event listener, global variable, Promise chain). V8 keeps the entire captured scope chain alive even if only one variable is needed.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// Classic closure — counter with private state</span>
+<span class="kw">function</span> <span class="fn">makeCounter</span>() {
+  <span class="kw">let</span> count = <span class="num">0</span>;              <span class="cm">// Heap-allocated, not stack</span>
+  <span class="kw">return</span> {
+    inc: () => ++count,       <span class="cm">// Closes over `count`</span>
+    get: () => count,
+  };
+}
+<span class="kw">const</span> c = <span class="fn">makeCounter</span>();
+c.<span class="fn">inc</span>(); c.<span class="fn">inc</span>();
+console.<span class="fn">log</span>(c.<span class="fn">get</span>()); <span class="cm">// 2 — count survived makeCounter's return</span>
+
+<span class="cm">// Memoization via closure</span>
+<span class="kw">function</span> <span class="fn">memoize</span>(fn) {
+  <span class="kw">const</span> cache = <span class="kw">new</span> <span class="cl">Map</span>();   <span class="cm">// Captured in closure, persists between calls</span>
+  <span class="kw">return</span> (...args) => {
+    <span class="kw">const</span> key = <span class="cl">JSON</span>.<span class="fn">stringify</span>(args);
+    <span class="kw">if</span> (!cache.<span class="fn">has</span>(key)) cache.<span class="fn">set</span>(key, <span class="fn">fn</span>(...args));
+    <span class="kw">return</span> cache.<span class="fn">get</span>(key);
+  };
+}
+
+<span class="cm">// Stale closure bug (React context)</span>
+<span class="kw">function</span> <span class="fn">Component</span>() {
+  <span class="kw">const</span> [count, setCount] = <span class="fn">useState</span>(<span class="num">0</span>);
+  <span class="fn">useEffect</span>(() => {
+    <span class="kw">const</span> id = <span class="fn">setInterval</span>(() => {
+      console.<span class="fn">log</span>(count); <span class="cm">// ❌ Stale! Captures count=0 from first render</span>
+    }, <span class="num">1000</span>);
+    <span class="kw">return</span> () => <span class="fn">clearInterval</span>(id);
+  }, []); <span class="cm">// Empty deps — closure never refreshed</span>
+}
+<span class="cm">// Fix: add count to deps, or use useRef for the latest value</span>
+
+<span class="cm">// ❌ Memory leak — large object unnecessarily captured</span>
+<span class="kw">function</span> <span class="fn">setup</span>() {
+  <span class="kw">const</span> bigData = <span class="kw">new</span> <span class="cl">Array</span>(<span class="num">1e6</span>).<span class="fn">fill</span>(<span class="num">0</span>);
+  <span class="kw">const</span> needed = bigData[<span class="num">0</span>];  <span class="cm">// Only this is needed</span>
+  <span class="cm">// If the returned fn closes over `bigData`, the 1M array is kept alive</span>
+  <span class="kw">return</span> () => console.<span class="fn">log</span>(needed); <span class="cm">// ✅ Closes over `needed`, not bigData</span>
+  <span class="cm">// V8's context analysis only captures variables used by inner fns</span>
+}</pre></div>
+
+  <div class="sl">Real-world use case</div>
+  <div class="arch"><h4>React hooks are built on closures</h4><p>Every <code>useState</code>, <code>useEffect</code>, and <code>useCallback</code> captures state and props from the render scope. The hooks model <em>is</em> the closure model. React's stale closure problem (and the dependency array fix) only makes sense through the lens of: "this callback was created at render N and closes over values from that render's scope; if state updates occur, the closure doesn't see them unless recreated." <code>useRef</code> is the escape hatch because refs are mutable heap objects not replaced per render — the closure always sees the same ref, and can read <code>ref.current</code> for the latest value.</p></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Thinking closures are a "feature" you have to opt into. Every function in JS is a closure. The question is which outer environments it captures and whether that causes a problem.</div>
+  <div class="mst">Stale closures in React <code>useEffect</code> with empty dependency arrays — the most common production React bug. The fix (add deps or use refs) only makes sense if you understand that the effect callback is a closure over the render's scope snapshot.</div>
+  <div class="mst">Assuming V8 captures the entire outer scope — it only captures variables actually referenced by inner functions (context variable analysis). But if <em>any</em> inner function references a large variable, the entire binding survives.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Explain what a closure is and how it works in memory."</div><div class="d">Define it via lexical environment: the inner function holds a reference to the heap-allocated outer env. Explain GC: as long as the inner function is reachable, the outer env chain won't be collected. Bring up V8 context analysis (only referenced vars captured).</div></div>
+  <div class="iq"><div class="q">"What is a stale closure? Give a React example."</div><div class="d">A closure that captured a value from an older render/call and doesn't see subsequent updates because it was never recreated. Classic case: useEffect with empty deps containing state reads. Solutions: dependency array, useRef, useReducer.</div></div>
+  <div class="iq"><div class="q">"How can closures cause memory leaks?"</div><div class="d">By keeping large objects in captured scope chains alive longer than needed, especially when the closure is stored in a long-lived reference (global, Map, event listener on a long-lived DOM node). Fix: extract only needed values, or null out references explicitly.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">React hooks model (built on closures)</span>
+    <span class="pill pq">Module pattern / IIFE</span>
+    <span class="pill pc">V8 heap allocation (env objects)</span>
+    <span class="pill pc">GC rooting (closure = GC root for captured scope)</span>
+    <span class="pill pq">Memoization (useMemo, useCallback)</span>
+  </div>
+</div>
+
+<div class="topic" id="t2">
+  <div class="tnum">Topic 3 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">Prototypal inheritance</h1>
+  <div class="tags"><span class="tag tv">Prototype chain</span><span class="tag tv">class desugaring</span><span class="tag tp">Object.create</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">JavaScript's inheritance model is <strong>prototypal</strong>, not classical. Every object has an internal slot <code>[[Prototype]]</code> (accessible via <code>Object.getPrototypeOf(obj)</code> or the deprecated <code>obj.__proto__</code>) pointing to another object — its prototype. When you access a property on an object, V8 first checks the object's own properties, then walks up the <code>[[Prototype]]</code> chain until it finds the property or hits <code>null</code> (the end). <code>class</code> syntax in ES6+ is pure syntactic sugar over this prototype chain mechanism — no new VM primitives, no true classical inheritance. Understanding what <code>class</code> desugars to is what separates candidates who know JS from candidates who know syntax.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">When you write <code>new Foo()</code>, V8 does: (1) creates a plain object, (2) sets its <code>[[Prototype]]</code> to <code>Foo.prototype</code>, (3) calls <code>Foo</code> with <code>this</code> bound to the new object, (4) returns the object (unless the constructor explicitly returns another object). <code>Foo.prototype</code> is a plain object that has a <code>constructor</code> property pointing back to <code>Foo</code>. Methods defined on <code>Foo.prototype</code> are shared across all instances — they're not copied; each instance accesses them by walking the prototype chain. <code>Object.create(proto)</code> creates a new object with its <code>[[Prototype]]</code> set to <code>proto</code>, without calling any constructor. V8's <strong>hidden class (Shape)</strong> system tracks the prototype chain — objects sharing a shape that has the same prototype benefit from fast property lookup via inline caches without traversing the chain at runtime.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>__proto__ vs prototype</h4><p><code>__proto__</code> is an instance's link to its prototype (the <code>[[Prototype]]</code> slot). <code>prototype</code> is a property on constructor <em>functions</em> — it becomes the <code>[[Prototype]]</code> of instances created with <code>new</code>. Conflating these is the #1 source of confusion.</p></div>
+    <div class="sb"><h4>Object.create()</h4><p>Creates an object with a specified prototype without a constructor call. Clean prototypal inheritance without the <code>new</code> / class machinery. Used in Object.create(null) for truly property-less dictionaries (no toString, no hasOwnProperty).</p></div>
+    <div class="sb"><h4>class desugaring</h4><p><code>class Foo extends Bar</code> sets up: <code>Foo.prototype.[[Prototype]] = Bar.prototype</code> and <code>Foo.[[Prototype]] = Bar</code> (for static inheritance). <code>super()</code> in constructor calls <code>Bar.call(this)</code>. Methods go on <code>Foo.prototype</code>.</p></div>
+    <div class="sb"><h4>Property shadowing</h4><p>Setting a property on an instance shadows the prototype's property. Does NOT modify the prototype. Own-property check: <code>obj.hasOwnProperty(key)</code> or <code>Object.hasOwn(obj, key)</code>. Needed when iterating.</p></div>
+    <div class="sb"><h4>instanceof</h4><p>Checks if <code>Foo.prototype</code> appears anywhere in the target's <code>[[Prototype]]</code> chain. Can be fooled: reassigning <code>Foo.prototype</code> after instances are created breaks it.</p></div>
+    <div class="sb"><h4>Prototype pollution</h4><p>Writing to <code>Object.prototype</code> (e.g., <code>obj['__proto__'] = {admin: true}</code> via JSON merge) contaminates the prototype of all plain objects. A security vulnerability class in Node.js servers.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// What `class` actually desugars to</span>
+<span class="kw">class</span> <span class="cl">Animal</span> {
+  <span class="fn">constructor</span>(name) { <span class="kw">this</span>.name = name; }
+  <span class="fn">speak</span>() { <span class="kw">return</span> <span class="str">`${this.name} speaks`</span>; }
+}
+<span class="kw">class</span> <span class="cl">Dog</span> <span class="kw">extends</span> <span class="cl">Animal</span> {
+  <span class="fn">speak</span>() { <span class="kw">return</span> <span class="str">`${super.speak()} — woof`</span>; }
+}
+
+<span class="cm">// Equivalent without class syntax:</span>
+<span class="kw">function</span> <span class="fn">Animal</span>(name) { <span class="kw">this</span>.name = name; }
+<span class="cl">Animal</span>.prototype.<span class="fn">speak</span> = <span class="kw">function</span>() { <span class="kw">return</span> <span class="str">`${this.name} speaks`</span>; };
+
+<span class="kw">function</span> <span class="fn">Dog</span>(name) { <span class="cl">Animal</span>.<span class="fn">call</span>(<span class="kw">this</span>, name); } <span class="cm">// super()</span>
+<span class="cl">Dog</span>.prototype = <span class="cl">Object</span>.<span class="fn">create</span>(<span class="cl">Animal</span>.prototype); <span class="cm">// extends</span>
+<span class="cl">Dog</span>.prototype.constructor = <span class="cl">Dog</span>;             <span class="cm">// restore constructor</span>
+<span class="cl">Dog</span>.prototype.<span class="fn">speak</span> = <span class="kw">function</span>() {
+  <span class="kw">return</span> <span class="cl">Animal</span>.prototype.<span class="fn">speak</span>.<span class="fn">call</span>(<span class="kw">this</span>) + <span class="str">' — woof'</span>; <span class="cm">// super</span>
+};
+
+<span class="cm">// Prototype chain of a Dog instance:</span>
+<span class="cm">// d → Dog.prototype → Animal.prototype → Object.prototype → null</span>
+
+<span class="cm">// Object.create(null) — no prototype at all</span>
+<span class="kw">const</span> dict = <span class="cl">Object</span>.<span class="fn">create</span>(<span class="kw">null</span>);
+dict.key = <span class="str">'value'</span>;
+<span class="cm">// dict.hasOwnProperty → TypeError! No Object.prototype in chain</span>
+<span class="cm">// Use: Object.hasOwn(dict, 'key') — ES2022 static method</span>
+
+<span class="cm">// Property lookup order</span>
+<span class="kw">const</span> d = <span class="kw">new</span> <span class="cl">Dog</span>(<span class="str">'Rex'</span>);
+<span class="cm">// d.speak(): V8 checks d own props → no speak → Dog.prototype → found ✓</span>
+<span class="cm">// d.toString(): Dog.prototype → Animal.prototype → Object.prototype → found</span></pre></div>
+
+  <div class="sl">Real-world use case</div>
+  <div class="arch"><h4>Prototype pollution in JSON merge utilities (security)</h4><p>A known attack vector: <code>JSON.parse('{"__proto__": {"isAdmin": true}}')</code> when naively merged into another object via <code>Object.assign({}, parsed)</code> can contaminate <code>Object.prototype.isAdmin</code>, affecting all plain objects in the process. This hit lodash (CVE-2019-10744), query-string, and dozens of other npm packages. Defense: <code>Object.create(null)</code> for dictionaries, schema validation before merge, or using <code>structuredClone</code> instead of manual merging.</p></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Confusing <code>__proto__</code> (instance property linking to prototype) with <code>prototype</code> (property on constructor functions). A function has <code>prototype</code>. An instance has <code>[[Prototype]]</code> (accessible as <code>__proto__</code>). They're different things.</div>
+  <div class="mst">Mutating <code>Object.prototype</code> or <code>Array.prototype</code> — any property added appears on all objects/arrays via chain lookup. Breaks <code>for...in</code> loops that don't use <code>hasOwnProperty</code>. The prototype pollution attack vector.</div>
+  <div class="mst">Thinking <code>class</code> introduces true privacy or classical inheritance — it doesn't until private class fields (<code>#field</code>) which use a WeakMap internally, genuinely inaccessible from outside.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does prototypal inheritance differ from classical inheritance?"</div><div class="d">Classical: classes are blueprints, instances are copies. Prototypal: objects directly inherit from other objects via a live link. No copying — property lookup traverses the chain at runtime. Class syntax in JS is syntactic sugar, not true classical inheritance.</div></div>
+  <div class="iq"><div class="q">"What does `new` actually do?"</div><div class="d">Four steps: create empty object, set its [[Prototype]] to Constructor.prototype, call Constructor with this=newObj, return newObj (unless constructor returns an object explicitly).</div></div>
+  <div class="iq"><div class="q">"What is prototype pollution?"</div><div class="d">Writing to Object.prototype (or Array/Function.prototype) contaminates all objects in the process. Security vulnerability in npm packages that do naive object merging from user input. Defense: Object.create(null), schema validation, structuredClone.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pc">V8 hidden classes (shapes track prototype chains)</span>
+    <span class="pill pq">Security — prototype pollution (CVEs)</span>
+    <span class="pill pq">TypeScript structural typing vs JS prototype chain</span>
+    <span class="pill pc">OOP patterns in Java vs JS</span>
+    <span class="pill pq">Private class fields (#field → WeakMap internally)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 1–3 complete ───</div>
+
+<div class="topic" id="t3">
+  <div class="tnum">Topic 4 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">this binding</h1>
+  <div class="tags"><span class="tag tv">Dynamic binding</span><span class="tag tv">Arrow functions</span><span class="tag tw">Lost context</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose"><code>this</code> in JavaScript is not determined by where a function is <em>written</em> (unlike scope) but by <em>how it is called</em> — it's a dynamic binding. V8 sets the <code>this</code> slot in the execution context at call time, not at definition time. There are four binding rules that apply in priority order: <strong>new binding</strong> (constructor call) → <strong>explicit binding</strong> (call/apply/bind) → <strong>implicit binding</strong> (method call) → <strong>default binding</strong> (plain function call). Arrow functions are the exception: they have no own <code>this</code> binding and lexically inherit <code>this</code> from the enclosing scope at definition time — essentially making <code>this</code> behave like a normal closed-over variable for arrow functions.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">V8's EC creation sets the <code>this</code> value in the EC's binding object. For regular functions, the value is determined by the call site: if called as <code>obj.method()</code>, <code>this = obj</code>. If called as <code>fn()</code> in strict mode, <code>this = undefined</code>; in sloppy mode, <code>this = globalThis</code>. <code>Function.prototype.call(ctx, ...args)</code> sets <code>this = ctx</code> explicitly and calls immediately. <code>Function.prototype.bind(ctx)</code> returns a <strong>new function object</strong> that has the <code>this</code> pre-set — this new function ignores any later <code>call</code>/<code>apply</code> attempts to override <code>this</code> (though <code>new</code> can still override it). Arrow functions set <code>[[ThisMode]]</code> to "lexical" — V8 looks up the scope chain for the nearest enclosing regular function's <code>this</code> value, which is captured at definition time into the closure's context object.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Default binding</h4><p>Plain function call: <code>fn()</code>. In strict mode: <code>this = undefined</code>. In sloppy mode: <code>this = globalThis</code>. The most common source of "undefined is not an object" bugs.</p></div>
+    <div class="sb"><h4>Implicit binding</h4><p>Method call: <code>obj.method()</code>. <code>this = obj</code>. Lost when the method is extracted: <code>const m = obj.method; m()</code> → default binding applies. Classic event handler bug.</p></div>
+    <div class="sb"><h4>Explicit binding</h4><p><code>fn.call(ctx, a, b)</code> — sets this, calls immediately. <code>fn.apply(ctx, [a,b])</code> — same but args as array. <code>fn.bind(ctx)</code> — returns new function with this locked. Cannot be overridden by call/apply.</p></div>
+    <div class="sb"><h4>new binding</h4><p>Highest priority (except hard bind edge case). <code>new Foo()</code> creates a new object, sets this to it. Even if Foo was bound via .bind(), new overrides the bound this.</p></div>
+    <div class="sb"><h4>Arrow functions</h4><p>No own <code>this</code>. Lexically inherits from enclosing scope at definition. Cannot be used as constructors. Cannot be rebound with call/apply/bind (the call still works, this just doesn't change).</p></div>
+    <div class="sb"><h4>Class methods</h4><p>Regular class methods are on the prototype — <code>this</code> is the instance when called as a method. Class fields with arrow function syntax (<code>onClick = () => {}</code>) create a per-instance bound function — useful for event handlers.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// Priority: new > explicit > implicit > default</span>
+<span class="kw">function</span> <span class="fn">show</span>() { console.<span class="fn">log</span>(<span class="kw">this</span>.val); }
+
+<span class="kw">const</span> obj = { val: <span class="num">42</span>, show };
+obj.<span class="fn">show</span>();                     <span class="cm">// 42 — implicit binding (obj.)</span>
+
+<span class="kw">const</span> detached = obj.show;
+<span class="fn">detached</span>();                     <span class="cm">// undefined (strict) — default binding</span>
+
+<span class="fn">show</span>.<span class="fn">call</span>({ val: <span class="num">99</span> });        <span class="cm">// 99 — explicit beats implicit</span>
+
+<span class="kw">const</span> bound = show.<span class="fn">bind</span>({ val: <span class="num">7</span> });
+<span class="fn">bound</span>.<span class="fn">call</span>({ val: <span class="num">0</span> });        <span class="cm">// 7 — hard bind ignores call/apply</span>
+
+<span class="cm">// Arrow function — lexical this</span>
+<span class="kw">class</span> <span class="cl">Timer</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.ticks = <span class="num">0</span>; }
+
+  <span class="cm">// ❌ Regular method — loses this when passed as callback</span>
+  <span class="fn">startBad</span>() {
+    <span class="fn">setInterval</span>(<span class="kw">function</span>() {
+      <span class="kw">this</span>.ticks++; <span class="cm">// this = undefined (strict) or globalThis</span>
+    }, <span class="num">1000</span>);
+  }
+
+  <span class="cm">// ✅ Arrow function — captures this from constructor scope</span>
+  <span class="fn">startGood</span>() {
+    <span class="fn">setInterval</span>(() => {
+      <span class="kw">this</span>.ticks++; <span class="cm">// this = the Timer instance ✓</span>
+    }, <span class="num">1000</span>);
+  }
+}
+
+<span class="cm">// Class field arrow — per-instance bound method</span>
+<span class="kw">class</span> <span class="cl">Button</span> {
+  count = <span class="num">0</span>;
+  onClick = () => {              <span class="cm">// Own property, not on prototype</span>
+    <span class="kw">this</span>.count++;               <span class="cm">// Always bound to instance</span>
+  };
+}
+<span class="cm">// Cost: each Button instance gets its own onClick function object</span>
+<span class="cm">// (unlike prototype method shared across instances)</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Passing a method as a callback without binding: <code>setTimeout(obj.method, 0)</code> — the method loses its <code>obj</code> binding and runs with default this. Fix: <code>setTimeout(obj.method.bind(obj), 0)</code> or <code>setTimeout(() => obj.method(), 0)</code>.</div>
+  <div class="mst">Using arrow functions as object methods: <code>const obj = { greet: () => this.name }</code> — <code>this</code> is lexically bound to whatever scope surrounds the object literal (usually global/undefined), not to <code>obj</code>. Arrow functions should not be object methods.</div>
+  <div class="mst">Thinking <code>bind</code> mutates the original function — it returns a new function object. The original is unchanged. Multiple <code>bind</code> calls each return new functions; the outermost bind's this wins.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What are the four rules for this binding in JS? What's the priority?"</div><div class="d">new > explicit (call/apply/bind) > implicit (obj.method()) > default (plain call). Arrow functions are exempt — they're lexical. Know all four, know the priority, know that arrow functions break the whole dynamic-binding model intentionally.</div></div>
+  <div class="iq"><div class="q">"What is the difference between call, apply, and bind?"</div><div class="d">call/apply set this and call immediately (call = individual args, apply = array of args). bind returns a new function with this pre-set but doesn't call it. bind's result ignores subsequent call/apply rebinding.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">React event handlers (bind vs arrow class fields)</span>
+    <span class="pill pc">Execution context creation phase</span>
+    <span class="pill pq">Class methods vs prototype methods (memory implications)</span>
+    <span class="pill pc">Strict mode behavior</span>
+  </div>
+</div>
+
+<div class="topic" id="t4">
+  <div class="tnum">Topic 5 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">Event delegation</h1>
+  <div class="tags"><span class="tag tv">Bubbling</span><span class="tag tp">Performance</span><span class="tag tv">Dynamic DOM</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose"><strong>Event delegation</strong> is a pattern where a single event listener is placed on a parent element to handle events for all current and future child elements, rather than attaching individual listeners to each child. It works because of <strong>event bubbling</strong>: after a DOM event fires on a target element, it propagates ("bubbles") up through each ancestor in the DOM tree, firing on each one. The parent's listener receives the event with <code>event.target</code> pointing to the original element that was interacted with, allowing the handler to determine which child triggered it.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">Blink's event dispatch algorithm follows the W3C UI Events spec: (1) <strong>Capture phase</strong> — event travels from <code>document</code> down to the target element (listeners registered with <code>{ capture: true }</code> fire here). (2) <strong>Target phase</strong> — event fires on the target element itself (both capture and bubble listeners fire). (3) <strong>Bubble phase</strong> — event travels back up from target to <code>document</code> (default listener phase). The event object maintains a reference to the original <code>target</code> throughout all phases, while <code>currentTarget</code> refers to the element whose listener is currently executing. <code>event.stopPropagation()</code> halts bubbling at the current element. <code>event.stopImmediatePropagation()</code> also prevents other listeners on the <em>same</em> element from firing. Not all events bubble: <code>focus</code>/<code>blur</code> don't bubble (use <code>focusin</code>/<code>focusout</code> which do), <code>load</code> doesn't bubble.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>event.target vs currentTarget</h4><p><code>target</code> = the element that originally triggered the event (may be a deep child). <code>currentTarget</code> = the element whose listener is executing (the delegating parent). <code>currentTarget</code> is null after async use of the event object.</p></div>
+    <div class="sb"><h4>event.stopPropagation</h4><p>Stops bubbling from current element upward. Dangerous to use liberally — breaks parent delegated handlers silently. Prefer <code>event.target</code> matching in the parent handler instead.</div></div>
+    <div class="sb"><h4>Non-bubbling events</h4><p><code>focus</code>, <code>blur</code>, <code>mouseenter</code>, <code>mouseleave</code>, <code>load</code>, <code>scroll</code>, <code>resize</code> do not bubble. Use <code>focusin</code>/<code>focusout</code> or <code>mouseover</code>/<code>mouseout</code> (which do bubble) for delegation on these.</p></div>
+    <div class="sb"><h4>Capture phase listeners</h4><p><code>addEventListener('click', fn, { capture: true })</code> fires before any bubble-phase handler. Useful for intercepting events before child components handle them (framework-level use).</p></div>
+    <div class="sb"><h4>Dynamic element handling</h4><p>Delegated listener on a static parent automatically handles children added after the listener was attached — a huge advantage for list rendering, virtual scroll, and dynamic content.</p></div>
+    <div class="sb"><h4>Passive listeners</h4><p><code>{ passive: true }</code> on scroll/touch listeners tells the browser the handler won't call preventDefault(). Allows compositor to scroll immediately without waiting for JS. Must be used correctly on touch-scroll handlers.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// ❌ Individual listeners — O(n) listeners, breaks on dynamic adds</span>
+<span class="fn">document</span>.<span class="fn">querySelectorAll</span>(<span class="str">'.item'</span>).<span class="fn">forEach</span>(el => {
+  el.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, <span class="fn">handleClick</span>);
+});
+<span class="cm">// New .item added later → no listener. N items = N listener objects in memory.</span>
+
+<span class="cm">// ✅ Delegation — one listener, handles all children including future ones</span>
+<span class="kw">const</span> list = document.<span class="fn">getElementById</span>(<span class="str">'list'</span>);
+list.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, (event) => {
+  <span class="kw">const</span> item = event.target.<span class="fn">closest</span>(<span class="str">'.item'</span>); <span class="cm">// Walk up to matching ancestor</span>
+  <span class="kw">if</span> (!item) <span class="kw">return</span>;                           <span class="cm">// Click was outside an item</span>
+  <span class="kw">if</span> (!list.<span class="fn">contains</span>(item)) <span class="kw">return</span>;           <span class="cm">// Safety check</span>
+  <span class="fn">handleClick</span>(item);
+});
+
+<span class="cm">// event.closest() walks up from the target — handles nested elements</span>
+<span class="cm">// e.g., clicking an <img> inside an <li class="item"> still finds the .item</span>
+
+<span class="cm">// React's synthetic event system — uses delegation internally</span>
+<span class="cm">// React attaches ONE listener per event type to the root container</span>
+<span class="cm">// All component onClick={fn} → routed through root delegation handler</span>
+<span class="cm">// This is why event.nativeEvent !== event (synthetic vs native)</span>
+<span class="cm">// And why stopPropagation on a synthetic event doesn't stop native events</span></pre></div>
+
+  <div class="sl">Real-world use case</div>
+  <div class="arch"><h4>React's synthetic event system</h4><p>React (pre-v17) attached a single delegated listener per event type to <code>document</code>. Since v17, it attaches to the root React container element. All component <code>onClick</code>, <code>onChange</code> etc. are handled via this single delegated handler — no individual listeners per component. This is why React has extremely low event listener overhead regardless of component count. The tradeoff: React wraps native events in <code>SyntheticEvent</code> objects (pooled for performance), which become nullified after the handler returns — a source of async event access bugs in older React.</p></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using <code>event.target</code> directly without <code>.closest()</code> — if the clicked element has child elements (e.g., an icon inside a button), <code>event.target</code> will be the icon, not the button. <code>closest(selector)</code> walks up to find the right ancestor.</div>
+  <div class="mst">Assuming all events bubble — <code>focus</code>, <code>blur</code>, <code>mouseenter</code>, <code>mouseleave</code> don't. Trying to delegate these to a parent does nothing. Use their bubbling equivalents.</div>
+  <div class="mst">Calling <code>stopPropagation</code> inside child components while relying on parent delegation — the parent handler never fires. This creates subtle bugs in component libraries where parent components expect to receive all events.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is event delegation and why is it performant?"</div><div class="d">One listener on a parent instead of N listeners on N children. O(1) memory for listeners regardless of list size. Handles dynamic adds automatically. Mention bubbling as the mechanism, closest() as the pattern. Bring up React's use of it.</div></div>
+  <div class="iq"><div class="q">"What's the difference between event.target and event.currentTarget?"</div><div class="d">target = originating element. currentTarget = the element whose listener is firing. In delegation, currentTarget is the parent; target is the child that was clicked. After async use (inside a Promise), currentTarget becomes null (React's SyntheticEvent pooling caveat).</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pq">React synthetic events (built on delegation)</span>
+    <span class="pill pc">Browser event dispatch algorithm (W3C spec)</span>
+    <span class="pill pc">Memory management (fewer listener objects)</span>
+    <span class="pill pq">Passive listeners and scroll performance</span>
+  </div>
+</div>
+
+<div class="topic" id="t5">
+  <div class="tnum">Topic 6 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">Promises &amp; microtask queue</h1>
+  <div class="tags"><span class="tag tv">Resolution order</span><span class="tag tv">Combinators</span><span class="tag tp">Microtask starvation</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">A <strong>Promise</strong> is an object representing the eventual completion or failure of an asynchronous operation, with three states: <strong>pending</strong>, <strong>fulfilled</strong>, or <strong>rejected</strong>. Once settled (fulfilled or rejected) it is immutable. Promises don't execute anything asynchronously by themselves — they are a queuing mechanism. When a Promise settles, its <code>.then()</code>/<code>.catch()</code> callbacks are enqueued as <strong>microtasks</strong> — the highest-priority task type in the event loop, drained completely between every macrotask. Understanding Promise combinators (<code>all</code>, <code>allSettled</code>, <code>race</code>, <code>any</code>) and their failure semantics is a core senior interview topic.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">A Promise object internally holds a state machine: <code>[[PromiseState]]</code> (pending/fulfilled/rejected) and <code>[[PromiseResult]]</code>. It also holds a list of <strong>reaction records</strong> — objects that pair a fulfillment handler with a rejection handler and a promise to resolve/reject when the handler runs. When <code>resolve(value)</code> is called, V8 transitions the state, then for each reaction record, enqueues a <strong>PromiseReactionJob</strong> microtask. The microtask calls the appropriate handler function and resolves the chained promise with its return value. This is why <code>.then(fn)</code> always returns a new Promise — each <code>.then()</code> creates a new reaction record and a new chained Promise. <code>Promise.resolve()</code> with a thenable (object with a <code>.then</code> method) schedules two additional microtasks during the resolution process — a nuance that causes <code>Promise.resolve(nativePromise)</code> to be slower than returning a value directly.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Promise.all(iterable)</h4><p>Resolves when ALL promises resolve; rejects as soon as ANY rejects (fail-fast). Returns array of results in input order. Use for parallel independent operations where all must succeed.</p></div>
+    <div class="sb"><h4>Promise.allSettled(iterable)</h4><p>Waits for ALL promises to settle (resolve or reject). Returns array of <code>{status, value/reason}</code> objects. Never rejects. Use when you need all results regardless of failures.</p></div>
+    <div class="sb"><h4>Promise.race(iterable)</h4><p>Settles (resolves OR rejects) as soon as the first promise settles — regardless of outcome. Use for timeouts: race your fetch against a timeout promise.</p></div>
+    <div class="sb"><h4>Promise.any(iterable)</h4><p>Resolves when the FIRST promise fulfills; rejects only if ALL reject (AggregateError). Use for redundant requests where you want the fastest success.</p></div>
+    <div class="sb"><h4>Unhandled rejection</h4><p>A rejected promise with no .catch() fires <code>unhandledrejection</code> event on window. In Node.js, crashes the process since v15. Always add .catch() or use try/catch in async functions.</p></div>
+    <div class="sb"><h4>Thenable resolution</h4><p>If you resolve a Promise with a thenable (obj with .then method), the resolution is async and takes 2 extra microtask ticks. Resolving with a plain value is synchronous within the reaction job.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// Microtask queue ordering</span>
+<span class="cl">Promise</span>.<span class="fn">resolve</span>(<span class="str">'a'</span>)
+  .<span class="fn">then</span>(v => { console.<span class="fn">log</span>(v); <span class="kw">return</span> <span class="str">'b'</span>; }) <span class="cm">// microtask 1 → 'a'</span>
+  .<span class="fn">then</span>(v => console.<span class="fn">log</span>(v));                 <span class="cm">// microtask 2 → 'b'</span>
+console.<span class="fn">log</span>(<span class="str">'sync'</span>);
+<span class="cm">// Output: 'sync', 'a', 'b'</span>
+
+<span class="cm">// Combinators — when to use which</span>
+<span class="kw">const</span> [user, orders, prefs] = <span class="kw">await</span> <span class="cl">Promise</span>.<span class="fn">all</span>([
+  <span class="fn">fetchUser</span>(id), <span class="fn">fetchOrders</span>(id), <span class="fn">fetchPrefs</span>(id)
+]); <span class="cm">// All must succeed, all run in parallel</span>
+
+<span class="kw">const</span> results = <span class="kw">await</span> <span class="cl">Promise</span>.<span class="fn">allSettled</span>([
+  <span class="fn">fetchPrimary</span>(), <span class="fn">fetchSecondary</span>()
+]);
+<span class="cm">// [{status:'fulfilled',value:...}, {status:'rejected',reason:...}]</span>
+<span class="kw">const</span> succeeded = results.<span class="fn">filter</span>(r => r.status === <span class="str">'fulfilled'</span>);
+
+<span class="kw">const</span> data = <span class="kw">await</span> <span class="cl">Promise</span>.<span class="fn">race</span>([
+  <span class="fn">fetchData</span>(),
+  <span class="kw">new</span> <span class="cl">Promise</span>((_, reject) =>
+    <span class="fn">setTimeout</span>(() => <span class="fn">reject</span>(<span class="kw">new</span> <span class="cl">Error</span>(<span class="str">'timeout'</span>)), <span class="num">5000</span>))
+]); <span class="cm">// First to settle wins — timeout pattern</span>
+
+<span class="kw">const</span> fastest = <span class="kw">await</span> <span class="cl">Promise</span>.<span class="fn">any</span>([
+  <span class="fn">fetchFromRegion</span>(<span class="str">'us'</span>), <span class="fn">fetchFromRegion</span>(<span class="str">'eu'</span>), <span class="fn">fetchFromRegion</span>(<span class="str">'ap'</span>)
+]); <span class="cm">// Fastest success, redundant requests for latency reduction</span>
+
+<span class="cm">// Promise chaining returns new Promise each time</span>
+<span class="kw">const</span> p = <span class="cl">Promise</span>.<span class="fn">resolve</span>(<span class="num">1</span>);
+<span class="kw">const</span> p2 = p.<span class="fn">then</span>(x => x + <span class="num">1</span>); <span class="cm">// New promise, different object</span>
+<span class="kw">const</span> p3 = p.<span class="fn">then</span>(x => x * <span class="num">2</span>); <span class="cm">// Another branch from p (not from p2)</span>
+<span class="cm">// p2 resolves to 2, p3 resolves to 2 — both branch from original p</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Forgetting that Promise.all fails fast — if one of 10 requests fails, the other 9's results are discarded. If you need partial results, use allSettled.</div>
+  <div class="mst">Promise.race resolves OR rejects on first settlement — a rejected first promise rejects the race. Use Promise.any if you only care about the first success.</div>
+  <div class="mst">Not handling unhandled rejections — in Node.js v15+, an unhandled rejection crashes the process. Always attach .catch() or wrap in try/catch. Global <code>process.on('unhandledRejection')</code> is for logging, not a substitute for handling.</div>
+  <div class="mst">Creating a Promise executor with async function — errors thrown inside an async executor are swallowed because the Promise constructor only catches synchronous throws. Use <code>new Promise((res, rej) => { async fn().then(res).catch(rej) })</code> pattern.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the difference between Promise.all, allSettled, race, and any?"</div><div class="d">all = all must succeed (fail-fast). allSettled = all settle, gives you each outcome. race = first to settle (success OR failure) wins. any = first to fulfill wins (only rejects if ALL reject). Know exact failure behavior for each.</div></div>
+  <div class="iq"><div class="q">"Why do Promise callbacks run before setTimeout(fn, 0)?"</div><div class="d">Promise callbacks are microtasks. setTimeout is a macrotask. After each macrotask (or after synchronous script), the entire microtask queue is drained before the next macrotask starts. So a resolved Promise's .then fires before any setTimeout, even with delay=0.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pc">Microtask queue (event loop Block 1)</span>
+    <span class="pill pq">async/await (sugar over Promises)</span>
+    <span class="pill pq">Node.js error handling patterns</span>
+    <span class="pill pc">V8 PromiseReactionJob internals</span>
+    <span class="pill pq">Fetch API (returns Promise)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 4–6 complete ───</div>
+
+<div class="topic" id="t6">
+  <div class="tnum">Topic 7 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">Async/await</h1>
+  <div class="tags"><span class="tag tv">Generator desugaring</span><span class="tag tv">Error handling</span><span class="tag tw">Sequential vs parallel</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose"><code>async/await</code> is syntactic sugar over Promises and the generator protocol. An <code>async</code> function always returns a Promise. <code>await expr</code> suspends the async function's execution, schedules the continuation as a microtask when <code>expr</code>'s Promise resolves, and yields control back to the event loop. The critical insight: <code>await</code> only suspends the <em>async function</em>, not the entire thread or event loop. Synchronous code elsewhere continues to run. The async function's frame is preserved on the heap (not the call stack) while it's suspended — the same mechanism as closures keeping environments alive.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">V8 transforms async functions during compilation using a technique equivalent to state-machine generators. The body is split at each <code>await</code> into continuation segments. Each segment is wrapped as a <code>.then()</code> callback on the awaited Promise. When the Promise resolves, the next segment is scheduled as a microtask. Specifically: <code>await x</code> is lowered to roughly <code>Promise.resolve(x).then(continuation)</code>. V8 performs an optimization — if <code>x</code> is already a native Promise (not a thenable wrapper), it can avoid two extra microtask ticks that would otherwise be needed for thenable resolution. This is why returning <code>value</code> directly in an async function is marginally faster than returning <code>Promise.resolve(value)</code>. The async function's execution context (including all local variables) is captured in a "resumable" state object on the heap when suspended at an <code>await</code>.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Sequential await</h4><p>Awaiting promises one after another: each starts only after the previous resolves. Total time = sum of all durations. Correct when each operation depends on the previous result.</p></div>
+    <div class="sb"><h4>Parallel await</h4><p>Start all promises before awaiting: <code>const [a,b] = await Promise.all([fetchA(), fetchB()])</code>. Total time = max of all durations. Use when operations are independent.</p></div>
+    <div class="sb"><h4>Error handling patterns</h4><p>try/catch wraps the await. Uncaught errors in async functions reject the returned Promise. Can also use <code>.catch()</code> on the returned Promise from an async function call.</p></div>
+    <div class="sb"><h4>Top-level await</h4><p>ES2022: <code>await</code> at module top level without async function. Module evaluation is async. Importing modules stall until the module's top-level await resolves. Can create import deadlocks.</p></div>
+    <div class="sb"><h4>Async iteration</h4><p><code>for await (const item of asyncIterable)</code>. Processes each value from an async iterable (e.g., ReadableStream, paginated API). Awaits each item sequentially.</p></div>
+    <div class="sb"><h4>Concurrency patterns</h4><p>Run N async tasks with max concurrency (e.g., process 100 items 5 at a time): chunk the array and await Promise.all per chunk, or use a semaphore/queue pattern.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// ❌ Sequential when parallel is possible — slow</span>
+<span class="kw">async function</span> <span class="fn">loadDashboard</span>(userId) {
+  <span class="kw">const</span> user   = <span class="kw">await</span> <span class="fn">fetchUser</span>(userId);   <span class="cm">// 300ms</span>
+  <span class="kw">const</span> orders = <span class="kw">await</span> <span class="fn">fetchOrders</span>(userId); <span class="cm">// 200ms — waits for user!</span>
+  <span class="kw">const</span> prefs  = <span class="kw">await</span> <span class="fn">fetchPrefs</span>(userId);  <span class="cm">// 150ms — waits for orders!</span>
+  <span class="cm">// Total: ~650ms sequential</span>
+}
+
+<span class="cm">// ✅ Parallel — fire all, await completion</span>
+<span class="kw">async function</span> <span class="fn">loadDashboard</span>(userId) {
+  <span class="kw">const</span> [user, orders, prefs] = <span class="kw">await</span> <span class="cl">Promise</span>.<span class="fn">all</span>([
+    <span class="fn">fetchUser</span>(userId),
+    <span class="fn">fetchOrders</span>(userId),
+    <span class="fn">fetchPrefs</span>(userId),
+  ]);
+  <span class="cm">// Total: ~300ms (max of the three)</span>
+}
+
+<span class="cm">// Error handling — try/catch in async</span>
+<span class="kw">async function</span> <span class="fn">safeLoad</span>(id) {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> data = <span class="kw">await</span> <span class="fn">fetchUser</span>(id);
+    <span class="kw">return</span> { data, error: <span class="kw">null</span> };
+  } <span class="kw">catch</span> (err) {
+    <span class="kw">return</span> { data: <span class="kw">null</span>, error: err.message };
+  }
+}
+
+<span class="cm">// Concurrency limiter — process 100 items, 5 at a time</span>
+<span class="kw">async function</span> <span class="fn">processConcurrently</span>(items, limit = <span class="num">5</span>) {
+  <span class="kw">const</span> results = [];
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < items.length; i += limit) {
+    <span class="kw">const</span> chunk = items.<span class="fn">slice</span>(i, i + limit);
+    <span class="kw">const</span> chunkResults = <span class="kw">await</span> <span class="cl">Promise</span>.<span class="fn">all</span>(chunk.<span class="fn">map</span>(<span class="fn">processItem</span>));
+    results.<span class="fn">push</span>(...chunkResults);
+  }
+  <span class="kw">return</span> results;
+}
+
+<span class="cm">// Async iterator — paginated API</span>
+<span class="kw">async function</span>* <span class="fn">fetchAllPages</span>(url) {
+  <span class="kw">let</span> next = url;
+  <span class="kw">while</span> (next) {
+    <span class="kw">const</span> { data, nextPage } = <span class="kw">await</span> <span class="fn">fetch</span>(next).<span class="fn">then</span>(r => r.<span class="fn">json</span>());
+    <span class="kw">yield</span>* data;
+    next = nextPage;
+  }
+}
+<span class="kw">for await</span> (<span class="kw">const</span> item <span class="kw">of</span> <span class="fn">fetchAllPages</span>(<span class="str">'/api/items'</span>)) {
+  <span class="fn">process</span>(item);
+}</pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Awaiting in a loop with <code>forEach</code> — <code>arr.forEach(async item => await fn(item))</code> doesn't work. forEach ignores the returned Promise. Use <code>for...of</code> with await (sequential) or <code>Promise.all(arr.map(...))</code> (parallel).</div>
+  <div class="mst">Not knowing that <code>await</code> before the first await in an async function is synchronous — all code up to the first <code>await</code> runs synchronously in the current microtask. An async function is not deferred just because it's async.</div>
+  <div class="mst">Using top-level await in a module imported by many others — if the awaited operation is slow, all importers stall. It's appropriate for one-time initialization but dangerous in shared utilities.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"How does async/await work under the hood?"</div><div class="d">State machine compiled from generator pattern. Each await point splits the function into a continuation registered as a .then() microtask on the awaited Promise. Function frame lives on heap while suspended. async function always returns a Promise. This is the senior-level answer — don't just say "syntactic sugar".</div></div>
+  <div class="iq"><div class="q">"What's the difference between sequential and parallel await patterns?"</div><div class="d">Sequential: each await waits for the previous. Total time = sum. Use when results depend on each other. Parallel: start all promises before any await, use Promise.all. Total time = max. The most common interview-detected mistake in production code.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pc">Promises (direct foundation)</span>
+    <span class="pill pc">Generators (structural model)</span>
+    <span class="pill pq">Fetch + AbortController patterns</span>
+    <span class="pill pq">Node.js streaming (async iteration)</span>
+    <span class="pill pc">Event loop microtask scheduling</span>
+  </div>
+</div>
+
+<div class="topic" id="t7">
+  <div class="tnum">Topic 8 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">Web Workers</h1>
+  <div class="tags"><span class="tag tv">Dedicated</span><span class="tag tv">Shared</span><span class="tag tv">Service Worker</span><span class="tag tp">Off-main-thread</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">Web Workers are a browser API for running JavaScript on a separate OS thread, outside the main thread. They provide true parallelism (not just concurrency like the event loop) because they run on a different thread within the same Renderer Process. There are three types: <strong>Dedicated Workers</strong> (one-to-one with a page), <strong>Shared Workers</strong> (shared across multiple tabs of the same origin), and <strong>Service Workers</strong> (a network proxy layer, not a compute worker). Workers have their own event loop, their own microtask queue, and their own V8 isolate — but no access to the DOM.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">When <code>new Worker(url)</code> is called, the browser creates a new OS thread within the current Renderer Process, starts a fresh V8 isolate on it, and loads the worker script. Communication between the main thread and the Worker happens via <code>postMessage</code> — messages are <strong>structured-clone serialized</strong> (deep copy of the data, O(n) cost) and transferred as macrotasks to the receiving thread's event loop. To avoid serialization for large binary data, <strong>Transferable objects</strong> (ArrayBuffer, MessagePort, ImageBitmap, OffscreenCanvas) can be <em>transferred</em> — ownership moves from sender to receiver in O(1), and the sender's reference is neutered. <strong>SharedArrayBuffer</strong> enables zero-copy shared memory between the main thread and Worker, with <code>Atomics</code> for synchronization. SAB requires COOP/COEP security headers to be enabled.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Dedicated Worker</h4><p>Created by one page, terminates when the page closes. One-to-one relationship. Communicates via onmessage/postMessage. Ideal for heavy per-page computation (image processing, wasm, crypto).</p></div>
+    <div class="sb"><h4>Shared Worker</h4><p>Shared across all pages of the same origin. Lives as long as at least one connecting page is open. Communicates via MessagePort. Useful for shared state/cache across tabs without a server.</p></div>
+    <div class="sb"><h4>Service Worker</h4><p>Network proxy, not a compute worker. Intercepts fetch events. Has its own lifecycle (install/activate/fetch). Persists independently of any tab. Used for offline caching, background sync, push notifications.</p></div>
+    <div class="sb"><h4>What Workers CANNOT do</h4><p>No DOM access (document, window, Element). No localStorage/sessionStorage (can use IndexedDB). No alert/confirm/prompt. No synchronous XHR in dedicated workers. No direct canvas 2D without OffscreenCanvas.</p></div>
+    <div class="sb"><h4>Transferable objects</h4><p>ArrayBuffer, MessagePort, ImageBitmap, OffscreenCanvas, ReadableStream/WritableStream. Transfer with <code>postMessage(data, [transferList])</code>. O(1) ownership transfer — sender's reference neutered immediately.</p></div>
+    <div class="sb"><h4>SharedArrayBuffer + Atomics</h4><p>Zero-copy shared memory. Requires COOP/COEP headers. Atomics.wait() blocks a Worker thread (not main). Atomics.notify() wakes workers. Used in Wasm-compiled multithreaded C++ (Figma, AutoCAD).</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// main.js — offload heavy computation</span>
+<span class="kw">const</span> worker = <span class="kw">new</span> <span class="cl">Worker</span>(<span class="str">'/workers/compute.js'</span>);
+
+<span class="cm">// Transfer ArrayBuffer — zero copy, sender's ref neutered</span>
+<span class="kw">const</span> buffer = <span class="kw">new</span> <span class="cl">ArrayBuffer</span>(<span class="num">16</span> * <span class="num">1024</span> * <span class="num">1024</span>); <span class="cm">// 16MB</span>
+worker.<span class="fn">postMessage</span>({ buffer }, [buffer]);         <span class="cm">// Transfer, not clone</span>
+console.<span class="fn">log</span>(buffer.byteLength); <span class="cm">// 0 — neutered</span>
+
+worker.onmessage = ({ data }) => <span class="fn">applyResult</span>(data);
+worker.onerror = (err) => console.<span class="fn">error</span>(err);
+
+<span class="cm">// compute.js (worker context)</span>
+self.onmessage = ({ data: { buffer } }) => {
+  <span class="kw">const</span> arr = <span class="kw">new</span> <span class="cl">Float32Array</span>(buffer);
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < arr.length; i++) arr[i] = <span class="cl">Math</span>.<span class="fn">sqrt</span>(arr[i]);
+  self.<span class="fn">postMessage</span>({ result: arr }, [arr.buffer]); <span class="cm">// Transfer back</span>
+};
+
+<span class="cm">// SharedArrayBuffer — zero-copy shared state</span>
+<span class="cm">// Requires: Cross-Origin-Opener-Policy: same-origin</span>
+<span class="cm">//           Cross-Origin-Embedder-Policy: require-corp</span>
+<span class="kw">const</span> sab = <span class="kw">new</span> <span class="cl">SharedArrayBuffer</span>(<span class="num">4</span>);
+<span class="kw">const</span> view = <span class="kw">new</span> <span class="cl">Int32Array</span>(sab);
+worker.<span class="fn">postMessage</span>({ sab }); <span class="cm">// SAB can be cloned — both sides read same memory</span>
+
+<span class="cm">// In worker: Atomics for safe shared access</span>
+<span class="cl">Atomics</span>.<span class="fn">add</span>(view, <span class="num">0</span>, <span class="num">1</span>);             <span class="cm">// Atomic increment</span>
+<span class="cl">Atomics</span>.<span class="fn">wait</span>(view, <span class="num">0</span>, <span class="num">0</span>);             <span class="cm">// Block until view[0] !== 0</span>
+<span class="cl">Atomics</span>.<span class="fn">notify</span>(view, <span class="num">0</span>, <span class="num">1</span>);           <span class="cm">// Wake one waiting worker</span></pre></div>
+
+  <div class="sl">Real-world use case</div>
+  <div class="arch"><h4>Figma's render architecture</h4><p>Figma runs a C++ rendering engine compiled to WebAssembly inside a Dedicated Worker. The main thread handles UI events and React rendering. The Worker runs the geometry engine in Wasm, writes output into a SharedArrayBuffer (the frame buffer). The main thread reads from the SAB in a rAF callback and draws to a canvas. Zero serialization overhead for the frame data — the GPU uploads from shared memory directly. Atomics.notify() signals the main thread that a new frame is ready. This is the reference architecture for computation-heavy web apps that approach native performance.</p></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Trying to access <code>document</code>, <code>window</code>, or any DOM API inside a Worker — throws immediately. Workers have <code>self</code> (the WorkerGlobalScope), not <code>window</code>.</div>
+  <div class="mst">Using structured-clone postMessage for large data repeatedly — the O(n) serialization cost exceeds the computation benefit for large payloads. Use Transferable objects or SharedArrayBuffer.</div>
+  <div class="mst">Forgetting that Service Workers have their own lifecycle and may not be active on first page load — the first visit is always served from the network. SW activates on subsequent visits (or after <code>skipWaiting()</code> + <code>clients.claim()</code>).</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What's the difference between a Dedicated Worker, Shared Worker, and Service Worker?"</div><div class="d">Dedicated: one page, compute. Shared: shared across tabs of same origin, MessagePort communication, shared state. Service: network proxy, fetch interception, offline caching, independent of tabs. Don't conflate SW with compute workers.</div></div>
+  <div class="iq"><div class="q">"How do you share large data between a Worker and the main thread without copying?"</div><div class="d">Transferable objects (ArrayBuffer) — zero copy, sender neutered. SharedArrayBuffer — both sides access same memory, Atomics for sync. Requires COOP/COEP headers. This is a senior-signal answer.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pc">Browser architecture (same Renderer Process, different thread)</span>
+    <span class="pill pq">WebAssembly (often run in Workers)</span>
+    <span class="pill pc">Structured clone algorithm</span>
+    <span class="pill pq">COOP/COEP headers (security prerequisite for SAB)</span>
+    <span class="pill pq">Service Worker / PWA offline architecture</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── Topics 7–9 complete ───</div>
+
+<div class="topic" id="t8">
+  <div class="tnum">Topic 9 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">WeakMap &amp; WeakRef</h1>
+  <div class="tags"><span class="tag tv">GC implications</span><span class="tag tp">Memory</span><span class="tag tv">Caching patterns</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose"><strong>WeakMap</strong> is a Map-like collection where keys must be objects (not primitives), and the key-value pair does not prevent the key object from being garbage collected. When the key object has no other references and becomes eligible for GC, the entry is automatically removed from the WeakMap. <strong>WeakRef</strong> (ES2021) allows holding a reference to an object that also does not prevent it from being GC'd — you access the object via <code>.deref()</code>, which returns <code>undefined</code> if it has been collected. <strong>FinalizationRegistry</strong> pairs with WeakRef to run a cleanup callback after an object is collected. These APIs exist specifically for memory-conscious patterns: caches, private data storage, and metadata association without ownership semantics.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">In V8, WeakMap entries use <strong>ephemeron</strong> semantics — a key-value pair is kept alive only if the key itself is reachable from other strong references. V8's GC maintains a set of "ephemeron tables" and processes them in a fixed-point loop during marking: an entry's value is marked reachable only if its key is also marked reachable. This is a special GC algorithm because the liveness of the value depends on the liveness of the key — a non-trivial dependency to track during marking. WeakRef objects go through a two-phase GC: in the first pass, the referent is tentatively collected; the FinalizationRegistry callbacks are scheduled as microtasks in a later GC cycle to avoid re-entrancy issues. <code>WeakRef.deref()</code> returns <code>undefined</code> once the referent has been collected, but the exact timing of collection is non-deterministic and implementation-dependent.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>WeakMap vs Map</h4><p>Map: any key type, strong references (prevents GC), iterable. WeakMap: object keys only, weak references (allows GC), NOT iterable (GC non-determinism makes enumeration unsafe).</p></div>
+    <div class="sb"><h4>WeakSet</h4><p>Like WeakMap but only stores keys (no values). Useful for tracking object membership ("has this element been visited?") without preventing GC of the elements.</p></div>
+    <div class="sb"><h4>Private data pattern</h4><p>Pre-private class fields (#), WeakMap was the idiomatic way to store private data per instance: <code>const _private = new WeakMap()</code>. When the instance is GC'd, its private data is also GC'd automatically.</p></div>
+    <div class="sb"><h4>WeakRef caching</h4><p>Cache values with WeakRef: if memory pressure causes GC, cached values are collected. Next access misses the cache and recomputes. A self-healing cache that doesn't leak memory.</p></div>
+    <div class="sb"><h4>FinalizationRegistry</h4><p>Register a cleanup callback to run after an object is GC'd. Takes a held value (cannot be the object itself). Used for releasing external resources (file handles, GPU textures) when the JS object is collected.</p></div>
+    <div class="sb"><h4>Non-determinism caution</h4><p>GC timing is engine-defined. Never write correctness-critical logic that depends on WeakRef deref returning undefined at a specific time. WeakRef is for optimization/cleanup, not for lifecycle control.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// WeakMap — private instance data (pre-# syntax pattern)</span>
+<span class="kw">const</span> _private = <span class="kw">new</span> <span class="cl">WeakMap</span>();
+<span class="kw">class</span> <span class="cl">SecureStore</span> {
+  <span class="fn">constructor</span>(secret) {
+    _private.<span class="fn">set</span>(<span class="kw">this</span>, { secret });  <span class="cm">// Not on the instance, not enumerable</span>
+  }
+  <span class="fn">getSecret</span>() { <span class="kw">return</span> _private.<span class="fn">get</span>(<span class="kw">this</span>).secret; }
+}
+<span class="cm">// When instance is GC'd, the WeakMap entry is automatically removed</span>
+<span class="cm">// No cleanup needed — prevents leak unlike a regular Map</span>
+
+<span class="cm">// DOM metadata without leaking (attaching data to elements)</span>
+<span class="kw">const</span> elementMeta = <span class="kw">new</span> <span class="cl">WeakMap</span>();
+<span class="kw">function</span> <span class="fn">attachMeta</span>(el, data) { elementMeta.<span class="fn">set</span>(el, data); }
+<span class="kw">function</span> <span class="fn">getMeta</span>(el) { <span class="kw">return</span> elementMeta.<span class="fn">get</span>(el); }
+<span class="cm">// When el is removed from DOM and all refs dropped → GC'd → map entry gone</span>
+<span class="cm">// Equivalent to el.dataset but without polluting the DOM attribute namespace</span>
+
+<span class="cm">// WeakRef cache — memory-safe memoization</span>
+<span class="kw">class</span> <span class="cl">WeakCache</span> {
+  #cache = <span class="kw">new</span> <span class="cl">Map</span>();
+  #registry = <span class="kw">new</span> <span class="cl">FinalizationRegistry</span>(key => {
+    <span class="kw">this</span>.#cache.<span class="fn">delete</span>(key); <span class="cm">// Clean up Map entry when value is GC'd</span>
+  });
+
+  <span class="fn">set</span>(key, value) {
+    <span class="kw">this</span>.#cache.<span class="fn">set</span>(key, <span class="kw">new</span> <span class="cl">WeakRef</span>(value));
+    <span class="kw">this</span>.#registry.<span class="fn">register</span>(value, key); <span class="cm">// cleanup on GC</span>
+  }
+  <span class="fn">get</span>(key) {
+    <span class="kw">return</span> <span class="kw">this</span>.#cache.<span class="fn">get</span>(key)?.<span class="fn">deref</span>(); <span class="cm">// undefined if GC'd</span>
+  }
+}
+<span class="cm">// If memory pressure → GC collects values → cache misses → recomputes</span>
+<span class="cm">// No unbounded growth. FinalizationRegistry cleans the Map keys too.</span></pre></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Using Map when WeakMap is appropriate for DOM-keyed metadata — the Map holds strong references to DOM elements, preventing them from being GC'd even after removal from the document. Classic memory leak source in charting/animation libraries.</div>
+  <div class="mst">Using WeakRef for correctness logic — <code>if (weakRef.deref()) doSomething()</code> is a race condition with the GC. Between the <code>deref()</code> check and the use, GC could collect the object. Store the deref result in a local variable: <code>const obj = ref.deref(); if (obj) use(obj)</code>.</div>
+  <div class="mst">Trying to iterate a WeakMap — it's not iterable by design (non-deterministic GC would make iteration results unpredictable). If you need iteration, use a Map and manage lifecycle yourself.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"Why would you use a WeakMap over a Map?"</div><div class="d">When the keys are objects and you don't want the Map to prevent GC of those objects. Use cases: DOM element metadata, private instance data, object-keyed caches. The WeakMap entry automatically disappears when the key is GC'd — no manual cleanup needed.</div></div>
+  <div class="iq"><div class="q">"What is WeakRef and when is it appropriate?"</div><div class="d">A non-owning reference that allows the referent to be GC'd. Appropriate for caches where you want entries to be evictable under memory pressure. Not appropriate for correctness-critical logic because deref() timing is non-deterministic. Always store deref() result in a variable before using it.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pc">V8 GC (ephemeron tables, generational collection)</span>
+    <span class="pill pq">Memory leaks in SPAs (Block 1 topic 7)</span>
+    <span class="pill pq">Private class fields (#field)</span>
+    <span class="pill pc">Map vs WeakMap performance characteristics</span>
+  </div>
+</div>
+
+<div class="topic" id="t9">
+  <div class="tnum">Topic 10 of 10 — Block 2: JS Deep Internals</div>
+  <h1 class="ttl">Symbols &amp; iterators</h1>
+  <div class="tags"><span class="tag tv">Iteration protocol</span><span class="tag tv">Generators</span><span class="tag tp">Lazy sequences</span><span class="tag tc">Well-known Symbols</span></div>
+
+  <div class="sl">Definition</div>
+  <p class="prose">A <strong>Symbol</strong> is a primitive value that is guaranteed to be unique and immutable. <code>Symbol('desc')</code> creates a value that is never equal to any other Symbol, even one with the same description. Symbols are primarily used as property keys that are non-enumerable, non-collision property names — they don't appear in <code>for...in</code>, <code>Object.keys()</code>, or <code>JSON.stringify()</code>. <strong>Well-known Symbols</strong> (<code>Symbol.iterator</code>, <code>Symbol.toPrimitive</code>, <code>Symbol.hasInstance</code>, etc.) are hooks that let objects customize built-in JS protocol behaviors. The <strong>iteration protocol</strong> defines how an object exposes its elements to <code>for...of</code>, spread, and destructuring — by implementing a method at <code>[Symbol.iterator]</code> that returns an iterator object.</p>
+
+  <div class="sl">How it works internally</div>
+  <p class="prose">V8 implements <code>for...of</code> by calling <code>[Symbol.iterator]()</code> on the target to get an <strong>iterator</strong>, then repeatedly calling <code>iterator.next()</code> until the result's <code>done</code> property is <code>true</code>. An object is <strong>iterable</strong> if it has <code>[Symbol.iterator]</code>. An object is an <strong>iterator</strong> if it has <code>.next()</code> returning <code>{ value, done }</code>. Built-in iterables: Array, String, Map, Set, arguments, NodeList, HTMLCollection, TypedArray. A <strong>generator function</strong> (<code>function*</code>) returns a <strong>generator object</strong> that is both iterable (has <code>[Symbol.iterator]</code> returning itself) and an iterator (has <code>.next()</code>). Generators implement <strong>lazy evaluation</strong> — they only compute the next value when <code>.next()</code> is called, making infinite sequences possible without memory issues. Internally, V8 compiles generator functions into state machines where each <code>yield</code> suspends execution and returns a value, preserving the function's stack frame on the heap between calls.</p>
+
+  <div class="sl">Subtopics</div>
+  <div class="g2">
+    <div class="sb"><h4>Symbol.iterator</h4><p>The hook for the iteration protocol. Implement on any object to make it work with for...of, spread [...obj], destructuring, Promise.all, Array.from. The iterator factory pattern.</p></div>
+    <div class="sb"><h4>Symbol.asyncIterator</h4><p>For async iteration. Implement on objects to work with <code>for await...of</code>. Returned iterator's .next() returns a Promise resolving to {value, done}. Used for streams, paginated APIs.</p></div>
+    <div class="sb"><h4>Well-known Symbols</h4><p>Symbol.toPrimitive: customize coercion (+ operator, template literals). Symbol.hasInstance: customize instanceof. Symbol.species: what constructor to use for derived objects. Symbol.toStringTag: customize Object.prototype.toString output.</p></div>
+    <div class="sb"><h4>Generator functions</h4><p>function*: returns generator object. yield pauses and emits a value. next(value) resumes and passes value back into the generator (as the result of the yield expression). yield* delegates to another iterable.</p></div>
+    <div class="sb"><h4>Lazy sequences</h4><p>Generators compute values on demand. Infinite ranges, lazy filter/map pipelines — no array allocated for intermediate results. Compose generators like Unix pipes: source → transform → sink.</p></div>
+    <div class="sb"><h4>Symbol.for / Symbol.keyFor</h4><p>Symbol.for('key') returns the same Symbol across realms (iframes, workers) from a global registry. Unlike Symbol('key') which creates a unique symbol each time.</p></div>
+  </div>
+
+  <div class="sl">Code example</div>
+  <div class="code-block"><pre><span class="cm">// Custom iterable — range object</span>
+<span class="kw">const</span> range = {
+  from: <span class="num">1</span>, to: <span class="num">5</span>,
+  [<span class="cl">Symbol</span>.iterator]() {
+    <span class="kw">let</span> current = <span class="kw">this</span>.from;
+    <span class="kw">const</span> last = <span class="kw">this</span>.to;
+    <span class="kw">return</span> {
+      next() {
+        <span class="kw">return</span> current <= last
+          ? { value: current++, done: <span class="kw">false</span> }
+          : { value: <span class="kw">undefined</span>, done: <span class="kw">true</span> };
+      }
+    };
+  }
+};
+console.<span class="fn">log</span>([...range]); <span class="cm">// [1,2,3,4,5] — spread uses Symbol.iterator</span>
+
+<span class="cm">// Generator — lazy infinite sequence</span>
+<span class="kw">function</span>* <span class="fn">naturals</span>(start = <span class="num">0</span>) {
+  <span class="kw">while</span> (<span class="kw">true</span>) <span class="kw">yield</span> start++; <span class="cm">// Infinite — no array created</span>
+}
+
+<span class="kw">function</span>* <span class="fn">take</span>(n, iterable) {
+  <span class="kw">let</span> i = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">const</span> x <span class="kw">of</span> iterable) {
+    <span class="kw">if</span> (i++ >= n) <span class="kw">return</span>;
+    <span class="kw">yield</span> x;
+  }
+}
+
+<span class="cm">// Lazy pipeline — no intermediate arrays</span>
+<span class="kw">function</span>* <span class="fn">map</span>(fn, iter) { <span class="kw">for</span> (<span class="kw">const</span> x <span class="kw">of</span> iter) <span class="kw">yield</span> <span class="fn">fn</span>(x); }
+<span class="kw">function</span>* <span class="fn">filter</span>(pred, iter) { <span class="kw">for</span> (<span class="kw">const</span> x <span class="kw">of</span> iter) <span class="kw">if</span> (<span class="fn">pred</span>(x)) <span class="kw">yield</span> x; }
+
+<span class="kw">const</span> result = [
+  ...<span class="fn">take</span>(<span class="num">5</span>,
+    <span class="fn">map</span>(x => x ** <span class="num">2</span>,
+      <span class="fn">filter</span>(x => x % <span class="num">2</span> === <span class="num">0</span>,
+        <span class="fn">naturals</span>()
+      )
+    )
+  )
+]; <span class="cm">// [0, 4, 16, 36, 64] — first 5 squares of even numbers</span>
+<span class="cm">// Only generates as many values as needed — fully lazy</span>
+
+<span class="cm">// Well-known Symbol usage</span>
+<span class="kw">class</span> <span class="cl">Money</span> {
+  <span class="fn">constructor</span>(amount, currency) { <span class="kw">this</span>.amount = amount; <span class="kw">this</span>.currency = currency; }
+  [<span class="cl">Symbol</span>.toPrimitive](hint) {
+    <span class="kw">if</span> (hint === <span class="str">'number'</span>) <span class="kw">return</span> <span class="kw">this</span>.amount;
+    <span class="kw">if</span> (hint === <span class="str">'string'</span>) <span class="kw">return</span> <span class="str">`${this.amount} ${this.currency}`</span>;
+    <span class="kw">return</span> <span class="kw">this</span>.amount;
+  }
+}
+<span class="kw">const</span> price = <span class="kw">new</span> <span class="cl">Money</span>(<span class="num">100</span>, <span class="str">'USD'</span>);
+console.<span class="fn">log</span>(+price);         <span class="cm">// 100 — numeric hint</span>
+console.<span class="fn">log</span>(<span class="str">`${price}`</span>);    <span class="cm">// '100 USD' — string hint</span>
+console.<span class="fn">log</span>(price > <span class="num">50</span>);    <span class="cm">// true — default → number coercion</span></pre></div>
+
+  <div class="sl">Real-world use case</div>
+  <div class="arch"><h4>Node.js streams as async iterables</h4><p>Node.js <code>Readable</code> streams implement <code>Symbol.asyncIterator</code>, making them directly consumable with <code>for await...of</code>. This is how you process large files line-by-line without buffering the entire file: <code>const rl = createInterface({ input: fs.createReadStream('huge.txt') }); for await (const line of rl) processLine(line)</code>. The generator/iterator protocol enables true streaming — each iteration waits for the next chunk from the OS, processes it, and discards it. Memory usage stays constant regardless of file size. The TC39 iterator helpers proposal (Stage 3) adds lazy <code>.map()</code>, <code>.filter()</code>, <code>.take()</code> directly on iterators — bringing native lazy sequences to JS without generator composition boilerplate.</p></div>
+
+  <div class="sl">Common mistakes</div>
+  <div class="mst">Spreading an infinite generator without <code>take()</code> — <code>[...naturals()]</code> is an infinite loop and OOM. Always apply a terminating operation before materializing to an array.</div>
+  <div class="mst">Confusing Symbol('desc') (always unique) with Symbol.for('desc') (global registry, same across realms). <code>Symbol('x') === Symbol('x')</code> is false. <code>Symbol.for('x') === Symbol.for('x')</code> is true.</div>
+  <div class="mst">Not implementing the return() method on custom iterators — when a <code>for...of</code> loop <code>break</code>s early, it calls <code>iterator.return()</code> for cleanup. Without it, resources held by the iterator (file handles, connections) may not be released.</div>
+
+  <div class="sl">Interview perspective</div>
+  <div class="iq"><div class="q">"What is the iteration protocol in JavaScript?"</div><div class="d">An object is iterable if it has [Symbol.iterator]() returning an iterator (object with .next() returning {value, done}). for...of, spread, destructuring all use this protocol. Generator functions implement both automatically. Custom iterables let you define how for...of traverses your data structure.</div></div>
+  <div class="iq"><div class="q">"How do generators enable lazy evaluation?"</div><div class="d">Generators compute values on demand — yield suspends the function and returns a value. The consumer calls .next() to pull the next value. Infinite sequences are possible because no values are pre-computed. Compose generators like a pipeline for memory-efficient data transformation.</div></div>
+  <div class="iq"><div class="q">"What are well-known Symbols and give an example of customizing one?"</div><div class="d">Built-in protocol hooks. Symbol.iterator for for...of. Symbol.toPrimitive for coercion (+, template literals). Symbol.hasInstance for instanceof. Demonstrate with a custom class implementing [Symbol.toPrimitive] to control how it behaves in arithmetic and string contexts.</div></div>
+
+  <div class="sl">Connects to</div>
+  <div class="pills">
+    <span class="pill pc">Generators (structural model for async/await)</span>
+    <span class="pill pq">Node.js streams (AsyncIterable)</span>
+    <span class="pill pq">TC39 iterator helpers proposal</span>
+    <span class="pill pc">Lazy evaluation (functional programming)</span>
+    <span class="pill pc">Protocol-based design (similar to Java Iterable)</span>
+    <span class="pill pq">for await...of + async generators (Block 7 bridge)</span>
+  </div>
+</div>
+
+<hr class="divline">
+<div class="divlabel">─── All 10 topics complete · Block 2 done ───</div>
+
+</main>
+</div>
+
+<script>
+function show(idx, el) {
+  document.querySelectorAll('.topic').forEach(t => t.classList.remove('visible'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('t' + idx).classList.add('visible');
+  el.classList.add('active');
+  document.querySelector('.content').scrollTop = 0;
+}
+</script>

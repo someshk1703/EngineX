@@ -1,0 +1,570 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:800px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:210px;min-width:210px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary)}
+.sh{padding:14px 16px 10px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ni{padding:9px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;line-height:1.3}
+.ni:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ni.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.ni .num{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:1px}
+.content{flex:1;overflow-y:auto;padding:24px 28px}
+.topic{display:none}.topic.active{display:block}
+.tt{font-size:19px;font-weight:500;margin-bottom:3px}
+.ts2{font-size:13px;color:var(--color-text-tertiary);margin-bottom:20px}
+.sec{margin-bottom:20px}
+.sl{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kvc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.kvl{font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px;font-weight:500}
+.kvv{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.to{display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.to:last-child{border-bottom:none}
+.tos{font-size:12px;flex:1}
+.tos .lb{font-weight:500;margin-bottom:2px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.gain .lb{color:#3B6D11}.lose .lb{color:#A32D2D}
+.tos p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.fi{padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12.5px;line-height:1.6;color:var(--color-text-secondary)}
+.fi:last-child{border-bottom:none}
+.fi strong{color:var(--color-text-primary);font-weight:500}
+.ib{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px}
+.ib ol{padding-left:16px;font-size:12.5px;line-height:1.9;color:var(--color-text-secondary)}
+.ib li strong{color:var(--color-text-primary);font-weight:500}
+.cx{display:flex;flex-wrap:wrap;gap:6px}
+.cx a{font-size:11.5px;padding:3px 10px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.cx a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ab{font-family:var(--font-mono);font-size:11.5px;line-height:1.6;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px}
+.sn{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.sd{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.4}
+.tr{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:14px}
+.tab{font-size:12px;padding:7px 12px;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tp{display:none}.tp.active{display:block}
+.nb{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:7px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:20px}
+.nb:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.partition-row{display:flex;gap:3px;margin-bottom:6px;align-items:stretch}
+.p-label{font-size:11px;color:var(--color-text-tertiary);min-width:64px;padding-top:4px}
+.p-slots{display:flex;gap:2px;flex:1}
+.p-slot{height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-tertiary);min-width:28px;flex:1}
+.p-slot.filled{background:#E6F1FB;border-color:#85B7EB;color:#0C447C}
+.p-slot.head{background:#EAF3DE;border-color:#97C459;color:#27500A}
+.dlq-step{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.dlq-step:last-child{border-bottom:none}
+.dlq-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;margin-top:1px}
+.dlq-body{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.dlq-body strong{color:var(--color-text-primary);font-weight:500}
+.guarantee-row{display:grid;grid-template-columns:140px 1fr 1fr;gap:0;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;font-size:12.5px}
+.gr-hdr{background:var(--color-background-secondary);padding:8px 10px;font-weight:500;color:var(--color-text-primary);font-size:11px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.gr-label{background:var(--color-background-secondary);padding:8px 10px;color:var(--color-text-secondary);border-right:0.5px solid var(--color-border-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;font-size:12px}
+.gr-cell{padding:8px 10px;border-right:0.5px solid var(--color-border-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.gr-cell:last-child{border-right:none}
+.gr-last .gr-label,.gr-last .gr-cell{border-bottom:none}
+.sim-wrap{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px;margin-top:8px}
+.sim-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12.5px}
+.sim-row label{color:var(--color-text-secondary);min-width:100px}
+.sim-row span{min-width:40px;text-align:right;font-weight:500;color:var(--color-text-primary)}
+.sim-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stat-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;text-align:center}
+.stat-val{font-size:17px;font-weight:500;color:var(--color-text-primary)}
+.stat-lbl{font-size:11px;color:var(--color-text-tertiary);margin-top:2px}
+</style>
+
+<h2 class="sr-only">System Design Messaging and Async Systems — Block 5 covering message queues vs event streams, Kafka deep dive, delivery guarantees, event-driven architecture, dead letter queues, and pub/sub pattern.</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sh">Block 5 — Messaging</div>
+  <div class="ni active" onclick="show(0)"><span class="num">01</span>Queues vs streams</div>
+  <div class="ni" onclick="show(1)"><span class="num">02</span>Kafka deep dive</div>
+  <div class="ni" onclick="show(2)"><span class="num">03</span>Delivery guarantees</div>
+  <div class="ni" onclick="show(3)"><span class="num">04</span>Event-driven architecture</div>
+  <div class="ni" onclick="show(4)"><span class="num">05</span>Dead letter queues</div>
+  <div class="ni" onclick="show(5)"><span class="num">06</span>Pub/Sub pattern</div>
+</nav>
+
+<main class="content">
+
+<!-- ══ T0: Queues vs Streams ══ -->
+<div class="topic active" id="t0">
+  <div class="tt">Message queues vs event streams</div>
+  <div class="ts2">RabbitMQ vs Kafka · pull vs push · when to use each</div>
+
+  <div class="sec">
+    <div class="sl">The fundamental difference</div>
+    <div class="prose">The distinction is not speed — it's about what happens to a message after a consumer reads it.<br><br><strong>Message queue (RabbitMQ, SQS):</strong> A message is consumed and deleted. It's a task to be done, handed to exactly one worker. Once processed, it's gone. The queue is a pipeline, not a log.<br><br><strong>Event stream (Kafka):</strong> Events are written to a durable, ordered, append-only log. Consumers read from any position and can re-read. The stream is a permanent record. Multiple independent consumers can each read the full stream at their own pace — nothing is deleted on read.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">RabbitMQ vs Kafka — the real comparison</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'qk','q0')">RabbitMQ</div>
+      <div class="tab" onclick="stab(this,'qk','q1')">Kafka</div>
+      <div class="tab" onclick="stab(this,'qk','q2')">Pull vs push</div>
+    </div>
+    <div id="qk">
+      <div class="tp active" id="q0">
+        <div class="prose"><strong>RabbitMQ — classic message broker (AMQP):</strong><br><br>Messages flow through exchanges → bindings → queues → consumers. Producers publish to an exchange with a routing key. The exchange routes the message to one or more queues based on binding rules (direct, fanout, topic, headers).<br><br><strong>Push-based delivery:</strong> RabbitMQ pushes messages to consumers. Consumers register and receive messages as they arrive. Low latency for individual messages. The broker tracks which messages are in-flight and acked.<br><br><strong>Message lifecycle:</strong> Consumer receives message → processes → sends ACK → broker deletes message. NACK or timeout → message goes back to queue (or to DLQ after max retries).<br><br><strong>Best for:</strong> Task queues (image processing jobs, email sending), RPC patterns, complex routing (topic exchanges), when each message should be processed exactly once by exactly one worker, when message ordering is less critical than delivery.</div>
+      </div>
+      <div class="tp" id="q1">
+        <div class="prose"><strong>Kafka — distributed event streaming platform:</strong><br><br>Events are appended to topic partitions. Each partition is an ordered, immutable sequence of records. Records are retained for a configured period (default: 7 days, can be forever). Consumer offsets track where each consumer group is in the log.<br><br><strong>Pull-based delivery:</strong> Consumers poll Kafka for new messages. They control their own read rate, replay, and position. The broker tracks no per-message delivery state — just the consumer's current offset.<br><br><strong>Message lifecycle:</strong> Record appended to partition log → consumer reads at its own pace → consumer commits offset. Record remains in the log after reading — other consumer groups can read the same record independently.<br><br><strong>Best for:</strong> Event sourcing, audit logs, activity tracking, change data capture, stream processing (Kafka Streams, Flink), fan-out to many independent consumers, replay and time-travel, data pipeline (ETL), when you need multiple independent consumers of the same events.</div>
+      </div>
+      <div class="tp" id="q2">
+        <div class="prose"><strong>Push (RabbitMQ, SQS):</strong> Broker pushes messages to consumers as they arrive. Low per-message latency. Broker must manage backpressure — if consumers are slow, the broker must throttle producers or buffer messages. Consumer must be continuously connected.<br><br><strong>Pull (Kafka):</strong> Consumers poll for batches of messages at their own pace. Consumer controls throughput. Broker doesn't need to track consumer state (just stores the log). Consumers can batch large reads for efficiency. Long-polling: consumer waits up to N ms for data to arrive, reducing empty poll overhead.<br><br><strong>Why Kafka chose pull:</strong> With diverse consumers (some fast, some slow), push creates backpressure complexity at the broker. Pull lets each consumer run at its own optimal rate. The broker stores the log — consumers manage their own progress. This decoupling is what enables replaying events independently across consumer groups.<br><br><strong>Pull downside:</strong> Slightly higher per-message latency (next poll interval). Not suitable for sub-millisecond response requirements.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Decision guide</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Use RabbitMQ / SQS when</div><div class="kvv">Task queue semantics (do this once). Complex routing rules. Per-message ACK/NACK. At-most-once delivery OK. Traditional worker pool pattern.</div></div>
+      <div class="kvc"><div class="kvl">Use Kafka when</div><div class="kvv">Multiple independent consumers need same events. Event replay required. Ordering within a partition matters. High throughput (millions/sec). Event sourcing, CDC, audit log.</div></div>
+      <div class="kvc"><div class="kvl">Both wrong? Consider</div><div class="kvv">Redis Streams: lighter than Kafka, heavier than Redis Lists. Good for moderate scale. AWS EventBridge: fully managed, serverless, routing rules without infra.</div></div>
+      <div class="kvc"><div class="kvl">Scale numbers</div><div class="kvv">RabbitMQ: ~50K msgs/sec per node. Kafka: ~1M msgs/sec per broker (sequential disk I/O). SQS: effectively unlimited (managed). Numbers assume defaults, tuning can 10× these.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Trade-offs</div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ Kafka strengths</div><p>Immutable log — replay, audit, CDC. Fan-out to unlimited consumers. Linear horizontal scale. Survives consumer downtime (log persists).</p></div><div class="tos lose"><div class="lb">✗ Kafka cost</div><p>Operationally complex. Higher latency per message (ms vs µs). Ordering only within a partition. Overkill for simple task queues.</p></div></div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ RabbitMQ strengths</div><p>Per-message ACK semantics. Complex routing (exchanges, bindings). Lower operational complexity. Sub-millisecond delivery. Priority queues.</p></div><div class="tos lose"><div class="lb">✗ RabbitMQ cost</div><p>Messages gone on consume — no replay. Fan-out requires message duplication to each queue. Memory-based → can fill up under load spikes.</p></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Frame by semantics, not speed.</strong> "RabbitMQ is for task distribution — one worker, one message. Kafka is for event broadcasting — many consumers, permanent log."</li>
+      <li><strong>Notification system → Kafka.</strong> Multiple services (email, push, SMS) all consume the same notification event independently. Kafka fan-out is correct.</li>
+      <li><strong>Job queue → RabbitMQ/SQS.</strong> Image resize job should be processed by exactly one worker. No replay needed. RabbitMQ or SQS is correct.</li>
+      <li><strong>Probe: "User service updates user email. How do other services learn?"</strong> → Publish a <code>user.email_updated</code> event to Kafka. Profile service, notification service, and billing service each have their own consumer group and consume independently.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">Kafka deep dive →</a><a onclick="show(2)">Delivery guarantees →</a><a onclick="show(5)">Pub/Sub →</a></div></div>
+  <button class="nb" onclick="show(1)">Next: Kafka deep dive <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T1: Kafka ══ -->
+<div class="topic" id="t1">
+  <div class="tt">Kafka deep dive</div>
+  <div class="ts2">Topics · partitions · offsets · consumer groups · replication</div>
+
+  <div class="sec">
+    <div class="sl">Core concepts — precisely defined</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Topic</div><div class="kvv">Named stream of records. Logically represents a category of events: <code>orders</code>, <code>payments</code>, <code>user-events</code>. Divided into partitions for parallel processing.</div></div>
+      <div class="kvc"><div class="kvl">Partition</div><div class="kvv">Ordered, immutable, append-only sequence of records within a topic. Unit of parallelism. Records in a partition are totally ordered. Records across partitions are not ordered relative to each other.</div></div>
+      <div class="kvc"><div class="kvl">Offset</div><div class="kvv">Sequential integer assigned to each record within a partition (0, 1, 2, …). Unique within a partition. Consumer tracks its current offset — the position it has read up to. Committed to <code>__consumer_offsets</code> topic.</div></div>
+      <div class="kvc"><div class="kvl">Consumer group</div><div class="kvv">A set of consumers that together consume a topic. Each partition is assigned to exactly one consumer in the group. Enables parallel consumption. Multiple independent groups can each consume the full topic.</div></div>
+      <div class="kvc"><div class="kvl">Replication factor</div><div class="kvv">Number of copies of each partition across brokers. RF=3: one leader, two followers. Leader handles all reads and writes. Followers replicate. On leader failure, a follower is elected leader.</div></div>
+      <div class="kvc"><div class="kvl">ISR (In-Sync Replicas)</div><div class="kvv">Set of replicas that are fully caught up with the leader. A write is acknowledged only after ISR replicas write it (configurable: <code>acks=all</code>). If ISR shrinks below min.insync.replicas, producers get an error.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Partition layout — interactive</div>
+    <div style="padding:12px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary)">Partitions</label>
+        <input type="range" min="1" max="6" step="1" value="3" id="p-count" oninput="drawPartitions()">
+        <span id="p-count-out" style="font-weight:500;min-width:16px;color:var(--color-text-primary)">3</span>
+        <label style="color:var(--color-text-secondary);margin-left:12px">Records each</label>
+        <input type="range" min="3" max="8" step="1" value="5" id="p-records" oninput="drawPartitions()">
+        <span id="p-records-out" style="font-weight:500;min-width:16px;color:var(--color-text-primary)">5</span>
+      </div>
+      <div id="partition-vis"></div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:8px" id="partition-caption">Green = consumer head (current offset). Blue = committed records.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Consumer group mechanics</div>
+    <div class="prose"><strong>The assignment rule:</strong> Each partition is consumed by exactly one consumer in a consumer group at any time. If the group has fewer consumers than partitions, some consumers handle multiple partitions. If more consumers than partitions — extra consumers are idle.<br><br><strong>Optimal parallelism:</strong> consumers_in_group ≤ partitions_in_topic. Set partitions at topic creation based on your target consumer parallelism.<br><br><strong>Rebalancing:</strong> When a consumer joins or leaves the group, Kafka's group coordinator triggers a rebalance — partitions are redistributed. During rebalance, consumption pauses (~seconds). Minimize rebalances: use static membership (<code>group.instance.id</code>) for long-lived consumers.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — Kafka cluster</div>
+    <div class="ab">Topic: "orders" — 3 partitions, replication factor 3
+
+  Broker 1           Broker 2           Broker 3
+  ┌──────────┐       ┌──────────┐       ┌──────────┐
+  │ P0 LEADER│       │ P0 follow│       │ P0 follow│
+  │ P1 follow│       │ P1 LEADER│       │ P1 follow│
+  │ P2 follow│       │ P2 follow│       │ P2 LEADER│
+  └──────────┘       └──────────┘       └──────────┘
+
+  Producer (key="user-42") → hash(key) % 3 = partition 0 → Broker 1
+  All events for user-42 go to P0 → ordering guaranteed per user
+
+  Consumer Group "payments-processor":
+    Consumer A → P0 (reads from offset 1247)
+    Consumer B → P1 (reads from offset 892)
+    Consumer C → P2 (reads from offset 2103)
+
+  Consumer Group "analytics" (independent):
+    Consumer X → P0, P1, P2 (reads from its own offsets, much further behind)
+
+  Broker 1 failure:
+    P0 leader → elected from ISR (Broker 2 or 3)
+    ~5-30s for election + client reconnect
+    No data loss if acks=all and ISR maintained</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Key producer configs</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">acks=0</div><div class="kvv">Fire and forget. No broker ack. Fastest, data loss risk. Use for metrics where occasional loss is OK.</div></div>
+      <div class="kvc"><div class="kvl">acks=1</div><div class="kvv">Leader acks. Fast. Risk: leader crashes before replication — data lost. Most common default.</div></div>
+      <div class="kvc"><div class="kvl">acks=all (-1)</div><div class="kvv">All ISR replicas ack. No data loss (if min.insync.replicas ≥ 2). Slower. Required for exactly-once.</div></div>
+      <div class="kvc"><div class="kvl">Partition key</div><div class="kvv">Records with the same key always go to the same partition → ordering guarantee per key. Null key → round-robin across partitions.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Partitions = unit of parallelism.</strong> "I'd set partitions = expected max consumers for this topic. For an order processing service with 10 workers, I'd create 10+ partitions."</li>
+      <li><strong>Partition key = ordering guarantee.</strong> "I'd use user_id as the partition key so all events for a given user are in the same partition and are processed in order."</li>
+      <li><strong>Replication factor = 3 always in production.</strong> "RF=3 means we can lose one broker with no data loss and one more with no availability loss."</li>
+      <li><strong>Probe: "Kafka consumer is slow, messages pile up."</strong> → Increase partition count (allows more parallel consumers). Add consumers to the group (up to partition count). Check for slow processing per message — is it waiting on DB? Cache expensive lookups. Consider async processing inside consumer.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(2)">Delivery guarantees →</a><a onclick="sendPrompt('Explain Kafka Streams vs Apache Flink for stream processing')">Stream processing</a><a onclick="sendPrompt('Explain Kafka Connect and CDC with Debezium')">Kafka Connect + CDC</a></div></div>
+  <button class="nb" onclick="show(2)">Next: Delivery guarantees <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T2: Delivery Guarantees ══ -->
+<div class="topic" id="t2">
+  <div class="tt">Delivery guarantees</div>
+  <div class="ts2">At-most-once · at-least-once · exactly-once — how each is achieved</div>
+
+  <div class="sec">
+    <div class="sl">The three guarantees</div>
+    <div class="guarantee-row">
+      <div class="gr-hdr"></div><div class="gr-hdr">What it means</div><div class="gr-hdr">How achieved</div>
+      <div class="gr-label">At-most-once</div><div class="gr-cell">Message delivered 0 or 1 times. May be lost, never duplicated. Fire and forget.</div><div class="gr-cell">Producer: acks=0. Consumer: commit offset before processing. If crash mid-process → message lost, not retried.</div>
+      <div class="gr-label">At-least-once</div><div class="gr-cell">Message delivered 1 or more times. Never lost, may be duplicated. Consumer must be idempotent.</div><div class="gr-cell">Producer: acks=all + retries. Consumer: process first, commit offset after. Crash before commit → reprocess on restart.</div>
+      <div class="gr-label gr-last">Exactly-once</div><div class="gr-cell gr-last">Message delivered exactly once. No loss, no duplicates. The gold standard, and the hardest.</div><div class="gr-cell gr-last">Kafka: idempotent producer (dedup by sequence number) + transactional API (atomic write + offset commit). Requires consumer.isolation.level = read_committed.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Why at-least-once is the real default</div>
+    <div class="prose"><strong>The fundamental problem:</strong> Between processing a message and committing the offset, the consumer can crash. On restart, it re-reads and reprocesses. This gives at-least-once delivery.<br><br><strong>The correct response:</strong> Make your consumers idempotent. Processing the same message twice must produce the same result as processing it once. Examples: <code>INSERT ... ON CONFLICT DO NOTHING</code>, <code>UPDATE ... WHERE version = expected_version</code>, <code>SET key = value</code> (idempotent by definition). An idempotent consumer with at-least-once delivery is effectively exactly-once from a business logic perspective — without the overhead of Kafka transactions.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Kafka exactly-once — deep mechanics</div>
+    <div class="prose"><strong>Idempotent producer:</strong> Each producer is assigned a PID (producer ID). Each message gets a sequence number. Broker deduplicates based on (PID, partition, sequence_number). Retries are safe — duplicates are silently dropped. Enabled with <code>enable.idempotence=true</code>.<br><br><strong>Transactional producer:</strong> Wraps produce + offset commit in a single atomic transaction. Either both succeed or neither does. Consumer with <code>isolation.level=read_committed</code> only sees records from committed transactions — uncommitted records are invisible.<br><br><strong>The two-phase commit under the hood:</strong> Kafka's transaction coordinator uses 2PC internally between the producer log and the <code>__transaction_state</code> topic. This is what guarantees the atomic commit — but it's fully managed by Kafka, not exposed to the application.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Delivery guarantee simulator</div>
+    <div class="sim-wrap">
+      <div class="sim-row"><label>Crash probability</label><input type="range" min="0" max="50" step="5" value="20" id="crash-p" oninput="simGuarantee()"><span id="crash-p-out">20%</span></div>
+      <div class="sim-row"><label>Messages sent</label><input type="range" min="10" max="200" step="10" value="100" id="msg-n" oninput="simGuarantee()"><span id="msg-n-out">100</span></div>
+      <div class="sim-stats">
+        <div class="stat-card"><div class="stat-val" id="g-amo">—</div><div class="stat-lbl">At-most-once<br>messages lost</div></div>
+        <div class="stat-card"><div class="stat-val" id="g-alo">—</div><div class="stat-lbl">At-least-once<br>duplicates</div></div>
+        <div class="stat-card"><div class="stat-val" id="g-eo">0</div><div class="stat-lbl">Exactly-once<br>anomalies</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Default: at-least-once + idempotent consumers.</strong> "I design consumers to be idempotent so duplicate messages don't matter. This is simpler and cheaper than exactly-once Kafka transactions."</li>
+      <li><strong>Exactly-once for financial data.</strong> "For payment processing where a duplicate could double-charge, I'd use Kafka transactions with <code>enable.idempotence=true</code> and <code>isolation.level=read_committed</code>."</li>
+      <li><strong>Idempotency key pattern.</strong> "Each event carries a unique idempotency key. The consumer checks if that key was already processed before acting. Deduplication at the application layer is often simpler than exactly-once at the broker layer."</li>
+      <li><strong>Probe: "Payment processed twice."</strong> → Either not idempotent consumer, or exactly-once not configured. Fix: idempotency key stored in DB with unique constraint. Second process attempt hits unique constraint → no-op. This is the practical exactly-once for payments.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(4)">DLQ →</a><a onclick="sendPrompt('Explain idempotency in distributed systems with examples')">Idempotency patterns</a><a onclick="sendPrompt('Explain Kafka exactly-once semantics configuration')">Kafka EOS config</a></div></div>
+  <button class="nb" onclick="show(3)">Next: Event-driven architecture <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T3: Event-driven ══ -->
+<div class="topic" id="t3">
+  <div class="tt">Event-driven architecture</div>
+  <div class="ts2">Event sourcing · CQRS · eventual consistency</div>
+
+  <div class="sec">
+    <div class="sl">Event-driven architecture — the mindset shift</div>
+    <div class="prose">Traditional architecture: service A calls service B synchronously and waits. Event-driven: service A publishes an event to a bus and moves on. Service B (and C, D…) react when they're ready. The producer doesn't know or care who consumes the event.<br><br><strong>Benefits:</strong> Decoupling — producer and consumer never need to know about each other. Resilience — if B is down, the event waits in Kafka; B processes when it recovers. Scalability — consumers scale independently. Auditability — the event log is a complete history.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Event sourcing</div>
+    <div class="prose"><strong>Core idea:</strong> Don't store the current state of an entity. Store the sequence of events that led to that state. The current state is derived by replaying events.<br><br><strong>Example (bank account):</strong> Instead of a row <code>account_id=1, balance=850</code>, store: <code>AccountOpened(initial=1000)</code>, <code>Deposited(200)</code>, <code>Withdrawn(350)</code>. Current balance = replay: 1000 + 200 - 350 = 850.<br><br><strong>Benefits:</strong> Complete audit trail for free. Time travel — replay events up to any point in time. Event replay to rebuild read models. Debugging — reproduce any bug by replaying the exact sequence of events.<br><br><strong>Costs:</strong> Reading current state requires replaying all events (use snapshots to mitigate — snapshot every N events). Schema evolution for old events is hard. Query patterns must work on the event log structure.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">CQRS — Command Query Responsibility Segregation</div>
+    <div class="prose"><strong>Core idea:</strong> Split the write model (commands) from the read model (queries). They are separate code paths, separate data stores if needed.<br><br><strong>Write side (command):</strong> Accepts commands (<code>PlaceOrder</code>, <code>UpdateProfile</code>). Validates, applies business rules, persists to the write store (event log or normalized DB), publishes events.<br><br><strong>Read side (query):</strong> Optimized for specific query patterns. One read model per query type. Populated asynchronously from events. Can be denormalized, pre-aggregated, cached — whatever makes reads fast.<br><br><strong>Example:</strong> Order write store = normalized Postgres (ACID, constraints). Order read model for "user's order history page" = a MongoDB document per user with embedded last-10 orders (pre-denormalized for fast page load). Updated by consuming <code>order.placed</code> events.<br><br><strong>The consistency tradeoff:</strong> Read models are updated asynchronously → there's a propagation lag. User places order, immediately refreshes order history — might not see the new order yet. This is the cost of CQRS eventual consistency.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — event-driven order system</div>
+    <div class="ab">Event-driven order placement:
+
+  Client → POST /orders → Order Service
+  Order Service:
+    1. Validate command (stock available? payment method valid?)
+    2. Write OrderPlaced event to event store (Postgres)
+    3. Publish to Kafka topic "orders" (transactional outbox pattern)
+    4. Return 202 Accepted (async — not waiting for downstream)
+
+  Consumers (independent, Kafka consumer groups):
+    Inventory Service:
+      Reads "orders" topic → reserves stock → publishes InventoryReserved
+    
+    Payment Service:
+      Reads "orders" topic → charges card → publishes PaymentCharged
+    
+    Notification Service:
+      Reads PaymentCharged → sends confirmation email
+
+    Read Model Updater:
+      Reads all events → updates OrderStatus read model (MongoDB)
+      → Client polls GET /orders/123/status → reads from MongoDB
+
+  Outbox pattern (avoids dual-write problem):
+    Order Service writes to:
+      ① Event store (Postgres, ACID) — in same transaction as business logic
+      ② NOT directly to Kafka
+    Outbox relay process reads from Postgres event store → publishes to Kafka
+    Guarantees: event published iff business logic committed</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Outbox pattern is mandatory with event-driven.</strong> "I'd never write directly to Kafka in the same operation as writing to the DB — dual-write creates consistency risk. Instead, write to an outbox table in the same transaction, then relay to Kafka."</li>
+      <li><strong>CQRS separates scale concerns.</strong> "Writes hit the normalized Postgres. Reads hit purpose-built read models. Each scales independently."</li>
+      <li><strong>Eventual consistency is the tradeoff to name explicitly.</strong> "The read model is eventually consistent — typically 100–500ms behind. For this use case, that's acceptable. For balance checks before a payment, I'd read from the write model directly."</li>
+      <li><strong>Event sourcing ≠ Kafka.</strong> "Event sourcing is a storage pattern. Kafka is a transport. You can event-source to Postgres and publish to Kafka separately."</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="sendPrompt('Explain the transactional outbox pattern in detail')">Outbox pattern</a><a onclick="sendPrompt('Explain saga pattern with event-driven choreography')">Saga choreography</a><a onclick="show(5)">Pub/Sub →</a></div></div>
+  <button class="nb" onclick="show(4)">Next: Dead letter queues <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T4: DLQ ══ -->
+<div class="topic" id="t4">
+  <div class="tt">Dead letter queues</div>
+  <div class="ts2">Poison messages · retry strategies · exponential backoff</div>
+
+  <div class="sec">
+    <div class="sl">What a poison message is</div>
+    <div class="prose">A poison message is a message that causes the consumer to fail repeatedly — crashing or throwing exceptions every time it's processed. Without a DLQ, the consumer retries indefinitely, blocking all other messages in the queue. A Dead Letter Queue (DLQ) is the safety valve: after N failed attempts, the message is moved out of the main queue into a separate DLQ where it can be inspected and handled without blocking normal processing.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">The full retry pipeline</div>
+    <div class="dlq-step">
+      <div class="dlq-num" style="background:#E6F1FB;color:#0C447C;border:0.5px solid #85B7EB">1</div>
+      <div class="dlq-body"><strong>First delivery attempt.</strong> Consumer processes message. Succeeds → ACK → deleted. Fails → NACK → back to queue.</div>
+    </div>
+    <div class="dlq-step">
+      <div class="dlq-num" style="background:#E6F1FB;color:#0C447C;border:0.5px solid #85B7EB">2</div>
+      <div class="dlq-body"><strong>Retry with backoff.</strong> Wait 1s → retry. Fail again → wait 2s → retry. Fail → 4s → retry. Exponential backoff: wait = min(base × 2ⁿ, max_delay). Add jitter: wait = wait × random(0.5, 1.5) to prevent retry storms when many consumers fail simultaneously.</div>
+    </div>
+    <div class="dlq-step">
+      <div class="dlq-num" style="background:#FAEEDA;color:#633806;border:0.5px solid #EF9F27">3</div>
+      <div class="dlq-body"><strong>Max retries exceeded.</strong> After N attempts (common: 3–5), message is moved to the DLQ. Consumer moves on to the next message in the main queue. No more blocking.</div>
+    </div>
+    <div class="dlq-step">
+      <div class="dlq-num" style="background:#FAEEDA;color:#633806;border:0.5px solid #EF9F27">4</div>
+      <div class="dlq-body"><strong>DLQ inspection.</strong> Alert fired (DLQ depth > 0 = production incident). Engineers inspect the poison message. Root cause: bad data format? Downstream service down? Bug in consumer?</div>
+    </div>
+    <div class="dlq-step">
+      <div class="dlq-num" style="background:#EAF3DE;color:#27500A;border:0.5px solid #97C459">5</div>
+      <div class="dlq-body"><strong>Remediation.</strong> Fix the bug. Either replay from DLQ (reprocess fixed messages), or dead-letter permanently (log and discard truly unprocessable messages). SQS: <code>redrive policy</code> re-enqueues DLQ messages to the source queue.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Exponential backoff with jitter — the math</div>
+    <div class="ab">Base delay: 1s  |  Max delay: 60s  |  Jitter: ±30%
+
+  Attempt 1 fail: wait = min(1 × 2⁰, 60) × jitter = 1s × 0.85 = 0.85s
+  Attempt 2 fail: wait = min(1 × 2¹, 60) × jitter = 2s × 1.20 = 2.4s
+  Attempt 3 fail: wait = min(1 × 2², 60) × jitter = 4s × 0.92 = 3.7s
+  Attempt 4 fail: wait = min(1 × 2³, 60) × jitter = 8s × 1.10 = 8.8s
+  Attempt 5 fail: → DLQ
+
+Without jitter (thundering herd):
+  1000 consumers all fail at t=0
+  All retry at exactly t=1s → 1000 simultaneous retries → downstream crushed
+  All fail again at t=1s → all retry at t=3s → same problem
+
+With jitter:
+  Retries spread across [0.7s, 1.3s] window → 1000/0.6s ≈ 1667/s → manageable</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">DLQ in different systems</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">SQS + DLQ</div><div class="kvv">Native support. Set <code>maxReceiveCount</code> on source queue. Messages auto-moved to DLQ. Redrive policy sends them back. CloudWatch alarm on <code>ApproximateNumberOfMessagesVisible</code> in DLQ.</div></div>
+      <div class="kvc"><div class="kvl">RabbitMQ</div><div class="kvv">Dead letter exchange (DLX). Set <code>x-dead-letter-exchange</code> on queue. Messages routed to DLX after NACK or TTL expiry. Separate DLQ queue bound to DLX.</div></div>
+      <div class="kvc"><div class="kvl">Kafka</div><div class="kvv">No native DLQ. Convention: consumer catches exception after N retries, produces message to <code>{topic}-dlq</code> topic. Spring Kafka: <code>DeadLetterPublishingRecoverer</code> does this automatically.</div></div>
+      <div class="kvc"><div class="kvl">Retry topics (Kafka)</div><div class="kvv">Multi-stage retry: fail → <code>orders-retry-1</code> (wait 5s) → fail → <code>orders-retry-2</code> (wait 30s) → fail → <code>orders-dlq</code>. Each retry topic has a consumer with built-in delay. Used by Spring Kafka's non-blocking retry.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Always mention DLQ when designing any queue-based system.</strong> "I'd configure a DLQ with maxRetries=3 and exponential backoff. DLQ depth > 0 triggers a PagerDuty alert."</li>
+      <li><strong>Exponential backoff + jitter is mandatory.</strong> "Fixed retries create synchronized thundering herds. Exponential backoff with jitter spreads retries across a window."</li>
+      <li><strong>Poison message vs transient failure:</strong> "A transient failure (DB briefly down) should recover on retry. A poison message (malformed data) will never succeed. The DLQ catches the latter and lets ops handle it without manual queue surgery."</li>
+      <li><strong>Probe: "DLQ is full. What do you do?"</strong> → Alert fires. First: determine if it's a bug (all messages bad) or a downstream outage (all messages fail because payment service is down). Bug → fix, redrive after fix. Outage → wait for service recovery, then redrive. Never blindly redrive without understanding the root cause.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(2)">← Delivery guarantees</a><a onclick="sendPrompt('Explain circuit breaker pattern for messaging systems')">Circuit breaker</a><a onclick="sendPrompt('Explain Spring Kafka non-blocking retry with retry topics')">Spring Kafka retry</a></div></div>
+  <button class="nb" onclick="show(5)">Next: Pub/Sub pattern <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T5: Pub/Sub ══ -->
+<div class="topic" id="t5">
+  <div class="tt">Pub/Sub pattern</div>
+  <div class="ts2">Decoupling producers and consumers · fan-out · real-world examples</div>
+
+  <div class="sec">
+    <div class="sl">Definition</div>
+    <div class="prose">Publish-Subscribe is a messaging pattern where publishers send messages to a topic (or channel) without knowing who will receive them. Subscribers register interest in a topic and receive all messages published to it — without knowing who published them. The topic is the decoupling point.<br><br>The core value: producer and consumer are completely independent. Adding a new consumer never requires changing the producer. Removing a consumer has zero effect on the producer or on other consumers.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Fan-out patterns</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'ps','p0')">Topic fan-out</div>
+      <div class="tab" onclick="stab(this,'ps','p1')">SNS + SQS fan-out</div>
+      <div class="tab" onclick="stab(this,'ps','p2')">Kafka fan-out</div>
+    </div>
+    <div id="ps">
+      <div class="tp active" id="p0">
+        <div class="prose"><strong>Topic fan-out:</strong> One published message → delivered to all subscribers of that topic. N subscribers = N deliveries of the same message.<br><br>Use case: a <code>payment.succeeded</code> event must trigger: email notification service, fraud analytics service, accounting service, loyalty points service. All four are independent subscribers. Publisher (payment service) knows nothing about them.<br><br><strong>The decoupling payoff:</strong> To add a 5th subscriber (say, a regulatory reporting service), you add a subscriber — zero changes to the payment service or any other subscriber. This is impossible with direct API calls.</div>
+      </div>
+      <div class="tp" id="p1">
+        <div class="prose"><strong>AWS SNS + SQS fan-out pattern:</strong><br><br>SNS topic is the pub/sub bus. Each subscriber has its own SQS queue subscribed to the SNS topic. SNS delivers a copy to each SQS queue. Each consumer processes from its own queue at its own rate.<br><br>Why SQS per consumer? Without a queue, if the subscriber service is down during the SNS delivery, the message is lost. An SQS queue buffers messages — the consumer catches up when it recovers. This makes the fan-out durable.<br><br><strong>Pattern:</strong> Producer → SNS → [SQS-email, SQS-analytics, SQS-accounting] → independent consumers. Each SQS queue has its own DLQ.</div>
+      </div>
+      <div class="tp" id="p2">
+        <div class="prose"><strong>Kafka fan-out via consumer groups:</strong><br><br>Each consumer group is an independent subscriber to the topic. Group A reads from offset 0 at its own pace. Group B reads from offset 0 at its own pace. The same event is consumed by both groups — independently, without any broker-side duplication.<br><br>Add a new consumer group = new subscriber. Zero changes to producer or other groups.<br><br><strong>Advantage over SNS+SQS:</strong> With Kafka, you can add a new consumer group after the fact and replay historical events from the beginning of the retention window. With SNS+SQS, you only receive events from the moment you subscribe. Kafka's log is a durable, replayable event history — pub/sub with time travel.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Notification system — pub/sub design</div>
+    <div class="ab">Notification system (WhatsApp / Razorpay style):
+
+  Event sources (producers):
+    Payment Service → publishes to Kafka topic "notifications"
+    Order Service   → publishes to Kafka topic "notifications"
+
+  Kafka topic "notifications":
+    Event: {type: "payment_succeeded", user_id: 42, amount: 1000}
+
+  Consumer Group "email-notifications":
+    Reads from "notifications" → filters type=* → sends email via SES
+
+  Consumer Group "push-notifications":
+    Reads from "notifications" → filters type=* → sends via FCM/APNS
+
+  Consumer Group "sms-notifications":
+    Reads from "notifications" → filters type=payment_* → sends SMS
+
+  Consumer Group "in-app-notifications":
+    Reads from "notifications" → writes to Redis pub/sub → WebSocket push
+    Redis pub/sub: server-side pub, WebSocket connections subscribe
+    → real-time in-app notification
+
+  Fan-out numbers:
+    100K payment events/day → 4 consumer groups → 400K deliveries
+    Zero producer changes to add a 5th notification channel</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Pub/Sub vs point-to-point</div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ Pub/Sub</div><p>Producer-consumer decoupling. Fan-out to N consumers. Easy to add new consumers. Natural for event-driven systems.</p></div><div class="tos lose"><div class="lb">✗ Pub/Sub</div><p>No guarantee of consumer order. Harder to track "did all consumers process this?" Debugging distributed event flows is complex.</p></div></div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ Point-to-point</div><p>Exactly one consumer processes each message. Simple reasoning about message ownership. Easy ACK/NACK per message.</p></div><div class="tos lose"><div class="lb">✗ Point-to-point</div><p>Tight coupling between producer and specific consumer. Adding consumer = producer change. No fan-out without message duplication.</p></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Pub/Sub is your default for cross-service communication.</strong> "Service A should publish an event. Services B, C, D subscribe. A never calls B directly — that's tight coupling."</li>
+      <li><strong>SNS+SQS fan-out on AWS.</strong> Know this pattern cold: SNS → multiple SQS queues → one consumer per queue. Each SQS acts as a durable buffer.</li>
+      <li><strong>Kafka for replayable fan-out.</strong> "Kafka lets me add a new consumer group and replay historical events — something SNS fan-out can't do."</li>
+      <li><strong>Probe: "Design a notification system."</strong> → Single Kafka topic "notifications". One consumer group per channel (email, push, SMS, in-app). Filter by notification type within each consumer. Scale each consumer group independently based on channel volume.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(0)">← Queues vs streams</a><a onclick="show(3)">← Event-driven arch</a><a onclick="sendPrompt('Continue with Block 6: System design problems — URL shortener, Twitter feed, WhatsApp, Uber, rate limiting, notification system')">Continue to Block 6 ↗</a></div></div>
+  <button class="nb" onclick="sendPrompt('Continue with Block 6: Full system design problems — URL shortener, Twitter/X feed, WhatsApp messaging, Uber ride matching, rate limiting, notification system, and observability')">Continue to Block 6 ↗</button>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(i){
+  document.querySelectorAll('.topic').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.querySelectorAll('.ni').forEach((n,j)=>n.classList.toggle('active',j===i));
+  document.querySelector('.content').scrollTop=0;
+}
+function stab(el,gid,pid){
+  document.getElementById(gid).querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pid).classList.add('active');
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function drawPartitions(){
+  const pc=+document.getElementById('p-count').value;
+  const pr=+document.getElementById('p-records').value;
+  document.getElementById('p-count-out').textContent=pc;
+  document.getElementById('p-records-out').textContent=pr;
+  let html='';
+  for(let p=0;p<pc;p++){
+    const headIdx=Math.floor(Math.random()*(pr-1));
+    html+=`<div class="partition-row"><span class="p-label">Partition ${p}</span><div class="p-slots">`;
+    for(let r=0;r<pr;r++){
+      if(r===headIdx) html+=`<div class="p-slot head">${r}</div>`;
+      else if(r<headIdx) html+=`<div class="p-slot filled">${r}</div>`;
+      else html+=`<div class="p-slot">${r}</div>`;
+    }
+    html+=`</div></div>`;
+  }
+  document.getElementById('partition-vis').innerHTML=html;
+  document.getElementById('partition-caption').textContent=`${pc} partition${pc>1?'s':''}, ${pr} offsets each. Green = consumer head (current read position). Blue = committed offsets.`;
+}
+drawPartitions();
+
+function simGuarantee(){
+  const crashP=+document.getElementById('crash-p').value/100;
+  const n=+document.getElementById('msg-n').value;
+  document.getElementById('crash-p-out').textContent=Math.round(crashP*100)+'%';
+  document.getElementById('msg-n-out').textContent=n;
+  let amo=0,alo=0;
+  for(let i=0;i<n;i++){
+    if(Math.random()<crashP) amo++;
+    if(Math.random()<crashP) alo++;
+  }
+  document.getElementById('g-amo').textContent=amo;
+  document.getElementById('g-alo').textContent=alo;
+}
+simGuarantee();
+</script>

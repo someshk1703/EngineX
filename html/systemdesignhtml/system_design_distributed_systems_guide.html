@@ -1,0 +1,625 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:800px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:210px;min-width:210px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary)}
+.sh{padding:14px 16px 10px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ni{padding:9px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;line-height:1.3}
+.ni:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ni.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.ni .num{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:1px}
+.content{flex:1;overflow-y:auto;padding:24px 28px}
+.topic{display:none}.topic.active{display:block}
+.tt{font-size:19px;font-weight:500;margin-bottom:3px}
+.ts2{font-size:13px;color:var(--color-text-tertiary);margin-bottom:20px}
+.sec{margin-bottom:20px}
+.sl{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kvc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.kvl{font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px;font-weight:500}
+.kvv{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.to{display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.to:last-child{border-bottom:none}
+.tos{font-size:12px;flex:1}
+.tos .lb{font-weight:500;margin-bottom:2px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.gain .lb{color:#3B6D11}.lose .lb{color:#A32D2D}
+.tos p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.fi{padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12.5px;line-height:1.6;color:var(--color-text-secondary)}
+.fi:last-child{border-bottom:none}
+.fi strong{color:var(--color-text-primary);font-weight:500}
+.ib{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px}
+.ib ol{padding-left:16px;font-size:12.5px;line-height:1.9;color:var(--color-text-secondary)}
+.ib li strong{color:var(--color-text-primary);font-weight:500}
+.cx{display:flex;flex-wrap:wrap;gap:6px}
+.cx a{font-size:11.5px;padding:3px 10px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.cx a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ab{font-family:var(--font-mono);font-size:11.5px;line-height:1.6;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px}
+.sn{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.sd{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.4}
+.tr{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:14px}
+.tab{font-size:12px;padding:7px 12px;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:all .15s}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tp{display:none}.tp.active{display:block}
+.nb{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:7px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:20px}
+.nb:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.ring-canvas{width:100%;max-width:340px;margin:0 auto;display:block}
+.step-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12.5px}
+.step-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.dot-ok{background:#E1F5EE;color:#0F6E56;border:0.5px solid #5DCAA5}
+.dot-warn{background:#FAEEDA;color:#854F0B;border:0.5px solid #EF9F27}
+.dot-err{background:#FCEBEB;color:#A32D2D;border:0.5px solid #F09595}
+.dot-gray{background:var(--color-background-secondary);color:var(--color-text-tertiary);border:0.5px solid var(--color-border-tertiary)}
+.vc-grid{display:grid;grid-template-columns:100px 1fr 1fr;gap:0;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;font-size:12px}
+.vc-hdr{background:var(--color-background-secondary);padding:7px 10px;font-weight:500;color:var(--color-text-primary);font-size:11px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.vc-t{padding:7px 10px;color:var(--color-text-tertiary);font-weight:500;border-right:0.5px solid var(--color-border-tertiary);border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.vc-c{padding:7px 10px;border-right:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.vc-c:last-child{border-right:none}
+.vc-last .vc-t,.vc-last .vc-c{border-bottom:none}
+.saga-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:6px}
+.saga-box .title{font-size:12.5px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.saga-box .comp{font-size:11.5px;color:var(--color-text-danger)}
+.saga-box .body{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+</style>
+
+<h2 class="sr-only">System Design Distributed Systems — Block 4 covering consistent hashing, distributed ID generation, distributed locking, Raft consensus, leader election, gossip protocol, vector clocks, two-phase commit, and Saga pattern.</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sh">Block 4 — Distributed Systems</div>
+  <div class="ni active" onclick="show(0)"><span class="num">01</span>Consistent hashing</div>
+  <div class="ni" onclick="show(1)"><span class="num">02</span>Distributed ID generation</div>
+  <div class="ni" onclick="show(2)"><span class="num">03</span>Distributed locking</div>
+  <div class="ni" onclick="show(3)"><span class="num">04</span>Consensus — Raft &amp; Paxos</div>
+  <div class="ni" onclick="show(4)"><span class="num">05</span>Leader election</div>
+  <div class="ni" onclick="show(5)"><span class="num">06</span>Gossip protocol</div>
+  <div class="ni" onclick="show(6)"><span class="num">07</span>Vector clocks</div>
+  <div class="ni" onclick="show(7)"><span class="num">08</span>Two-phase commit</div>
+  <div class="ni" onclick="show(8)"><span class="num">09</span>Saga pattern</div>
+</nav>
+
+<main class="content">
+
+<!-- ══ T0: Consistent Hashing ══ -->
+<div class="topic active" id="t0">
+  <div class="tt">Consistent hashing</div>
+  <div class="ts2">Virtual nodes · token ring · adding/removing nodes</div>
+  <div class="sec">
+    <div class="sl">The problem</div>
+    <div class="prose">Naive modulo sharding: <code>node = hash(key) % N</code>. Add one node: N becomes N+1. Almost every key remaps to a different node — massive data migration. At 1M keys, ~99.9% of keys move. Consistent hashing reduces this to ~1/N keys moving per node change.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">How it works — the ring</div>
+    <div class="prose">Hash space [0, 2³²) wraps into a ring. Both nodes and keys are hashed onto this ring. A key routes to the first node clockwise from its position. Adding a node only steals keys from its immediate clockwise neighbour. Removing a node transfers its keys to the next clockwise node.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interactive ring — add/remove nodes</div>
+    <canvas class="ring-canvas" id="ring" width="340" height="340"></canvas>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+      <button class="nb" style="margin-top:0" onclick="addNode()">Add node</button>
+      <button class="nb" style="margin-top:0" onclick="removeNode()">Remove node</button>
+      <button class="nb" style="margin-top:0" onclick="resetRing()">Reset</button>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--color-text-tertiary);text-align:center" id="ring-info">3 nodes, 12 keys. Click add/remove to see remapping.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Virtual nodes (vnodes)</div>
+    <div class="prose"><strong>Problem with basic ring:</strong> 3 physical nodes placed by hash accident → uneven distribution. One node gets 60% of the ring, another gets 10%.<br><br><strong>Fix — vnodes:</strong> Each physical node is represented by K virtual positions on the ring (K = 100–200 typical). Node A appears at positions A1, A2, … A150 spread around the ring. Keys are spread evenly across all virtual positions. Physical nodes end up with ~equal load regardless of hash placement.<br><br>Cassandra uses 256 vnodes per node by default. Redis Cluster uses exactly 16,384 fixed hash slots — a form of consistent hashing with discrete slots.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Architecture note</div>
+    <div class="ab">Key routing with 4 nodes (simplified, no vnodes):
+
+  hash("user:42") = 2,147,483,648  →  falls between Node B and Node C
+                                    →  routes to Node C (first clockwise)
+
+  Add Node E at position 2,000,000,000:
+  Keys between Node B and Node E → move to Node E
+  Keys between Node E and Node C → stay on Node C
+  Only ~25% of keys remapped (1 node / 4 nodes)
+
+  With 256 vnodes per node:
+  Keys remapped per add/remove ≈ 1/(N×vnodes) per vnode position
+  Distribution variance < 5% vs naive placement > 40%</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Trade-offs</div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ gain</div><p>O(1/N) remapping on topology change. Scales smoothly. Handles heterogeneous node capacity via weighted vnodes.</p></div><div class="tos lose"><div class="lb">✗ cost</div><p>Slightly uneven distribution without vnodes. Client must be ring-aware (or use a proxy). Hotspot keys still hit the same node regardless of ring.</p></div></div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Draw the ring</strong> — literally. Nodes as dots on a circle, keys hashed between them. Interviewers want to see you can sketch this.</li>
+      <li><strong>Nail the "why vnodes"</strong> answer: even distribution + hot node avoidance + graceful rebalancing when a node joins.</li>
+      <li><strong>Redis Cluster vs Cassandra:</strong> Redis uses 16,384 fixed slots (simpler mental model, less flexible). Cassandra uses 256 vnodes per node (more adaptive).</li>
+      <li><strong>Probe: "A node goes down. What happens?"</strong> → Its vnodes' key ranges are now served by the next clockwise node. If replication factor = 3, one of the two remaining replicas takes over without any key migration needed.</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="sendPrompt('Explain Redis Cluster hash slots vs consistent hashing')">Redis Cluster</a><a onclick="sendPrompt('Explain Cassandra vnodes and replication factor')">Cassandra vnodes</a><a onclick="show(5)">Gossip protocol →</a></div></div>
+  <button class="nb" onclick="show(1)">Next: Distributed ID generation <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T1: Distributed ID ══ -->
+<div class="topic" id="t1">
+  <div class="tt">Distributed ID generation</div>
+  <div class="ts2">UUID problems · Snowflake · Instagram · ticket server</div>
+  <div class="sec">
+    <div class="sl">Why sequential auto-increment fails at scale</div>
+    <div class="prose">A single Postgres SERIAL column is the simplest ID. Works fine on one node. At scale: you cannot insert into multiple DB nodes simultaneously and guarantee uniqueness across them. A distributed ID generator must produce IDs that are unique across all nodes, ideally roughly time-ordered, and generated without coordination.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">The four approaches</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'id','i0')">UUID v4</div>
+      <div class="tab" onclick="stab(this,'id','i1')">Snowflake</div>
+      <div class="tab" onclick="stab(this,'id','i2')">Instagram</div>
+      <div class="tab" onclick="stab(this,'id','i3')">Ticket server</div>
+    </div>
+    <div id="id">
+      <div class="tp active" id="i0">
+        <div class="prose"><strong>UUID v4:</strong> 128-bit random. Zero coordination. Works everywhere.<br><br><strong>Problems:</strong> Random UUIDs destroy B-tree index locality. New UUIDs insert at random positions in the index, causing page splits and cache misses. At 10M writes/day, this degrades write throughput by 30–50% vs sequential IDs. Also: 36-character string is 2–3× the storage of an 8-byte bigint. Cannot sort by creation time. Not human-readable in logs.<br><br><strong>UUID v7</strong> (2022 RFC): time-ordered UUID. First 48 bits = millisecond timestamp. Preserves index locality. Much better than v4 for DBs. Still 128 bits.</div>
+      </div>
+      <div class="tp" id="i1">
+        <div class="prose"><strong>Twitter Snowflake — 64-bit integer:</strong><br><br>
+<code>| 41 bits timestamp | 10 bits machine_id | 12 bits sequence |</code><br><br>
+<strong>41 bits timestamp:</strong> Milliseconds since a custom epoch (e.g., 2020-01-01). Gives ~69 years before rollover. IDs are roughly time-ordered by default.<br><br>
+<strong>10 bits machine_id:</strong> Supports 1,024 nodes generating simultaneously without coordination. Each node knows its own ID at startup (via config or ZooKeeper).<br><br>
+<strong>12 bits sequence:</strong> Counter per millisecond per node. Resets to 0 each millisecond. Supports 4,096 IDs/ms/node = 4M IDs/sec/node.<br><br>
+<strong>Total: 64-bit integer.</strong> Fits in a BIGINT. Index-friendly (monotonically increasing per node). No coordination needed after node startup. Used by: Twitter, Discord, Instagram (variant).</div>
+      </div>
+      <div class="tp" id="i2">
+        <div class="prose"><strong>Instagram approach:</strong> Generate IDs in Postgres itself using a custom function — avoids a separate ID service.<br><br>
+Schema: shard ID embedded in the ID itself. Sharding-aware. IDs are 64-bit: timestamp (41 bits) + shard_id (13 bits) + sequence (10 bits).<br><br>
+The PL/pgSQL function generates IDs atomically within Postgres transactions. Works without a separate service. Tightly coupled to Postgres but elegant — no extra infra.<br><br>
+<strong>Key insight:</strong> If you're already using Postgres and don't need cross-DB ID uniqueness, generating Snowflake-style IDs in Postgres functions is the simplest approach.</div>
+      </div>
+      <div class="tp" id="i3">
+        <div class="prose"><strong>Ticket server (Flickr approach):</strong> A dedicated MySQL database with a single-row table. Each ID request runs <code>REPLACE INTO Tickets64 (stub) VALUES ('a'); SELECT LAST_INSERT_ID();</code>. MySQL auto-increment provides a globally unique sequential integer.<br><br>
+<strong>Pros:</strong> Truly sequential integers. Simple to understand. Works across any number of app nodes.<br><br>
+<strong>Cons:</strong> The ticket server is a SPOF. Mitigate with two servers (even/odd IDs), but failover adds complexity. Network round-trip per ID request adds latency. Throughput limited by the ticket server's write capacity (~50K IDs/sec).<br><br>
+<strong>Use when:</strong> You need human-friendly sequential IDs and can tolerate the SPOF risk (or run two servers). Simpler than Snowflake for lower-scale systems.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sl">Snowflake anatomy</div>
+    <div class="ab">64-bit Snowflake ID: 1753024783001600001
+
+  Bit layout:
+  [0][ 41 bits: ms timestamp ][ 10 bits: machine ][ 12 bits: seq ]
+   ^                                                               ^
+  sign bit (always 0)                              rightmost bit
+
+  Decode example:
+  timestamp_ms = (id >> 22) + custom_epoch_ms    → "2024-03-15 10:23:01.234"
+  machine_id   = (id >> 12) & 0b1111111111        → node 7
+  sequence     = id & 0b111111111111               → counter 1
+
+  Properties:
+  - Monotonically increasing within a single node
+  - Time-ordered globally (within a few milliseconds of drift)
+  - 4,096 IDs per millisecond per node, 1,024 nodes
+  - Total capacity: 4.2 billion IDs per second globally</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Never suggest UUID v4 for high-write DB IDs</strong> without acknowledging the index fragmentation cost. Suggest UUID v7 or Snowflake.</li>
+      <li><strong>Snowflake is the default answer.</strong> Know the bit layout by heart: 41 timestamp + 10 machine + 12 sequence = 64-bit BIGINT.</li>
+      <li><strong>Probe: "Clock goes backward on a node."</strong> → Node must either wait until the clock catches up, or refuse to generate IDs during the anomaly. Twitter's implementation tracks last-used timestamp and panics if it goes backward. NTP should be tightly configured to avoid large adjustments.</li>
+      <li><strong>Probe: "We have 2000 nodes."</strong> → 10 bits = 1024 nodes max. Solution: increase machine_id bits (steal from sequence or timestamp), or use a tiered ID service where 10 bits = datacenter_id + machine_id within datacenter.</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="sendPrompt('Explain database sharding with Snowflake IDs')">Sharding + IDs</a><a onclick="sendPrompt('Explain UUID v7 vs Snowflake ID for database primary keys')">UUID v7</a></div></div>
+  <button class="nb" onclick="show(2)">Next: Distributed locking <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T2: Distributed Locking ══ -->
+<div class="topic" id="t2">
+  <div class="tt">Distributed locking</div>
+  <div class="ts2">Redis SETNX · Redlock · ZooKeeper · lease-based locks</div>
+  <div class="sec">
+    <div class="sl">Why distributed locks are hard</div>
+    <div class="prose">In-process locks (Java <code>synchronized</code>, <code>ReentrantLock</code>) work within one JVM. In distributed systems, the "lock" must be visible to all nodes. The challenge: the system holding the lock can crash, partition from the network, or experience GC pause — leaving the lock held forever.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Three approaches</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'lk','l0')">Redis SETNX</div>
+      <div class="tab" onclick="stab(this,'lk','l1')">Redlock</div>
+      <div class="tab" onclick="stab(this,'lk','l2')">ZooKeeper</div>
+    </div>
+    <div id="lk">
+      <div class="tp active" id="l0">
+        <div class="prose"><strong>Redis SETNX (single-node):</strong><br><br><code>SET lock:resource_id {uuid} NX EX 30</code><br><br><code>NX</code> = only set if Not eXists. <code>EX 30</code> = expire in 30 seconds (TTL prevents infinite lock hold on crash). Returns OK if lock acquired, nil if already held.<br><br><strong>Unlock (must be atomic — use Lua):</strong><br><code>if redis.call("get",KEYS[1]) == ARGV[1] then return redis.call("del",KEYS[1]) else return 0 end</code><br><br>The UUID check is critical: prevents Thread B from deleting Thread A's lock. Without it: A acquires lock, A's lock expires, B acquires lock, A finishes its work and calls DEL — deletes B's lock. UUID ensures only the lock owner can delete it.<br><br><strong>Weakness:</strong> Single Redis node is a SPOF. If Redis crashes after the lock is acquired but before it expires, the lock is gone but the resource may be mid-operation.</div>
+      </div>
+      <div class="tp" id="l1">
+        <div class="prose"><strong>Redlock (multi-node Redis):</strong> Proposed by Antirez. Uses N independent Redis nodes (N=5 recommended).<br><br>Acquire: try to acquire the lock on all N nodes with a short timeout. Lock is considered held if acquired on a majority (⌈N/2⌉ + 1 = 3 of 5) within the lock validity time.<br><br><strong>The controversy:</strong> Martin Kleppmann proved Redlock is unsafe in the presence of process pauses (GC, OS scheduling): Thread A acquires lock, pauses for 10s (GC), lock expires, Thread B acquires same lock, Thread A resumes thinking it still holds the lock → both A and B are in the critical section simultaneously.<br><br><strong>Fencing tokens fix this:</strong> Lock server returns a monotonically increasing token with each grant. Storage system rejects operations with a stale token. Even if A resumes with an expired lock, its token (42) is rejected in favour of B's fresher token (43).<br><br><strong>Use Redlock for</strong>: advisory locks where brief double-execution is acceptable (job deduplication, cache warming). Do NOT use for safety-critical exclusive access to shared resources without fencing tokens.</div>
+      </div>
+      <div class="tp" id="l2">
+        <div class="prose"><strong>ZooKeeper / etcd (CP consensus-based):</strong> The strongest distributed lock. Uses linearizable writes — a write to ZooKeeper is guaranteed to be seen by all nodes in order.<br><br><strong>ZooKeeper ephemeral nodes:</strong> Create an ephemeral sequential znode: <code>/locks/resource-0000000001</code>. The client with the lowest sequence number holds the lock. Others watch the node just below theirs. When that node is deleted (owner released or crashed — ephemeral nodes auto-delete on session loss), the next client is notified and acquires the lock.<br><br>ZooKeeper session timeout (typically 3–10s) serves as the lease. If the client's session dies, its ephemeral node is deleted, releasing the lock automatically.<br><br><strong>Pros:</strong> Truly linearizable. No split-brain. Session expiry is the TTL. No fencing token needed (ZooKeeper's Zxid serves as a monotonic ordering).<br><br><strong>Cons:</strong> Latency higher than Redis (consensus round-trips). Operational complexity. Not appropriate for high-frequency short locks.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sl">When to use what</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Redis SETNX</div><div class="kvv">Low-stakes advisory locks. Job deduplication ("only one worker processes job X"). Cache stampede prevention. Acceptable: occasional double-execution if Redis restarts.</div></div>
+      <div class="kvc"><div class="kvl">Redlock + fencing</div><div class="kvv">Medium-stakes. Multiple Redis nodes for HA. Must pair with fencing tokens for correctness. Seat reservation, rate limiting, distributed counters.</div></div>
+      <div class="kvc"><div class="kvl">ZooKeeper / etcd</div><div class="kvv">High-stakes leadership election, shard ownership, configuration management. Where correctness beats performance. Used by Kafka, HBase, Hadoop for coordination.</div></div>
+      <div class="kvc"><div class="kvl">Database row lock</div><div class="kvv">When your data is already in Postgres: <code>SELECT FOR UPDATE</code> is a perfectly good distributed lock if all nodes share the same DB. Simplest approach, often overlooked.</div></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Start with Redis SETNX</strong> — show you know the NX+EX pattern and the Lua unlock script.</li>
+      <li><strong>Voluntarily mention the fencing token problem.</strong> "Redlock alone isn't safe under process pauses. I'd pair it with fencing tokens where the storage layer rejects stale token operations."</li>
+      <li><strong>ZooKeeper for leader election</strong> — show you know ephemeral nodes and the watch mechanism.</li>
+      <li><strong>Probe: "What happens if the lock holder crashes?"</strong> → TTL/EX ensures the lock expires automatically. ZooKeeper session expiry deletes ephemeral nodes. The lock self-heals without manual intervention.</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(4)">Leader election →</a><a onclick="show(3)">Consensus (Raft) →</a><a onclick="sendPrompt('Explain fencing tokens for distributed lock safety')">Fencing tokens</a></div></div>
+  <button class="nb" onclick="show(3)">Next: Consensus — Raft &amp; Paxos <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T3: Raft/Paxos ══ -->
+<div class="topic" id="t3">
+  <div class="tt">Consensus — Raft &amp; Paxos</div>
+  <div class="ts2">Leader election · log replication · Paxos intuition</div>
+  <div class="sec">
+    <div class="sl">What consensus solves</div>
+    <div class="prose">Multiple nodes must agree on a single value (which node is the leader, what the next log entry is, what the committed state is) even when some nodes fail or messages are delayed. Without consensus, you get split-brain: two nodes both believe they are leader and accept conflicting writes.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Raft — designed to be understandable</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'rf','r0')">Leader election</div>
+      <div class="tab" onclick="stab(this,'rf','r1')">Log replication</div>
+      <div class="tab" onclick="stab(this,'rf','r2')">Paxos intuition</div>
+    </div>
+    <div id="rf">
+      <div class="tp active" id="r0">
+        <div class="prose"><strong>Terms and roles:</strong> Time is divided into terms (monotonically increasing integers). Each term begins with an election. Nodes are in one of three states: Follower, Candidate, Leader.<br><br><strong>Election trigger:</strong> Followers expect heartbeats from the leader. If no heartbeat arrives within the election timeout (150–300ms random), the follower becomes a Candidate and starts a new term.<br><br><strong>Election process:</strong> Candidate increments its term, votes for itself, sends RequestVote RPCs to all other nodes. Each node grants at most one vote per term (first come, first served). Candidate wins if it gets votes from a majority (⌈N/2⌉ + 1). Becomes Leader, starts sending heartbeats immediately.<br><br><strong>Randomized timeouts prevent ties:</strong> If two candidates start simultaneously (split vote), both time out again, but with different random delays — one starts the next election before the other, wins cleanly.<br><br><strong>Safety invariant:</strong> A node only votes for a candidate whose log is at least as up-to-date as its own. Ensures the leader always has all committed entries.</div>
+      </div>
+      <div class="tp" id="r1">
+        <div class="prose"><strong>Client writes go to the leader only.</strong> Leader appends the entry to its log (uncommitted), then sends AppendEntries RPCs to all followers in parallel.<br><br><strong>Commitment:</strong> Entry is committed once a majority of nodes have written it to their logs. Leader then applies to its state machine, responds to client, and notifies followers to commit on next AppendEntries.<br><br><strong>Log matching guarantee:</strong> If two logs have an entry with the same index and term, all preceding entries are identical. This allows Raft to guarantee consistency during leader changes.<br><br><strong>Leader crash during replication:</strong> New leader is elected. On first AppendEntries to each follower, new leader sends its log and checks consistency. Followers whose logs diverge are overwritten to match the new leader. Committed entries are never overwritten — only uncommitted ones that weren't on a majority of nodes.<br><br><strong>Read path:</strong> Leader must confirm it's still leader before serving reads (another leader may have been elected). Can use lease-based reads (within election timeout, leader is guaranteed to still be the only leader) for lower latency.</div>
+      </div>
+      <div class="tp" id="r2">
+        <div class="prose"><strong>Paxos (intuition):</strong> The original consensus algorithm by Leslie Lamport. Raft was designed specifically because Paxos is notoriously hard to understand and implement correctly.<br><br><strong>Two phases:</strong><br>Phase 1 (Prepare): Proposer sends Prepare(n) to a quorum of acceptors. Acceptors respond with a promise not to accept any proposal with a lower number, and return the highest-numbered proposal they've already accepted (if any).<br><br>Phase 2 (Accept): If proposer receives promises from a majority, it sends Accept(n, value). Acceptors accept if they haven't promised a higher number. When a majority accepts, the value is chosen.<br><br><strong>Why Paxos is hard:</strong> The basic algorithm only solves single-value consensus. Multi-Paxos (replicated log) requires significant additional protocol design. Leader lease, read safety, membership changes — all require extensions that are underspecified in Lamport's original paper.<br><br><strong>Interview reality:</strong> Know Paxos at the phase level. Understand that Raft is essentially "Paxos made explicit" — same guarantees, clearer specification. etcd, CockroachDB, and TiKV use Raft. Google Chubby, Spanner use Paxos variants.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sl">Architecture — Raft cluster write</div>
+    <div class="ab">5-node Raft cluster (leader = Node 1):
+
+  Client → write "x=5" → Node 1 (Leader)
+  
+  Node 1: appends to log[idx=42, term=3, value="x=5"] (uncommitted)
+  Node 1 → AppendEntries(idx=42, term=3, "x=5") → Node 2, 3, 4, 5 (parallel)
+  
+  Node 2 ack → Node 1  ✓
+  Node 3 ack → Node 1  ✓ ← majority (3/5), COMMIT
+  Node 4 (slow)...
+  Node 5 (partitioned)...
+
+  Node 1: commit log[42], apply to state machine, respond to client "OK"
+  Next AppendEntries carries commit notification → followers 2,3,4 apply
+  Node 5 resync on reconnect: leader replays log entries since last known index</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Know Raft, mention Paxos.</strong> "Raft is the practical implementation used by etcd and CockroachDB. Paxos is the theoretical foundation — same guarantees but notoriously difficult to implement correctly."</li>
+      <li><strong>Majority quorum = (N/2)+1.</strong> For 3 nodes, 2 votes needed. For 5 nodes, 3 votes. Always odd number of nodes to avoid tie.</li>
+      <li><strong>Probe: "Can a partitioned minority elect a leader?"</strong> → No. It can't get a majority of votes. The partition with the majority elects a new leader and continues. The minority partition is unavailable (CP).</li>
+      <li><strong>Probe: "How does Raft handle a network partition that heals?"</strong> → Old leader that was in the minority discovers a higher term number when it reconnects → steps down, becomes follower, syncs its log with the new leader, discarding uncommitted entries it made alone.</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(4)">Leader election →</a><a onclick="show(2)">← Distributed locking</a><a onclick="sendPrompt('Explain etcd and its use in Kubernetes')">etcd in Kubernetes</a></div></div>
+  <button class="nb" onclick="show(4)">Next: Leader election <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T4: Leader Election ══ -->
+<div class="topic" id="t4">
+  <div class="tt">Leader election</div>
+  <div class="ts2">Why needed · bully algorithm · Raft election</div>
+  <div class="sec">
+    <div class="sl">Why leader election exists</div>
+    <div class="prose">Many distributed systems require exactly one node to act as coordinator: the Kafka partition leader accepts all writes, the database primary handles writes, the Elasticsearch master manages cluster state. Without a clear leader: any node could accept writes, creating split-brain. Leader election is the mechanism for nodes to agree on which single node is in charge, and to replace it when it fails — automatically, without human intervention.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Bully algorithm</div>
+    <div class="prose">Simple algorithm. Each node has a unique numeric ID. The node with the highest ID becomes the leader.<br><br><strong>Election trigger:</strong> Node P notices the leader is down (missed heartbeats). P sends an Election message to all nodes with a higher ID.<br><br>If any higher-ID node responds (OK), it takes over the election. If no higher-ID node responds (they're all down), P declares itself leader and sends Coordinator messages to all lower-ID nodes.<br><br><strong>Problem:</strong> The node with the highest ID is always elected, even if it's actually the worst choice (low bandwidth, far from clients). Also: O(N²) messages in the worst case. Not used in modern production systems but appears in textbooks and older systems.<br><br><strong>Modern replacement:</strong> Raft. Randomized election timeouts, log-based voting (most up-to-date node wins), O(N) message complexity.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Real-world leader election</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Kafka</div><div class="kvv">KRaft (Kafka 3.x): Raft-based controller election. Previously used ZooKeeper ephemeral nodes. Controller elected by Raft quorum manages partition leader assignments.</div></div>
+      <div class="kvc"><div class="kvl">Elasticsearch</div><div class="kvv">Master-eligible nodes hold elections using a bully-like algorithm with quorum. Master manages cluster state (index creation, shard allocation). Split-brain prevention via minimum_master_nodes = (N/2)+1.</div></div>
+      <div class="kvc"><div class="kvl">Kubernetes</div><div class="kvv">etcd (Raft) stores all cluster state. API server is stateless — any instance can serve. Controller manager uses leader election via etcd lease to ensure only one controller runs at a time.</div></div>
+      <div class="kvc"><div class="kvl">Postgres</div><div class="kvv">Patroni uses etcd/Consul/ZooKeeper for leader election. Winning node becomes the Postgres primary. Others become standbys. Automatic failover when primary's lease expires.</div></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sl">Lease-based election</div>
+    <div class="prose"><strong>Leader lease:</strong> The elected leader holds a time-bounded lease (e.g., 10-second renewable lease in etcd). While the lease is valid, the leader is authoritative. To remain leader, it must renew the lease before expiry.<br><br>If the leader crashes: lease expires after timeout. Next candidate acquires the lease via etcd compare-and-swap. New leader takes over. Maximum unavailability = lease TTL (~10s).<br><br>Lease TTL is the key tuning parameter: short TTL = faster failover but higher risk of spurious leader changes under network jitter. Long TTL = slower failover but more stable.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Know Raft election</strong> (covered in Topic 4). Bully algorithm is trivia — know it exists, know Raft replaced it.</li>
+      <li><strong>Lease + etcd is the practical answer</strong> for "how would you implement leader election?" in a system design interview.</li>
+      <li><strong>Probe: "Two nodes both think they are the leader."</strong> → Split-brain. Prevention: fencing tokens (storage layer rejects writes from old leader), etcd lease expiry (old leader can't renew → stops serving), STONITH (Shoot The Other Node In The Head — hardware fencing in high-stakes clusters).</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(3)">← Raft consensus</a><a onclick="show(2)">← Distributed locking</a><a onclick="sendPrompt('Explain Kafka KRaft mode and its advantages over ZooKeeper')">Kafka KRaft</a></div></div>
+  <button class="nb" onclick="show(5)">Next: Gossip protocol <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T5: Gossip ══ -->
+<div class="topic" id="t5">
+  <div class="tt">Gossip protocol</div>
+  <div class="ts2">Epidemic spread · eventual consistency · Cassandra's use</div>
+  <div class="sec">
+    <div class="sl">The core idea</div>
+    <div class="prose">Gossip protocols spread information through a cluster the way a rumour spreads through a network of people: each node periodically picks K random peers and exchanges state. Every node eventually learns everything, without any central coordinator.<br><br><strong>Key properties:</strong> Decentralized (no single point of failure), eventually consistent (all nodes converge on the same state), robust to node failures (gossip routes around failures), scalable (O(log N) rounds to reach all N nodes).</div>
+  </div>
+  <div class="sec">
+    <div class="sl">How it works</div>
+    <div class="prose"><strong>Each node maintains a membership list:</strong> For every known node, it stores the node's address, a heartbeat counter, and a timestamp of when it last received that heartbeat.<br><br><strong>Gossip round (every 1 second):</strong> Node A picks 3 random nodes from its membership list. Sends its entire membership list to each. Recipients merge the received list with their own — keeping the entry with the higher heartbeat counter for each node.<br><br><strong>Failure detection:</strong> If Node B's heartbeat counter hasn't increased in T seconds (default ~5s in Cassandra), Node B is marked "suspect." After another timeout, it's marked "dead" and removed from the ring. This is eventually consistent — different nodes may mark B as dead at slightly different times.<br><br><strong>Convergence:</strong> With N nodes and fan-out K, gossip converges in O(log N / log K) rounds. For 1,000 nodes with K=3: ~6 rounds ≈ 6 seconds for full cluster knowledge.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Cassandra's gossip implementation</div>
+    <div class="prose"><strong>Gossip in Cassandra serves three purposes:</strong><br><br>1. <strong>Membership:</strong> Which nodes are in the cluster, which are alive, which are unreachable.<br>2. <strong>Token ownership:</strong> Which node owns which hash ring token ranges. This is how every node knows where to route any key without a central directory.<br>3. <strong>Schema:</strong> Gossip propagates schema changes (CREATE TABLE, etc.) to all nodes within a few seconds.<br><br>Cassandra uses <strong>Phi Accrual Failure Detector</strong> instead of a hard timeout — it computes a suspicion level (phi) based on the history of inter-arrival times of heartbeats. This adapts to varying network conditions rather than using a fixed timeout. Phi > 8 → node suspected. Phi > 12 → node marked down.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Trade-offs</div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ gain</div><p>No SPOF. Scales to thousands of nodes. Self-healing — gossip routes around failures automatically. No coordinator bottleneck.</p></div><div class="tos lose"><div class="lb">✗ cost</div><p>Eventual (not immediate) consistency. Some nodes may have stale membership briefly. Network bandwidth grows O(N) (each node sends N-entry list to K peers). False positives on slow networks.</p></div></div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Gossip = epidemic broadcast.</strong> "Like a rumour spreading: each node tells a few random peers, who tell a few more. Reaches everyone in O(log N) rounds."</li>
+      <li><strong>Cassandra uses gossip for membership + token ownership.</strong> "Every Cassandra node knows the entire ring topology without a central directory. Gossip keeps it eventually consistent."</li>
+      <li><strong>Probe: "How does Cassandra detect a dead node?"</strong> → Phi Accrual Failure Detector based on heartbeat inter-arrival statistics. When phi exceeds threshold, node is marked suspect, then down after further timeout.</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(0)">← Consistent hashing</a><a onclick="show(6)">Vector clocks →</a><a onclick="sendPrompt('Explain Cassandra architecture and replication')">Cassandra architecture</a></div></div>
+  <button class="nb" onclick="show(6)">Next: Vector clocks <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T6: Vector Clocks ══ -->
+<div class="topic" id="t6">
+  <div class="tt">Vector clocks &amp; conflict resolution</div>
+  <div class="ts2">Causality tracking · Dynamo-style conflict resolution</div>
+  <div class="sec">
+    <div class="sl">The problem — ordering events in distributed systems</div>
+    <div class="prose">In a single machine, time is total order — event A before event B is unambiguous. In distributed systems, clocks drift, messages arrive out of order, and there is no global "now." Two events on different nodes can't be reliably ordered by wall clock time alone. Vector clocks capture causal relationships without relying on synchronized clocks.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">How vector clocks work</div>
+    <div class="prose">Each node maintains a vector of counters, one per node in the system. Initially all zeros: <code>[A:0, B:0, C:0]</code>.<br><br><strong>Rules:</strong><br>1. Before any internal event, increment your own counter: A's clock becomes <code>[A:1, B:0, C:0]</code>.<br>2. Before sending a message, increment your own counter, then attach the full vector.<br>3. On receiving a message, merge: take the max of each position, then increment your own.<br><br><strong>Causality:</strong> Vector V1 "happened before" V2 if every element of V1 ≤ V2 and at least one element is strictly less. If neither V1 ≤ V2 nor V2 ≤ V1, the events are concurrent — no causal relationship.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Vector clock timeline</div>
+    <div class="vc-grid">
+      <div class="vc-hdr">Event</div><div class="vc-hdr">Node A clock</div><div class="vc-hdr">Node B clock</div>
+      <div class="vc-t">B0: B writes x=1</div><div class="vc-c"></div><div class="vc-c">[A:0, B:1]</div>
+      <div class="vc-t">A0: A writes x=2</div><div class="vc-c">[A:1, B:0]</div><div class="vc-c"></div>
+      <div class="vc-t">A sends to B</div><div class="vc-c">[A:2, B:0]</div><div class="vc-c">receives [A:2, B:0]<br>merges → [A:2, B:2]</div>
+      <div class="vc-t">Conflict?</div><div class="vc-c">[A:1, B:0]</div><div class="vc-c">[A:0, B:1] — concurrent! Neither happened-before the other. Both must be kept.</div>
+      <div class="vc-t vc-last" style="border-bottom:none">Resolution</div><div class="vc-c vc-last" colspan="2" style="border-bottom:none">Application decides: LWW (discard one), merge (shopping cart union), user prompt</div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sl">Dynamo-style conflict resolution</div>
+    <div class="prose"><strong>Amazon Dynamo</strong> stores multiple versions of a value when concurrent writes occur, using vector clocks to track them. On read, if only one version exists → return it. If multiple concurrent versions exist → return all to the application, which must reconcile.<br><br><strong>Shopping cart (Dynamo's own example):</strong> User A adds item X on device 1. Concurrently adds item Y on device 2. Network partition keeps them separate. On merge: both X and Y must be in the cart. Union is the correct merge. Silently dropping either (LWW) would lose an item — unacceptable.<br><br><strong>LWW (Last-Write-Wins):</strong> Cassandra's default. One write wins based on timestamp. Simple but lossy — the other concurrent write is permanently discarded. Acceptable for metrics, user profile updates. Unacceptable for shopping carts, inventory.<br><br><strong>CRDTs (Conflict-free Replicated Data Types):</strong> Data structures designed so all concurrent operations can be merged without conflicts. G-Counter (grow-only), PN-Counter, OR-Set. Riak, Redis (some types) support CRDTs. The merge is always correct — no application-level conflict resolution needed.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Vector clocks show causality, not wall-clock time.</strong> "If V1 → V2 (happened-before), we know V1 caused V2. If V1 || V2 (concurrent), we have a conflict."</li>
+      <li><strong>Know the Dynamo shopping cart example cold.</strong> It's the canonical illustration of why LWW is wrong and why merge semantics matter.</li>
+      <li><strong>Probe: "Your AP system has concurrent writes. How do you handle conflicts?"</strong> → Depends on data type. For user profile (last-write-wins is OK), for counters (use CRDT G-Counter), for sets (use OR-Set CRDT), for shopping cart (merge/union semantics).</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(5)">← Gossip</a><a onclick="sendPrompt('Explain CRDTs conflict-free replicated data types in depth')">CRDTs</a><a onclick="sendPrompt('Explain Amazon Dynamo architecture and eventual consistency')">Amazon Dynamo</a></div></div>
+  <button class="nb" onclick="show(7)">Next: Two-phase commit <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T7: 2PC ══ -->
+<div class="topic" id="t7">
+  <div class="tt">Two-phase commit (2PC)</div>
+  <div class="ts2">Distributed transactions · coordinator failure</div>
+  <div class="sec">
+    <div class="sl">What 2PC solves</div>
+    <div class="prose">A transaction spans multiple databases (or services). You need atomicity: either all commit or all roll back. With independent DBs, one might commit while another fails → inconsistent state. 2PC coordinates a distributed atomic commit using a central coordinator.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">The two phases</div>
+    <div class="ab">PHASE 1 — Prepare (Voting):
+  Coordinator → "Prepare to commit TX-99" → Participant A, B, C
+  
+  Participant A: write to WAL, acquire locks, reply "YES, prepared"
+  Participant B: write to WAL, acquire locks, reply "YES, prepared"
+  Participant C: detects conflict, reply "NO, abort"
+
+  All must vote YES to proceed. Any NO → abort.
+
+PHASE 2 — Commit (or Abort):
+  If all YES:
+    Coordinator → "COMMIT TX-99" → A, B, C
+    Participants commit, release locks, ack coordinator
+  
+  If any NO (or timeout):
+    Coordinator → "ABORT TX-99" → A, B, C
+    Participants rollback, release locks
+
+BLOCKING PROBLEM — coordinator crash after Phase 1:
+  Participants A, B are in "prepared" state (locks held, WAL written)
+  Coordinator is down
+  Participants CANNOT commit or abort unilaterally — they must wait
+  Locks are held indefinitely → other transactions blocked
+  This is the fundamental 2PC flaw: blocking on coordinator failure</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Failure modes &amp; mitigations</div>
+    <div class="fi"><strong>Coordinator crash after "Prepare":</strong> Participants are in limbo — they voted YES but don't know the outcome. They hold locks and must wait for the coordinator to recover. Recovery: coordinator uses its WAL to determine the intended outcome and re-sends Commit/Abort. Window of unavailability = coordinator downtime.</div>
+    <div class="fi"><strong>Participant crash after "Prepare":</strong> On recovery, participant checks its WAL — if it logged "prepared for TX-99," it must ask the coordinator for the outcome and commit or roll back accordingly.</div>
+    <div class="fi"><strong>3PC (three-phase commit):</strong> Adds a pre-commit phase to eliminate the blocking problem. Theoretically non-blocking but adds round-trips and is still unsafe under network partitions. Almost never used in practice.</div>
+    <div class="fi"><strong>Practical alternative:</strong> Saga pattern avoids 2PC entirely. Each step is a local transaction with a compensating transaction for rollback. No distributed locks, no coordinator SPOF, but no atomicity guarantee — eventual consistency only.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Where 2PC is actually used</div>
+    <div class="prose">Postgres <code>PREPARE TRANSACTION</code> + external coordinator. Google Spanner (using TrueTime for commit ordering). XA transactions in Java EE / JTA. Kafka exactly-once semantics (transactions across producer + consumer + offset commit). Most systems prefer Saga over 2PC for cross-service coordination.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Know the two phases by name</strong> and their purpose. Phase 1 = voting (can you commit?). Phase 2 = execution (do it).</li>
+      <li><strong>Coordinator failure is the key weakness.</strong> "2PC is a blocking protocol — if the coordinator fails after Phase 1, participants hold locks indefinitely. This is why most modern systems prefer Saga."</li>
+      <li><strong>Probe: "How does Kafka achieve exactly-once?"</strong> → Producer transactions + 2PC between the producer's transaction log and the consumer offset commit. Kafka's transaction coordinator is the 2PC coordinator.</li>
+      <li><strong>When to use 2PC:</strong> "Only when you absolutely need cross-service atomicity and can tolerate the blocking risk. For most microservice scenarios, Saga with compensating transactions is the better choice."</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(8)">Saga pattern →</a><a onclick="sendPrompt('Explain XA transactions in Java')">XA / JTA</a><a onclick="sendPrompt('Explain Kafka exactly-once semantics')">Kafka exactly-once</a></div></div>
+  <button class="nb" onclick="show(8)">Next: Saga pattern <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T8: Saga ══ -->
+<div class="topic" id="t8">
+  <div class="tt">Saga pattern</div>
+  <div class="ts2">Distributed transactions without 2PC · choreography vs orchestration</div>
+  <div class="sec">
+    <div class="sl">The core insight</div>
+    <div class="prose">2PC achieves atomicity by locking resources across services until all agree. This creates blocking, latency, and SPOF risk. Saga achieves eventual consistency differently: break the distributed transaction into a sequence of local transactions, each with a <strong>compensating transaction</strong> that can undo it if a later step fails. No distributed locks. No coordinator SPOF. Trade-off: the system is temporarily inconsistent during execution — this is the defining cost of Saga.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Two coordination patterns</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'sg','s0')">Orchestration</div>
+      <div class="tab" onclick="stab(this,'sg','s1')">Choreography</div>
+    </div>
+    <div id="sg">
+      <div class="tp active" id="s0">
+        <div class="prose"><strong>Orchestration Saga:</strong> A central orchestrator (coordinator service) drives the entire flow. It calls each participant in sequence, waits for responses, and triggers compensating transactions on failure. The orchestrator owns the saga state machine.<br><br><strong>Flow for "place order":</strong><br>Orchestrator → Reserve inventory → Success<br>Orchestrator → Charge payment → Fail<br>Orchestrator → Compensate: Release inventory (compensating tx)<br>Orchestrator → Mark order failed<br><br><strong>Pros:</strong> Easy to reason about. Single place to see the full saga state. Easy to add new steps. Good for complex multi-step workflows.<br><br><strong>Cons:</strong> Orchestrator is a new service to build and maintain. Centralizes logic — becomes a new coordination bottleneck. Risk of orchestrator being a SPOF (mitigate: make it stateless with state in DB).<br><br><strong>Used by:</strong> Netflix (Conductor), Temporal, AWS Step Functions, Camunda. This is the dominant approach for complex sagas in 2024.</div>
+      </div>
+      <div class="tp" id="s1">
+        <div class="prose"><strong>Choreography Saga:</strong> No central orchestrator. Each service reacts to events and emits its own events. Services are loosely coupled through an event bus (Kafka). Each service knows what to do in response to each event type.<br><br><strong>Flow for "place order":</strong><br>OrderService publishes → <code>order.created</code><br>InventoryService listens → reserves → publishes <code>inventory.reserved</code><br>PaymentService listens → charges → publishes <code>payment.failed</code><br>InventoryService listens → publishes <code>inventory.released</code><br>OrderService listens → publishes <code>order.failed</code><br><br><strong>Pros:</strong> No central coordinator. Fully decentralized. Services are loosely coupled — adding a new service just subscribes to the relevant events. Natural for event-driven architectures.<br><br><strong>Cons:</strong> Hard to understand the full saga flow (no single place to see it). Debugging distributed failures requires tracing events across many services. Risk of cyclic event dependencies. Compensations are implicit and can be missed if a service doesn't implement them.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sl">Compensating transactions — the hard part</div>
+    <div class="prose">A compensating transaction is <em>semantically</em> correct but not always a simple rollback. It runs after the fact, when other things may have happened.<br><br><strong>Example:</strong> Payment was charged. Customer was notified. Now the inventory step failed. Compensating transaction: refund the payment + send a "sorry" email to the customer. You can't "un-send" the notification — you can only send a correction.<br><br><strong>Not all operations are compensatable.</strong> If an email was sent, a physical document printed, or cash dispensed — you cannot un-do these. Design your saga steps to be as late-binding as possible (authorize the payment rather than charge; reserve inventory rather than consume) and only finalize irreversible actions at the very end.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Saga for order placement</div>
+    <div class="saga-box"><div class="title">Step 1: Create order (Order service)</div><div class="comp">Compensate: Mark order as cancelled</div><div class="body">Local transaction. Order record created in PENDING state.</div></div>
+    <div class="saga-box"><div class="title">Step 2: Reserve inventory (Inventory service)</div><div class="comp">Compensate: Release reservation</div><div class="body">Atomically decrement available stock, create reservation record.</div></div>
+    <div class="saga-box"><div class="title">Step 3: Charge payment (Payment service)</div><div class="comp">Compensate: Issue refund</div><div class="body">Authorize and capture payment. If fails here → trigger steps 2C, 1C.</div></div>
+    <div class="saga-box"><div class="title">Step 4: Schedule delivery (Delivery service)</div><div class="comp">Compensate: Cancel delivery</div><div class="body">If fails here → trigger steps 3C, 2C, 1C in reverse order.</div></div>
+    <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:6px">Each step is a local transaction. Compensations execute in reverse order on failure.</div>
+  </div>
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Saga vs 2PC trade-off in one sentence:</strong> "2PC gives atomicity at the cost of blocking and SPOF. Saga gives availability at the cost of temporary inconsistency and compensating transaction complexity."</li>
+      <li><strong>Default to orchestration</strong> for interviews. "I'd use an orchestration saga with a dedicated workflow service — Temporal or a custom state machine backed by Postgres — to manage the saga state and retry failed steps."</li>
+      <li><strong>Idempotency is mandatory with Saga.</strong> "Every step must be idempotent because the orchestrator may retry on timeout. Payment must not double-charge if charged twice with the same idempotency key."</li>
+      <li><strong>Probe: "Payment succeeded but delivery scheduling failed. What happens?"</strong> → Reverse compensation: cancel delivery (no-op if nothing scheduled), issue refund for payment, release inventory reservation, mark order failed. Each compensation step must also be idempotent.</li>
+    </ol></div>
+  </div>
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(7)">← 2PC</a><a onclick="sendPrompt('Explain Temporal workflow engine for saga orchestration')">Temporal</a><a onclick="sendPrompt('Explain idempotency in distributed systems')">Idempotency</a><a onclick="sendPrompt('Continue with Block 5: Message queues — Kafka architecture, RabbitMQ, event-driven design, CQRS, rate limiting, circuit breaker, observability')">Continue to Block 5 ↗</a></div></div>
+  <button class="nb" onclick="sendPrompt('Continue with Block 5: Message queues — Kafka architecture, RabbitMQ, event-driven design, CQRS, rate limiting, circuit breaker, observability')">Continue to Block 5 ↗</button>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(idx){
+  document.querySelectorAll('.topic').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.ni').forEach((n,i)=>n.classList.toggle('active',i===idx));
+  document.querySelector('.content').scrollTop=0;
+}
+function stab(el,gid,pid){
+  document.getElementById(gid).querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pid).classList.add('active');
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const RING={
+  nodes:[],keys:[],
+  colors:['#185FA5','#0F6E56','#854F0B','#993C1D','#534AB7'],
+  nodeCount:3
+};
+function hashPos(s){let h=0;for(let c of s)h=(h*31+c.charCodeAt(0))>>>0;return h/4294967296;}
+function resetRing(){
+  RING.nodes=[];RING.keys=[];
+  for(let i=0;i<3;i++) RING.nodes.push({id:'N'+(i+1),pos:hashPos('node'+i+Date.now()*0+i*0.33)});
+  RING.nodes.sort((a,b)=>a.pos-b.pos);
+  for(let i=0;i<12;i++) RING.keys.push({id:'k'+i,pos:hashPos('key'+i)});
+  drawRing();
+}
+function addNode(){
+  if(RING.nodes.length>=6)return;
+  const id='N'+(++RING.nodeCount);
+  RING.nodes.push({id,pos:Math.random()});
+  RING.nodes.sort((a,b)=>a.pos-b.pos);
+  drawRing();
+}
+function removeNode(){
+  if(RING.nodes.length<=2)return;
+  RING.nodes.splice(Math.floor(Math.random()*RING.nodes.length),1);
+  drawRing();
+}
+function drawRing(){
+  const cvs=document.getElementById('ring');
+  const ctx=cvs.getContext('2d');
+  const W=340,H=340,cx=170,cy=170,R=110,nr=18,kr=5;
+  const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const textCol=isDark?'#c2c0b6':'#3d3d3a';
+  const ringCol=isDark?'#444441':'#D3D1C7';
+  ctx.clearRect(0,0,W,H);
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.strokeStyle=ringCol;ctx.lineWidth=1;ctx.stroke();
+  function ringXY(pos){return{x:cx+R*Math.cos(pos*Math.PI*2-Math.PI/2),y:cy+R*Math.sin(pos*Math.PI*2-Math.PI/2)};}
+  function ownerIdx(pos){
+    let best=0;
+    for(let i=0;i<RING.nodes.length;i++){
+      if(RING.nodes[i].pos>=pos){best=i;break;}
+      best=(i+1)%RING.nodes.length;
+    }
+    return best;
+  }
+  RING.keys.forEach(k=>{
+    const p=ringXY(k.pos);
+    const oi=ownerIdx(k.pos);
+    const col=RING.colors[oi%RING.colors.length]+'44';
+    ctx.beginPath();ctx.arc(p.x,p.y,kr,0,Math.PI*2);
+    ctx.fillStyle=col;ctx.fill();
+    ctx.strokeStyle=RING.colors[oi%RING.colors.length];ctx.lineWidth=0.5;ctx.stroke();
+  });
+  RING.nodes.forEach((n,i)=>{
+    const p=ringXY(n.pos);
+    const col=RING.colors[i%RING.colors.length];
+    ctx.beginPath();ctx.arc(p.x,p.y,nr,0,Math.PI*2);
+    ctx.fillStyle=col+'22';ctx.fill();
+    ctx.strokeStyle=col;ctx.lineWidth=1;ctx.stroke();
+    ctx.font='500 11px sans-serif';ctx.fillStyle=col;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n.id,p.x,p.y);
+  });
+  document.getElementById('ring-info').textContent=`${RING.nodes.length} nodes, ${RING.keys.length} keys — colours show which node owns each key`;
+}
+resetRing();
+</script>

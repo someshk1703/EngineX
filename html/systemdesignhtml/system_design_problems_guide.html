@@ -1,0 +1,667 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:820px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:200px;min-width:200px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary)}
+.sh{padding:12px 14px 8px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ni{padding:8px 14px;font-size:12.5px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;line-height:1.3}
+.ni:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ni.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.ni .num{font-size:10px;color:var(--color-text-tertiary);display:block;margin-bottom:1px}
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+.topic{display:none}.topic.active{display:block}
+.tt{font-size:18px;font-weight:500;margin-bottom:2px;color:var(--color-text-primary)}
+.ts2{font-size:12.5px;color:var(--color-text-tertiary);margin-bottom:18px}
+.sec{margin-bottom:18px}
+.sl{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13px;line-height:1.72;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.kvc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px 11px}
+.kvl{font-size:10.5px;color:var(--color-text-tertiary);margin-bottom:3px;font-weight:500}
+.kvv{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.ib{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:13px}
+.ib ol{padding-left:15px;font-size:12px;line-height:1.9;color:var(--color-text-secondary)}
+.ib li strong{color:var(--color-text-primary);font-weight:500}
+.cx{display:flex;flex-wrap:wrap;gap:5px}
+.cx a{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.cx a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ab{font-family:var(--font-mono);font-size:11px;line-height:1.6;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:12px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.nb{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:6px 13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:18px}
+.nb:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.badge{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:9px;font-weight:500;margin-right:3px;vertical-align:middle}
+.b-blue{background:#E6F1FB;color:#0C447C}
+.b-teal{background:#E1F5EE;color:#085041}
+.b-amber{background:#FAEEDA;color:#633806}
+.b-coral{background:#FAECE7;color:#712B13}
+.b-purple{background:#EEEDFE;color:#3C3489}
+.b-green{background:#EAF3DE;color:#27500A}
+.b-gray{background:#F1EFE8;color:#5F5E5A}
+.walk-step{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.walk-step:last-child{border-bottom:none}
+.wnum{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;background:#E6F1FB;color:#0C447C;border:0.5px solid #85B7EB}
+.wbody{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.wbody strong{color:var(--color-text-primary);font-weight:500}
+.est-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.est-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px}
+.est-num{font-size:16px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
+.est-lbl{font-size:11px;color:var(--color-text-tertiary);line-height:1.3}
+.fi{padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px;line-height:1.6;color:var(--color-text-secondary)}
+.fi:last-child{border-bottom:none}
+.fi strong{color:var(--color-text-primary);font-weight:500}
+</style>
+
+<h2 class="sr-only">System Design Problems Guide — Block 9, a complete 12-problem interview playbook covering URL shortener, Twitter feed, WhatsApp, YouTube, Uber, Google Search, Netflix, payment system, notification system, rate limiter, distributed KV store, and typeahead.</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sh">Block 9 — Problems</div>
+  <div class="ni active" onclick="show(0)"><span class="num">01</span>URL shortener</div>
+  <div class="ni" onclick="show(1)"><span class="num">02</span>Twitter / X feed</div>
+  <div class="ni" onclick="show(2)"><span class="num">03</span>WhatsApp / chat</div>
+  <div class="ni" onclick="show(3)"><span class="num">04</span>YouTube / video</div>
+  <div class="ni" onclick="show(4)"><span class="num">05</span>Uber / ride matching</div>
+  <div class="ni" onclick="show(5)"><span class="num">06</span>Google Search</div>
+  <div class="ni" onclick="show(6)"><span class="num">07</span>Netflix</div>
+  <div class="ni" onclick="show(7)"><span class="num">08</span>Payment system</div>
+  <div class="ni" onclick="show(8)"><span class="num">09</span>Notification system</div>
+  <div class="ni" onclick="show(9)"><span class="num">10</span>Rate limiter</div>
+  <div class="ni" onclick="show(10)"><span class="num">11</span>Distributed KV store</div>
+  <div class="ni" onclick="show(11)"><span class="num">12</span>Typeahead / autocomplete</div>
+</nav>
+
+<main class="content">
+
+<!-- ══ URL Shortener ══ -->
+<div class="topic active" id="t0">
+  <div class="tt">URL shortener</div>
+  <div class="ts2">Base62 · Snowflake IDs · 301 vs 302 · caching strategy</div>
+  <div class="sec"><div class="sl">Estimates</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">100M</div><div class="est-lbl">URLs created/day</div></div>
+    <div class="est-card"><div class="est-num">10B</div><div class="est-lbl">redirects/day (100:1 read:write)</div></div>
+    <div class="est-card"><div class="est-num">~115K</div><div class="est-lbl">redirects/sec peak</div></div>
+    <div class="est-card"><div class="est-num">500B</div><div class="est-lbl">URLs in 5 years (500GB)</div></div>
+    <div class="est-card"><div class="est-num">7 chars</div><div class="est-lbl">base62 covers 62⁷ = 3.5T URLs</div></div>
+    <div class="est-card"><div class="est-num">&lt;10ms</div><div class="est-lbl">p99 redirect latency SLO</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Core design decisions</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">ID generation</div><div class="kvv">Snowflake 64-bit ID → base62 encode → 7-char short code. Globally unique, no coordination at generation time, monotonically increasing (DB-friendly). Never MD5/hash — collision risk and longer codes.</div></div>
+    <div class="kvc"><div class="kvl">301 vs 302</div><div class="kvv">301 = permanent. Browser caches redirect forever — no more requests hit your servers. 302 = temporary. Every click goes through your redirect server. Use 302 for analytics/click tracking. Use 301 if you want to reduce server load and don't need tracking.</div></div>
+    <div class="kvc"><div class="kvl">Storage</div><div class="kvv">Write: short_code → long_url in Postgres (primary key on short_code). Read: Redis cache in front (hot URLs stay in memory, p99 redirect = Redis GET = ~1ms). Cache miss: DB lookup + populate cache.</div></div>
+    <div class="kvc"><div class="kvl">Custom aliases</div><div class="kvv">User provides slug (e.g. "bit.ly/my-link"). Try INSERT; on unique constraint violation → return conflict error. No pre-reservation needed.</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Architecture — write and read paths</div>
+  <div class="ab">WRITE (create short URL):
+  Client → POST /shorten {url, expiry, custom_alias?}
+  API → validate URL → generate Snowflake ID → base62(id) → 7-char code
+  API → INSERT INTO urls (code, long_url, user_id, expiry) → Postgres
+  API → return https://sho.rt/{code}
+
+READ (redirect):
+  Client → GET https://sho.rt/abc1234
+  LB → Redirect Service
+  Redirect Service → GET redis:url:abc1234
+    HIT  → 302 Location: {long_url}  (~1ms)
+    MISS → SELECT long_url FROM urls WHERE code='abc1234' → Postgres
+         → SET redis:url:abc1234 {long_url} EX 86400
+         → 302 Location: {long_url}  (~15ms)
+
+Expiry: Postgres TTL column + cron job. Redis key TTL aligned.
+Analytics: async Kafka event {code, ip, timestamp, referer}
+           → ClickHouse aggregation for click counts</div></div>
+  <div class="sec"><div class="sl">Failure modes</div>
+  <div class="fi"><strong>Cache stampede:</strong> Popular URL expires; 10K concurrent requests all miss → 10K Postgres queries. Fix: mutex lock on first miss (only one DB fetch); others wait.</div>
+  <div class="fi"><strong>DB bottleneck on reads:</strong> 115K redirects/sec >> Postgres capacity. Fix: Redis handles 99% of reads. Postgres is cold path only. Read replicas as backup.</div>
+  <div class="fi"><strong>Short code collision:</strong> Impossible with Snowflake — the ID is globally unique before base62 encoding. Only custom aliases can conflict (handled by unique constraint).</div>
+  </div>
+  <div class="sec"><div class="sl">45-minute interview walkthrough</div>
+  <div class="ib"><ol>
+    <li><strong>Min 0–5:</strong> Clarify scale (100M URLs/day?), analytics needed?, custom aliases?, expiry?</li>
+    <li><strong>Min 5–10:</strong> Estimates — DAU, read:write ratio, storage for 5 years, p99 latency target</li>
+    <li><strong>Min 10–20:</strong> API design. Core entities: url table. ID generation choice (Snowflake + base62). 301 vs 302 and why.</li>
+    <li><strong>Min 20–35:</strong> Architecture — write path (Postgres), read path (Redis → Postgres). Scale the redirect: Redis cluster, multiple stateless redirect servers, CDN for extreme scale.</li>
+    <li><strong>Min 35–45:</strong> Deep dive on one asked by interviewer. Likely: cache stampede, expiry implementation, or analytics pipeline.</li>
+  </ol></div></div>
+  <button class="nb" onclick="show(1)">Next: Twitter / X feed <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ Twitter Feed ══ -->
+<div class="topic" id="t1">
+  <div class="tt">Twitter / X feed</div>
+  <div class="ts2">Fan-out on write vs read · celebrity problem · timeline generation</div>
+  <div class="sec"><div class="sl">Estimates</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">300M</div><div class="est-lbl">daily active users</div></div>
+    <div class="est-card"><div class="est-num">500M</div><div class="est-lbl">tweets/day (~6K/sec)</div></div>
+    <div class="est-card"><div class="est-num">300B</div><div class="est-lbl">timeline reads/day (1000:1 R:W)</div></div>
+    <div class="est-card"><div class="est-num">150K</div><div class="est-lbl">followers for avg celeb</div></div>
+    <div class="est-card"><div class="est-num">130M</div><div class="est-lbl">Cristiano Ronaldo followers</div></div>
+    <div class="est-card"><div class="est-num">&lt;300ms</div><div class="est-lbl">feed load SLO</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">The central problem — fan-out</div>
+  <div class="prose">When a user with 130M followers tweets, how does that tweet appear in 130M timelines? This is the fan-out problem and the answer defines your entire architecture.</div></div>
+  <div class="sec"><div class="sl">Two approaches</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">Fan-out on write (push)</div><div class="kvv">On tweet, push tweet_id to every follower's pre-computed timeline in Redis. Read = O(1) Redis list fetch. Cost: writing to 130M Redis lists takes minutes for a celebrity. Write amplification is enormous.</div></div>
+    <div class="kvc"><div class="kvl">Fan-out on read (pull)</div><div class="kvv">On feed load, fetch tweet_ids of everyone the user follows, merge and sort. Read = expensive N DB queries merged. Simple to implement. Kills at scale (300M users × 200 followees each = 60B DB queries/day).</div></div>
+    <div class="kvc"><div class="kvl">Hybrid (Twitter's actual approach)</div><div class="kvv">Fan-out on write for normal users. Fan-out on read for celebrities (> 1M followers). On feed load: pre-computed timeline (from written fan-out) + merge celebrity tweets in real-time. Best of both.</div></div>
+    <div class="kvc"><div class="kvl">Celebrity threshold</div><div class="kvv">Define celebrity: > 1M followers. Do NOT fan-out their tweets. On feed load, fetch from a "celebrity tweets" cache and merge with pre-computed timeline. The 1M-follower threshold limits celebrity count to manageable size.</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Architecture</div>
+  <div class="ab">WRITE (tweet creation):
+  Client → POST /tweet {text, media_ids}
+  Tweet Service → INSERT INTO tweets (id, user_id, text) → Postgres
+  Tweet Service → publish to Kafka "tweets" topic
+  
+  Fan-out Service (Kafka consumer):
+    Get follower list from Follower Service (from Redis/Cassandra)
+    IF user.followers < 1M:
+      FOR each follower: LPUSH timeline:{follower_id} {tweet_id}  (Redis, async)
+      LTRIM to keep last 800 tweet IDs
+    ELSE (celebrity):
+      Store tweet in Celebrity Cache only (no individual fan-out)
+
+READ (load feed):
+  Timeline Service:
+    1. LRANGE timeline:{user_id} 0 19  ← pre-computed, 20 tweets
+    2. Fetch celeb tweets for celebs the user follows (from Celebrity Cache)
+    3. Merge + sort by timestamp → top 20
+    4. Hydrate tweet_ids → full tweet objects (Redis tweet cache → Postgres)
+    5. Return enriched feed</div></div>
+  <div class="sec"><div class="sl">Deep dives interviewers probe</div>
+  <div class="ib"><ol>
+    <li><strong>What about users who rarely log in?</strong> Don't maintain Redis timeline for inactive users. On login, compute timeline on-demand. Flag users as "cold" after 30 days of inactivity.</li>
+    <li><strong>Media (images/video)?</strong> Store in S3 via presigned upload. CDN in front of S3 for serving. Tweet stores S3 key; timeline hydration adds CDN URL.</li>
+    <li><strong>Trending topics?</strong> Kafka stream → Flink sliding-window count per hashtag per 5 minutes → top-K heap → Trending Service → Redis sorted set.</li>
+    <li><strong>Search?</strong> Kafka → Elasticsearch (index tweet text, user, timestamp). BM25 relevance + recency boost.</li>
+  </ol></div></div>
+  <button class="nb" onclick="show(2)">Next: WhatsApp / chat <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ WhatsApp ══ -->
+<div class="topic" id="t2">
+  <div class="tt">WhatsApp / chat system</div>
+  <div class="ts2">WebSocket · message storage · online presence · E2E encryption</div>
+  <div class="sec"><div class="sl">Estimates</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">2B</div><div class="est-lbl">users globally</div></div>
+    <div class="est-card"><div class="est-num">100B</div><div class="est-lbl">messages/day</div></div>
+    <div class="est-card"><div class="est-num">1.15M</div><div class="est-lbl">messages/sec</div></div>
+    <div class="est-card"><div class="est-num">500M</div><div class="est-lbl">concurrent WebSocket connections</div></div>
+    <div class="est-card"><div class="est-num">&lt;100ms</div><div class="est-lbl">message delivery p99</div></div>
+    <div class="est-card"><div class="est-num">~1KB</div><div class="est-lbl">avg message size</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Core architecture decisions</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">Real-time connection</div><div class="kvv">WebSocket — persistent, full-duplex. Each user connects to a Chat Server. Connection is sticky (same server for the session). 500M concurrent connections → ~50K Chat Servers (10K connections/server typical in BEAM/Erlang, fewer in Java).</div></div>
+    <div class="kvc"><div class="kvl">Message routing</div><div class="kvv">User A and User B may be on different Chat Servers. A's server receives the message, looks up which server B is connected to (from Redis: user_id → server_id), forwards via internal pub/sub (Redis pub/sub or Kafka) to B's server, which pushes to B's WebSocket.</div></div>
+    <div class="kvc"><div class="kvl">Message storage</div><div class="kvv">Cassandra — write-heavy (1M writes/sec), message lookup by (chat_id, timestamp). No random reads — always range scans. Partition key: chat_id. Clustering key: timestamp DESC. Stores last 30 days of messages. S3 for older messages and media.</div></div>
+    <div class="kvc"><div class="kvl">Offline delivery</div><div class="kvv">If B is offline: store message in Cassandra with status "pending". When B reconnects, fetch undelivered messages from Cassandra (WHERE delivered = false AND recipient_id = B ORDER BY timestamp). Deliver, update status. Push notification (FCM/APNs) to wake B's app.</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Architecture — message flow</div>
+  <div class="ab">A sends message to B:
+
+  A's client → WebSocket → Chat Server A
+  Chat Server A:
+    1. Persist message → Cassandra (message_id, chat_id, sender, text, ts, status=SENT)
+    2. ACK to A's client: message_id + status=SENT (receipt 1)
+    3. Look up Redis: {B's server} = "chat-server-47" OR "offline"
+    
+  IF B is online:
+    Chat Server A → Redis pub/sub "server:chat-server-47" → Chat Server 47
+    Chat Server 47 → push via WebSocket → B's client
+    B's client → ACK → Chat Server 47 → update status=DELIVERED
+    Chat Server 47 → notify Chat Server A → update status=DELIVERED
+    Chat Server A → push DELIVERED receipt to A (receipt 2, double tick)
+    B reads message → B's client → status=READ → push READ receipt to A
+
+  IF B is offline:
+    message status = PENDING in Cassandra
+    Send FCM/APNs push notification to B's device
+    When B reconnects → fetch pending messages → deliver → update status</div></div>
+  <div class="sec"><div class="sl">Online presence</div>
+  <div class="prose"><strong>How it works:</strong> When user B connects, Chat Server registers B's heartbeat in Redis: <code>SET presence:user_B {server_id} EX 30</code>. Client sends heartbeat every 20s. If key expires (B offline), presence disappears. "Last seen" stored in Cassandra on disconnect. Privacy option: users can disable last-seen sharing.</div></div>
+  <div class="sec"><div class="sl">E2E encryption (Signal protocol, brief)</div>
+  <div class="prose"><strong>The key insight:</strong> The server never sees plaintext. Each client generates a public/private key pair. Public keys are uploaded to the WhatsApp server. When A wants to message B, A fetches B's public key, encrypts the message with B's public key. Only B's private key (never leaves B's device) can decrypt it. WhatsApp's servers route ciphertexts they cannot read.</div></div>
+  <div class="ib"><ol>
+    <li><strong>Group messages:</strong> Store group member list. Sender encrypts message once per member (or use Sender Key protocol — one shared key per group session). Group messages fan-out to all online members via their respective Chat Servers.</li>
+    <li><strong>Media:</strong> Client encrypts media, uploads to S3 via presigned URL, sends the S3 key + decryption key via message. Server stores encrypted blob; only recipient can decrypt using the key in the message.</li>
+  </ol></div>
+  <button class="nb" onclick="show(3)">Next: YouTube / video <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ YouTube ══ -->
+<div class="topic" id="t3">
+  <div class="tt">YouTube / video streaming</div>
+  <div class="ts2">Chunked upload · transcoding · adaptive bitrate · CDN</div>
+  <div class="sec"><div class="sl">Estimates</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">500hrs</div><div class="est-lbl">video uploaded/minute</div></div>
+    <div class="est-card"><div class="est-num">1B hrs</div><div class="est-lbl">video watched/day</div></div>
+    <div class="est-card"><div class="est-num">5M</div><div class="est-lbl">concurrent viewers</div></div>
+    <div class="est-card"><div class="est-num">~2GB</div><div class="est-lbl">raw 10-min 1080p video</div></div>
+    <div class="est-card"><div class="est-num">5 copies</div><div class="est-lbl">per video (360/480/720/1080/4K)</div></div>
+    <div class="est-card"><div class="est-num">CDN</div><div class="est-lbl">handles 99.9% of view traffic</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Two distinct paths</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">Upload path</div><div class="kvv">Creator uploads raw video → multipart upload to S3 → triggers transcoding pipeline (async) → multiple resolutions produced → segments stored in S3 → CDN pulls segments on first request → video is "ready" when all resolutions processed.</div></div>
+    <div class="kvc"><div class="kvl">Viewing path</div><div class="kvv">Viewer requests video → video player fetches manifest file (HLS .m3u8 or DASH .mpd) listing all available resolutions and segments → player chooses initial resolution based on network → fetches video segments from CDN → adapts resolution as network changes.</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Transcoding pipeline</div>
+  <div class="ab">Creator uploads raw video → S3 (presigned multipart upload)
+  S3 event notification → SQS queue → Transcoding Workers (EC2 fleet)
+
+  Transcoding Worker (per video):
+    1. Download raw video from S3 (or stream it)
+    2. Transcode to 5 resolutions: 360p, 480p, 720p, 1080p, 4K
+       (FFmpeg: H.264 for compatibility, H.265/AV1 for efficiency)
+    3. Segment each resolution into 6-second chunks (.ts files for HLS)
+    4. Generate manifest file (master.m3u8 → resolution-specific .m3u8 files)
+    5. Upload all segments + manifests to S3
+    6. Update video metadata in Postgres: status=READY
+    7. Invalidate CDN cache for this video (if re-encoding)
+
+  For a 2-hour movie: ~1200 segments × 5 resolutions = 6000 files in S3
+  S3 key pattern: s3://videos/{video_id}/1080p/{segment_number}.ts</div></div>
+  <div class="sec"><div class="sl">Adaptive bitrate (ABR)</div>
+  <div class="prose"><strong>How the player adapts:</strong> Bandwidth estimation runs continuously. Player measures download speed of each segment. If the last segment took twice as long as expected → network is slow → switch to lower resolution. If consistently fast → switch to higher resolution. The manifest file lists all resolutions; the player picks segment by segment. Netflix and YouTube switch every 6–10 seconds. The result: no buffering on slow networks, best quality on fast networks — all automatic.</div></div>
+  <div class="sec"><div class="sl">CDN strategy</div>
+  <div class="prose">Popular videos are in CDN edge cache globally. First request from a PoP: CDN fetches from S3 (origin) and caches. Subsequent requests: served from edge. For truly popular videos (Gangnam Style), segments are in every PoP worldwide with near-zero origin traffic. For long-tail videos: CDN cache miss → S3 fetch. Videos are immutable once transcoded — CDN cache TTL can be years (content-addressed keys change if video changes).</div></div>
+  <div class="ib"><ol>
+    <li><strong>Recommendations:</strong> Collaborative filtering (users who watched X also watched Y). YouTube uses a two-stage model: candidate generation (YouTube DNN) → ranking (wide + deep model). Features: watch history, search history, demographics, context.</li>
+    <li><strong>Comments/likes at scale:</strong> Write to Kafka → async to Postgres/Cassandra. Like count uses Redis INCR (approximate, not exact). Exact count from Cassandra for display.</li>
+  </ol></div>
+  <button class="nb" onclick="show(4)">Next: Uber / ride matching <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ Uber ══ -->
+<div class="topic" id="t4">
+  <div class="tt">Uber / ride matching</div>
+  <div class="ts2">Geospatial indexing · real-time matching · surge pricing</div>
+  <div class="sec"><div class="sl">Estimates</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">20M</div><div class="est-lbl">trips/day globally</div></div>
+    <div class="est-card"><div class="est-num">7M</div><div class="est-lbl">active drivers at peak</div></div>
+    <div class="est-card"><div class="est-num">4/sec</div><div class="est-lbl">driver location update frequency</div></div>
+    <div class="est-card"><div class="est-num">28M</div><div class="est-lbl">location updates/sec</div></div>
+    <div class="est-card"><div class="est-num">&lt;5s</div><div class="est-lbl">match time SLO</div></div>
+    <div class="est-card"><div class="est-num">geohash</div><div class="est-lbl">spatial index of choice</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Geospatial indexing — geohash</div>
+  <div class="prose"><strong>Geohash:</strong> Encodes a lat/lng into a string of variable length. Longer string = finer precision. Characters that share a prefix are geographically close (mostly — edge cases exist at boundaries). Geohash precision 6 (~1.2km × 0.6km cell) is the sweet spot for ride-matching.<br><br>Drivers are stored in Redis Geospatial sets: <code>GEOADD drivers:live {lng} {lat} {driver_id}</code>. Rider requests a driver: <code>GEORADIUS drivers:live {rider_lng} {rider_lat} 2 km</code>. Redis returns list of driver_ids within 2km radius. Real-time. O(N+log M) where N = results in radius, M = total drivers.</div></div>
+  <div class="sec"><div class="sl">Architecture — ride request flow</div>
+  <div class="ab">Driver app → location update every 4s → Location Service
+  Location Service → GEOADD drivers:live {lng} {lat} {driver_id} → Redis Geo
+               → (async) Kafka "driver-locations" → ClickHouse for analytics
+
+Rider requests ride:
+  Rider app → POST /ride {pickup_lat, pickup_lng, destination}
+  Ride Service:
+    1. GEORADIUS drivers:live {pickup} 2km → [driver_1, driver_2, driver_3]
+    2. Filter: status=AVAILABLE, acceptable car type
+    3. Score by ETA (use routing service or haversine estimate)
+    4. Pick best candidate → send offer via WebSocket/push to driver
+    5. Wait 10s for accept. If reject/timeout → try next candidate
+    6. Driver accepts → create trip in Postgres
+       → notify rider via WebSocket (driver_id, ETA, car details)
+    7. Trip status tracked: MATCHED → ARRIVED → IN_PROGRESS → COMPLETED
+
+Surge pricing:
+  Flink window job: demand/supply ratio per geohash (last 5 min)
+  supply = available drivers in cell, demand = open ride requests
+  surge multiplier = f(demand/supply). Cap at 3×.
+  Feeds into Pricing Service. Riders see surge before confirming.</div></div>
+  <div class="sec"><div class="sl">Deep dives</div>
+  <div class="ib"><ol>
+    <li><strong>What if the matched driver's location is stale?</strong> Redis location is ≤4 seconds old. Driver may have moved. On accept, re-verify location and recalculate ETA. If driver is now too far, find next candidate. Driver-side app shows real-time routing.</li>
+    <li><strong>Geohash boundary problem:</strong> Rider at the edge of a geohash cell. Closest driver is 100m away but in a different cell. Fix: query the rider's cell AND all 8 neighbouring cells. Redis GEORADIUS handles this naturally with a radius query.</li>
+    <li><strong>ETA calculation at scale:</strong> Lightweight at request time: haversine distance ÷ average speed for the area. Routing API (Google Maps / Mapbox) only called after driver accepts — cost and latency are prohibitive at query time for all candidates.</li>
+  </ol></div></div>
+  <button class="nb" onclick="show(5)">Next: Google Search <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ Google Search ══ -->
+<div class="topic" id="t5">
+  <div class="tt">Google Search</div>
+  <div class="ts2">Web crawling · inverted index · PageRank · serving layer</div>
+  <div class="sec"><div class="sl">Estimates</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">8.5B</div><div class="est-lbl">searches/day</div></div>
+    <div class="est-card"><div class="est-num">100K</div><div class="est-lbl">queries/sec</div></div>
+    <div class="est-card"><div class="est-num">60T</div><div class="est-lbl">indexed web pages</div></div>
+    <div class="est-card"><div class="est-num">&lt;200ms</div><div class="est-lbl">p99 query latency SLO</div></div>
+    <div class="est-card"><div class="est-num">millions</div><div class="est-lbl">crawling machines worldwide</div></div>
+    <div class="est-card"><div class="est-num">exabytes</div><div class="est-lbl">total index size</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Three sub-systems</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">Crawling</div><div class="kvv">Distributed URL frontier (priority queue). Crawlers fetch HTML, follow links, respect robots.txt. Store raw HTML in distributed storage. Detect duplicate pages (SimHash fingerprinting). Crawl frequency based on page change rate.</div></div>
+    <div class="kvc"><div class="kvl">Indexing</div><div class="kvv">Parse HTML → extract tokens → tokenise → build inverted index: term → {docId, positions, TF}. Compute PageRank (link graph). Store index sharded by term hash. Replicated 3× for HA.</div></div>
+    <div class="kvc"><div class="kvl">Serving</div><div class="kvv">Query → tokenise → look up each term in the index → intersect posting lists → rank by BM25 × PageRank × 200+ signals → return top-10 results → SERP rendered. Must complete in &lt;200ms including network.</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">PageRank — the key insight</div>
+  <div class="prose"><strong>PageRank models importance as votes:</strong> A link from page A to page B is a vote for B. High-quality pages that get many links from other high-quality pages rank higher. Computed iteratively: PR(B) = sum of PR(A)/out_links(A) for all pages A that link to B. Converges after ~50 iterations on the web graph. Google runs this over 60 trillion pages. PageRank alone isn't enough — combined with 200+ signals including content freshness, mobile-friendliness, page speed, user click-through rate, and domain authority.</div></div>
+  <div class="sec"><div class="sl">Query serving architecture</div>
+  <div class="ab">Query: "system design interview"
+  
+  Frontend → Query Processor
+  Query Processor:
+    1. Spell check + query expansion ("system design interview guide")
+    2. Tokenise → ["system", "design", "interview"]
+    3. Fan out to Index Servers (sharded by term)
+       → fetch posting lists for each term in parallel
+    4. Intersection: docs containing all three terms
+    5. Score: BM25(query, doc) × PageRank(doc) × freshness × personalisation
+    6. Top-K merge (heap of size K)
+    7. Fetch doc metadata (titles, snippets) from Document Store
+    8. Return ranked results
+
+  Index sharding: 60T pages can't fit in one machine.
+  Shard by URL hash (document sharding) → each shard has full index.
+  OR shard by term hash → each shard has subset of terms.
+  Google uses document sharding: each index shard covers a random subset
+  of all web pages. Query fans out to all shards, results merged.</div></div>
+  <div class="ib"><ol>
+    <li><strong>How do you handle 100K QPS at &lt;200ms?</strong> Heavy caching of popular queries (same query asked millions of times). Index in-memory on serving machines (no disk I/O on hot path). Aggressive pre-computation. Thousands of serving machines globally.</li>
+    <li><strong>Fresh content (news)?</strong> Separate freshness-optimised index updated in near-real-time alongside the main index. News results fetched from freshness index; general results from main. Merged in ranking.</li>
+  </ol></div>
+  <button class="nb" onclick="show(6)">Next: Netflix <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ Netflix ══ -->
+<div class="topic" id="t6">
+  <div class="tt">Netflix</div>
+  <div class="ts2">Microservices · CDN strategy · recommendation system · A/B testing</div>
+  <div class="sec"><div class="sl">Key numbers</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">260M</div><div class="est-lbl">subscribers globally</div></div>
+    <div class="est-card"><div class="est-num">15%</div><div class="est-lbl">of global internet traffic</div></div>
+    <div class="est-card"><div class="est-num">3 AWS</div><div class="est-lbl">regions, active-active-active</div></div>
+    <div class="est-card"><div class="est-num">Open Connect</div><div class="est-lbl">Netflix's private CDN (1000+ PoPs)</div></div>
+    <div class="est-card"><div class="est-num">2000+</div><div class="est-lbl">microservices</div></div>
+    <div class="est-card"><div class="est-num">80%</div><div class="est-lbl">views driven by recommendations</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">What makes Netflix architecturally unique</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">Open Connect CDN</div><div class="kvv">Netflix built its own CDN appliances (OCAs) co-located in ISP datacenters. Pre-positions popular content before it's requested. ISPs serve Netflix content from their own network — no inter-network transit costs. Netflix provides the hardware; ISPs provide the rack space and power.</div></div>
+    <div class="kvc"><div class="kvl">Multi-region active-active</div><div class="kvv">Runs in us-east-1, us-west-2, eu-west-1 simultaneously. All three serve live traffic. Chaos Kong regularly kills one region to validate failover. Spinnaker for multi-region canary deployments.</div></div>
+    <div class="kvc"><div class="kvl">Hystrix / Resilience</div><div class="kvv">Netflix invented Hystrix (circuit breaker) and open-sourced it. Every service-to-service call is wrapped. Degraded responses (cached data, empty recommendations) always preferred over failures.</div></div>
+    <div class="kvc"><div class="kvl">A/B testing at scale</div><div class="kvv">Every UI change, algorithm change, encoding parameter is A/B tested. Hundreds of experiments running simultaneously. Users are randomly bucketed. Primary metric: streaming hours. Secondary: retention, reactivation. Results determine product direction — not opinions.</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Recommendation system</div>
+  <div class="prose"><strong>Stage 1 — Candidate generation:</strong> For a user, generate ~500 candidate titles. Collaborative filtering: "users similar to you watched these." Matrix factorisation (SVD) on the user-item interaction matrix. Content-based: titles similar to what you've watched.<br><br><strong>Stage 2 — Ranking:</strong> Score each candidate with a ranking model (gradient boosted trees or neural net). Features: predicted rating, novelty, context (morning vs evening), device, what others in your household watch, trending in your region. Return top-N.<br><br><strong>Personalised thumbnails:</strong> Not just what to show — which thumbnail for each title to show YOU. A/B tested per user segment. Some users click more on action thumbnails; others on character-focused. Netflix generates multiple thumbnails per title and serves the optimal one per user.</div></div>
+  <div class="ib"><ol>
+    <li><strong>Encoding strategy:</strong> Netflix stores multiple encodings per title per device type. A 4K TV gets HEVC at 15Mbps. A mobile on 3G gets H.264 at 300Kbps. Per-title encoding: dark scenes encoded differently than bright scenes (Variable Bitrate). Reduces storage and bandwidth without quality loss.</li>
+    <li><strong>Billing service:</strong> Idempotent charges. Exactly-once via Kafka transactions. Stripe as payment processor. Reconciliation job nightly comparing Stripe ledger to internal ledger.</li>
+  </ol></div>
+  <button class="nb" onclick="show(7)">Next: Payment system <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ Payment System ══ -->
+<div class="topic" id="t7">
+  <div class="tt">Payment system</div>
+  <div class="ts2">Idempotency · exactly-once · double-spend prevention · ledger</div>
+  <div class="sec"><div class="sl">The non-negotiable requirements</div>
+  <div class="prose">Payments have the highest correctness bar of any system. A missed notification is annoying. A missed payment or a duplicate charge is catastrophic — legal liability, customer loss, regulatory consequences. Every component must be designed around exactly-once semantics, zero data loss, and full auditability.</div></div>
+  <div class="sec"><div class="sl">Core design decisions</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">Idempotency key</div><div class="kvv">Every payment request carries a client-generated UUID as idempotency key. Server stores (idempotency_key, result) with unique constraint. Second request with same key returns stored result without re-executing. Prevents duplicate charges on retry.</div></div>
+    <div class="kvc"><div class="kvl">Double-entry ledger</div><div class="kvv">Every transaction is two ledger entries: debit (money leaves account A) + credit (money enters account B). Ledger is append-only — no updates, no deletes. Balance = sum of all debits and credits. This is how Razorpay, Stripe, and all banks work. Enables perfect audit trail.</div></div>
+    <div class="kvc"><div class="kvl">Database choice</div><div class="kvv">Postgres with SERIALIZABLE isolation. ACID is non-negotiable. No eventually consistent database for payment writes. Balance check and debit in one serializable transaction prevents double-spend.</div></div>
+    <div class="kvc"><div class="kvl">Exactly-once delivery</div><div class="kvv">Kafka producer with idempotent=true + transactions. Consumer: process payment event → mark idempotency key as used in same DB transaction → commit Kafka offset atomically. Duplicate events: idempotency key already exists → no-op return stored result.</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Payment flow — complete</div>
+  <div class="ab">Merchant checkout → POST /payments {amount, currency, method, idempotency_key}
+  
+  Payment API:
+    1. Check idempotency_key in DB → if exists, return cached result
+    2. Validate: amount > 0, currency valid, merchant has permission
+    3. BEGIN SERIALIZABLE transaction
+       a. SELECT balance FROM accounts WHERE id = payer_id FOR UPDATE
+       b. IF balance < amount → ROLLBACK → return INSUFFICIENT_FUNDS
+       c. INSERT INTO ledger (id, account_id, type=DEBIT, amount, ref_id, ts)
+       d. INSERT INTO ledger (id, account_id, type=CREDIT, amount, ref_id, ts)
+       e. INSERT INTO payments (id, status=PROCESSING, idempotency_key, ...)
+    4. COMMIT  ← durability guaranteed by WAL fsync
+    5. Publish to Kafka "payments" topic: {payment_id, amount, ...}
+
+  Payment Processor (Kafka consumer):
+    6. Forward to payment gateway (Stripe/bank network)
+    7. Gateway response: SUCCESS or FAILED
+    8. Update payment status in DB (idempotent update)
+    9. Publish "payment.completed" event for downstream (notifications, order service)
+
+  Reconciliation (nightly):
+    Compare internal ledger totals with bank statement
+    Flag any discrepancy > ₹0 for manual review
+    Target: zero discrepancy</div></div>
+  <div class="sec"><div class="sl">Failure modes</div>
+  <div class="fi"><strong>Gateway timeout:</strong> We charged the user but the gateway response timed out. Did it succeed? Query gateway status API with payment_id. Always build a reconciliation job to catch these.</div>
+  <div class="fi"><strong>App crash after gateway success but before DB update:</strong> On restart, Kafka re-delivers the event. Idempotency key check: already processed → return cached result. Gateway charge not duplicated because gateway also has idempotency key.</div>
+  <div class="fi"><strong>Double-spend:</strong> Prevented by SERIALIZABLE + SELECT FOR UPDATE. Two concurrent requests for the same account both try to debit: one gets the lock, checks balance, debits. The second waits, then checks balance (now lower), may see insufficient funds.</div>
+  </div>
+  <button class="nb" onclick="show(8)">Next: Notification system <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ Notification System ══ -->
+<div class="topic" id="t8">
+  <div class="tt">Notification system</div>
+  <div class="ts2">Multi-channel · fan-out · priority queues · delivery guarantees</div>
+  <div class="sec"><div class="sl">Estimates</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">1B</div><div class="est-lbl">notifications/day (all channels)</div></div>
+    <div class="est-card"><div class="est-num">10K</div><div class="est-lbl">notifications/sec peak</div></div>
+    <div class="est-card"><div class="est-num">3</div><div class="est-lbl">channels: push, email, SMS</div></div>
+    <div class="est-card"><div class="est-num">High</div><div class="est-lbl">priority: OTP, payment alerts</div></div>
+    <div class="est-card"><div class="est-num">Low</div><div class="est-lbl">priority: marketing, newsletters</div></div>
+    <div class="est-card"><div class="est-num">at-least-once</div><div class="est-lbl">+ idempotency = goal</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Architecture</div>
+  <div class="ab">Event sources (any service can publish):
+  Payment Service, Order Service, Marketing Service
+  → Kafka topic "notification-requests"
+  → {user_id, type, priority, template_id, data, channels}
+
+  Notification Router (Kafka consumer):
+    1. Fetch user preferences: which channels enabled? DND hours? Language?
+    2. Fetch device tokens (FCM/APNs), email, phone number from User Service
+    3. Render notification template with data
+    4. Fan-out to channel-specific Kafka topics:
+       → "notifications-push-high"    (OTP, payment alerts — consumed first)
+       → "notifications-push-low"     (marketing — consumed when capacity allows)
+       → "notifications-email"
+       → "notifications-sms"
+
+  Push Worker (FCM/APNs):
+    Consume "notifications-push-high" with priority consumer
+    Call FCM/APNs API → success: mark delivered
+    Failure: exponential backoff retry (3 attempts)
+    After 3 failures: → DLQ → alert ops
+
+  Email Worker:
+    Consume "notifications-email"
+    Call AWS SES / SendGrid API
+    Bounce handling: mark email as invalid in User Service
+
+  SMS Worker:
+    Consume "notifications-sms"
+    Call Twilio / Vonage API
+    High cost → reserve for OTP and critical alerts only
+
+  Delivery tracking:
+    All delivery events → Cassandra (user_id, notification_id, channel, status, ts)
+    Dashboard: Redis sorted set for real-time delivery rate</div></div>
+  <div class="sec"><div class="sl">Priority handling</div>
+  <div class="prose"><strong>Separate Kafka topics by priority.</strong> High-priority consumers are allocated more partitions and more worker instances. Low-priority topics can be deprioritised when the system is under load — marketing emails can wait; OTP codes cannot. This is the Kafka implementation of priority queues: not a single priority queue (Kafka doesn't support that), but multiple topics with different consumer capacities.</div></div>
+  <div class="ib"><ol>
+    <li><strong>Deduplication:</strong> Same notification_id delivered twice (Kafka at-least-once). Worker checks Redis: <code>SET delivered:{notification_id} 1 NX EX 86400</code>. NX = only set if not exists. If already delivered, skip.</li>
+    <li><strong>Rate limiting per user:</strong> Don't send more than 3 push notifications/hour to a user (notification fatigue). Redis counter: <code>INCR notif_count:{user_id}:{hour}</code> with TTL. If > 3, queue for next hour or drop if low priority.</li>
+  </ol></div>
+  <button class="nb" onclick="show(9)">Next: Rate limiter <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ Rate Limiter ══ -->
+<div class="topic" id="t9">
+  <div class="tt">Rate limiter</div>
+  <div class="ts2">Token bucket Redis implementation · distributed rate limiting</div>
+  <div class="sec"><div class="sl">Design scope</div>
+  <div class="prose">This problem is often framed as: "Design a rate limiter that can rate-limit API calls across a distributed fleet of 100 API servers, with per-user, per-endpoint limits."</div></div>
+  <div class="sec"><div class="sl">The core challenge — distributed state</div>
+  <div class="prose"><strong>Local rate limiter (wrong):</strong> Each API server maintains its own counter. User sends 100 requests spread across 10 servers — each server sees 10 requests. With a limit of 50/min, the user is allowed through despite sending 100.<br><br><strong>Centralised rate limiter (correct):</strong> All API servers query a shared Redis cluster for rate limit state. One source of truth. Slightly higher latency (one extra Redis call per request, ~1ms) but correct.</div></div>
+  <div class="sec"><div class="sl">Implementation — token bucket in Redis Lua</div>
+  <div class="ab">Algorithm: token bucket
+  Key: "rl:{user_id}:{endpoint}"
+  Capacity: 100 tokens
+  Refill rate: 10 tokens/second
+
+  Lua script (atomic check-and-consume):
+  ─────────────────────────────────────
+  local key = KEYS[1]
+  local capacity = tonumber(ARGV[1])   -- 100
+  local rate = tonumber(ARGV[2])       -- 10 tokens/sec
+  local now = tonumber(ARGV[3])        -- current time ms
+  
+  local data = redis.call('HMGET', key, 'tokens', 'ts')
+  local tokens = tonumber(data[1]) or capacity
+  local last_ts = tonumber(data[2]) or now
+  
+  local elapsed_sec = (now - last_ts) / 1000
+  tokens = math.min(capacity, tokens + elapsed_sec * rate)
+  
+  if tokens >= 1 then
+    tokens = tokens - 1
+    redis.call('HMSET', key, 'tokens', tokens, 'ts', now)
+    redis.call('EXPIRE', key, 3600)
+    return {1, math.floor(tokens)}  -- allowed, remaining
+  else
+    return {0, 0}  -- rejected
+  end
+
+  Response on rejection:
+    HTTP 429 Too Many Requests
+    X-RateLimit-Limit: 100
+    X-RateLimit-Remaining: 0
+    X-RateLimit-Reset: {unix_ts when next token available}
+    Retry-After: 3</div></div>
+  <div class="sec"><div class="sl">Layered rate limiting</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">Layer 1 — IP level</div><div class="kvv">At the API gateway / Nginx: 1000 req/min per IP. Catches unauthenticated abuse and DDoS before it hits application servers.</div></div>
+    <div class="kvc"><div class="kvl">Layer 2 — API key / user</div><div class="kvv">In application code via Redis Lua: per-user, per-endpoint limits. Catches authenticated misuse. Enables tiered plans (free: 100/min, pro: 10K/min).</div></div>
+    <div class="kvc"><div class="kvl">Layer 3 — tenant/organisation</div><div class="kvv">For B2B APIs: shared limit across all users of the same organisation. Prevents one user starving others on the same plan.</div></div>
+    <div class="kvc"><div class="kvl">Redis cluster HA</div><div class="kvv">Rate limiter Redis must itself be HA. Redis Cluster with 3 primaries + 3 replicas. On Redis failure: fail open (allow requests) rather than fail closed (block everything).</div></div>
+  </div></div>
+  <button class="nb" onclick="show(10)">Next: Distributed KV store <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ KV Store ══ -->
+<div class="topic" id="t10">
+  <div class="tt">Distributed key-value store</div>
+  <div class="ts2">Consistent hashing · replication · quorum reads/writes</div>
+  <div class="sec"><div class="sl">What you're building</div>
+  <div class="prose">Design a system like DynamoDB or Cassandra — distributed, highly available, eventually consistent. Stores arbitrary byte values by key. Supports GET, PUT, DELETE. Must survive node failures without downtime. Scale to petabytes.</div></div>
+  <div class="sec"><div class="sl">Core components</div>
+  <div class="kv">
+    <div class="kvc"><div class="kvl">Consistent hashing ring</div><div class="kvv">Keys are hashed onto a ring. Each node owns a range of the ring (vnodes for even distribution). A key routes to the first node clockwise from its hash position. Adding/removing nodes remaps only ~1/N keys.</div></div>
+    <div class="kvc"><div class="kvl">Replication</div><div class="kvv">Replication factor N=3 (industry standard). A key is stored on the primary node AND the next N-1 clockwise nodes. All N replicas are in different AZs. On PUT, write to all N; on GET, quorum of R must agree.</div></div>
+    <div class="kvc"><div class="kvl">Quorum reads/writes</div><div class="kvv">W = 2, R = 2, N = 3. W + R > N → strong consistency guaranteed. Alternatively: W=1, R=1 for high availability + low latency (eventual consistency). Tune per operation.</div></div>
+    <div class="kvc"><div class="kvl">Conflict resolution</div><div class="kvv">Concurrent writes to same key across replicas. Vector clocks to track causality. LWW (last-write-wins) by timestamp for simple cases. Application-level merge for complex cases (shopping cart → union).</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">Storage engine</div>
+  <div class="ab">Write path (on each node):
+  PUT key=user:42 value={"name":"Somesh"}
+  1. Write to WAL (commit log) → durability guaranteed
+  2. Write to MemTable (in-memory sorted structure)
+  3. Return ACK (fast — no disk I/O on hot path)
+  4. Background: flush MemTable → SSTable file on disk (immutable)
+  5. Compaction: merge SSTables, remove tombstones (deleted keys)
+
+  This is the LSM Tree (Log-Structured Merge Tree) used by Cassandra, RocksDB:
+  - Writes are always sequential (fast, no random I/O)
+  - Reads: check MemTable → check Bloom filter → check SSTable(s)
+  - Bloom filter: probabilistic check "is this key in this SSTable?" (no false negatives)
+
+Read path:
+  GET user:42
+  1. Check MemTable (most recent writes)
+  2. Check Bloom filter for each SSTable (skip if key definitely absent)
+  3. Binary search within matching SSTable
+  4. Merge results across quorum nodes (R=2 of N=3 nodes)
+  5. Return value with highest vector clock version</div></div>
+  <div class="sec"><div class="sl">Failure handling</div>
+  <div class="fi"><strong>Node failure:</strong> Hinted handoff — writes destined for the failed node are temporarily stored on the next clockwise node with a "hint" (deliver to node X when it recovers). On recovery, hints are replayed.</div>
+  <div class="fi"><strong>Anti-entropy:</strong> Background Merkle tree comparison between replicas. Root hashes differ → find divergent subtree → sync just the differing keys. Keeps replicas consistent without full data transfer.</div>
+  </div>
+  <button class="nb" onclick="show(11)">Next: Typeahead <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ Typeahead ══ -->
+<div class="topic" id="t11">
+  <div class="tt">Typeahead / autocomplete</div>
+  <div class="ts2">Trie · top-K with heap · distributed trie</div>
+  <div class="sec"><div class="sl">Estimates</div>
+  <div class="est-grid">
+    <div class="est-card"><div class="est-num">5B</div><div class="est-lbl">searches/day (Google scale)</div></div>
+    <div class="est-card"><div class="est-num">~20</div><div class="est-lbl">keystrokes per query average</div></div>
+    <div class="est-card"><div class="est-num">100B</div><div class="est-lbl">typeahead requests/day</div></div>
+    <div class="est-card"><div class="est-num">&lt;50ms</div><div class="est-lbl">p99 suggestion latency</div></div>
+    <div class="est-card"><div class="est-num">top-5</div><div class="est-lbl">suggestions shown per keystroke</div></div>
+    <div class="est-card"><div class="est-num">prefix</div><div class="est-lbl">match + popularity rank</div></div>
+  </div></div>
+  <div class="sec"><div class="sl">The Trie data structure</div>
+  <div class="prose"><strong>A Trie (prefix tree) stores strings such that all strings with a common prefix share a common path from the root.</strong> Each node represents a character. Path from root to a node = a prefix. Nodes marked as "end of word" are complete search terms.<br><br>Searching for all words with prefix "sys": traverse from root → s → y → s. All descendants are valid completions. Time complexity: O(prefix_length) to reach the node, O(N) to collect all descendants (where N = number of completions under that prefix).<br><br><strong>The problem:</strong> A prefix like "a" might have billions of descendants. Collecting and sorting all of them is too slow. Solution: store the top-K terms and their frequencies at each node — not just the children.</div></div>
+  <div class="sec"><div class="sl">Optimised Trie with top-K at each node</div>
+  <div class="ab">Each Trie node stores:
+  {
+    children: {char → node},
+    top5: [(term, frequency), ...],  ← precomputed top-5 for this prefix
+    is_end: bool
+  }
+
+  GET suggestions for "sys":
+  1. Traverse root → 's' → 'y' → 's'
+  2. Return node.top5 → [("system", 8M), ("system design", 5M), ...]
+  O(prefix_length) time — no traversal of descendants needed!
+
+  Building the Trie (offline, periodic rebuild):
+  1. Collect all queries from past 7 days (Kafka → Hadoop)
+  2. Count frequency per (query, day) → aggregate total
+  3. Sort by frequency descending
+  4. Build Trie: insert each query, at each prefix node update top5 (min-heap of size 5)
+  5. Serialise Trie → distributed storage
+  6. Push to Typeahead Servers (hot reload, no downtime)
+  Rebuild frequency: hourly for trending, daily for general</div></div>
+  <div class="sec"><div class="sl">Distributed Trie</div>
+  <div class="prose"><strong>The Trie doesn't fit in one machine</strong> at Google's scale (petabytes of query data). Partition by first character (or first two characters). Node A owns all prefixes starting with 'a'–'f'. Node B owns 'g'–'m'. Etc. This is range sharding on the Trie.<br><br>A query for "sys" routes to the node owning 's'. Client is unaware of sharding — a router/consistent-hash layer directs the request to the correct Trie shard.<br><br>Replication: each Trie shard is replicated 3× for HA. Reads are served from any replica (all reads — no writes at query time). Updates are propagated during the offline rebuild cycle.</div></div>
+  <div class="sec"><div class="sl">Personalisation layer</div>
+  <div class="prose">Global Trie gives population-level suggestions. Personalisation adds a user-specific component: recent searches, frequently used terms, location-based suggestions. Implemented as a client-side cache (last 20 personal searches) merged with the global top-5 at display time. No server round-trip for personal suggestions. Global Trie result → merge with client-side personal history → display top-5 combined.</div></div>
+  <div class="ib"><ol>
+    <li><strong>Caching at the edge:</strong> "sys", "syst", "syste", "system" are all popular prefixes. Cache them at CDN edge — the same suggestions served to millions of users don't need to hit Trie servers. Cache TTL: 1 hour. Hit rate for top-1000 prefixes: >80% of all requests.</li>
+    <li><strong>Trending topics:</strong> Break news causes "earthquake india" to spike. The offline rebuild is too slow. Separate "trending" layer updated every 5 minutes from real-time query stream (Flink top-K sliding window). Merged with Trie results at serving time.</li>
+    <li><strong>Interview framing:</strong> "I'd start with a single-machine Trie with top-K at each node. Scale by sharding on prefix first character. Cache popular prefixes at CDN edge. Add a trending layer for real-time signals. Rebuild the Trie every hour from aggregated query logs."</li>
+  </ol></div>
+  <div class="sec"><div class="sl">All problems — one more level deep</div>
+  <div class="cx">
+    <a onclick="sendPrompt('Give me a mock system design interview for the URL shortener — ask me questions as the interviewer and evaluate my answers')">Mock: URL shortener ↗</a>
+    <a onclick="sendPrompt('Give me a mock system design interview for Twitter/X feed design — ask questions as interviewer')">Mock: Twitter feed ↗</a>
+    <a onclick="sendPrompt('Give me a mock system design interview for WhatsApp — ask questions as interviewer')">Mock: WhatsApp ↗</a>
+    <a onclick="sendPrompt('Give me a mock system design interview for a payment system like Razorpay — ask questions as interviewer')">Mock: Payment system ↗</a>
+    <a onclick="sendPrompt('Give me a mock system design interview for Uber ride matching — ask questions as interviewer')">Mock: Uber ↗</a>
+    <a onclick="sendPrompt('Continue with Block 10: JavaScript deep dive — execution context, closures, event loop, promises, V8 internals, and browser rendering pipeline')">Continue to Block 10: JavaScript ↗</a>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(i){
+  document.querySelectorAll('.topic').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.querySelectorAll('.ni').forEach((n,j)=>n.classList.toggle('active',j===i));
+  document.querySelector('.content').scrollTop=0;
+}
+</script>

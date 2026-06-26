@@ -1,0 +1,872 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:780px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:224px;min-width:224px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary)}
+.sh{padding:14px 16px 10px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ni{padding:10px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;transition:all .15s;line-height:1.35}
+.ni:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ni.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.ni .num{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:2px}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic{display:none}.topic.active{display:block}
+.tt{font-size:20px;font-weight:500;margin-bottom:4px}
+.ts2{font-size:13px;color:var(--color-text-tertiary);margin-bottom:24px}
+.sec{margin-bottom:24px}
+.sl{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:14px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kvc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px}
+.kvl{font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px;font-weight:500}
+.kvv{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.to{display:flex;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.to:last-child{border-bottom:none}
+.tos{font-size:12px;flex:1}
+.tos .lb{font-weight:500;margin-bottom:3px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.gain .lb{color:#3B6D11}.lose .lb{color:#A32D2D}
+.tos p{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.fi{padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px;line-height:1.6;color:var(--color-text-secondary)}
+.fi:last-child{border-bottom:none}
+.fi strong{color:var(--color-text-primary);font-weight:500}
+.ib{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:16px}
+.ib ol{padding-left:18px;font-size:13px;line-height:2;color:var(--color-text-secondary)}
+.ib li strong{color:var(--color-text-primary);font-weight:500}
+.cx{display:flex;flex-wrap:wrap;gap:8px}
+.cx a{font-size:12px;padding:4px 12px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.cx a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ab{font-family:var(--font-mono);font-size:12px;line-height:1.65;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:16px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px}
+.sn{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.sd{font-size:12px;color:var(--color-text-tertiary);line-height:1.4}
+.tr{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:16px}
+.tab{font-size:12px;padding:8px 14px;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:all .15s}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tp{display:none}.tp.active{display:block}
+.nb{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:8px 16px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:24px}
+.nb:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.iso-table{width:100%;border-collapse:collapse;font-size:12px}
+.iso-table th{background:var(--color-background-secondary);padding:8px 10px;text-align:left;border:0.5px solid var(--color-border-tertiary);font-weight:500;color:var(--color-text-primary)}
+.iso-table td{padding:8px 10px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);vertical-align:top}
+.iso-table tr:hover td{background:var(--color-background-secondary)}
+.yes{color:#3B6D11;font-weight:500}.no{color:#A32D2D;font-weight:500}
+.mvcc-step{display:flex;flex-direction:column;gap:0}
+.mvcc-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.mvcc-row:last-child{border-bottom:none}
+.mvcc-t{padding:8px 10px;color:var(--color-text-tertiary);font-weight:500;border-right:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+.mvcc-a{padding:8px 10px;border-right:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.mvcc-b{padding:8px 10px;color:var(--color-text-secondary)}
+.mvcc-hdr{background:var(--color-background-secondary);font-weight:500;color:var(--color-text-primary)}
+.pool-bar{height:20px;border-radius:4px;transition:width .4s;margin-bottom:4px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-right:4px;font-weight:500}
+.b-teal{background:#E1F5EE;color:#0F6E56}
+.b-amber{background:#FAEEDA;color:#854F0B}
+.b-coral{background:#FAECE7;color:#993C1D}
+.b-blue{background:#E6F1FB;color:#185FA5}
+.b-gray{background:#F1EFE8;color:#5F5E5A}
+</style>
+
+<h2 class="sr-only">System Design Databases — Block 3 interactive reference covering SQL vs NoSQL, indexing, ACID transactions, replication, sharding, partitioning, connection pooling, WAL, and MVCC.</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sh">Block 3 — Databases</div>
+  <div class="ni active" onclick="show(0)"><span class="num">01</span>SQL vs NoSQL</div>
+  <div class="ni" onclick="show(1)"><span class="num">02</span>Database indexing</div>
+  <div class="ni" onclick="show(2)"><span class="num">03</span>Transactions &amp; ACID</div>
+  <div class="ni" onclick="show(3)"><span class="num">04</span>Replication</div>
+  <div class="ni" onclick="show(4)"><span class="num">05</span>Sharding</div>
+  <div class="ni" onclick="show(5)"><span class="num">06</span>Partitioning</div>
+  <div class="ni" onclick="show(6)"><span class="num">07</span>Connection pooling</div>
+  <div class="ni" onclick="show(7)"><span class="num">08</span>Write-Ahead Log</div>
+  <div class="ni" onclick="show(8)"><span class="num">09</span>MVCC</div>
+</nav>
+
+<main class="content">
+
+<!-- ══ T0: SQL vs NoSQL ══ -->
+<div class="topic active" id="t0">
+  <div class="tt">SQL vs NoSQL</div>
+  <div class="ts2">When to use each — not "NoSQL is faster"</div>
+
+  <div class="sec">
+    <div class="sl">The real question</div>
+    <div class="prose">
+      "NoSQL is faster" is a myth. PostgreSQL on properly sized hardware with good indexes handles millions of QPS. The right question is: <strong>what does your data look like, and what queries do you need to run?</strong><br><br>
+      SQL wins when your data has relationships, you need joins, you need ACID transactions across multiple entities, and your schema is mostly known upfront. NoSQL wins when your data is document-shaped, your schema evolves rapidly, you need to shard horizontally across many nodes, or you need specific access patterns that SQL handles poorly at extreme scale.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Decision framework</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Use SQL (Postgres, MySQL) when</div><div class="kvv">Relational data with joins. ACID transactions (payments, inventory). Complex queries (aggregations, GROUP BY). Schema is stable. Team knows SQL. Data integrity matters above all.</div></div>
+      <div class="kvc"><div class="kvl">Use Document DB (MongoDB, DynamoDB) when</div><div class="kvv">JSON-shaped data where all fields accessed together (no joins). Schema changes frequently. Horizontal write scaling needed. Hierarchical data (orders with line items embedded).</div></div>
+      <div class="kvc"><div class="kvl">Use Wide-Column (Cassandra, HBase) when</div><div class="kvv">Time-series data. Write-heavy workloads (IoT, events, metrics). Need linear horizontal scale. Queries are always by a known partition key — no arbitrary queries.</div></div>
+      <div class="kvc"><div class="kvl">Use Graph DB (Neo4j) when</div><div class="kvv">Data IS the relationships. Friend-of-friend queries. Fraud ring detection. Recommendation engines where traversing N hops of relationships is the primary query pattern.</div></div>
+      <div class="kvc"><div class="kvl">Use Search Engine (Elasticsearch) when</div><div class="kvv">Full-text search with relevance ranking. Fuzzy matching. Log aggregation (ELK stack). Not a primary DB — always a secondary index over the source of truth.</div></div>
+      <div class="kvc"><div class="kvl">Use Time-series DB (InfluxDB, TimescaleDB) when</div><div class="kvv">Metrics, monitoring, IoT sensor data. Queries are always "range over time." Automatic downsampling and retention policies. TimescaleDB = Postgres extension — good if you already use Postgres.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">The "NoSQL is schemaless" myth</div>
+    <div class="prose">
+      NoSQL databases are not schemaless — they have <strong>schema-on-read</strong> rather than schema-on-write. The schema is enforced by your application code when it reads the data. This means: if you write documents inconsistently (some have "email", some have "emailAddress"), the DB accepts both. Your application breaks at read time.<br><br>
+      SQL enforces schema-on-write — the DB rejects malformed data at insert time. This strictness is a feature, not a limitation.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — polyglot persistence</div>
+    <div class="ab">Real systems use multiple DBs for different access patterns:
+
+  User service        → Postgres    (relational, ACID, user+account joins)
+  Product catalog     → MongoDB     (flexible schema, embedded reviews)
+  Search              → Elasticsearch (full-text, relevance)
+  Sessions            → Redis       (low-latency key-value, TTL)
+  Driver location     → Redis (sorted set by geo, 4×/sec writes)
+  Analytics           → ClickHouse  (columnar, OLAP, fast aggregations)
+  Event stream        → Kafka       (durable log, consumer groups)
+  Metrics/monitoring  → InfluxDB    (time-series, downsampling)
+
+Rule: use the right tool for each access pattern.
+Never force all data into one DB to "keep it simple."</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Trade-offs</div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ SQL strengths</div><p>ACID guarantees. Joins across tables. Mature query optimizer. FOREIGN KEY integrity. 40 years of operational knowledge.</p></div><div class="tos lose"><div class="lb">✗ SQL weaknesses</div><p>Horizontal write scaling requires sharding (complex). Schema migrations on large tables are painful. JOIN performance degrades on very large tables without careful indexing.</p></div></div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ NoSQL strengths</div><p>Horizontal scale by design. No schema migrations. Fits document-shaped access patterns natively. Tunable consistency (AP or CP).</p></div><div class="tos lose"><div class="lb">✗ NoSQL weaknesses</div><p>No joins (must denormalize). Eventual consistency is hard to reason about. No multi-document ACID (DynamoDB added it, but it's limited). Application must enforce data integrity.</p></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Never say "NoSQL is faster."</strong> Say: "NoSQL is better suited for horizontal write scaling and flexible schemas. For relational data with transactions, SQL is the right choice."</li>
+      <li><strong>Default to Postgres</strong> for most services unless you can justify otherwise with a specific access pattern argument.</li>
+      <li><strong>Polyglot persistence</strong> is the senior answer. "I'd use Postgres for the order service (ACID), Elasticsearch as a read model for search, and Redis for session state."</li>
+      <li><strong>Probe: "Your product catalog has 500M SKUs. SQL or NoSQL?"</strong> → SQL with proper indexing first. If schema varies wildly per category (electronics vs clothing), MongoDB. If querying by arbitrary attributes, Elasticsearch.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(2)">ACID transactions →</a><a onclick="show(4)">Sharding →</a><a onclick="sendPrompt('Explain CAP theorem with database examples')">CAP theorem</a><a onclick="sendPrompt('Explain PACELC with Cassandra and DynamoDB examples')">PACELC</a></div></div>
+  <button class="nb" onclick="show(1)">Next: Database indexing <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T1: Indexing ══ -->
+<div class="topic" id="t1">
+  <div class="tt">Database indexing</div>
+  <div class="ts2">B-tree · composite · covering index · selectivity</div>
+
+  <div class="sec">
+    <div class="sl">Definition &amp; core purpose</div>
+    <div class="prose">
+      An index is a separate data structure that maps column values to the row locations (page + offset) that contain those values. Without an index, every query does a full table scan — O(N). With an index, lookups are O(log N) for B-tree, O(1) for hash indexes.<br><br>
+      The cost: indexes consume disk space and slow down writes (every INSERT/UPDATE/DELETE must also update all indexes on the table). The tradeoff: read-heavy workloads benefit enormously. Write-heavy workloads can be hurt by too many indexes.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">B-tree index — deep mechanics</div>
+    <div class="prose">
+      Postgres's default index type. A balanced tree where all leaf nodes are at the same depth. Internal nodes hold keys + pointers to child nodes. Leaf nodes hold keys + pointers to heap (actual table rows).<br><br>
+      <strong>Properties:</strong> Self-balancing (height stays O(log N) even as data grows). Supports range queries (<, >, BETWEEN) — in-order traversal of leaf nodes. Supports ORDER BY and MIN/MAX cheaply. Page size typically 8KB; tree height for 1B rows ≈ 4–5 levels.<br><br>
+      <strong>Why not a hash index?</strong> Hash indexes are O(1) for equality (<code>=</code>) but cannot do range queries, ORDER BY, or LIKE prefix matching. B-tree does all of these. Postgres hash indexes also weren't WAL-logged until PG10, making them unsafe.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Index types — key distinctions</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Single-column index</div><div class="kvv"><code>CREATE INDEX ON orders(user_id)</code>. Lookup by user_id uses index. Any other column (status, created_at) still requires full scan or separate index.</div></div>
+      <div class="kvc"><div class="kvl">Composite index</div><div class="kvv"><code>CREATE INDEX ON orders(user_id, status, created_at)</code>. Efficient for queries on (user_id), (user_id, status), (user_id, status, created_at). NOT efficient for (status) alone — leftmost prefix rule.</div></div>
+      <div class="kvc"><div class="kvl">Covering index</div><div class="kvv">Index includes all columns needed by a query — the DB never needs to touch the heap (table). <code>SELECT status FROM orders WHERE user_id=42</code> with index on (user_id, status) = index-only scan. Zero heap I/O.</div></div>
+      <div class="kvc"><div class="kvl">Partial index</div><div class="kvv"><code>CREATE INDEX ON orders(created_at) WHERE status='pending'</code>. Only indexes a subset of rows. Smaller, faster for the specific subset. Perfect for "active records" queries.</div></div>
+      <div class="kvc"><div class="kvl">Expression index</div><div class="kvv"><code>CREATE INDEX ON users(lower(email))</code>. Indexes the result of a function. Query must use the same expression: <code>WHERE lower(email) = ...</code>. Case-insensitive email lookup.</div></div>
+      <div class="kvc"><div class="kvl">GIN index (Postgres)</div><div class="kvv">Generalized Inverted Index. For JSONB, arrays, full-text search. Stores each element → row mapping. <code>WHERE data @> '{"tag":"urgent"}'</code> uses GIN on the JSONB column.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Index selectivity — the critical concept</div>
+    <div class="prose">
+      Selectivity = fraction of rows returned by a given value. High selectivity = few rows returned = index is useful. Low selectivity = many rows returned = full scan may be faster.<br><br>
+      <strong>High selectivity (good index candidate):</strong> email (unique), order_id (unique), UUID.<br>
+      <strong>Low selectivity (poor index candidate):</strong> boolean column (only 2 values), status ENUM with 3 values, gender. A query <code>WHERE is_active = true</code> on a table where 90% of rows are active → index returns 90% of rows → Postgres chooses full scan anyway (correct choice).<br><br>
+      <strong>Composite index selectivity:</strong> Index on (country, city, email) has low selectivity on country alone but high selectivity on (country, city, email) together. The optimizer evaluates the combined selectivity.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — query plans</div>
+    <div class="ab">EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 42 AND status = 'pending';
+
+WITHOUT INDEX:
+  Seq Scan on orders (cost=0.00..18450.00 rows=1 width=64)
+    Filter: ((user_id = 42) AND (status = 'pending'))
+  Rows Removed by Filter: 1844999
+  Planning time: 0.2ms  Execution time: 890ms  ← SLOW
+
+WITH INDEX ON (user_id, status):
+  Index Scan using orders_user_id_status_idx on orders
+    (cost=0.56..8.58 rows=1 width=64)
+    Index Cond: ((user_id=42) AND (status='pending'))
+  Planning time: 0.3ms  Execution time: 0.08ms  ← 11,000× faster
+
+COVERING INDEX ON (user_id, status) INCLUDE (created_at, total):
+  SELECT status, total FROM orders WHERE user_id=42
+  → Index Only Scan  ← never touches table heap, max speed</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Failure modes</div>
+    <div class="fi"><strong>Index not used — implicit type cast:</strong> Column is INTEGER, query passes string: <code>WHERE user_id = '42'</code>. Postgres casts '42' to int, but the cast breaks index usage. Fix: use the correct type in your query.</div>
+    <div class="fi"><strong>Index not used — function on indexed column:</strong> <code>WHERE YEAR(created_at) = 2024</code> wraps the indexed column in a function — index can't be used. Fix: <code>WHERE created_at BETWEEN '2024-01-01' AND '2024-12-31'</code>.</div>
+    <div class="fi"><strong>Too many indexes:</strong> Table with 20 indexes. Every write must update all 20 indexes. Write throughput collapses. Fix: audit with <code>pg_stat_user_indexes</code> — drop indexes with zero scans.</div>
+    <div class="fi"><strong>Leftmost prefix violation:</strong> Index on (user_id, status). Query on status alone → full scan. Developers assume all columns in a composite index are independently queryable.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Selectivity first.</strong> "Before adding an index, I check selectivity. A boolean column with 50/50 split has low selectivity — the optimizer won't use the index."</li>
+      <li><strong>Composite index column order:</strong> Put the highest-selectivity, most-frequently-queried column first. Equality conditions before range conditions.</li>
+      <li><strong>Covering indexes</strong> eliminate heap I/O entirely — mention these for read-heavy, latency-critical queries.</li>
+      <li><strong>Probe: "The query is slow even with an index."</strong> → Run EXPLAIN ANALYZE. Check: is it doing an Index Scan or Seq Scan? If Seq Scan despite an index: table statistics may be stale (run ANALYZE), or the selectivity is so low the optimizer chose correctly.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(7)">WAL →</a><a onclick="show(8)">MVCC →</a><a onclick="sendPrompt('Explain B-tree vs LSM tree for databases')">B-tree vs LSM tree</a><a onclick="sendPrompt('Explain query optimization and execution plans in Postgres')">Query optimizer</a></div></div>
+  <button class="nb" onclick="show(2)">Next: Transactions &amp; ACID <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T2: ACID ══ -->
+<div class="topic" id="t2">
+  <div class="tt">Transactions &amp; ACID</div>
+  <div class="ts2">Atomicity · Consistency · Isolation · Durability · Isolation levels</div>
+
+  <div class="sec">
+    <div class="sl">ACID properties — precise definitions</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Atomicity</div><div class="kvv">All operations in a transaction succeed or all are rolled back. No partial commits. If a payment debit succeeds but the credit fails → entire transaction rolls back. Implemented via undo logs.</div></div>
+      <div class="kvc"><div class="kvl">Consistency</div><div class="kvv">A transaction brings the database from one valid state to another valid state. All constraints (FOREIGN KEY, CHECK, UNIQUE, NOT NULL) are satisfied after the transaction. The DB rejects commits that violate constraints.</div></div>
+      <div class="kvc"><div class="kvl">Isolation</div><div class="kvv">Concurrent transactions execute as if they were serial. The degree of isolation is tunable via isolation levels — each level prevents specific anomalies at the cost of concurrency (and performance).</div></div>
+      <div class="kvc"><div class="kvl">Durability</div><div class="kvv">Once committed, data survives crashes. Implemented via WAL — the commit is written to durable storage (fsync) before the transaction is acknowledged. The in-memory data can be lost; the WAL ensures replay on restart.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Isolation levels — the full spectrum</div>
+    <div style="overflow-x:auto">
+    <table class="iso-table">
+      <tr><th>Level</th><th>Dirty Read</th><th>Non-repeatable Read</th><th>Phantom Read</th><th>Use when</th></tr>
+      <tr><td><strong>Read Uncommitted</strong></td><td><span class="no">Possible</span></td><td><span class="no">Possible</span></td><td><span class="no">Possible</span></td><td>Almost never. Might read uncommitted data from aborted transactions.</td></tr>
+      <tr><td><strong>Read Committed</strong></td><td><span class="yes">Prevented</span></td><td><span class="no">Possible</span></td><td><span class="no">Possible</span></td><td>Postgres default. Good for most OLTP. Each statement sees fresh snapshot.</td></tr>
+      <tr><td><strong>Repeatable Read</strong></td><td><span class="yes">Prevented</span></td><td><span class="yes">Prevented</span></td><td><span class="no">Possible*</span></td><td>Financial reports that run multiple queries and need consistent data. *Postgres prevents phantoms here too (MVCC).</td></tr>
+      <tr><td><strong>Serializable</strong></td><td><span class="yes">Prevented</span></td><td><span class="yes">Prevented</span></td><td><span class="yes">Prevented</span></td><td>Highest correctness. Bank transfers, inventory reservation. Lowest throughput — serialization failures force retries.</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Anomaly definitions — know these cold</div>
+    <div class="prose">
+      <strong>Dirty read:</strong> Transaction A reads data written by Transaction B, which hasn't committed yet. If B rolls back, A read data that never existed. Prevented from Read Committed upward.<br><br>
+      <strong>Non-repeatable read:</strong> Transaction A reads a row. Transaction B updates and commits that row. Transaction A reads the row again — it's different. A got two different values for the same row within one transaction. Prevented from Repeatable Read upward.<br><br>
+      <strong>Phantom read:</strong> Transaction A queries <code>SELECT COUNT(*) WHERE status='pending'</code> → 10 rows. Transaction B inserts a new pending order and commits. Transaction A runs the same query → 11 rows. New "phantom" rows appeared. Prevented at Serializable.<br><br>
+      <strong>Lost update:</strong> Two transactions read the same value, both compute a new value based on the old, both write. The first write is overwritten (lost). Classic race condition on a counter. Fix: SELECT FOR UPDATE, or atomic operations like <code>UPDATE SET count = count + 1</code>.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — payment transaction</div>
+    <div class="ab">BEGIN;
+  -- Atomicity: both updates in one transaction
+  UPDATE accounts SET balance = balance - 1000 WHERE id = 1;
+  UPDATE accounts SET balance = balance + 1000 WHERE id = 2;
+
+  -- Consistency: constraint check (balance must be >= 0)
+  -- CHECK (balance >= 0) will reject if id=1 has < 1000
+
+  -- Isolation: other transactions can't see these changes until COMMIT
+  -- Durability: on COMMIT, WAL flushed to disk before ack
+COMMIT;  -- or ROLLBACK if either fails
+
+-- Serializable isolation for seat reservation:
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+  SELECT * FROM seats WHERE seat_id = 42 FOR UPDATE;  -- lock the row
+  -- if another transaction is modifying seat 42: wait or error
+  UPDATE seats SET reserved_by = 99 WHERE seat_id = 42;
+COMMIT;</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Know all 4 anomalies by name and example.</strong> "Dirty read: reading uncommitted data. Non-repeatable read: same row gives different values within a transaction. Phantom: new rows appear in repeated range queries."</li>
+      <li><strong>Postgres default is Read Committed</strong> — not Serializable. Most teams never change it and rely on SELECT FOR UPDATE for specific critical sections.</li>
+      <li><strong>Probe: "How do you prevent double-spending?"</strong> → Serializable isolation + SELECT FOR UPDATE on the balance row. Or: optimistic locking with a version column (check version on update, retry on mismatch).</li>
+      <li><strong>ACID vs BASE:</strong> NoSQL systems often use BASE (Basically Available, Soft state, Eventually consistent) instead of ACID. "Razorpay uses ACID (Postgres) for payments; Cassandra uses BASE for event logs."</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(7)">WAL (Durability impl.) →</a><a onclick="show(8)">MVCC (Isolation impl.) →</a><a onclick="sendPrompt('Explain optimistic vs pessimistic locking in databases')">Optimistic locking</a><a onclick="sendPrompt('Explain two-phase commit in distributed transactions')">2-phase commit</a></div></div>
+  <button class="nb" onclick="show(3)">Next: Replication <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T3: Replication ══ -->
+<div class="topic" id="t3">
+  <div class="tt">Database replication</div>
+  <div class="ts2">Sync vs async · primary-replica · multi-primary · replication lag</div>
+
+  <div class="sec">
+    <div class="sl">What replication solves</div>
+    <div class="prose">
+      A single database node is a SPOF. Replication maintains one or more copies (replicas) of the primary's data on other nodes. This gives: <strong>high availability</strong> (replica can take over if primary fails), <strong>read scaling</strong> (read queries go to replicas, freeing the primary for writes), and <strong>geographic distribution</strong> (replica in another region reduces read latency for users there).
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Synchronous vs asynchronous</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'rp','r0')">Async (default)</div>
+      <div class="tab" onclick="stab(this,'rp','r1')">Synchronous</div>
+      <div class="tab" onclick="stab(this,'rp','r2')">Multi-primary</div>
+    </div>
+    <div id="rp">
+      <div class="tp active" id="r0">
+        <div class="prose">
+          <strong>Async replication (Postgres default):</strong> Primary commits the write locally, acknowledges to the client immediately, then sends WAL records to replicas in the background. If primary crashes before replicas receive the WAL: up to a few seconds of data loss (the replication lag at the time of crash).<br><br>
+          <strong>Replication lag:</strong> The delay between a write on the primary and it appearing on replicas. Under normal load: 10ms–100ms. Under heavy write load or network congestion: seconds. Reads from a replica during lag return stale data.<br><br>
+          <strong>Detecting lag:</strong> <code>SELECT now() - pg_last_xact_replay_timestamp()</code> on the replica. Alert if > 30s. Route reads to primary if freshness is critical.
+        </div>
+      </div>
+      <div class="tp" id="r1">
+        <div class="prose">
+          <strong>Synchronous replication:</strong> Primary waits for at least one replica to confirm it has received AND flushed the WAL record before acknowledging the write to the client. Zero data loss on primary failure — the replica has everything.<br><br>
+          <strong>Cost:</strong> Write latency increases by the primary→replica round-trip + replica disk fsync. On the same rack: ~1ms extra. Cross-AZ: ~5ms. Cross-region: 50–150ms. Writes that normally take 2ms now take 7ms → 3.5× slower writes.<br><br>
+          <strong>Postgres config:</strong> <code>synchronous_commit = on</code> (default: off). <code>synchronous_standby_names = 'replica1'</code>. If the named replica goes down, writes on the primary block until it reconnects or synchronous_commit is changed.
+        </div>
+      </div>
+      <div class="tp" id="r2">
+        <div class="prose">
+          <strong>Multi-primary (multi-master):</strong> Multiple nodes accept writes. No single primary. Each node replicates to all others.<br><br>
+          <strong>The hard problem:</strong> Concurrent writes to the same row on different primaries create conflicts. Who wins? Last-write-wins (LWW) silently discards one write. Conflict resolution logic must be in the DB or application.<br><br>
+          <strong>Where it works well:</strong> Geographically distributed writes where each region primarily writes its own data (CockroachDB, Google Spanner, Galera for MySQL). Works poorly for global shared data (e.g., a single counter incremented by all regions).<br><br>
+          <strong>Single-primary is almost always the right choice</strong> for most teams. Multi-primary adds enormous complexity for a problem you probably don't have yet.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — primary-replica with routing</div>
+    <div class="ab">Primary-Replica Read Routing
+
+  Application
+    │
+    ├─ Writes ────────────────────────────→ Primary
+    │                                        │
+    │                                    WAL stream (async ~10ms)
+    │                                        │
+    ├─ Reads (fresh) ─────────────────────→ Primary (consistency-critical)
+    │
+    ├─ Reads (stale OK) ──────────────────→ Replica 1 (same AZ)
+    │
+    └─ Reads (reporting, analytics) ──────→ Replica 2 (another AZ)
+
+  Connection routing:
+  - Spring: @Transactional(readOnly=true) → routes to replica via HikariCP routing
+  - PgBouncer: separate pools for primary (port 5432) and replica (port 5433)
+  - AWS RDS Proxy: built-in read/write split
+
+  On primary failure:
+  1. Replication monitor detects missed heartbeat (~10s)
+  2. Replica 1 elected as new primary
+  3. DNS updated to point to Replica 1
+  4. Replica 2 starts replicating from new primary
+  5. Total failover time: ~30–60s (RDS: ~30s, Patroni: ~10–15s)</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Trade-offs</div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ Async replication</div><p>No write latency impact. Replica can lag without blocking writes. Primary failure doesn't cascade.</p></div><div class="tos lose"><div class="lb">✗ Async replication</div><p>Data loss on crash = replication lag at time of failure. Stale reads from replicas. Replica can be seconds behind under load.</p></div></div>
+    <div class="to"><div class="tos gain"><div class="lb">✓ Sync replication</div><p>Zero data loss guarantee. Replica always has complete data. Safe failover.</p></div><div class="tos lose"><div class="lb">✗ Sync replication</div><p>Write latency up by replica RTT. If replica goes down: writes block (or must change config). Problematic for cross-region.</p></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Default: async primary-replica.</strong> "For most services, async replication is correct — the replication lag is acceptable and write performance is not impacted."</li>
+      <li><strong>When to upgrade to sync:</strong> "For the payment service, I'd use synchronous replication or RDS Multi-AZ to guarantee zero data loss on primary failure."</li>
+      <li><strong>Read replica routing:</strong> Mention routing reads to replicas for analytics/reporting but always reading from primary for anything that needs to be immediately consistent after a write.</li>
+      <li><strong>Probe: "Your replica is 30 seconds behind. User writes data, immediately reads it — what happens?"</strong> → Read-after-write inconsistency. Fix: route the read immediately after a write to the primary, or track the replication LSN and wait until replica catches up.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(7)">WAL (mechanism) →</a><a onclick="show(4)">Sharding →</a><a onclick="sendPrompt('Explain Patroni for PostgreSQL high availability')">Patroni HA</a><a onclick="sendPrompt('Explain read-your-own-writes consistency')">Read-your-writes</a></div></div>
+  <button class="nb" onclick="show(4)">Next: Sharding <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T4: Sharding ══ -->
+<div class="topic" id="t4">
+  <div class="tt">Database sharding</div>
+  <div class="ts2">Range · hash · directory · hotspots · cross-shard queries</div>
+
+  <div class="sec">
+    <div class="sl">Definition &amp; why it's a last resort</div>
+    <div class="prose">
+      Sharding = horizontally partitioning data across multiple independent database instances, each holding a subset of the data. Each shard is a fully independent database that has no knowledge of the others.<br><br>
+      <strong>Sharding is a last resort.</strong> Before sharding: vertical scale, read replicas, caching, archiving old data, denormalization. Sharding adds massive operational complexity and destroys cross-shard transactions and joins. Most teams that think they need sharding actually need better indexing and caching first.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Three sharding strategies</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'sh','s0')">Range sharding</div>
+      <div class="tab" onclick="stab(this,'sh','s1')">Hash sharding</div>
+      <div class="tab" onclick="stab(this,'sh','s2')">Directory-based</div>
+    </div>
+    <div id="sh">
+      <div class="tp active" id="s0">
+        <div class="prose">
+          <strong>Range sharding:</strong> Partition key range divided into contiguous ranges. Shard 1: user_id 1–1M, Shard 2: 1M–2M, Shard 3: 2M+.<br><br>
+          <strong>Pros:</strong> Range queries are efficient (all data for a date range is in one shard). Easy to reason about. Shard routing is simple arithmetic.<br><br>
+          <strong>Fatal flaw — hotspot:</strong> Sequential inserts (auto-increment IDs, timestamps) all land on the last shard. New users → all go to shard 3. New orders → all go to the latest shard. One shard gets all writes while others are idle. You've added operational complexity without any write scaling benefit.<br><br>
+          <strong>Use when:</strong> Queries are time-range based (logs, metrics, events). You can tolerate hot recent shards and archive old ones (HBase, ClickHouse time partitions).
+        </div>
+      </div>
+      <div class="tp" id="s1">
+        <div class="prose">
+          <strong>Hash sharding:</strong> <code>shard = hash(user_id) % N</code>. Data is distributed uniformly across all shards — no hotspots for random data.<br><br>
+          <strong>Pros:</strong> Uniform load distribution. No hotspot problem for write-heavy workloads. Simple to implement.<br><br>
+          <strong>Fatal flaw — resharding:</strong> Adding a shard changes N → <code>hash(id) % (N+1)</code> remaps almost all keys to different shards. Massive data migration required. Consistent hashing (as used by Cassandra, Dynamo) reduces remapping to ~1/N of keys.<br><br>
+          <strong>Use when:</strong> Write load is uniform across keys. You can predict your shard count in advance and rarely need to add shards. User-sharded social data (user A's data always goes to shard X).
+        </div>
+      </div>
+      <div class="tp" id="s2">
+        <div class="prose">
+          <strong>Directory-based sharding:</strong> A separate lookup service (or table) maps each key → shard. <code>shard_lookup(user_id=42) → shard_3</code>.<br><br>
+          <strong>Pros:</strong> Maximum flexibility. Can move individual keys between shards (rebalance hot users). No resharding problem. Supports arbitrary distribution.<br><br>
+          <strong>Fatal flaw — lookup service as SPOF:</strong> Every DB request requires a directory lookup first. Directory becomes a high-QPS service (1B requests/day = 11K QPS). If it's down, all DB routing fails. Must be cached aggressively (cached in app memory), highly available.<br><br>
+          <strong>Use when:</strong> You need the ability to rebalance specific "hot" tenants (large customers) to dedicated shards. Multi-tenant SaaS where each customer might have wildly different data volumes.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">The cross-shard problem</div>
+    <div class="prose">
+      <strong>Joins:</strong> User on shard 1, orders on shard 2 (if not co-located). <code>SELECT * FROM users JOIN orders ON users.id = orders.user_id</code> → impossible in one query. Must: fetch users from shard 1, fetch matching orders from shard 2, join in application. Slow and complex.<br><br>
+      <strong>Cross-shard transactions:</strong> Atomic update across two shards requires 2-phase commit (2PC). Complex, slow, and a distributed systems landmine. Avoid by co-locating related data on the same shard (same user's orders always go to the shard that holds that user).<br><br>
+      <strong>Aggregations:</strong> <code>SELECT COUNT(*) FROM orders</code> → must query all shards, sum results. Scatter-gather pattern. Only works if you can tolerate approximate counts or query all shards in parallel.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — shard routing</div>
+    <div class="ab">Shard Router (application or middleware layer)
+
+  Request: GET /orders?user_id=42
+    │
+    ├─ shard_id = hash(42) % 4  →  shard_id = 2
+    │
+    ├─ Route to Shard 2 (Postgres instance @ db-shard-2:5432)
+    │
+    └─ Execute: SELECT * FROM orders WHERE user_id = 42
+
+  Co-location strategy (critical):
+    User 42's profile  → shard 2 (hash(42) % 4 = 2)
+    User 42's orders   → shard 2 (same shard key: user_id=42)
+    User 42's cart     → shard 2 (same)
+  
+  Result: ALL of user 42's data lives on one shard.
+  Joins within a user are fast. Cross-user joins still scatter-gather.
+
+  Hotspot problem solution:
+    Hot user (celebrity with 100M followers): 
+    Override directory: user_id=1 → dedicated shard 99 (large instance)
+    Regular users hash normally to shards 0-3</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Propose sharding reluctantly.</strong> "I'd shard only after exhausting vertical scaling, read replicas, caching, and data archival. Sharding adds complexity that affects every query and transaction."</li>
+      <li><strong>Always propose a shard key with co-location in mind.</strong> "I'd shard on user_id and co-locate all user-related data (orders, sessions, preferences) on the same shard to avoid cross-shard joins."</li>
+      <li><strong>Hotspot is a mandatory mention.</strong> "Range sharding on timestamp creates a hot shard problem — all new writes go to the latest shard. I'd use hash sharding or bucket timestamps to spread load."</li>
+      <li><strong>Probe: "How do you handle a viral celebrity user on your social platform?"</strong> → That user creates a hotspot on their shard. Fix: directory-based routing to move them to a dedicated high-capacity shard, or cache their data aggressively at the application layer.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(5)">Partitioning →</a><a onclick="sendPrompt('Explain consistent hashing for database sharding')">Consistent hashing</a><a onclick="sendPrompt('Explain two-phase commit for cross-shard transactions')">2-phase commit</a><a onclick="show(3)">← Replication</a></div></div>
+  <button class="nb" onclick="show(5)">Next: Partitioning <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T5: Partitioning ══ -->
+<div class="topic" id="t5">
+  <div class="tt">Database partitioning</div>
+  <div class="ts2">Horizontal vs vertical · partition pruning</div>
+
+  <div class="sec">
+    <div class="sl">Partitioning vs sharding — the distinction</div>
+    <div class="prose">
+      <strong>Partitioning</strong> splits data within a single database instance across multiple physical storage units (partitions). All partitions are managed by the same DB engine. Queries can span partitions transparently — the DB handles the routing.<br><br>
+      <strong>Sharding</strong> splits data across multiple independent database instances. The application is responsible for routing.<br><br>
+      Think of partitioning as an optimization technique within one DB. Sharding is a distributed systems architecture. You can use both simultaneously: partition each shard internally.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Horizontal vs vertical partitioning</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Horizontal partitioning (row-based)</div><div class="kvv">Split rows across partitions by a partition key. orders_2023, orders_2024. Each partition holds all columns for its subset of rows. This is what most people mean by "partitioning." Postgres PARTITION BY RANGE/LIST/HASH.</div></div>
+      <div class="kvc"><div class="kvl">Vertical partitioning (column-based)</div><div class="kvv">Split columns across tables. Hot columns (id, status, created_at) in one table, cold columns (long_description, metadata_json) in another. Reduces I/O for queries that only need hot columns. Essentially normalization taken further.</div></div>
+      <div class="kvc"><div class="kvl">Range partitioning</div><div class="kvv"><code>PARTITION BY RANGE (created_at)</code>. Partition per month or year. Time-series data. Old partitions can be dropped instantly (DROP PARTITION vs DELETE with index churn). Queries by date range hit only relevant partitions.</div></div>
+      <div class="kvc"><div class="kvl">List partitioning</div><div class="kvv"><code>PARTITION BY LIST (region)</code>. Partition per country or region. All EU users in eu_partition, US users in us_partition. Useful for data locality (GDPR: EU data stays on EU storage) and query isolation.</div></div>
+      <div class="kvc"><div class="kvl">Hash partitioning</div><div class="kvv"><code>PARTITION BY HASH (user_id)</code>. Even distribution across N partitions. No hotspot for sequential inserts. Good for parallelizing large tables without a natural time or list dimension.</div></div>
+      <div class="kvc"><div class="kvl">Partition pruning</div><div class="kvv">Query optimizer detects which partitions could contain matching rows and skips the rest. <code>WHERE created_at BETWEEN '2024-01-01' AND '2024-03-31'</code> on a monthly partitioned table → scans only Q1 partitions. 9× faster than scanning all 12.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — time-partitioned orders table</div>
+    <div class="ab">CREATE TABLE orders (
+  id BIGSERIAL, user_id INT, created_at TIMESTAMP, total DECIMAL
+) PARTITION BY RANGE (created_at);
+
+CREATE TABLE orders_2023 PARTITION OF orders
+  FOR VALUES FROM ('2023-01-01') TO ('2024-01-01');
+CREATE TABLE orders_2024 PARTITION OF orders
+  FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
+
+-- Query hits ONLY orders_2024 (partition pruning):
+SELECT * FROM orders WHERE created_at > '2024-06-01';
+-- EXPLAIN shows: Seq Scan on orders_2024 (not orders_2023)
+
+-- Drop old data instantly (vs DELETE which takes hours and bloats WAL):
+DROP TABLE orders_2022;  -- instant, no row-level locking
+
+-- Indexes per partition (smaller, faster):
+CREATE INDEX ON orders_2024 (user_id, created_at);</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Failure modes</div>
+    <div class="fi"><strong>Partition key in WHERE is mandatory for pruning:</strong> <code>SELECT * FROM orders WHERE user_id = 42</code> (no created_at filter) → scans ALL partitions. Pruning only works when the partition key appears in the WHERE clause.</div>
+    <div class="fi"><strong>Too many partitions:</strong> 1 partition per day for 10 years = 3,650 partitions. Postgres opens a file handle per partition — at some point, planning overhead exceeds pruning benefit. Keep partitions in the hundreds, not thousands.</div>
+    <div class="fi"><strong>Cross-partition transactions:</strong> Insert into the wrong partition (partition constraint violation) → error. Always use the parent table for inserts and let Postgres route to the correct partition.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Partitioning before sharding.</strong> "I'd partition the orders table by month before considering sharding. Partitioning is transparent, keeps everything in one DB, and enables instant data archival."</li>
+      <li><strong>Partition pruning is the payoff.</strong> "With monthly partitions and a date filter, the query only scans the relevant month — 1/12 the I/O of a full scan."</li>
+      <li><strong>Archival use case:</strong> "Dropping a partition to archive old data is O(1) — it's just removing a file pointer. DELETE for the same operation would take hours and generate massive WAL."</li>
+      <li><strong>Probe: "GDPR requires EU user data to stay in EU."</strong> → List partitioning by region. EU partition stored on EU-region storage. Non-EU partition on US storage. Postgres tablespaces control where each partition is physically stored.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(4)">← Sharding</a><a onclick="sendPrompt('Explain columnar storage and OLAP vs OLTP')">Columnar storage</a><a onclick="sendPrompt('Explain TimescaleDB time-series partitioning')">TimescaleDB</a></div></div>
+  <button class="nb" onclick="show(6)">Next: Connection pooling <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T6: Connection Pooling ══ -->
+<div class="topic" id="t6">
+  <div class="tt">Connection pooling</div>
+  <div class="ts2">Why it exists · HikariCP · pool exhaustion</div>
+
+  <div class="sec">
+    <div class="sl">Why connections are expensive</div>
+    <div class="prose">
+      A TCP connection to Postgres is not cheap. The DB must fork (or use a lightweight process), allocate memory (~5–10MB per connection on the backend process), establish TLS, authenticate, and set up session state. This takes ~50–100ms. Doing this on every request is catastrophic at scale.<br><br>
+      Postgres has a hard limit on max connections (~100–500 depending on RAM). At 100 connections × 10MB = 1GB of RAM used just for connection overhead, before a single byte of data is processed. A connection pool maintains a fixed set of long-lived connections and lends them to request threads for the duration of a query.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">How HikariCP works</div>
+    <div class="prose">
+      HikariCP is the fastest JDBC connection pool (Spring Boot's default). Internally: a lock-free ConcurrentBag of connection wrappers. When a thread requests a connection:<br><br>
+      1. Check if the calling thread previously returned a connection (thread-local cache) → return it immediately (O(1), no contention).<br>
+      2. If not, look in the shared bag for an idle connection → acquire and return.<br>
+      3. If all connections are checked out → wait up to <code>connectionTimeout</code> (default: 30s) for one to become available.<br>
+      4. Timeout → throw <code>SQLTimeoutException</code> (pool exhaustion).<br><br>
+      <strong>Key config parameters:</strong><br>
+      <code>maximumPoolSize</code>: max connections to DB. Recommendation: start with 10, tune based on CPU cores on DB server. More is not better — DB CPU becomes the bottleneck.<br>
+      <code>minimumIdle</code>: connections kept open when idle. <code>connectionTimeout</code>: max wait for a connection. <code>idleTimeout</code>: close idle connections after this duration. <code>maxLifetime</code>: recycle connections before DB's server-side timeout kills them (prevents "connection was closed" errors).
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Pool size simulator</div>
+    <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:16px;margin-top:4px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px">
+        <label style="color:var(--color-text-secondary);min-width:100px">Concurrent threads</label>
+        <input type="range" min="1" max="50" step="1" value="15" id="p-threads" oninput="calcPool()" style="flex:1">
+        <span id="o-threads" style="min-width:32px;text-align:right;font-weight:500;color:var(--color-text-primary)">15</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:13px">
+        <label style="color:var(--color-text-secondary);min-width:100px">Pool size</label>
+        <input type="range" min="2" max="30" step="1" value="10" id="p-pool" oninput="calcPool()" style="flex:1">
+        <span id="o-pool" style="min-width:32px;text-align:right;font-weight:500;color:var(--color-text-primary)">10</span>
+      </div>
+      <div style="margin-bottom:8px;font-size:12px;color:var(--color-text-tertiary)">Connection utilization</div>
+      <div class="pool-bar" id="pool-bar" style="background:#E1F5EE;width:100%"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+        <div class="sc"><div class="sn" id="p-used">10</div><div class="sd">In use</div></div>
+        <div class="sc"><div class="sn" id="p-wait">5</div><div class="sd">Threads waiting</div></div>
+        <div class="sc"><div class="sn" id="p-status" style="font-size:14px">Exhausted</div><div class="sd">Pool status</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — PgBouncer + HikariCP</div>
+    <div class="ab">Why both HikariCP AND PgBouncer?
+
+  App (Spring Boot, 50 instances) × HikariCP pool size 10
+  = 500 total connections to PgBouncer
+
+  PgBouncer (connection pooler proxy, transaction mode)
+  = 20 actual connections to Postgres
+
+  Postgres max_connections = 100
+  
+  Without PgBouncer:
+    50 app instances × 10 pool size = 500 connections to Postgres
+    Postgres crashes (max_connections exceeded)
+
+  With PgBouncer (transaction pooling):
+    A connection is borrowed from PgBouncer only for the duration
+    of a single transaction, then returned immediately.
+    500 app connections → multiplexed → 20 Postgres connections.
+    Works because most app threads wait for response, not holding a transaction.
+
+  CRITICAL: PgBouncer transaction mode breaks:
+    - SET commands (session-level config is lost between transactions)
+    - Prepared statements (must disable)
+    - Advisory locks
+    - LISTEN/NOTIFY</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Failure modes</div>
+    <div class="fi"><strong>Pool exhaustion:</strong> All connections checked out, new requests queue. Queue fills → SQLTimeoutException → 503s to users. Root cause: slow queries holding connections too long. Fix: find slow queries (pg_stat_activity), add indexes, reduce query time. Short-term: increase pool size but this is treating symptoms.</div>
+    <div class="fi"><strong>Connection leak:</strong> Code opens a connection but doesn't close it (missing try-with-resources). Pool is gradually depleted. Fix: always use try-with-resources (Java), or Spring's <code>@Transactional</code> which handles connection lifecycle.</div>
+    <div class="fi"><strong>Pool size too large:</strong> 500 connections to a Postgres with 8 CPUs. DB spends more time context-switching between connections than executing queries. Throughput drops. The optimal pool size formula (HikariCP docs): <code>pool_size = (core_count × 2) + effective_spindle_count</code>. For 8-core DB with SSDs: ~17 connections per app instance.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Know why pooling exists</strong> and the cost of a raw connection (~50ms, ~10MB). "Without pooling, a 1000 RPS service would try to open 1000 DB connections per second — the DB falls over instantly."</li>
+      <li><strong>Pool size rule:</strong> "Bigger pool is not always better. Optimal size is roughly 2× CPU cores on the DB server. More connections than that and the DB spends time on context switching."</li>
+      <li><strong>PgBouncer is the senior-level addition.</strong> "At scale with many app instances, each with their own pool, I'd put PgBouncer in front of Postgres to multiplex hundreds of app connections down to a few dozen real DB connections."</li>
+      <li><strong>Pool exhaustion diagnosis:</strong> "If I see SQLTimeoutException, I check pg_stat_activity to find which queries are long-running and holding connections. Usually it's a missing index causing a slow query, not actually needing a bigger pool."</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">← Indexing (slow query fix)</a><a onclick="sendPrompt('Explain PgBouncer transaction vs session pooling modes')">PgBouncer modes</a><a onclick="sendPrompt('Explain HikariCP configuration and tuning')">HikariCP tuning</a></div></div>
+  <button class="nb" onclick="show(7)">Next: Write-Ahead Log <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T7: WAL ══ -->
+<div class="topic" id="t7">
+  <div class="tt">Write-Ahead Log (WAL)</div>
+  <div class="ts2">Crash recovery · replication · change data capture</div>
+
+  <div class="sec">
+    <div class="sl">Definition &amp; core purpose</div>
+    <div class="prose">
+      The WAL is a sequential, append-only log file where every change to the database is written <em>before</em> the change is applied to the actual data pages. The guarantee: <strong>if it's in the WAL, it's durable, even if the process crashes a millisecond later.</strong><br><br>
+      The WAL is the implementation backbone of three critical features: crash recovery (Durability in ACID), streaming replication (replicas replay the primary's WAL), and Change Data Capture (tools like Debezium read the WAL to produce change events).
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">How it works — step by step</div>
+    <div class="prose">
+      <strong>1. Write to WAL buffer (in memory):</strong> When a transaction modifies data, Postgres writes the change record (operation type, table OID, old/new values) to the WAL buffer in shared memory. This is fast — sequential memory write.<br><br>
+      <strong>2. Flush WAL buffer to disk (fsync):</strong> At COMMIT, Postgres fsyncs the WAL buffer to the WAL segment file on disk. This is the moment of durability. The data file (heap) has NOT been updated yet — only the log.<br><br>
+      <strong>3. Apply to heap (lazy):</strong> The actual data pages (heap files) are updated asynchronously by the background writer (bgwriter) when convenient. During peak load, the heap may be seconds behind the WAL.<br><br>
+      <strong>4. Crash recovery:</strong> On restart, Postgres finds the last checkpoint (a known good point where heap = WAL). Replays all WAL records after the checkpoint. In seconds, the heap is consistent with the WAL again.<br><br>
+      <strong>Sequential write = fast:</strong> Writing 1MB of WAL sequentially takes ~0.1ms on SSD. Updating random data pages (random I/O) would take much longer. WAL converts random I/O into sequential I/O — this is why it's fast.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">WAL for replication &amp; CDC</div>
+    <div class="prose">
+      <strong>Streaming replication:</strong> The WAL sender process on the primary streams WAL records to the WAL receiver on the replica in near-real-time. The replica's recovery process replays these records, applying them to the replica's heap. The replica is essentially always in "recovery mode" — constantly replaying the primary's WAL.<br><br>
+      <strong>Logical replication (Postgres 10+):</strong> Physical replication copies raw WAL bytes — only works between identical Postgres versions on the same architecture. Logical replication decodes WAL into logical change events (INSERT/UPDATE/DELETE at the table level) and streams those. Allows replication to different Postgres versions, or to non-Postgres targets (Kafka via Debezium, Elasticsearch).<br><br>
+      <strong>CDC with Debezium:</strong> Debezium acts as a Postgres logical replication slot consumer. It reads the logical WAL stream, converts changes to JSON events, and publishes to Kafka. Zero impact on the application — the WAL is produced anyway.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — WAL flow</div>
+    <div class="ab">WAL Write Path (single commit):
+
+  Transaction COMMIT
+    │
+    ├─ 1. Write change records to WAL buffer (memory, ~microseconds)
+    │
+    ├─ 2. fsync WAL buffer → WAL segment file (disk, ~0.1–1ms)
+    │       /var/lib/postgresql/data/pg_wal/000000010000000000000001
+    │
+    ├─ 3. ACK to client: "committed" ✓
+    │
+    └─ 4. Heap updated asynchronously (bgwriter, seconds later)
+
+WAL Segment:
+  [LSN: 0/01234567] UPDATE orders SET status='shipped' WHERE id=42
+  [LSN: 0/01234580] INSERT INTO audit_log VALUES (...)
+  [LSN: 0/012345A0] COMMIT
+
+Replication pipeline:
+  Primary WAL → WAL Sender → network → WAL Receiver (Replica)
+                                        → Recovery process replays WAL
+                                        → Replica heap updated
+
+CDC pipeline:
+  Primary WAL → Logical Replication Slot → Debezium → Kafka
+  ("orders" topic: {op:UPDATE, id:42, status:shipped})</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Failure modes</div>
+    <div class="fi"><strong>WAL bloat from idle replication slots:</strong> A logical replication slot prevents WAL segments from being deleted (replica might need them). If the replica disconnects and never reconnects, WAL accumulates indefinitely. Disk fills → Postgres stops accepting writes. Monitor with: <code>SELECT pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), confirmed_flush_lsn)) FROM pg_replication_slots</code>. Set <code>max_slot_wal_keep_size</code> limit.</div>
+    <div class="fi"><strong>Checkpoint too infrequent:</strong> Large gap between checkpoints means crash recovery must replay a lot of WAL → slow restart. Tune <code>checkpoint_completion_target</code> and <code>max_wal_size</code>.</div>
+    <div class="fi"><strong>fsync disabled:</strong> Setting <code>fsync=off</code> dramatically improves write performance but disables WAL durability guarantee. One power cut → DB corruption. Never in production. The performance gain is real but the risk is catastrophic.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>WAL = durability in ACID.</strong> "Durability is implemented via WAL — the commit record is fsynced to disk before the client is acknowledged. Even if the heap hasn't been updated, the WAL guarantees recovery."</li>
+      <li><strong>WAL = replication mechanism.</strong> "Streaming replication works by the primary streaming WAL records to replicas, which replay them. That's why replication lag = WAL receiver being behind the WAL sender."</li>
+      <li><strong>WAL → CDC.</strong> "For cache invalidation, I'd use Debezium to read Postgres's logical WAL and publish change events to Kafka. Zero application code change needed — works for all write paths including batch jobs."</li>
+      <li><strong>Probe: "How does Postgres recover after a crash?"</strong> → Finds last checkpoint in pg_control. Replays all WAL records after that checkpoint. Achieves consistency in seconds (dependent on WAL volume since last checkpoint).</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(2)">← ACID (Durability)</a><a onclick="show(3)">← Replication</a><a onclick="sendPrompt('Explain Debezium CDC pipeline with Postgres and Kafka')">Debezium</a><a onclick="show(8)">MVCC →</a></div></div>
+  <button class="nb" onclick="show(8)">Next: MVCC <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T8: MVCC ══ -->
+<div class="topic" id="t8">
+  <div class="tt">MVCC</div>
+  <div class="ts2">How Postgres avoids read locks — multi-version concurrency control</div>
+
+  <div class="sec">
+    <div class="sl">The problem MVCC solves</div>
+    <div class="prose">
+      Naive approach to concurrent transactions: readers take shared locks, writers take exclusive locks. Reader blocks writer. Writer blocks all readers. At high concurrency, everything queues. Throughput collapses.<br><br>
+      MVCC's insight: <strong>readers never block writers, and writers never block readers.</strong> Instead of locking, Postgres keeps multiple versions of each row simultaneously. Each transaction sees a consistent snapshot of the database as it existed at the start of that transaction — even if other transactions are modifying data concurrently.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">How it works — xmin/xmax</div>
+    <div class="prose">
+      Every row in Postgres has two hidden system columns:<br><br>
+      <strong>xmin:</strong> The transaction ID (XID) that created this row version.<br>
+      <strong>xmax:</strong> The transaction ID that deleted (or updated) this row version. Zero if the row is currently live.<br><br>
+      When a transaction reads a row, it checks: is <code>xmin</code> ≤ my snapshot's XID and <code>xmax</code> = 0 (or > my snapshot's XID)? If yes, this row version is visible to me.<br><br>
+      When a transaction UPDATES a row: it marks the old version with <code>xmax = my_XID</code> (soft delete) and inserts a NEW row version with <code>xmin = my_XID</code>. The old version still exists on disk — other concurrent transactions that started before the update see the old version. The transaction that did the update (and later transactions) see the new version.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">MVCC in action — concurrent timeline</div>
+    <div class="mvcc-step">
+      <div class="mvcc-row">
+        <div class="mvcc-t mvcc-hdr">Time</div><div class="mvcc-a mvcc-hdr">Transaction A (XID 100)</div><div class="mvcc-b mvcc-hdr">Transaction B (XID 101)</div>
+      </div>
+      <div class="mvcc-row"><div class="mvcc-t">T1</div><div class="mvcc-a">BEGIN — snapshot: sees XID &lt; 100</div><div class="mvcc-b"></div></div>
+      <div class="mvcc-row"><div class="mvcc-t">T2</div><div class="mvcc-a">SELECT balance WHERE id=1 → 1000 (row: xmin=50, xmax=0)</div><div class="mvcc-b">BEGIN — snapshot: sees XID &lt; 101</div></div>
+      <div class="mvcc-row"><div class="mvcc-t">T3</div><div class="mvcc-a"></div><div class="mvcc-b">UPDATE balance=900 WHERE id=1 → marks old row xmax=101, inserts new row xmin=101, balance=900</div></div>
+      <div class="mvcc-row"><div class="mvcc-t">T4</div><div class="mvcc-a"></div><div class="mvcc-b">COMMIT</div></div>
+      <div class="mvcc-row"><div class="mvcc-t">T5</div><div class="mvcc-a">SELECT balance WHERE id=1 → still 1000 (old row: xmin=50, xmax=101 &gt; snapshot 100 → visible to A) — No lock needed! A reads old version.</div><div class="mvcc-b"></div></div>
+      <div class="mvcc-row"><div class="mvcc-t">T6</div><div class="mvcc-a">COMMIT</div><div class="mvcc-b"></div></div>
+      <div class="mvcc-row"><div class="mvcc-t">T7</div><div class="mvcc-a" style="grid-column:span 2;color:var(--color-text-secondary)">New transaction C (XID 102): SELECT balance WHERE id=1 → 900 (new row: xmin=101, xmax=0, both &lt; 102 → visible)</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">VACUUM — cleaning up dead rows</div>
+    <div class="prose">
+      MVCC creates "dead rows" — old versions that are no longer visible to any active transaction. These consume disk space and slow down scans. <strong>VACUUM</strong> reclaims this space.<br><br>
+      <strong>Autovacuum:</strong> Postgres runs autovacuum automatically as a background process. It periodically scans tables for dead rows and removes them. You can tune aggressiveness via <code>autovacuum_vacuum_scale_factor</code> (default: 20% of table = vacuum trigger) and <code>autovacuum_vacuum_cost_delay</code>.<br><br>
+      <strong>VACUUM FULL:</strong> Rewrites the entire table to a new file without dead rows. Reclaims maximum space but requires exclusive lock on the table. Avoid in production. Use regular autovacuum instead.<br><br>
+      <strong>Table bloat:</strong> High-write tables with slow autovacuum accumulate dead rows. Table grows to 10× the live data size. Queries slow down proportionally. Fix: tune autovacuum aggressively for hot tables, or use pg_partman to rotate partitions.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">MVCC and isolation levels</div>
+    <div class="prose">
+      MVCC is how Postgres implements isolation levels:<br><br>
+      <strong>Read Committed:</strong> Each statement gets a new snapshot at statement start. A re-read within the same transaction can see committed changes by others (non-repeatable read is possible).<br><br>
+      <strong>Repeatable Read:</strong> Snapshot taken at transaction start. All reads within the transaction see the same consistent state. Committed changes by others are invisible (no non-repeatable reads). Postgres also prevents phantom reads at this level (stricter than SQL standard).<br><br>
+      <strong>Serializable (SSI):</strong> Postgres's Serializable Snapshot Isolation. Uses the MVCC snapshot mechanism but additionally detects "serialization anomalies" — situations where the result couldn't have been produced by any serial execution order. On detection: transaction is aborted with a serialization error and must retry. Zero false positives (unlike 2PL which causes unnecessary blocking).
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>"Readers don't block writers, writers don't block readers"</strong> — say this verbatim. It's the core MVCC elevator pitch and interviewers recognize it as accurate.</li>
+      <li><strong>Explain xmin/xmax</strong> if asked how it works. "Every row has a creation XID (xmin) and a deletion XID (xmax). A transaction sees a row if xmin is before its snapshot and xmax is after (or zero)."</li>
+      <li><strong>VACUUM</strong> is the MVCC gotcha. "MVCC leaves dead row versions that must be cleaned up by VACUUM. On high-write tables, if autovacuum can't keep up, table bloat accumulates and performance degrades."</li>
+      <li><strong>Probe: "How does Postgres implement Repeatable Read without locking?"</strong> → MVCC snapshot taken at transaction start. All reads in the transaction see the same version of data as of that snapshot, regardless of concurrent commits. No shared locks required.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(2)">← ACID isolation</a><a onclick="show(7)">← WAL</a><a onclick="sendPrompt('Explain Postgres VACUUM and table bloat in production')">VACUUM tuning</a><a onclick="sendPrompt('Continue with Block 4: Message queues — Kafka, RabbitMQ, event-driven architecture, CQRS')">Continue to Block 4 ↗</a></div></div>
+  <button class="nb" onclick="sendPrompt('Continue with Block 4: Message queues — Kafka, RabbitMQ, event-driven architecture, CQRS, rate limiting, circuit breaker')">Continue to Block 4 ↗</button>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(idx){
+  document.querySelectorAll('.topic').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.ni').forEach((n,i)=>n.classList.toggle('active',i===idx));
+  document.querySelector('.content').scrollTop=0;
+}
+function stab(el,gid,pid){
+  document.getElementById(gid).querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pid).classList.add('active');
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function calcPool(){
+  const threads=+document.getElementById('p-threads').value;
+  const pool=+document.getElementById('p-pool').value;
+  document.getElementById('o-threads').textContent=threads;
+  document.getElementById('o-pool').textContent=pool;
+  const inUse=Math.min(threads,pool);
+  const waiting=Math.max(0,threads-pool);
+  const pct=Math.round((inUse/pool)*100);
+  const bar=document.getElementById('pool-bar');
+  bar.style.width=pct+'%';
+  bar.style.background=waiting>0?'#F09595':pct>80?'#EF9F27':'#5DCAA5';
+  document.getElementById('p-used').textContent=inUse;
+  document.getElementById('p-wait').textContent=waiting;
+  const status=waiting>0?'Exhausted':pct>80?'High load':'Healthy';
+  document.getElementById('p-status').textContent=status;
+  document.getElementById('p-status').style.color=waiting>0?'#A32D2D':pct>80?'#854F0B':'#3B6D11';
+}
+calcPool();
+</script>

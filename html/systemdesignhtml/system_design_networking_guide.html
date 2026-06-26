@@ -1,0 +1,482 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:800px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:210px;min-width:210px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary)}
+.sh{padding:14px 16px 10px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ni{padding:9px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;line-height:1.3}
+.ni:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ni.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.ni .num{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:1px}
+.content{flex:1;overflow-y:auto;padding:24px 28px}
+.topic{display:none}.topic.active{display:block}
+.tt{font-size:19px;font-weight:500;margin-bottom:3px}
+.ts2{font-size:13px;color:var(--color-text-tertiary);margin-bottom:20px}
+.sec{margin-bottom:20px}
+.sl{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kvc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.kvl{font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px;font-weight:500}
+.kvv{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.to{display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.to:last-child{border-bottom:none}
+.tos{font-size:12px;flex:1}
+.tos .lb{font-weight:500;margin-bottom:2px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.gain .lb{color:#3B6D11}.lose .lb{color:#A32D2D}
+.tos p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.fi{padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12.5px;line-height:1.6;color:var(--color-text-secondary)}
+.fi:last-child{border-bottom:none}
+.fi strong{color:var(--color-text-primary);font-weight:500}
+.ib{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px}
+.ib ol{padding-left:16px;font-size:12.5px;line-height:1.9;color:var(--color-text-secondary)}
+.ib li strong{color:var(--color-text-primary);font-weight:500}
+.cx{display:flex;flex-wrap:wrap;gap:6px}
+.cx a{font-size:11.5px;padding:3px 10px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.cx a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ab{font-family:var(--font-mono);font-size:11.5px;line-height:1.6;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px}
+.sn{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.sd{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.4}
+.tr{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:14px}
+.tab{font-size:12px;padding:7px 12px;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tp{display:none}.tp.active{display:block}
+.nb{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:7px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:20px}
+.nb:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.http-lane{display:flex;flex-direction:column;gap:3px}
+.req-bar{height:18px;border-radius:3px;font-size:10px;font-weight:500;display:flex;align-items:center;padding:0 6px;transition:width .3s}
+.dns-step{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.dns-step:last-child{border-bottom:none}
+.dns-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;margin-top:1px;background:#E6F1FB;color:#0C447C;border:0.5px solid #85B7EB}
+.dns-body{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.dns-body strong{color:var(--color-text-primary);font-weight:500}
+.tls-phase{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:6px}
+.tls-phase .ph{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.tls-phase .pd{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-right:4px}
+.b-blue{background:#E6F1FB;color:#0C447C}
+.b-teal{background:#E1F5EE;color:#085041}
+.b-amber{background:#FAEEDA;color:#633806}
+.b-coral{background:#FAECE7;color:#712B13}
+.b-purple{background:#EEEDFE;color:#3C3489}
+.b-green{background:#EAF3DE;color:#27500A}
+.rt-vis{display:grid;gap:3px;margin:10px 0}
+.rt-row{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--color-text-secondary)}
+.rt-label{min-width:90px;font-weight:500;color:var(--color-text-primary)}
+.rt-bar-wrap{flex:1;height:16px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;border:0.5px solid var(--color-border-tertiary)}
+.rt-bar{height:100%;border-radius:3px}
+.rt-val{min-width:40px;text-align:right}
+</style>
+
+<h2 class="sr-only">System Design Networking and Protocols — Block 6 covering DNS resolution, HTTP versions, WebSocket vs SSE vs long polling, gRPC vs REST vs GraphQL, TLS/HTTPS, and TCP vs UDP.</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sh">Block 6 — Networking</div>
+  <div class="ni active" onclick="show(0)"><span class="num">01</span>DNS</div>
+  <div class="ni" onclick="show(1)"><span class="num">02</span>HTTP/1.1 vs /2 vs /3</div>
+  <div class="ni" onclick="show(2)"><span class="num">03</span>WebSocket vs SSE vs polling</div>
+  <div class="ni" onclick="show(3)"><span class="num">04</span>gRPC vs REST vs GraphQL</div>
+  <div class="ni" onclick="show(4)"><span class="num">05</span>TLS / HTTPS</div>
+  <div class="ni" onclick="show(5)"><span class="num">06</span>TCP vs UDP</div>
+</nav>
+
+<main class="content">
+
+<!-- ══ T0: DNS ══ -->
+<div class="topic active" id="t0">
+  <div class="tt">DNS</div>
+  <div class="ts2">Resolution process · recursive vs iterative · TTL · DNS load balancing</div>
+
+  <div class="sec">
+    <div class="sl">Definition</div>
+    <div class="prose">DNS (Domain Name System) is the internet's distributed phone book. It translates human-readable domain names (<code>api.razorpay.com</code>) into IP addresses (<code>34.93.21.48</code>) that routers understand. It's a hierarchical, globally distributed system with aggressive caching at every layer — by design, most DNS lookups never reach the authoritative server.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Resolution — step by step</div>
+    <div class="dns-step"><div class="dns-num">1</div><div class="dns-body"><strong>Browser cache.</strong> Chrome caches DNS entries (respect TTL). Check <code>chrome://net-internals/#dns</code>. If cached and not expired → done in microseconds.</div></div>
+    <div class="dns-step"><div class="dns-num">2</div><div class="dns-body"><strong>OS resolver cache.</strong> <code>/etc/hosts</code> checked first, then OS DNS cache (nscd, systemd-resolved). TTL managed by OS independently of browser.</div></div>
+    <div class="dns-step"><div class="dns-num">3</div><div class="dns-body"><strong>Recursive resolver (ISP or 8.8.8.8).</strong> If neither cache has it, the OS asks its configured resolver. This resolver does all the heavy lifting on behalf of the client — the client just waits.</div></div>
+    <div class="dns-step"><div class="dns-num">4</div><div class="dns-body"><strong>Root nameserver.</strong> Recursive resolver asks a root server (13 sets, operated by IANA): "who knows about .com?" Root returns the address of the .com TLD nameserver.</div></div>
+    <div class="dns-step"><div class="dns-num">5</div><div class="dns-body"><strong>TLD nameserver.</strong> Resolver asks the .com TLD: "who knows about razorpay.com?" Returns the address of Razorpay's authoritative nameserver.</div></div>
+    <div class="dns-step"><div class="dns-num">6</div><div class="dns-body"><strong>Authoritative nameserver.</strong> Resolver asks Razorpay's nameserver: "what's the IP for api.razorpay.com?" Returns the A record (IPv4) or AAAA record (IPv6). Result cached by recursive resolver for the TTL duration.</div></div>
+    <div class="dns-step"><div class="dns-num">7</div><div class="dns-body"><strong>Response to client.</strong> Recursive resolver returns IP to OS → OS returns to browser → TCP connection begins. Total time cold: 20–120ms. Warm cache: ~0ms.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Recursive vs iterative resolution</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Recursive (what clients use)</div><div class="kvv">Client asks resolver → resolver does all work → resolver returns final answer. Client makes one request and waits. Burden is on the resolver. All caching happens at the resolver.</div></div>
+      <div class="kvc"><div class="kvl">Iterative (what resolvers use internally)</div><div class="kvv">Resolver asks root → root says "ask .com TLD" → resolver asks .com TLD → TLD says "ask ns1.razorpay.com" → resolver asks that → gets answer. Each step returns a referral, not the answer. Resolver follows the chain.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">TTL — the key design lever</div>
+    <div class="prose"><strong>TTL controls how long the DNS response is cached</strong> by resolvers worldwide. It's set by the domain owner in their authoritative DNS records.<br><br><strong>Short TTL (30–60s):</strong> Changes propagate globally in under a minute. Essential before planned migrations, failover events, or blue/green deployments. Cost: every TTL expiry generates a fresh recursive query — higher load on your nameservers.<br><br><strong>Long TTL (300–3600s):</strong> High cache hit rate globally. Reduced nameserver load. Changes take the full TTL to propagate — dangerous during incidents when you need to redirect traffic urgently.<br><br><strong>Production strategy:</strong> Normal TTL = 300s. 24 hours before a planned migration, drop to 60s. Execute the migration. Raise back to 300s after validation. This is how companies do zero-downtime DNS cutovers.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">DNS for load balancing &amp; failover</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Round-robin DNS</div><div class="kvv">Return multiple A records for the same domain in rotating order. Clients pick the first one returned. Rough load distribution across IPs. No health checking — returns dead IPs too. Clients cache aggressively so rotation is unreliable.</div></div>
+      <div class="kvc"><div class="kvl">Weighted routing (Route 53)</div><div class="kvv">Send 90% of queries to primary region, 10% to canary. Gradual rollouts without code deployment. Change weights in seconds.</div></div>
+      <div class="kvc"><div class="kvl">Latency routing</div><div class="kvl">Route each user to the region with lowest measured RTT. AWS Route 53 maintains latency measurements and serves accordingly. User in Mumbai gets ap-south-1.</div></div>
+      <div class="kvc"><div class="kvl">Health-check failover</div><div class="kvv">Route 53 probes endpoints every 10s. If primary fails health checks → automatically switch DNS response to failover IP. TTL must be short for this to work quickly.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture</div>
+    <div class="ab">DNS hierarchy and caching layers:
+
+  [Browser]──cache hit (TTL OK)──→ IP returned instantly
+
+  [Browser]──cache miss──→[OS resolver]──cache miss──→[Recursive resolver (8.8.8.8)]
+                                                              │
+                                              ┌─────iterative queries─────┐
+                                              ▼                           ▼
+                                      [Root NS .]             [.com TLD NS]
+                                      "ask .com"              "ask ns1.razorpay.com"
+                                                                          │
+                                                              [Authoritative NS]
+                                                              A record: 34.93.21.48
+                                                              TTL: 300s
+
+  DNS record types:
+  A     → IPv4 address
+  AAAA  → IPv6 address
+  CNAME → alias to another domain (api.razorpay.com → razorpay.global.fastly.net)
+  MX    → mail server
+  TXT   → verification, SPF, DKIM
+  NS    → nameserver for the domain</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Know the hierarchy by heart:</strong> Browser → OS → Recursive resolver → Root → TLD → Authoritative. Explain each layer's role and caching behaviour.</li>
+      <li><strong>TTL is a design decision, not a detail.</strong> "Before a migration, I'd drop TTL to 60s 24 hours in advance, then restore after. This is the correct zero-downtime DNS cutover procedure."</li>
+      <li><strong>DNS ≠ reliable load balancing.</strong> "DNS round-robin distributes queries, not connections — clients cache aggressively, so distribution is uneven. Use an L7 load balancer for real traffic distribution."</li>
+      <li><strong>Probe: "How does Razorpay's API go down for 5 minutes during a failover?"</strong> → TTL was 300s. When the primary failed, it took 5 minutes for cached DNS entries to expire globally. Fix: pre-emptively lower TTL before incidents, or use Anycast routing.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(4)">TLS (after DNS) →</a><a onclick="show(1)">HTTP versions →</a><a onclick="sendPrompt('Explain Anycast routing and how Cloudflare uses it for DNS')">Anycast routing</a></div></div>
+  <button class="nb" onclick="show(1)">Next: HTTP/1.1 vs /2 vs /3 <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T1: HTTP ══ -->
+<div class="topic" id="t1">
+  <div class="tt">HTTP/1.1 vs HTTP/2 vs HTTP/3</div>
+  <div class="ts2">Head-of-line blocking · multiplexing · QUIC</div>
+
+  <div class="sec">
+    <div class="sl">The core problem HTTP/2 and /3 solve</div>
+    <div class="prose">HTTP/1.1 opens one TCP connection per request (or reuses connections with pipelining, which is widely broken). Loading a web page with 100 resources means 100 sequential round-trips — or opening 6 parallel connections per browser per domain (browser's workaround). HTTP/2 and HTTP/3 eliminate this by multiplexing many requests over a single connection.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">HTTP/1.1 — the baseline</div>
+    <div class="prose"><strong>Connection model:</strong> One request at a time per TCP connection (with keep-alive, the connection stays open for reuse — but still one outstanding request). Pipelining (send multiple before waiting for responses) exists in spec but is disabled in most browsers due to broken proxy behaviour.<br><br><strong>Head-of-line blocking (HOL):</strong> If request 1 is slow (large file), requests 2, 3, 4 wait behind it in the same connection. Like a queue where one slow customer holds everyone up.<br><br><strong>Browser workaround:</strong> Open 6 parallel TCP connections per domain. Each connection can serve one request at a time. 6 parallel → some parallelism. Still 6 TCP handshakes + 6 TLS handshakes per domain. High overhead.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">HTTP/2 — multiplexing over one TCP connection</div>
+    <div class="prose"><strong>Binary framing layer:</strong> HTTP/2 breaks messages into binary frames instead of text. Frames from different requests interleave over the same TCP connection. Each request/response pair is a stream identified by a stream ID.<br><br><strong>Multiplexing:</strong> 100 requests can fly over 1 TCP connection simultaneously. No head-of-line blocking at the HTTP layer — request 1 being slow doesn't block request 2.<br><br><strong>Header compression (HPACK):</strong> HTTP headers are repetitive (User-Agent, Cookie, etc.). HPACK compresses headers using Huffman coding + a shared dynamic table. Reduces header overhead by ~80%.<br><br><strong>Server push:</strong> Server can proactively send resources before the client requests them. In theory: server pushes CSS and JS when HTML is requested. In practice: browser deprecation; rarely used today (removed in Chrome 106 for HTTP/2 push).<br><br><strong>The remaining HOL problem:</strong> HTTP/2 eliminated HTTP-layer HOL. But TCP-layer HOL remains. TCP delivers bytes in order — if a packet is lost, all streams wait for retransmission. One lost packet blocks all 100 streams. This is TCP's fundamental limitation.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">HTTP/3 — QUIC replaces TCP</div>
+    <div class="prose"><strong>QUIC (Quick UDP Internet Connections):</strong> HTTP/3 runs over QUIC instead of TCP. QUIC is implemented in user space over UDP. It reimplements the reliability guarantees of TCP but eliminates TCP's HOL blocking.<br><br><strong>Why UDP?</strong> TCP is implemented in OS kernel — can't be changed without OS update. QUIC runs in user space, can be updated with the application. Deployed via Chrome and server software updates, not kernel patches.<br><br><strong>Stream independence:</strong> QUIC tracks individual streams independently. A lost packet only blocks the stream it belongs to — all other streams continue. True elimination of HOL blocking.<br><br><strong>0-RTT connection establishment:</strong> TLS 1.3 integrated into QUIC handshake. First connection: 1 RTT (vs TCP's 1 RTT + TLS's 1-2 RTT = 2-3 RTT total). Resumed connection: 0-RTT — can send data before the handshake completes (with replay attack risk, used carefully).<br><br><strong>Connection migration:</strong> QUIC connections are identified by a Connection ID, not by IP:port. When a mobile user moves from WiFi to LTE (IP changes), the QUIC connection continues without interruption. TCP connections would drop.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interactive comparison — request multiplexing</div>
+    <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary);min-width:80px">Slow req delay</label>
+        <input type="range" min="1" max="5" step="1" value="3" id="delay" oninput="drawHttp()" style="flex:1">
+        <span id="delay-out" style="font-weight:500;min-width:16px;color:var(--color-text-primary)">3</span><span style="color:var(--color-text-tertiary)">×</span>
+      </div>
+      <div id="http-vis" style="display:grid;gap:12px"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Numbers</div>
+    <div class="sg">
+      <div class="sc"><div class="sn">2–3</div><div class="sd">RTTs for HTTP/1.1 + TLS (TCP + TLS separately)</div></div>
+      <div class="sc"><div class="sn">1</div><div class="sd">RTT for HTTP/2 (TCP+TLS combined in TLS 1.3)</div></div>
+      <div class="sc"><div class="sn">0–1</div><div class="sd">RTTs for HTTP/3 QUIC (0-RTT for resumed connections)</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Two kinds of HOL blocking.</strong> "HTTP/2 solves HTTP-layer HOL but TCP-layer HOL remains. HTTP/3 with QUIC eliminates both by making each stream independent at the transport layer."</li>
+      <li><strong>HTTP/2 adoption:</strong> ~65% of web traffic as of 2024. HTTP/3 growing (~30%). Still worth designing for HTTP/2 as the default, HTTP/3 as progressive enhancement.</li>
+      <li><strong>Probe: "Why did Google invent QUIC?"</strong> → TCP HOL blocking hurt latency on lossy mobile networks (high packet loss). QUIC's per-stream loss recovery meant a single dropped packet no longer stalled all streams. Measurable improvement in mobile latency for YouTube/Search.</li>
+      <li><strong>Probe: "Your API has slow endpoints mixed with fast ones. What does HTTP/2 fix?"</strong> → With HTTP/1.1, a slow request blocks the connection. With HTTP/2 multiplexing, slow and fast requests travel concurrently — fast responses arrive without waiting for slow ones.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(4)">← TLS (handshake cost)</a><a onclick="show(2)">WebSocket vs SSE →</a><a onclick="sendPrompt('Explain QUIC connection ID and connection migration in detail')">QUIC connection migration</a></div></div>
+  <button class="nb" onclick="show(2)">Next: WebSocket vs SSE vs polling <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T2: Realtime ══ -->
+<div class="topic" id="t2">
+  <div class="tt">WebSocket vs SSE vs Long polling</div>
+  <div class="ts2">Real-time comparison · when each applies</div>
+
+  <div class="sec">
+    <div class="sl">The real-time problem</div>
+    <div class="prose">HTTP is request-response: the client always initiates, the server responds. But many applications need the server to push data to clients without the client asking — live chat, stock prices, collaborative editing, Uber driver location. Three patterns solve this with increasing sophistication.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Long polling — the HTTP workaround</div>
+    <div class="prose"><strong>Mechanism:</strong> Client sends a normal HTTP request. Server holds the connection open (doesn't respond immediately). When new data arrives, server sends the response. Client immediately makes another request. Repeat.<br><br><strong>Latency:</strong> Near-real-time — delay is only the network RTT. No artificial polling interval.<br><br><strong>Cost:</strong> Every "push" requires a full HTTP request-response cycle — headers, connection overhead. Under load, thousands of held-open connections consume server threads/sockets. Stateless servers require sticky sessions or an external pub/sub to route responses to the right connection.<br><br><strong>Use when:</strong> You need real-time but can't use WebSocket (strict HTTP-only proxies, legacy environments). Simple to implement with any HTTP stack. Used by early Slack, early Facebook Messenger.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Server-Sent Events (SSE) — one-way stream over HTTP</div>
+    <div class="prose"><strong>Mechanism:</strong> Client sends one HTTP GET with <code>Accept: text/event-stream</code>. Server keeps the connection open and streams newline-delimited events (<code>data: {json}\n\n</code>). The connection stays open indefinitely. Built into the browser via the <code>EventSource</code> API.<br><br><strong>Direction:</strong> Server → client only. No client-to-server messaging over the same connection.<br><br><strong>Auto-reconnect:</strong> Browser <code>EventSource</code> automatically reconnects if the connection drops. Server sends <code>id:</code> field to enable resuming from last received event.<br><br><strong>Infrastructure friendly:</strong> Plain HTTP — works through HTTP/2 multiplexing, CDNs, load balancers, proxies without special configuration. No protocol upgrade needed.<br><br><strong>Use when:</strong> One-way server push — live dashboards, notifications, AI streaming responses (ChatGPT uses SSE), news feeds, real-time log streaming. Simpler than WebSocket when you don't need bidirectional.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">WebSocket — full-duplex persistent connection</div>
+    <div class="prose"><strong>Mechanism:</strong> Client sends HTTP Upgrade request (<code>Upgrade: websocket</code>). Server responds with <code>101 Switching Protocols</code>. Connection is now a persistent, full-duplex TCP channel — both sides can send at any time, independently.<br><br><strong>Framing:</strong> WebSocket defines its own lightweight framing — no HTTP overhead per message. Small header (2–10 bytes) vs HTTP's 200–800 byte headers. Very efficient for high-frequency small messages.<br><br><strong>Bidirectional:</strong> Client and server both push messages. True real-time chat, collaborative editing (cursor positions from all users), multiplayer games, trading terminals.<br><br><strong>Infrastructure complexity:</strong> WebSocket connections are stateful and long-lived. Load balancers need sticky sessions (same client always to same server). L7 proxies must be configured to support the Upgrade. Horizontal scaling requires a message bus (Redis pub/sub) to route messages across server instances.<br><br><strong>Use when:</strong> Bidirectional real-time — chat (WhatsApp Web), collaborative docs (Figma, Google Docs), multiplayer games, live trading. Your Zombie Hunt game almost certainly uses WebSocket.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Side-by-side</div>
+    <div class="rt-vis">
+      <div class="rt-row"><span class="rt-label">Setup cost</span><div class="rt-bar-wrap"><div class="rt-bar" style="width:25%;background:#E6F1FB"></div></div><span class="rt-val" style="font-size:11px;color:var(--color-text-tertiary)">Long poll</span></div>
+      <div class="rt-row"><span class="rt-label"></span><div class="rt-bar-wrap"><div class="rt-bar" style="width:40%;background:#E1F5EE"></div></div><span class="rt-val" style="font-size:11px;color:var(--color-text-tertiary)">SSE</span></div>
+      <div class="rt-row"><span class="rt-label"></span><div class="rt-bar-wrap"><div class="rt-bar" style="width:70%;background:#FAEEDA"></div></div><span class="rt-val" style="font-size:11px;color:var(--color-text-tertiary)">WebSocket</span></div>
+    </div>
+    <div class="kv" style="margin-top:8px">
+      <div class="kvc"><div class="kvl">Long polling</div><div class="kvv"><span class="badge b-blue">HTTP only</span> Works everywhere. High overhead per message. No persistent connection. Simulated push.</div></div>
+      <div class="kvc"><div class="kvl">SSE</div><div class="kvv"><span class="badge b-teal">HTTP/2 native</span> One-way only. Auto-reconnect. CDN-friendly. Perfect for notifications and streaming.</div></div>
+      <div class="kvc"><div class="kvl">WebSocket</div><div class="kvv"><span class="badge b-amber">Full-duplex</span> Bidirectional. Lowest per-message overhead. Needs sticky LB + message bus at scale.</div></div>
+      <div class="kvc"><div class="kvl">Decision rule</div><div class="kvv">Server-only push? SSE. Bidirectional? WebSocket. Restricted to plain HTTP? Long polling.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>SSE is underrated.</strong> Most candidates go straight to WebSocket. Push back: "For this notification use case, SSE is simpler — it's HTTP, CDN-friendly, auto-reconnects, and works without any infrastructure changes."</li>
+      <li><strong>WebSocket scaling needs Redis pub/sub.</strong> "With 10 app servers and 100K WebSocket connections, a message from user A (on server 1) must reach user B (on server 3). I'd use Redis pub/sub to fan out across server instances."</li>
+      <li><strong>Probe: "Build a live Uber driver location tracker."</strong> → Driver app → REST API updates location every 4s. Rider browser → WebSocket to receive location pushes. Server subscribes to driver location updates → pushes via WebSocket to all riders watching that driver. (Or SSE if the rider view is read-only.)</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">← HTTP/2 (SSE multiplexing)</a><a onclick="sendPrompt('Explain Redis pub/sub for scaling WebSocket across multiple servers')">Redis pub/sub for WS</a><a onclick="sendPrompt('Explain how Figma handles real-time collaboration with WebSocket')">Figma real-time</a></div></div>
+  <button class="nb" onclick="show(3)">Next: gRPC vs REST vs GraphQL <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T3: API protocols ══ -->
+<div class="topic" id="t3">
+  <div class="tt">gRPC vs REST vs GraphQL</div>
+  <div class="ts2">Protocol buffers · streaming · N+1 problem</div>
+
+  <div class="sec">
+    <div class="sl">REST — the default</div>
+    <div class="prose"><strong>REST (Representational State Transfer):</strong> Architectural style, not a protocol. Resources identified by URLs, manipulated via HTTP verbs (GET, POST, PUT, DELETE, PATCH). Stateless — each request is self-contained. JSON over HTTP/1.1 or HTTP/2.<br><br><strong>Strengths:</strong> Universal — every language, framework, and tool speaks HTTP+JSON. Human-readable in browsers. Cacheable (GET responses can be CDN-cached). Simple mental model.<br><br><strong>Weaknesses:</strong> Over-fetching: <code>GET /users/42</code> returns 50 fields but you needed 3. Under-fetching (N+1 problem): <code>GET /orders</code> returns 100 orders but you need each order's user name — 100 more <code>GET /users/{id}</code> calls. No schema enforcement by default (OpenAPI/Swagger added separately).</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">GraphQL — query exactly what you need</div>
+    <div class="prose"><strong>Core idea:</strong> Client defines exactly what data it wants. Server returns exactly that — no more, no less. One endpoint (<code>POST /graphql</code>), one query language.<br><br><strong>Solves N+1 problem:</strong> Query orders + each order's user name in a single request. The server resolves the graph of data relationships in one round-trip. DataLoader library batches N individual DB queries into one.<br><br><strong>The N+1 problem in depth:</strong> A resolver for <code>orders { user { name } }</code> naively calls <code>getUser(order.userId)</code> for each order — 100 orders = 100 DB queries. DataLoader batches: collect all userIds during query resolution, make one <code>SELECT WHERE id IN (...)></code>, cache results for the query's lifetime.<br><br><strong>Weaknesses:</strong> Caching is hard (POST requests are not cacheable by default — use GET with query persisting or Persisted Queries). Complex queries can be expensive — clients can accidentally request huge graphs. Schema introspection exposed by default (security concern). Overkill for simple CRUD APIs.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">gRPC — high-performance service-to-service</div>
+    <div class="prose"><strong>Protocol Buffers (protobuf):</strong> Binary serialization format. Define schema in <code>.proto</code> files — strongly typed, compact, fast. Generates client and server code in any language.<br><br><strong>Why binary matters:</strong> A JSON payload <code>{"user_id":12345,"name":"Somesh"}</code> is ~35 bytes. The equivalent protobuf binary is ~12 bytes — 3× smaller. Parsing JSON is CPU-intensive (string scanning, unicode, number parsing). Parsing protobuf is mechanical bit-shifting — 10–100× faster.<br><br><strong>HTTP/2 native:</strong> gRPC runs exclusively over HTTP/2. Gets multiplexing, header compression, and streaming for free.<br><br><strong>Four streaming modes:</strong><br>Unary: single request → single response (like REST).<br>Server streaming: one request → stream of responses (real-time sensor data).<br>Client streaming: stream of requests → one response (file upload).<br>Bidirectional streaming: both sides stream independently (real-time chat between services).<br><br><strong>Weaknesses:</strong> Not human-readable. Browser support is limited (gRPC-Web proxy needed). Requires proto file coordination between teams — schema changes must be backward compatible.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">When to use which</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">REST</div><div class="kvv">Public APIs, mobile clients, browser clients, simple CRUD. Universal support. When team familiarity and ease of debugging matter more than performance.</div></div>
+      <div class="kvc"><div class="kvl">GraphQL</div><div class="kvv">Frontend needs flexible queries across related data. Multiple client types (mobile, web) need different data shapes. BFF (Backend for Frontend) pattern.</div></div>
+      <div class="kvc"><div class="kvl">gRPC</div><div class="kvv">Internal microservice-to-microservice. High-throughput, low-latency. Strong schema enforcement. Streaming use cases. Polyglot services where generated clients save work.</div></div>
+      <div class="kvc"><div class="kvl">Real examples</div><div class="kvv">Netflix: REST external, gRPC internal. GitHub: REST + GraphQL (both). Google Cloud: gRPC APIs. Uber: gRPC between microservices, REST for mobile apps.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>REST for external, gRPC for internal.</strong> "Public API stays REST — universal client support. Microservice-to-microservice uses gRPC — binary efficiency, streaming, generated clients."</li>
+      <li><strong>N+1 is the GraphQL gotcha.</strong> "Any GraphQL resolver that makes a DB call per parent item has an N+1 problem. I'd use DataLoader to batch and cache within a request."</li>
+      <li><strong>Protobuf field numbering is critical.</strong> "In protobuf, field names don't appear in binary — only field numbers. Removing field 2 and reusing that number for a different field corrupts all existing serialized data. Always add fields, never reuse numbers."</li>
+      <li><strong>Probe: "Razorpay's dashboard shows order details with payment info for 500 orders. REST or GraphQL?"</strong> → GraphQL. REST would require <code>GET /orders</code> then 500 <code>GET /payments/{orderId}</code> calls — classic N+1. One GraphQL query returns all orders with nested payment in one roundtrip, DataLoader batches the payment queries.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">← HTTP/2 (gRPC transport)</a><a onclick="sendPrompt('Explain GraphQL DataLoader and the N+1 problem with a concrete example')">DataLoader deep dive</a><a onclick="sendPrompt('Explain protobuf schema evolution and backward compatibility')">Proto backward compat</a></div></div>
+  <button class="nb" onclick="show(4)">Next: TLS / HTTPS <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T4: TLS ══ -->
+<div class="topic" id="t4">
+  <div class="tt">TLS / HTTPS</div>
+  <div class="ts2">Handshake · certificate chain · symmetric vs asymmetric · HSTS</div>
+
+  <div class="sec">
+    <div class="sl">Why TLS exists</div>
+    <div class="prose">HTTP sends data in plaintext. On any network between you and the server — your ISP, a coffee shop router, a nation-state — that data can be read or modified. TLS (Transport Layer Security) adds three guarantees: <strong>confidentiality</strong> (data encrypted, eavesdroppers can't read), <strong>integrity</strong> (data can't be modified in transit without detection), and <strong>authentication</strong> (you're actually talking to razorpay.com, not an imposter).</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">TLS 1.3 handshake — step by step</div>
+    <div class="tls-phase"><div class="ph"><span class="badge b-blue">Client → Server</span> ClientHello</div><div class="pd">Client sends: TLS version, list of supported cipher suites, client random (32 bytes of randomness), and key share (the client's Diffie-Hellman public key for the supported groups). This is the first message — round-trip 1 begins.</div></div>
+    <div class="tls-phase"><div class="ph"><span class="badge b-teal">Server → Client</span> ServerHello + Certificate + Finished</div><div class="pd">Server picks cipher suite, sends its DH public key (ServerHello). Sends its certificate (public key + identity). Derives session keys immediately using DH key exchange. Sends Finished (encrypted with the session key — proves server has the private key). All in one flight. Client now has everything needed to verify and derive session keys.</div></div>
+    <div class="tls-phase"><div class="ph"><span class="badge b-amber">Client</span> Certificate verification</div><div class="pd">Client verifies the server certificate: is it signed by a trusted CA? Is the domain name correct? Is it expired? Has it been revoked (OCSP check)? If all pass: client derives the same session key (DH is symmetric), sends Finished. Sends first encrypted HTTP request in the same flight.</div></div>
+    <div class="tls-phase"><div class="ph"><span class="badge b-green">Both</span> Symmetric encryption begins</div><div class="pd">From this point: AES-256-GCM symmetric encryption. Both sides have the same session key (derived via ECDH — never transmitted). One RTT total for TLS 1.3. TLS 1.2 required 2 RTT.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Symmetric vs asymmetric — the key insight</div>
+    <div class="prose"><strong>Asymmetric (RSA, ECDH):</strong> Two mathematically linked keys. Anything encrypted with the public key can only be decrypted with the private key. Used in the handshake to <em>authenticate</em> the server and to <em>establish</em> a shared secret. Slow — RSA 2048-bit operations take microseconds on dedicated hardware, milliseconds on commodity CPUs.<br><br><strong>Symmetric (AES):</strong> One shared key used for both encryption and decryption. 100–1000× faster than asymmetric. Used for all actual data transfer after the handshake.<br><br><strong>The pattern:</strong> Use slow asymmetric crypto once to securely establish a fast symmetric key. Then use the fast symmetric key for everything else. This is TLS in a sentence.<br><br><strong>Why ECDH over RSA for key exchange:</strong> ECDH (Elliptic Curve Diffie-Hellman) provides perfect forward secrecy — if the server's private key is compromised later, past session keys can't be derived. RSA key exchange embeds the session secret in the RSA-encrypted premaster secret — compromise the long-term key → decrypt all past sessions. ECDH generates ephemeral keys per session.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Certificate chain</div>
+    <div class="prose">A certificate says: "I am api.razorpay.com and here is my public key, signed by DigiCert." But how do you trust DigiCert? DigiCert's certificate is signed by DigiCert Root CA. The root CA certificate is pre-installed in your OS and browser trust store (there are ~150 trusted roots).<br><br><strong>Chain:</strong> Leaf cert (api.razorpay.com) → Intermediate CA (DigiCert SHA2) → Root CA (DigiCert Global Root CA) → trusted by OS.<br><br><strong>Why intermediates?</strong> Root CA private keys are kept offline (air-gapped) in HSMs. If compromised, all trust is lost. Intermediates are online and issue leaf certs. Intermediate compromise affects only certs signed by that intermediate — root can revoke the intermediate cert.<br><br><strong>Certificate Transparency (CT):</strong> All publicly trusted certs must be logged to public CT logs. This prevents CAs from secretly issuing certs for your domain. Browsers reject certs not in CT logs.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">HSTS — preventing protocol downgrade</div>
+    <div class="prose"><strong>Attack:</strong> User types <code>razorpay.com</code> — browser first tries HTTP (port 80). MITM intercepts, never upgrades to HTTPS. User is on plain HTTP without knowing.<br><br><strong>HSTS header:</strong> <code>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</code>. Once received over HTTPS, browser remembers for max-age seconds. Future visits go directly to HTTPS — never HTTP first. Eliminates the first-visit attack window.<br><br><strong>HSTS preload:</strong> Submit to Chrome's preload list — browsers ship with your domain hardcoded as HTTPS-only, so even the very first visit is secure. Cannot be unset without shipping a browser update — permanent commitment.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>TLS 1.3 = 1 RTT.</strong> "TLS 1.3 completes the handshake in 1 round-trip, vs TLS 1.2's 2. For a mobile user with 150ms RTT, that's 150ms saved on every new connection."</li>
+      <li><strong>Perfect forward secrecy.</strong> "I'd use ECDH key exchange, not RSA, because ECDH provides forward secrecy — compromising the server's private key doesn't decrypt past sessions."</li>
+      <li><strong>HSTS preload for payment pages.</strong> "For a payments product like Razorpay, I'd absolutely add HSTS with preload. The cost of a protocol downgrade attack on a payment page is catastrophic."</li>
+      <li><strong>Probe: "What does the certificate chain verify?"</strong> → That the entity sending you their public key actually owns the domain (via a CA that verified domain ownership through DNS or file challenges), and that the CA is trusted (via chain to a root in your OS trust store).</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(0)">← DNS (DANE, DoH)</a><a onclick="show(5)">TCP vs UDP →</a><a onclick="sendPrompt('Explain mTLS mutual TLS for service-to-service authentication')">mTLS</a><a onclick="sendPrompt('Explain certificate pinning and its risks')">Certificate pinning</a></div></div>
+  <button class="nb" onclick="show(5)">Next: TCP vs UDP <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T5: TCP vs UDP ══ -->
+<div class="topic" id="t5">
+  <div class="tt">TCP vs UDP</div>
+  <div class="ts2">Reliability vs speed · when streaming uses UDP · QUIC</div>
+
+  <div class="sec">
+    <div class="sl">The fundamental distinction</div>
+    <div class="prose">TCP and UDP are both Layer 4 transport protocols, but they make opposite bets about what the application needs more.<br><br><strong>TCP bets: correctness over speed.</strong> Every byte arrives, in order, exactly once. If a packet is lost, TCP retransmits it and blocks everything waiting for it to arrive. The cost: latency spikes on packet loss.<br><br><strong>UDP bets: speed over correctness.</strong> Fire and forget. No connection setup, no ACK, no retransmission, no ordering. Packets can arrive out of order, duplicated, or not at all. The application handles this — or ignores it. The cost: unreliability that the app must manage.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">TCP — how it actually works</div>
+    <div class="prose"><strong>Three-way handshake:</strong> SYN → SYN-ACK → ACK. One full RTT before any data can be sent. Establishes sequence numbers and window sizes.<br><br><strong>Reliable delivery:</strong> Every sent segment is ACK'd. Unacknowledged segments are retransmitted after a timeout (RTO — Retransmission Timeout). RTO starts at ~200ms and doubles on each retry (exponential backoff).<br><br><strong>Flow control:</strong> Receiver advertises a receive window (how much buffer space it has). Sender can't blast faster than the receiver can consume. Prevents overwhelming slow receivers.<br><br><strong>Congestion control:</strong> TCP infers network congestion from packet loss (a lost packet = congestion signal). Responds by reducing send rate. Algorithms: CUBIC (default Linux), BBR (Google, latency-based rather than loss-based). BBR dramatically improves throughput on high-bandwidth, high-latency links (satellite, intercontinental).<br><br><strong>Head-of-line blocking:</strong> TCP delivers bytes in order. Lost segment → all subsequent segments wait in kernel buffer until the lost one is retransmitted. This blocks even unrelated application-level streams (the HTTP/2 problem).</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Why streaming uses UDP</div>
+    <div class="prose">For a video call, receiving a frame from 100ms ago is worthless — you need the current frame. A retransmitted packet from the past arriving late is worse than nothing: it uses bandwidth and arrives too late to display.<br><br><strong>The UDP choice for media:</strong> RTP (Real-time Transport Protocol) runs over UDP. If a packet is lost — display the last frame (freeze), use error concealment, or skip it. A brief glitch is far better than a 200ms+ freeze waiting for TCP retransmission.<br><br><strong>WebRTC:</strong> Browser-to-browser real-time media (video calls, screen share). Uses UDP with DTLS (Datagram TLS) for security + SRTP (Secure RTP) for encryption. ICE + STUN + TURN for NAT traversal. Google Meet, Discord video, Zoom — all WebRTC for the media plane.<br><br><strong>Online gaming:</strong> Player position updates are sent via UDP. A missed position update is immediately superseded by the next one (100ms later). Retransmitting old position data would cause lag and stuttering worse than packet loss. Game state sync uses sequence numbers in the application layer to detect and discard out-of-order packets.<br><br><strong>DNS uses UDP:</strong> DNS queries fit in a single UDP packet (512 bytes, or up to 4096 with EDNS). UDP adds zero overhead. If a query is lost, the resolver retries — simpler than TCP for one-shot queries.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">QUIC — the best of both</div>
+    <div class="prose">QUIC (HTTP/3's transport) runs over UDP but reimplements reliability, ordering, and congestion control in user space — per stream. It gets TCP's correctness with UDP's flexibility:<br><br>Connection setup: no separate TCP handshake (saves 1 RTT). Reliability: per-stream — lost packet only affects that stream, not others. Congestion control: modern algorithms (NewReno, CUBIC, or BBR configurable). Encryption: mandatory (DTLS built-in). Connection migration: connection ID-based, survives IP changes.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Decision matrix</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Use TCP when</div><div class="kvv">Every byte must arrive: file transfer, email, HTTP, SSH, database connections. Correctness is non-negotiable. Latency spikes on packet loss are acceptable.</div></div>
+      <div class="kvc"><div class="kvl">Use UDP when</div><div class="kvv">Latency beats correctness: video/audio streaming (RTP), online gaming, DNS, IoT sensor data, real-time telemetry. Old data is worthless.</div></div>
+      <div class="kvc"><div class="kvl">Use QUIC/HTTP/3 when</div><div class="kvv">You want TCP reliability with UDP flexibility. Mobile clients (connection migration). High packet-loss environments. Modern APIs (if server/CDN supports it).</div></div>
+      <div class="kvc"><div class="kvl">Numbers</div><div class="kvv">TCP 3-way handshake: 1 RTT overhead. UDP: 0 RTT overhead. TCP retransmit timeout: 200ms–3s. QUIC connection: 0-1 RTT for new/resumed.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>The key tradeoff in one sentence:</strong> "TCP guarantees delivery but HOL blocking under loss. UDP is fast but unreliable — the application handles reliability selectively."</li>
+      <li><strong>Real-time media always UDP.</strong> "For your Zombie Hunt real-time multiplayer, player positions go over UDP. A missed position packet is superseded in 50ms. Retransmitting it would cause the notorious 'lag spike' users hate."</li>
+      <li><strong>Probe: "How does Google Meet handle packet loss?"</strong> → WebRTC over UDP/RTP. On packet loss: FEC (Forward Error Correction) — pre-emptively sends redundant data so one loss can be recovered without retransmission. For video: concealment (freeze/extrapolate from last frame). For audio: comfort noise, PLC (Packet Loss Concealment).</li>
+      <li><strong>QUIC bridges the gap.</strong> "For HTTP/3 and modern APIs, QUIC gives you TCP's reliability per-stream but UDP's speed and flexibility at the transport level — connection migration is the killer feature for mobile."</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">← HTTP/3 QUIC</a><a onclick="show(4)">← TLS (DTLS for UDP)</a><a onclick="sendPrompt('Continue with Block 7: Operating Systems — processes, threads, scheduling, virtual memory, file systems, I/O models, and CS fundamentals')">Continue to Block 7 ↗</a></div></div>
+  <button class="nb" onclick="sendPrompt('Continue with Block 7: Operating Systems and CS Fundamentals — processes vs threads, context switching, scheduling algorithms, deadlock, virtual memory, paging, file systems, I/O models (blocking vs non-blocking vs async), and computer architecture (CPU cache hierarchy, memory model)')">Continue to Block 7 ↗</button>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(i){
+  document.querySelectorAll('.topic').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.querySelectorAll('.ni').forEach((n,j)=>n.classList.toggle('active',j===i));
+  document.querySelector('.content').scrollTop=0;
+}
+function stab(el,gid,pid){
+  document.getElementById(gid).querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pid).classList.add('active');
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function drawHttp(){
+  const delay=+document.getElementById('delay').value;
+  document.getElementById('delay-out').textContent=delay;
+  const versions=[
+    {label:'HTTP/1.1',reqs:['R1','R2','R3'],blocked:true},
+    {label:'HTTP/2',reqs:['R1','R2','R3'],blocked:false},
+    {label:'HTTP/3',reqs:['R1','R2','R3'],blocked:false,quic:true}
+  ];
+  const colors={R1:'#85B7EB',R2:'#5DCAA5',R3:'#EF9F27'};
+  const slowReq='R1';
+  let html='';
+  versions.forEach(v=>{
+    html+=`<div style="margin-bottom:10px"><div style="font-size:11.5px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">${v.label}${v.quic?' (QUIC)':''}</div>`;
+    if(v.blocked){
+      let offset=0;
+      v.reqs.forEach(r=>{
+        const w=r===slowReq?delay*40:40;
+        html+=`<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px">`;
+        html+=`<div style="width:${offset}px;min-width:${offset}px"></div>`;
+        html+=`<div style="height:16px;width:${w}px;background:${colors[r]};border-radius:3px;font-size:10px;color:#0C447C;font-weight:500;display:flex;align-items:center;padding:0 5px">${r}</div>`;
+        html+=`</div>`;
+        offset+=w+2;
+      });
+      html+=`<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px">Sequential — total time: ${delay*40+80}px units</div>`;
+    } else {
+      html+=`<div style="display:flex;gap:2px;align-items:flex-end;margin-bottom:2px">`;
+      v.reqs.forEach(r=>{
+        const h=r===slowReq?delay*16:16;
+        html+=`<div style="width:40px;height:${h}px;background:${colors[r]};border-radius:3px;font-size:10px;color:#0C447C;font-weight:500;display:flex;align-items:center;justify-content:center">${r}</div>`;
+      });
+      html+=`</div>`;
+      html+=`<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px">Parallel — total time: ${delay*16}px units (longest request)</div>`;
+    }
+    html+=`</div>`;
+  });
+  document.getElementById('http-vis').innerHTML=html;
+}
+drawHttp();
+</script>

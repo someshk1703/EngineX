@@ -1,0 +1,1582 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.app { padding: 1rem 0; }
+.topic-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; }
+.topic-btn { font-size: 12px; padding: 5px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all .15s; }
+.topic-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.topic-btn.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); font-weight: 500; }
+.section-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); padding-bottom: 8px; }
+.sec-btn { font-size: 11px; padding: 4px 8px; border: 0.5px solid transparent; border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-tertiary); cursor: pointer; transition: all .12s; }
+.sec-btn:hover { color: var(--color-text-secondary); background: var(--color-background-secondary); }
+.sec-btn.active { color: var(--color-text-primary); background: var(--color-background-secondary); border-color: var(--color-border-secondary); font-weight: 500; }
+.content-area { font-size: 14px; line-height: 1.7; color: var(--color-text-primary); }
+.content-area h3 { font-size: 16px; font-weight: 500; margin-bottom: .75rem; color: var(--color-text-primary); }
+.content-area h4 { font-size: 14px; font-weight: 500; margin: 1rem 0 .4rem; }
+.content-area p { margin-bottom: .75rem; color: var(--color-text-secondary); }
+.content-area ul { padding-left: 1.2rem; margin-bottom: .75rem; }
+.content-area li { margin-bottom: .35rem; color: var(--color-text-secondary); }
+.content-area li strong { color: var(--color-text-primary); font-weight: 500; }
+.tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; margin: 2px; }
+.tag-blue { background: var(--color-background-info); color: var(--color-text-info); }
+.tag-green { background: var(--color-background-success); color: var(--color-text-success); }
+.tag-warn { background: var(--color-background-warning); color: var(--color-text-warning); }
+.tag-red { background: var(--color-background-danger); color: var(--color-text-danger); }
+pre { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; font-family: var(--font-mono); font-size: 12px; overflow-x: auto; margin-bottom: .75rem; line-height: 1.6; white-space: pre; }
+.complexity-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: .75rem; }
+.complexity-table th { text-align: left; padding: 6px 10px; background: var(--color-background-secondary); font-weight: 500; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.complexity-table td { padding: 6px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); }
+.complexity-table td:nth-child(2) { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-info); }
+.smell-map { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: .75rem; }
+.smell-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: .75rem; }
+.smell-if { font-size: 11px; color: var(--color-text-secondary); margin-bottom: .25rem; }
+.smell-then { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.pattern-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: .75rem; margin-bottom: .5rem; }
+.pattern-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: .25rem; }
+.pattern-trigger { font-size: 12px; font-style: italic; color: var(--color-text-info); }
+.practice-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: .75rem; margin-bottom: .5rem; display: flex; gap: 10px; align-items: flex-start; }
+.diff-badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 99px; white-space: nowrap; margin-top: 2px; }
+.topic-header { margin-bottom: 1rem; }
+.topic-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: .25rem; }
+.topic-subtitle { font-size: 13px; color: var(--color-text-secondary); }
+.interview-card { background: var(--color-background-secondary); border-left: 3px solid var(--color-border-info); padding: .75rem 1rem; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; margin-bottom: .5rem; }
+</style>
+<h2 class="sr-only">DSA Block 4 — Core Algorithmic Patterns coaching widget with 8 topics and 10 sections each</h2>
+<div class="app">
+<div class="topic-nav" id="topicNav"></div>
+<div class="topic-header">
+  <div class="topic-title" id="topicTitle"></div>
+  <div class="topic-subtitle" id="topicSubtitle"></div>
+</div>
+<div class="section-tabs" id="secTabs"></div>
+<div class="content-area" id="contentArea"></div>
+</div>
+<script>
+const TOPICS = [
+  {
+    id: 0,
+    name: "Two Pointers",
+    subtitle: "Same direction · Opposite ends · Fast/Slow (Floyd's Cycle)",
+    sections: {
+      "Definition": `<h3>Two Pointers</h3>
+<p>Two Pointers is a technique where you maintain two index variables (pointers) that traverse a data structure — typically an array or linked list — often in the same or opposite directions. Instead of using nested loops (O(n²)), a single pass with two pointers achieves O(n) by exploiting sorted order or structural properties.</p>
+<p>Think of it like two people walking along a corridor: they can start from the same end and walk at different speeds, start from opposite ends and walk toward each other, or use one as a "scout" ahead of the other.</p>`,
+
+      "Internal Mechanics": `<h3>Internal Mechanics</h3>
+<h4>Opposite Ends (Converging)</h4>
+<p>Two indices: <code>left = 0</code>, <code>right = n-1</code>. They advance inward based on a comparison. Works because the array is sorted — moving left increases the sum, moving right decreases it.</p>
+<h4>Same Direction (Sliding)</h4>
+<p><code>slow</code> and <code>fast</code> both start at 0 but advance at different rates. <code>fast</code> probes ahead; <code>slow</code> marks the write position. Used for in-place array mutations.</p>
+<h4>Fast/Slow (Floyd's Cycle Detection)</h4>
+<p>On a linked list: <code>slow</code> moves 1 step, <code>fast</code> moves 2 steps. If a cycle exists, fast laps slow inside the cycle. The meeting point's distance to cycle start equals head's distance to cycle start — this is the mathematical invariant that powers cycle entry detection.</p>
+<p><strong>Why it works mathematically:</strong> Let F = distance from head to cycle start, C = cycle length, h = distance from cycle start to meeting point. When they meet: slow has traveled F+h steps. Fast has traveled 2(F+h). The extra distance fast traveled, F+h, must be divisible by C. Therefore F ≡ C−h (mod C), which means resetting slow to head and advancing both one step at a time leads them to meet at the cycle entry.</p>`,
+
+      "Time & Space Complexity": `<h3>Time & Space Complexity</h3>
+<table class="complexity-table">
+<tr><th>Variant</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Opposite ends (sorted array)</td><td>O(n)</td><td>O(1)</td><td>Each pointer moves at most n times total; they never cross</td></tr>
+<tr><td>Same direction (remove duplicates)</td><td>O(n)</td><td>O(1)</td><td>fast scans every element once; slow writes only on unique</td></tr>
+<tr><td>Fast/Slow (cycle detection)</td><td>O(n)</td><td>O(1)</td><td>Fast reaches the cycle in O(F) steps, then traverses at most O(C) to catch slow</td></tr>
+<tr><td>3Sum (sort + two pointers)</td><td>O(n²)</td><td>O(1) or O(n) for output</td><td>Outer loop O(n), inner two-pointer O(n) per iteration</td></tr>
+</table>
+<p><strong>Key insight:</strong> The gain over brute force comes from monotonicity — in a sorted array, moving one pointer invalidates one direction of search space, so you never need to revisit elements.</p>`,
+
+      "Subtypes & Variants": `<h3>Subtypes & Variants</h3>
+<h4>1. Opposite Ends (Two Sum II, Container With Most Water)</h4>
+<p>Requires sorted array or sorted-by-property structure. Left and right converge. Decision logic: if sum too small → move left; if sum too large → move right.</p>
+<h4>2. Same Direction / Slow-Fast Write (Remove Element, Move Zeroes)</h4>
+<p>Both start at 0. Fast scans; slow is the "write cursor." When fast finds a valid element, slow writes it and advances. Creates an in-place filter.</p>
+<h4>3. Fast/Slow Linked List (Floyd's Cycle)</h4>
+<p>Cycle detection, finding middle of linked list, finding cycle start, determining if palindrome linked list (find middle → reverse second half → compare).</p>
+<h4>4. Partitioning (Dutch National Flag)</h4>
+<p>Three pointers: <code>low</code>, <code>mid</code>, <code>high</code>. Partition array into 3 regions. Classic: sort array of 0s, 1s, 2s in one pass.</p>
+<h4>5. Merging Two Sorted Arrays</h4>
+<p>One pointer per array, compare and advance the smaller one. Merge Sort's merge step is this pattern.</p>`,
+
+      "Core Patterns": `<h3>Core Patterns</h3>
+<div class="pattern-card">
+<div class="pattern-name">1. Converge to Target Sum</div>
+<p>Sort the array. left=0, right=n-1. If arr[left]+arr[right] == target → found. If too small → left++. If too big → right--.</p>
+<div class="pattern-trigger">🧠 Trigger: "find pair/triplet that sums to X in sorted array"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">2. In-Place Array Mutation</div>
+<p>slow pointer is the write position. fast pointer scans. On valid condition, write arr[fast] to arr[slow], advance both. Otherwise only advance fast.</p>
+<div class="pattern-trigger">🧠 Trigger: "remove elements / keep only valid elements in-place"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">3. Linked List Cycle Detection (Floyd)</div>
+<p>slow=head, fast=head. Loop: slow=slow.next, fast=fast.next.next. If they meet → cycle exists. Reset slow to head, advance both by 1 to find entry.</p>
+<div class="pattern-trigger">🧠 Trigger: "does this linked list have a cycle?" or "find cycle start"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">4. Linked List Middle</div>
+<p>slow=fast=head. Advance slow by 1, fast by 2. When fast reaches end, slow is at middle.</p>
+<div class="pattern-trigger">🧠 Trigger: "find middle of linked list" or "palindrome linked list"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">5. Dutch National Flag (3-way Partition)</div>
+<p>low=0, mid=0, high=n-1. If arr[mid]==0 → swap(low,mid), low++, mid++. If 1 → mid++. If 2 → swap(mid,high), high--.</p>
+<div class="pattern-trigger">🧠 Trigger: "sort array of 3 distinct values in one pass"</div>
+</div>`,
+
+      "Problem Smell → Pattern Map": `<h3>Problem Smell → Pattern Map</h3>
+<div class="smell-map">
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Find pair summing to target in sorted array"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Opposite ends two pointer</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Remove duplicates / move zeroes in-place"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Same-direction slow/fast write pointer</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Linked list cycle detection"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Floyd's slow=1 fast=2 pointer</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Middle of linked list" / "palindrome LL"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Slow/fast to find middle, then reverse</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Container with most water"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Opposite ends, always move the shorter bar</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"3Sum / 4Sum"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Sort + fix one pointer + two-pointer inner loop</div></div>
+</div>`,
+
+      "Java Implementation": `<h3>Java Implementation</h3>
+<pre>// ── 1. Two Sum II (sorted array, opposite ends) ──────────────────
+public int[] twoSum(int[] numbers, int target) {
+    int left = 0, right = numbers.length - 1;
+    while (left < right) {
+        int sum = numbers[left] + numbers[right];
+        if (sum == target)  return new int[]{left+1, right+1};
+        else if (sum < target) left++;   // need larger sum
+        else                   right--;  // need smaller sum
+    }
+    return new int[]{-1, -1}; // never reached per problem guarantee
+}
+
+// ── 2. Remove Duplicates In-Place (same direction) ─────────────
+public int removeDuplicates(int[] nums) {
+    if (nums.length == 0) return 0;
+    int slow = 1; // slow = next write position
+    for (int fast = 1; fast < nums.length; fast++) {
+        if (nums[fast] != nums[fast - 1]) {
+            nums[slow++] = nums[fast]; // write unique element
+        }
+    }
+    return slow;
+}
+
+// ── 3. Floyd's Cycle Detection ──────────────────────────────────
+public boolean hasCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) return true; // meeting point → cycle
+    }
+    return false;
+}
+
+// ── 4. Find Cycle Start (Floyd Part 2) ─────────────────────────
+public ListNode detectCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) {         // cycle detected
+            slow = head;            // reset one pointer to head
+            while (slow != fast) { // advance both by 1 until meet
+                slow = slow.next;
+                fast = fast.next;
+            }
+            return slow;            // cycle entry node
+        }
+    }
+    return null;
+}
+
+// ── 5. Middle of Linked List ────────────────────────────────────
+public ListNode middleNode(ListNode head) {
+    ListNode slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    return slow; // when fast is at end, slow is at middle
+}</pre>`,
+
+      "Worked Example": `<h3>Worked Example — Container With Most Water (LC 11)</h3>
+<h4>Problem</h4>
+<p>Given n vertical lines of heights <code>height[i]</code>, find two lines that together with x-axis form a container holding the most water.</p>
+<h4>Brute Force — O(n²)</h4>
+<pre>// Check every pair — TLE for n > 10^4
+int maxWater = 0;
+for (int i = 0; i < height.length; i++)
+    for (int j = i+1; j < height.length; j++)
+        maxWater = Math.max(maxWater,
+            Math.min(height[i], height[j]) * (j - i));
+return maxWater;</pre>
+<h4>Optimal — Two Pointers O(n)</h4>
+<pre>public int maxArea(int[] height) {
+    int left = 0, right = height.length - 1, max = 0;
+    while (left < right) {
+        int water = Math.min(height[left], height[right]) * (right - left);
+        max = Math.max(max, water);
+        // Always move the SHORTER bar — moving the taller can only shrink width
+        // without increasing the min height, so it can never improve the result.
+        if (height[left] < height[right]) left++;
+        else                               right--;
+    }
+    return max;
+}</pre>
+<h4>Why Two Pointers Applies</h4>
+<p>The key insight: if we move the pointer at the taller bar inward, the width decreases AND the height is still bounded by the shorter bar — water can only decrease. So we must move the shorter bar. This greedy correctness argument makes opposite-ends two pointer optimal here.</p>`,
+
+      "Practice Problems": `<h3>Practice Problems</h3>
+<div class="practice-card"><span class="diff-badge tag-green">Easy</span><div><strong>LC 283 — Move Zeroes</strong><p>Move all zeroes to end in-place while maintaining relative order of non-zeroes. Use slow/fast same-direction: fast scans, slow writes non-zeroes, then fill remaining with 0.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 15 — 3Sum</strong><p>Sort, fix one pointer i, run two-pointer on the rest. Key: skip duplicates after finding a valid triplet. Pattern: sort + converging pointers.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 142 — Linked List Cycle II</strong><p>Find the cycle entry node. Floyd's two-step algorithm: detect cycle → reset slow to head → advance both by 1. Deep understanding of Floyd's math required.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 234 — Palindrome Linked List</strong><p>Find middle (slow/fast), reverse second half, compare. Combines two two-pointer sub-problems. Space O(1).</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 42 — Trapping Rain Water</strong><p>Two pointers from ends. Track maxLeft and maxRight. Water at each position = min(maxLeft,maxRight) - height[i]. The pointer with smaller max moves inward. Why? Because that side's water is already determined.</p></div></div>`,
+
+      "Interview Perspective": `<h3>Interview Perspective</h3>
+<div class="interview-card"><strong>What interviewers test</strong><p>Can you recognise when two-pointer is applicable (sorted order, or linear scan with a write cursor)? Can you state the invariant? Do you handle edge cases (empty array, no cycle, single element)?</p></div>
+<div class="interview-card"><strong>How to think out loud</strong><p>"I notice the array is sorted / the problem has two endpoints / I need cycle detection — this screams two pointers. I'll use left=0, right=n-1 and move the pointer that can improve the result. My loop invariant is: [state invariant]. Time O(n), space O(1)."</p></div>
+<div class="interview-card"><strong>Common follow-ups</strong><ul><li>Why do you move the shorter bar and not the taller? (Container With Most Water)</li><li>Prove Floyd's cycle detection mathematically</li><li>What if the array is unsorted? (Sort first — O(n log n), or use a hash set)</li><li>3Sum with duplicates — how do you avoid duplicate triplets?</li></ul></div>
+<div class="interview-card"><strong>Red flags to avoid</strong><ul><li>Using a HashSet when the problem says O(1) space — two pointer is expected</li><li>Not handling <code>fast != null && fast.next != null</code> — causes NPE</li><li>Forgetting to skip duplicates in 3Sum</li></ul></div>`
+    }
+  },
+  {
+    id: 1,
+    name: "Sliding Window",
+    subtitle: "Fixed size · Variable size · Frequency map variant",
+    sections: {
+      "Definition": `<h3>Sliding Window</h3>
+<p>Sliding Window is a technique to process contiguous subarrays (or substrings) efficiently by maintaining a "window" — a range [left, right] — and sliding it across the input. Instead of recomputing from scratch for every subarray, you add the new right element and remove the old left element, maintaining running state.</p>
+<p>Think of it as a camera frame sliding across a film strip: you see exactly k frames at once, and as you advance, one old frame leaves and one new frame enters.</p>`,
+
+      "Internal Mechanics": `<h3>Internal Mechanics</h3>
+<h4>Fixed Size Window</h4>
+<p>Window size k is constant. right advances until window size = k. Then: process window, remove arr[left], left++. State is maintained incrementally — no need to recompute sum/max each time.</p>
+<h4>Variable Size Window (Expand-Contract)</h4>
+<p>right always advances (expand). When window violates a constraint → contract by moving left rightward until constraint is satisfied again. The window size varies dynamically. Track max/min window size seen.</p>
+<h4>Frequency Map Variant</h4>
+<p>Use a HashMap or int[] array to count character frequencies in the window. When a character's count hits a threshold or the window has too many distinct characters → contract. This is the engine behind "minimum window substring" and "longest substring without repeating characters".</p>
+<p><strong>Key invariant:</strong> In expand-contract, left ≤ right always, and the window always satisfies the constraint AFTER contraction. This ensures you never miss a valid state.</p>`,
+
+      "Time & Space Complexity": `<h3>Time & Space Complexity</h3>
+<table class="complexity-table">
+<tr><th>Variant</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Fixed window</td><td>O(n)</td><td>O(1) or O(k)</td><td>Each element enters and leaves window exactly once</td></tr>
+<tr><td>Variable window</td><td>O(n)</td><td>O(1)</td><td>left and right each move forward at most n times total — amortized O(1) per step</td></tr>
+<tr><td>Frequency map window</td><td>O(n)</td><td>O(k) where k = alphabet size</td><td>Same amortized argument; map has at most k entries</td></tr>
+<tr><td>Minimum window substring</td><td>O(n + m)</td><td>O(m)</td><td>n = string length, m = pattern size; two passes over s</td></tr>
+</table>
+<p><strong>Critical insight:</strong> The amortized O(n) for variable windows comes from the fact that each pointer is monotonically non-decreasing — left and right never go backward. So total operations = 2n at most.</p>`,
+
+      "Subtypes & Variants": `<h3>Subtypes & Variants</h3>
+<h4>1. Fixed Size (Max Sum Subarray of Size K)</h4>
+<p>Window is exactly k. Compute initial window, then slide: add right, subtract left, update answer.</p>
+<h4>2. Variable Size — Find Longest</h4>
+<p>Expand right as far as possible while constraint holds. If violated, shrink from left. Track max length seen. Example: Longest Substring Without Repeating Characters.</p>
+<h4>3. Variable Size — Find Shortest</h4>
+<p>Expand right until constraint is satisfied. Then shrink from left while still satisfied, tracking minimum length. Example: Minimum Size Subarray Sum.</p>
+<h4>4. Frequency Map (Anagram/Permutation)</h4>
+<p>Fixed window on string, maintain char count array. Compare window counts to target counts in O(26) = O(1). Example: Find All Anagrams in a String.</p>
+<h4>5. At Most K Distinct (Template)</h4>
+<p>"Exactly K" problems convert to: f(exactly K) = f(at most K) - f(at most K-1). Powerful meta-trick.</p>`,
+
+      "Core Patterns": `<h3>Core Patterns</h3>
+<div class="pattern-card">
+<div class="pattern-name">1. Fixed Window Sum/Max</div>
+<p>Precompute first window. Then for each new right: add nums[right], subtract nums[left], advance left. Track max/min over all windows.</p>
+<div class="pattern-trigger">🧠 Trigger: "maximum average subarray of length k" / "first negative in every window"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">2. Expand Until Invalid, Then Contract</div>
+<p>while right < n: expand (right++, update state). While invalid: contract (remove left, left++). Update answer with current valid window.</p>
+<div class="pattern-trigger">🧠 Trigger: "longest substring / subarray satisfying property X"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">3. Expand Until Valid, Then Contract While Valid</div>
+<p>Find MINIMUM window: expand until valid. Then shrink from left while still valid, recording min each time.</p>
+<div class="pattern-trigger">🧠 Trigger: "smallest subarray with sum ≥ target" / "minimum window substring"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">4. Character Frequency Matching</div>
+<p>Use int[26] for window char counts. Track how many chars are "satisfied" (count ≥ required). When satisfied chars == unique chars needed → valid window.</p>
+<div class="pattern-trigger">🧠 Trigger: "find anagram" / "permutation in string" / "all characters of t in s"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">5. Exactly K → At Most K Trick</div>
+<p>Count subarrays with exactly k distinct elements = atMostK(k) - atMostK(k-1).</p>
+<div class="pattern-trigger">🧠 Trigger: "exactly k distinct elements" — convert to two at-most-k calls</div>
+</div>`,
+
+      "Problem Smell → Pattern Map": `<h3>Problem Smell → Pattern Map</h3>
+<div class="smell-map">
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Maximum sum subarray of size k"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Fixed window, slide one element at a time</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Longest substring without repeating chars"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Variable window + set/map, expand-contract</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Minimum window containing all chars of t"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Frequency map, expand until valid, contract</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Find all anagrams / permutation in string"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Fixed window + int[26] frequency comparison</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Longest repeating char replacement (allow k changes)"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Variable window, track maxFreq in window, window valid if size-maxFreq ≤ k</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Contiguous subarray, sum/product constraint"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Variable window (works if all positives; use prefix sum otherwise)</div></div>
+</div>`,
+
+      "Java Implementation": `<h3>Java Implementation</h3>
+<pre>// ── 1. Fixed Window — Max Sum of Size K ────────────────────────
+public int maxSumSubarray(int[] nums, int k) {
+    int windowSum = 0, maxSum = 0;
+    for (int i = 0; i < k; i++) windowSum += nums[i]; // initial window
+    maxSum = windowSum;
+    for (int right = k; right < nums.length; right++) {
+        windowSum += nums[right] - nums[right - k]; // slide: add right, drop left
+        maxSum = Math.max(maxSum, windowSum);
+    }
+    return maxSum;
+}
+
+// ── 2. Variable Window — Longest Substring No Repeating ────────
+public int lengthOfLongestSubstring(String s) {
+    Map&lt;Character, Integer&gt; map = new HashMap&lt;&gt;(); // char → last seen index
+    int max = 0;
+    for (int left = 0, right = 0; right < s.length(); right++) {
+        char c = s.charAt(right);
+        if (map.containsKey(c)) {
+            // jump left past the last occurrence of c
+            left = Math.max(left, map.get(c) + 1);
+        }
+        map.put(c, right);
+        max = Math.max(max, right - left + 1);
+    }
+    return max;
+}
+
+// ── 3. Minimum Window Substring ─────────────────────────────────
+public String minWindow(String s, String t) {
+    int[] need = new int[128], have = new int[128];
+    for (char c : t.toCharArray()) need[c]++;
+    int formed = 0, required = (int) t.chars().distinct().count();
+    int left = 0, minLen = Integer.MAX_VALUE, minL = 0;
+    for (int right = 0; right < s.length(); right++) {
+        char c = s.charAt(right);
+        have[c]++;
+        if (need[c] > 0 && have[c] == need[c]) formed++; // just satisfied c
+        while (formed == required) { // valid window → try to shrink
+            if (right - left + 1 < minLen) { minLen = right-left+1; minL = left; }
+            char lc = s.charAt(left++);
+            if (need[lc] > 0 && have[lc]-- == need[lc]) formed--; // lost c
+        }
+    }
+    return minLen == Integer.MAX_VALUE ? "" : s.substring(minL, minL + minLen);
+}
+
+// ── 4. Find All Anagrams (Fixed Window + Freq Array) ───────────
+public List&lt;Integer&gt; findAnagrams(String s, String p) {
+    List&lt;Integer&gt; res = new ArrayList&lt;&gt;();
+    if (s.length() < p.length()) return res;
+    int[] pCount = new int[26], wCount = new int[26];
+    for (char c : p.toCharArray()) pCount[c-'a']++;
+    for (int i = 0; i < p.length(); i++) wCount[s.charAt(i)-'a']++;
+    if (Arrays.equals(pCount, wCount)) res.add(0);
+    for (int i = p.length(); i < s.length(); i++) {
+        wCount[s.charAt(i)-'a']++;
+        wCount[s.charAt(i-p.length())-'a']--;
+        if (Arrays.equals(pCount, wCount)) res.add(i - p.length() + 1);
+    }
+    return res;
+}</pre>`,
+
+      "Worked Example": `<h3>Worked Example — Longest Repeating Character Replacement (LC 424)</h3>
+<h4>Problem</h4>
+<p>Given string s and integer k, find the length of the longest substring you can get if you can replace at most k characters.</p>
+<h4>Key Insight</h4>
+<p>A window is valid if: <code>(windowSize - maxFreqInWindow) ≤ k</code>. The non-max-frequency characters are the ones we'd replace. We only need to track the maximum frequency seen, and we never shrink it (monotonic trick — we only care about LONGER windows).</p>
+<h4>Brute Force — O(n² × 26)</h4>
+<pre>// Try every substring, count frequencies — TLE
+int max = 0;
+for (int i = 0; i < s.length(); i++) {
+    int[] freq = new int[26];
+    int maxFreq = 0;
+    for (int j = i; j < s.length(); j++) {
+        maxFreq = Math.max(maxFreq, ++freq[s.charAt(j)-'a']);
+        if ((j - i + 1) - maxFreq <= k) max = Math.max(max, j-i+1);
+    }
+}
+return max;</pre>
+<h4>Optimal — Sliding Window O(n)</h4>
+<pre>public int characterReplacement(String s, int k) {
+    int[] count = new int[26];
+    int left = 0, maxFreq = 0, maxLen = 0;
+    for (int right = 0; right < s.length(); right++) {
+        maxFreq = Math.max(maxFreq, ++count[s.charAt(right) - 'A']);
+        // If window is invalid (too many replacements needed), shrink
+        while ((right - left + 1) - maxFreq > k) {
+            count[s.charAt(left++) - 'A']--;
+            // Note: maxFreq is NOT decremented — we only care about LONGER windows
+        }
+        maxLen = Math.max(maxLen, right - left + 1);
+    }
+    return maxLen;
+}</pre>
+<p><strong>Why not decrement maxFreq?</strong> We want the longest window. If shrinking doesn't produce a longer window, maxFreq stays — it's a monotonic optimisation valid because we only care about the global max.</p>`,
+
+      "Practice Problems": `<h3>Practice Problems</h3>
+<div class="practice-card"><span class="diff-badge tag-green">Easy</span><div><strong>LC 643 — Maximum Average Subarray I</strong><p>Fixed window of size k. Compute initial sum, slide by adding nums[right] - nums[right-k]. Classic fixed window intro.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 3 — Longest Substring Without Repeating Characters</strong><p>Variable window + HashMap. Key insight: when duplicate found, jump left past its last position (don't just increment left by 1).</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 567 — Permutation in String</strong><p>Fixed window size len(p) on s. int[26] frequency comparison. Check Arrays.equals every slide. O(n × 26) = O(n).</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 209 — Minimum Size Subarray Sum</strong><p>Variable window, find shortest. Expand until sum ≥ target, then shrink while still valid. Classic minimum window pattern.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 76 — Minimum Window Substring</strong><p>Frequency map + "formed" counter tracking satisfied characters. Classic hardest sliding window. Master this and you've mastered the pattern.</p></div></div>`,
+
+      "Interview Perspective": `<h3>Interview Perspective</h3>
+<div class="interview-card"><strong>What interviewers test</strong><p>Can you identify fixed vs variable window? Do you understand WHY the window is valid? Can you maintain state incrementally instead of recomputing? Do you handle the minimum window contraction correctly?</p></div>
+<div class="interview-card"><strong>How to think out loud</strong><p>"This is a subarray/substring problem — sliding window is my first instinct. The window constraint is [X]. My window is valid when [Y]. I'll expand right always, and contract left when the constraint is violated. State I need to track: [Z]."</p></div>
+<div class="interview-card"><strong>Common follow-ups</strong><ul><li>What if elements can be negative? (Can't use variable window — use prefix sum)</li><li>How would you extend this to 2D? (2D sliding window = nested loops + 1D window)</li><li>Why does the "don't decrement maxFreq" trick work in LC 424?</li></ul></div>
+<div class="interview-card"><strong>Template to memorise</strong><pre style="font-size:11px">int left = 0;
+Map/int[] state;
+for (int right = 0; right < n; right++) {
+    // add nums[right] to state
+    while (window invalid) {
+        // remove nums[left] from state
+        left++;
+    }
+    // update answer with current window [left, right]
+}</pre></div>`
+    }
+  },
+  {
+    id: 2,
+    name: "Prefix Sum",
+    subtitle: "1D and 2D · Subarray sum equals K · Running totals",
+    sections: {
+      "Definition": `<h3>Prefix Sum</h3>
+<p>A prefix sum array (also called cumulative sum) is a precomputed array where <code>prefix[i]</code> = sum of all elements from index 0 to i-1. Once built, the sum of any subarray <code>[l, r]</code> can be computed in O(1) as <code>prefix[r+1] - prefix[l]</code>.</p>
+<p>Think of it as a running odometer reading: if the odometer reads 50 at city A and 80 at city B, the distance between them is 30 — no need to retrace the route.</p>`,
+
+      "Internal Mechanics": `<h3>Internal Mechanics</h3>
+<h4>Building the Prefix Array</h4>
+<p><code>prefix[0] = 0</code> (empty prefix). <code>prefix[i] = prefix[i-1] + nums[i-1]</code>. Array size is n+1 to avoid off-by-one issues — prefix[0]=0 makes range queries uniform.</p>
+<h4>Range Query</h4>
+<p><code>sum(l, r) = prefix[r+1] - prefix[l]</code>. This works because prefix[r+1] includes elements 0..r, and subtracting prefix[l] removes elements 0..l-1.</p>
+<h4>Subarray Sum Equals K (HashMap trick)</h4>
+<p>As you compute running sum, you want: does any previous prefix sum equal <code>currentSum - k</code>? Store prefix sums in a HashMap with their count. Initialize map with {0: 1} (empty prefix). At each index: check if <code>map.get(currentSum - k)</code> exists — if so, add its count to result. Then store currentSum in map.</p>
+<h4>2D Prefix Sum</h4>
+<p><code>prefix[i][j] = prefix[i-1][j] + prefix[i][j-1] - prefix[i-1][j-1] + grid[i-1][j-1]</code>. Inclusion-exclusion removes the double-counted top-left rectangle.</p>`,
+
+      "Time & Space Complexity": `<h3>Time & Space Complexity</h3>
+<table class="complexity-table">
+<tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Build prefix array</td><td>O(n)</td><td>O(n)</td><td>Single pass, each element computed from previous</td></tr>
+<tr><td>Range sum query</td><td>O(1)</td><td>O(1)</td><td>Two array lookups and a subtraction</td></tr>
+<tr><td>Subarray sum = K</td><td>O(n)</td><td>O(n)</td><td>Single pass, HashMap stores at most n prefix sums</td></tr>
+<tr><td>Build 2D prefix</td><td>O(m×n)</td><td>O(m×n)</td><td>Fill each cell once using inclusion-exclusion</td></tr>
+<tr><td>2D range sum query</td><td>O(1)</td><td>O(1)</td><td>Four lookups + inclusion-exclusion arithmetic</td></tr>
+</table>
+<p><strong>Trade-off:</strong> Prefix sum trades O(n) space for O(1) query time. If you have many queries (Q >> 1), total time drops from O(Q×n) to O(n + Q). Worth it when Q ≥ 2.</p>`,
+
+      "Subtypes & Variants": `<h3>Subtypes & Variants</h3>
+<h4>1. Static 1D Prefix Sum</h4>
+<p>Precompute once, answer multiple range queries in O(1). Good for read-only arrays.</p>
+<h4>2. Running Sum + HashMap (Subarray Count)</h4>
+<p>No explicit prefix array — compute running sum on the fly, use HashMap to count matching previous prefix sums. Answers: "how many subarrays have sum = K?"</p>
+<h4>3. 2D Prefix Sum (Matrix Queries)</h4>
+<p>Precompute for 2D grid. Inclusion-exclusion formula for rectangle sums. Used in image processing (integral image / summed area table).</p>
+<h4>4. Prefix XOR / Prefix Product</h4>
+<p>Same technique for XOR or product instead of sum. Prefix XOR lets you find subarrays with XOR = K in O(n). Note: prefix product requires handling zeros carefully.</p>
+<h4>5. Difference Array</h4>
+<p>Inverse of prefix sum: make range updates O(1), query at O(n) build time. Add x to [l,r]: diff[l]+=x, diff[r+1]-=x. Then prefix sum of diff gives actual array.</p>`,
+
+      "Core Patterns": `<h3>Core Patterns</h3>
+<div class="pattern-card">
+<div class="pattern-name">1. Precompute → O(1) Range Query</div>
+<p>Build prefix array in O(n). For each range [l,r] query: return prefix[r+1] - prefix[l]. Useful when many queries are made on a static array.</p>
+<div class="pattern-trigger">🧠 Trigger: "sum of elements between index l and r" repeated Q times</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">2. Count Subarrays with Sum = K</div>
+<p>HashMap of {prefixSum: count}, initialized with {0:1}. For each element: result += map.getOrDefault(runningSum-k, 0); map.put(runningSum, count+1).</p>
+<div class="pattern-trigger">🧠 Trigger: "how many subarrays sum to K" — can be negative numbers</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">3. Longest Subarray with Sum = K</div>
+<p>HashMap of {prefixSum: firstIndex}. For each index: if (runningSum-k) exists in map, update maxLength = max(maxLength, i - map.get(runningSum-k)).</p>
+<div class="pattern-trigger">🧠 Trigger: "longest subarray with sum/XOR equal to k"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">4. 2D Matrix Sum Query</div>
+<p>Build 2D prefix. Query(r1,c1,r2,c2) = prefix[r2+1][c2+1] - prefix[r1][c2+1] - prefix[r2+1][c1] + prefix[r1][c1].</p>
+<div class="pattern-trigger">🧠 Trigger: "sum of submatrix / multiple 2D range queries"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">5. Range Update (Difference Array)</div>
+<p>Add d to [l,r]: diff[l]+=d, diff[r+1]-=d. Apply all updates, then prefix-sum diff to get final array. O(1) update, O(n) finalize.</p>
+<div class="pattern-trigger">🧠 Trigger: "add value to a range of indices, then query final array"</div>
+</div>`,
+
+      "Problem Smell → Pattern Map": `<h3>Problem Smell → Pattern Map</h3>
+<div class="smell-map">
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Range sum queries on static array"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Prefix array, O(n) build, O(1) query</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Number of subarrays with sum = K" (with negatives)</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Running sum + HashMap {prefixSum: count}</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Longest subarray with sum = K"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Running sum + HashMap {prefixSum: firstIndex}</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Sum of submatrix / 2D range queries"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">2D prefix sum with inclusion-exclusion formula</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"XOR of subarray equals K"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Prefix XOR + HashMap (same pattern as sum)</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Add value to range, then print array"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Difference array + prefix sum to reconstruct</div></div>
+</div>`,
+
+      "Java Implementation": `<h3>Java Implementation</h3>
+<pre>// ── 1. Static Prefix Sum + Range Query ─────────────────────────
+class NumArray {
+    private int[] prefix;
+    public NumArray(int[] nums) {
+        prefix = new int[nums.length + 1];
+        for (int i = 0; i < nums.length; i++)
+            prefix[i + 1] = prefix[i] + nums[i];
+    }
+    // sum of nums[left..right] inclusive
+    public int sumRange(int left, int right) {
+        return prefix[right + 1] - prefix[left];
+    }
+}
+
+// ── 2. Subarray Sum Equals K (count) ────────────────────────────
+public int subarraySum(int[] nums, int k) {
+    Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
+    map.put(0, 1); // empty prefix has sum 0
+    int sum = 0, count = 0;
+    for (int num : nums) {
+        sum += num;
+        // if (sum - k) was a previous prefix sum, those subarrays sum to k
+        count += map.getOrDefault(sum - k, 0);
+        map.put(sum, map.getOrDefault(sum, 0) + 1);
+    }
+    return count;
+}
+
+// ── 3. 2D Prefix Sum ─────────────────────────────────────────────
+class NumMatrix {
+    private int[][] prefix;
+    public NumMatrix(int[][] matrix) {
+        int m = matrix.length, n = matrix[0].length;
+        prefix = new int[m + 1][n + 1];
+        for (int i = 1; i <= m; i++)
+            for (int j = 1; j <= n; j++)
+                prefix[i][j] = prefix[i-1][j] + prefix[i][j-1]
+                              - prefix[i-1][j-1] + matrix[i-1][j-1];
+    }
+    public int sumRegion(int r1, int c1, int r2, int c2) {
+        return prefix[r2+1][c2+1] - prefix[r1][c2+1]
+             - prefix[r2+1][c1]   + prefix[r1][c1];
+    }
+}
+
+// ── 4. Difference Array (range updates) ─────────────────────────
+public int[] applyRangeUpdates(int n, int[][] updates) {
+    int[] diff = new int[n + 1];
+    for (int[] u : updates) {  // u = [left, right, val]
+        diff[u[0]] += u[2];
+        diff[u[1] + 1] -= u[2]; // cancel after range
+    }
+    int[] result = new int[n];
+    int running = 0;
+    for (int i = 0; i < n; i++) {
+        running += diff[i];
+        result[i] = running;
+    }
+    return result;
+}</pre>`,
+
+      "Worked Example": `<h3>Worked Example — Subarray Sum Equals K (LC 560)</h3>
+<h4>Problem</h4>
+<p>Given integer array nums and integer k, return the total number of subarrays whose sum equals k. Array can contain negative numbers.</p>
+<h4>Why Sliding Window FAILS</h4>
+<p>Negative numbers break the monotonicity assumption. Expanding the window doesn't guarantee increasing the sum, so we can't contract greedily. We need prefix sums.</p>
+<h4>Brute Force — O(n²)</h4>
+<pre>int count = 0;
+for (int i = 0; i < nums.length; i++) {
+    int sum = 0;
+    for (int j = i; j < nums.length; j++) {
+        sum += nums[j];
+        if (sum == k) count++;
+    }
+}
+return count;</pre>
+<h4>Optimal — Prefix Sum + HashMap O(n)</h4>
+<pre>public int subarraySum(int[] nums, int k) {
+    Map&lt;Integer, Integer&gt; prefixCount = new HashMap&lt;&gt;();
+    prefixCount.put(0, 1); // base case: empty prefix, sum=0
+    int runningSum = 0, count = 0;
+    for (int num : nums) {
+        runningSum += num;
+        // sum[l..r] = runningSum - prefix[l] = k
+        // ⟹ prefix[l] = runningSum - k
+        // Ask: how many times have we seen (runningSum - k) as a prefix sum?
+        count += prefixCount.getOrDefault(runningSum - k, 0);
+        prefixCount.merge(runningSum, 1, Integer::sum);
+    }
+    return count;
+}
+// Trace: nums=[1,1,1], k=2
+// i=0: sum=1, need=-1 → 0 found, map={0:1, 1:1}
+// i=1: sum=2, need=0  → 1 found! count=1, map={0:1,1:1,2:1}
+// i=2: sum=3, need=1  → 1 found! count=2, map={0:1,1:1,2:1,3:1}
+// Answer: 2 ✓ (subarrays [0,1] and [1,2])</pre>`,
+
+      "Practice Problems": `<h3>Practice Problems</h3>
+<div class="practice-card"><span class="diff-badge tag-green">Easy</span><div><strong>LC 303 — Range Sum Query - Immutable</strong><p>Classic prefix array. Build prefix once, answer each query in O(1). Entry-level prefix sum problem.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 525 — Contiguous Array</strong><p>Replace 0s with -1s, find longest subarray with sum=0. Prefix sum + HashMap {sum: firstIndex}. Key insight: 0s and 1s balance = sum becomes 0.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 304 — Range Sum Query 2D - Immutable</strong><p>2D prefix sum with inclusion-exclusion. Build O(mn), query O(1). Master the formula: prefix[r2+1][c2+1] - prefix[r1][c2+1] - prefix[r2+1][c1] + prefix[r1][c1].</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 974 — Subarray Sums Divisible by K</strong><p>Prefix sum mod k. If prefix[i] % k == prefix[j] % k, then sum(i+1,j) divisible by k. Count pairs with same mod value using int[k] frequency array.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 363 — Max Sum of Rectangle No Larger Than K</strong><p>2D prefix + TreeSet. Fix top and bottom rows, reduce to 1D: find subarray with max sum ≤ k using prefix sum + binary search in TreeSet. O(m²n log n).</p></div></div>`,
+
+      "Interview Perspective": `<h3>Interview Perspective</h3>
+<div class="interview-card"><strong>What interviewers test</strong><p>Do you know when sliding window fails (negative numbers)? Can you derive the {prefixSum - k} lookup trick on the spot? Do you handle the base case map.put(0, 1) correctly?</p></div>
+<div class="interview-card"><strong>How to think out loud</strong><p>"Since the array can have negatives, I can't use a sliding window — it loses monotonicity. Instead I'll use prefix sums. For a subarray sum[l..r]=k, I need prefix[r+1]-prefix[l]=k, i.e., prefix[l]=prefix[r+1]-k. I'll store prefix sums in a HashMap as I go and look up each complement. Initialize with {0:1} for the empty prefix."</p></div>
+<div class="interview-card"><strong>Common follow-ups</strong><ul><li>What if you need the actual subarray, not just the count?</li><li>What if k is not fixed but you want maximum sum ≤ k? (Binary search in TreeSet)</li><li>How does this extend to XOR? (Same pattern, XOR instead of +)</li><li>When would you use a difference array vs prefix sum?</li></ul></div>`
+    }
+  },
+  {
+    id: 3,
+    name: "Binary Search",
+    subtitle: "Classic · Rotated array · Search on answer space · Boundary finding",
+    sections: {
+      "Definition": `<h3>Binary Search</h3>
+<p>Binary Search is a divide-and-conquer algorithm that finds a target in a SORTED (or monotonically ordered) search space by repeatedly halving the space. In each step, compare the midpoint to the target: if equal, done; if target is smaller, search left half; if larger, search right half.</p>
+<p>The key insight: you can eliminate half the search space in each step because monotonicity guarantees that the target can only be in one half. This generalises far beyond sorted arrays — any search space where you can say "left half is definitely wrong" or "right half is definitely wrong" can use binary search.</p>`,
+
+      "Internal Mechanics": `<h3>Internal Mechanics</h3>
+<h4>Mid-Point Calculation</h4>
+<p>Never write <code>mid = (left + right) / 2</code> — integer overflow when left+right exceeds INT_MAX. Always use: <code>mid = left + (right - left) / 2</code>.</p>
+<h4>Invariant Maintenance</h4>
+<p>The search space must be [left, right] inclusive. The loop continues while <code>left ≤ right</code> (for exact match) or <code>left < right</code> (for boundary finding). The wrong termination condition is a very common bug.</p>
+<h4>Boundary Finding Template</h4>
+<p>To find the leftmost position where condition is true: maintain <code>ans = -1</code>. When condition holds: save mid as candidate, search left (right = mid-1). When condition fails: search right (left = mid+1).</p>
+<h4>Rotated Array</h4>
+<p>One half is always sorted. Determine which half: if nums[mid] >= nums[left], left half is sorted. Check if target is in the sorted half — if yes, binary search there; otherwise, search the other half.</p>`,
+
+      "Time & Space Complexity": `<h3>Time & Space Complexity</h3>
+<table class="complexity-table">
+<tr><th>Variant</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Classic binary search</td><td>O(log n)</td><td>O(1)</td><td>Search space halves each iteration: n → n/2 → ... → 1 = log₂n steps</td></tr>
+<tr><td>Rotated array search</td><td>O(log n)</td><td>O(1)</td><td>Same halving; extra conditional to pick the sorted half</td></tr>
+<tr><td>Search on answer space</td><td>O(log(max-min) × f(n))</td><td>O(1)</td><td>Binary search over answer range, feasibility check costs f(n)</td></tr>
+<tr><td>Finding kth element (2 arrays)</td><td>O(log(m+n))</td><td>O(1)</td><td>Each step eliminates k/2 elements from consideration</td></tr>
+</table>
+<p><strong>Why O(log n)?</strong> Each comparison halves the search space. Starting with n elements: after k steps, n/2^k elements remain. When n/2^k = 1, k = log₂n. This logarithmic convergence is binary search's core power.</p>`,
+
+      "Subtypes & Variants": `<h3>Subtypes & Variants</h3>
+<h4>1. Classic Binary Search (Find Exact Value)</h4>
+<p>Sorted array, find target. Return mid if found, -1 otherwise. The textbook algorithm.</p>
+<h4>2. Find First/Last Occurrence (Boundary Finding)</h4>
+<p>When duplicates exist, find leftmost or rightmost position. Don't stop at first match — record it and keep searching.</p>
+<h4>3. Rotated Sorted Array</h4>
+<p>Array was sorted then rotated. One half is always sorted — use that to determine which half to recurse into.</p>
+<h4>4. Search on Answer Space</h4>
+<p>The search space is NOT the array but possible ANSWERS. Binary search over the range of possible answers; use a feasibility function to check if a given answer is achievable. Classic: "minimum capacity to ship packages in D days".</p>
+<h4>5. Lower/Upper Bound (Java's Arrays.binarySearch equivalent)</h4>
+<p>Find the leftmost position where arr[i] >= target (lower bound) or arr[i] > target (upper bound). Used in problems like "count of elements in range [a, b]".</p>`,
+
+      "Core Patterns": `<h3>Core Patterns</h3>
+<div class="pattern-card">
+<div class="pattern-name">1. Classic Exact Match</div>
+<p>while(left≤right): mid=left+(right-left)/2. if arr[mid]==target return mid. if arr[mid]<target: left=mid+1. else: right=mid-1. Return -1.</p>
+<div class="pattern-trigger">🧠 Trigger: "search in sorted array" / "O(log n) lookup"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">2. Leftmost/Rightmost Boundary</div>
+<p>ans=-1. while(left≤right): if condition(mid): ans=mid; right=mid-1 (for leftmost) OR left=mid+1 (for rightmost). else: move the other pointer.</p>
+<div class="pattern-trigger">🧠 Trigger: "first position / last position / find boundary" in sorted array</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">3. Rotated Array — Find Sorted Half</div>
+<p>if nums[left]<=nums[mid], left half sorted. Check if target in [nums[left], nums[mid]] → search left. Else search right. Mirror for right half sorted.</p>
+<div class="pattern-trigger">🧠 Trigger: "search in rotated sorted array" / "find minimum in rotated array"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">4. Binary Search on Answer Space</div>
+<p>lo=minPossibleAnswer, hi=maxPossibleAnswer. while(lo<hi): mid=(lo+hi)/2. if feasible(mid): hi=mid. else: lo=mid+1. Return lo.</p>
+<div class="pattern-trigger">🧠 Trigger: "minimize the maximum" / "maximize the minimum" / "find smallest X such that condition holds"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">5. Implicit Sorted Order</div>
+<p>Array not explicitly sorted but has a monotonic property (e.g., square root, peak element). Binary search on the property, not value.</p>
+<div class="pattern-trigger">🧠 Trigger: "find peak element" / "sqrt(x)" / "bad version" — monotonic structure without explicit sort</div>
+</div>`,
+
+      "Problem Smell → Pattern Map": `<h3>Problem Smell → Pattern Map</h3>
+<div class="smell-map">
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Find target in sorted array"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Classic binary search, return mid</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"First / last position of element"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Boundary binary search, don't stop at first match</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Search in rotated sorted array"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Check which half is sorted, narrow accordingly</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Minimize the maximum / maximum the minimum"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Binary search on answer space + feasibility check</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Capacity to ship / koko eating bananas"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Binary search on answer, feasibility = can we finish in D days?</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Find median of two sorted arrays"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Binary search partition on smaller array</div></div>
+</div>`,
+
+      "Java Implementation": `<h3>Java Implementation</h3>
+<pre>// ── 1. Classic Binary Search ────────────────────────────────────
+public int search(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2; // safe mid, avoids overflow
+        if (nums[mid] == target)   return mid;
+        else if (nums[mid] < target) left = mid + 1;
+        else                         right = mid - 1;
+    }
+    return -1;
+}
+
+// ── 2. Leftmost Position (First Occurrence / Lower Bound) ───────
+public int lowerBound(int[] nums, int target) {
+    int left = 0, right = nums.length - 1, ans = -1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] == target) { ans = mid; right = mid - 1; } // go left for more
+        else if (nums[mid] < target) left = mid + 1;
+        else                          right = mid - 1;
+    }
+    return ans;
+}
+
+// ── 3. Search in Rotated Sorted Array ───────────────────────────
+public int searchRotated(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] == target) return mid;
+        if (nums[left] <= nums[mid]) { // left half is sorted
+            if (nums[left] <= target && target < nums[mid])
+                right = mid - 1; // target in sorted left half
+            else left = mid + 1;
+        } else { // right half is sorted
+            if (nums[mid] < target && target <= nums[right])
+                left = mid + 1; // target in sorted right half
+            else right = mid - 1;
+        }
+    }
+    return -1;
+}
+
+// ── 4. Binary Search on Answer Space ───────────────────────────
+// Template: find minimum capacity to ship packages in D days
+public int shipWithinDays(int[] weights, int days) {
+    int lo = 0, hi = 0;
+    for (int w : weights) { lo = Math.max(lo, w); hi += w; }
+    // lo = max single weight (minimum possible), hi = sum (one day)
+    while (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (canShip(weights, days, mid)) hi = mid;   // try smaller
+        else                              lo = mid + 1; // need more
+    }
+    return lo;
+}
+private boolean canShip(int[] w, int days, int cap) {
+    int d = 1, cur = 0;
+    for (int x : w) { if (cur + x > cap) { d++; cur = 0; } cur += x; }
+    return d <= days;
+}</pre>`,
+
+      "Worked Example": `<h3>Worked Example — Koko Eating Bananas (LC 875)</h3>
+<h4>Problem</h4>
+<p>Koko can eat k bananas per hour. Given piles[] and hours h, find minimum k such that all bananas can be eaten in h hours.</p>
+<h4>Why Binary Search on Answer?</h4>
+<p>If speed k is feasible, then k+1 is also feasible (monotonic). If k is not feasible, k-1 is also not feasible. This monotonicity on the answer space means binary search works perfectly.</p>
+<h4>Answer Space</h4>
+<p>lo = 1 (minimum meaningful speed), hi = max(piles) (eat largest pile in 1 hour — no need to go faster).</p>
+<h4>Solution</h4>
+<pre>public int minEatingSpeed(int[] piles, int h) {
+    int lo = 1, hi = 0;
+    for (int p : piles) hi = Math.max(hi, p);
+    while (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (canFinish(piles, h, mid)) hi = mid;   // mid works, try smaller
+        else                           lo = mid + 1; // too slow, need faster
+    }
+    return lo;
+}
+private boolean canFinish(int[] piles, int h, int speed) {
+    int hours = 0;
+    for (int p : piles)
+        hours += (p + speed - 1) / speed; // ceil(p/speed)
+    return hours <= h;
+}
+// Time: O(n log(max_pile)). Why? log(max_pile) binary search iterations,
+// each costing O(n) feasibility check. n ≤ 10^4, max_pile ≤ 10^9 → 30 iterations.</pre>
+<h4>Key Pattern Recognition</h4>
+<p>Phrases "minimum k" + "feasible in D operations" + monotonic feasibility → binary search on answer space. The feasibility function does the actual work; binary search just finds the boundary.</p>`,
+
+      "Practice Problems": `<h3>Practice Problems</h3>
+<div class="practice-card"><span class="diff-badge tag-green">Easy</span><div><strong>LC 278 — First Bad Version</strong><p>Classic binary search on implicit sorted space. isBadVersion(mid) is your condition. Find leftmost True in [False,False,True,True,True] sequence.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 33 — Search in Rotated Sorted Array</strong><p>Master the "which half is sorted" decision. The comparison nums[left]<=nums[mid] determines this. One of the most common FAANG interview questions.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 1011 — Capacity to Ship Packages Within D Days</strong><p>Binary search on answer space. Feasibility: can we ship all packages with given capacity? lo=max(weights), hi=sum(weights).</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 162 — Find Peak Element</strong><p>No explicit sorted order, but monotonic property: nums[mid]>nums[mid+1] → peak on left side. Binary search without a "target".</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 4 — Median of Two Sorted Arrays</strong><p>Binary search partition on smaller array. Ensure left partitions are equal in size to right partitions, and max(left) ≤ min(right). O(log(min(m,n))). One of the hardest binary search problems.</p></div></div>`,
+
+      "Interview Perspective": `<h3>Interview Perspective</h3>
+<div class="interview-card"><strong>What interviewers test</strong><p>Do you use safe mid calculation? Do you know when to use left<=right vs left<right? Can you identify when an answer-space binary search applies? Can you write the feasibility function cleanly?</p></div>
+<div class="interview-card"><strong>How to think out loud</strong><p>"I see 'find minimum/maximum X such that condition holds'. The condition is monotonic — once true for X, it stays true for all larger X. So I'll binary search on the answer space from [lo, hi]. My feasibility function checks if the condition holds for a given answer. Time: O(log(range) × cost_of_feasibility)."</p></div>
+<div class="interview-card"><strong>Common follow-ups</strong><ul><li>Why lo = max(weights) and not lo = 1 in the ship packages problem?</li><li>How do you handle duplicates in a rotated array? (Extra condition needed)</li><li>What's the difference between lower_bound and upper_bound?</li><li>Can you implement binary search recursively? (Yes, but iterative preferred)</li></ul></div>
+<div class="interview-card"><strong>Critical bug to avoid</strong><p>Using <code>mid = (left + right) / 2</code> — causes integer overflow. ALWAYS use <code>mid = left + (right - left) / 2</code>. Interviewers watch for this.</p></div>`
+    }
+  },
+  {
+    id: 4,
+    name: "Merge Intervals",
+    subtitle: "Sort by start · Overlap detection · Insert interval",
+    sections: {
+      "Definition": `<h3>Merge Intervals</h3>
+<p>The Merge Intervals pattern handles problems involving ranges or time windows — merging overlapping intervals, inserting a new interval, finding gaps, or counting overlaps. The core idea: sort intervals by start time, then greedily decide whether to merge based on whether the current interval overlaps with the last merged one.</p>
+<p>Two intervals [a,b] and [c,d] overlap if and only if <code>c ≤ b</code> (when sorted by start). If they overlap, the merged interval is <code>[a, max(b, d)]</code>.</p>`,
+
+      "Internal Mechanics": `<h3>Internal Mechanics</h3>
+<h4>Sorting</h4>
+<p>Sort intervals by start time: <code>Arrays.sort(intervals, (a,b) -> a[0] - b[0])</code>. This guarantees that we only need to check if the current interval overlaps with the LAST merged interval (not any previous one).</p>
+<h4>Overlap Condition</h4>
+<p>After sorting, intervals[i][0] ≥ intervals[i-1][0] always. Overlap occurs when: <code>intervals[i][0] ≤ lastMerged[1]</code> (current start ≤ previous end). If overlapping, extend the end: <code>lastMerged[1] = max(lastMerged[1], intervals[i][1])</code>.</p>
+<h4>Insert Interval</h4>
+<p>Three-phase approach: (1) add all intervals that end before new interval starts, (2) merge all intervals that overlap with new interval into one, (3) add all remaining intervals. No sorting needed if original is sorted.</p>
+<h4>Greedy Correctness</h4>
+<p>After sorting by start, the greedy decision (merge if overlap, else start new group) is optimal because any interval that could overlap with the current one must have a start ≤ current end, and we've processed all such intervals already.</p>`,
+
+      "Time & Space Complexity": `<h3>Time & Space Complexity</h3>
+<table class="complexity-table">
+<tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Merge intervals</td><td>O(n log n)</td><td>O(n)</td><td>Sort dominates: O(n log n). Merge pass is O(n). Output is O(n) in worst case</td></tr>
+<tr><td>Insert interval (sorted input)</td><td>O(n)</td><td>O(n)</td><td>No sort needed; single pass through all intervals</td></tr>
+<tr><td>Count overlapping intervals</td><td>O(n log n)</td><td>O(n)</td><td>Sort events, sweep — equivalent to merge but counts instead</td></tr>
+<tr><td>Meeting rooms II (min rooms)</td><td>O(n log n)</td><td>O(n)</td><td>Sort starts+ends separately, two-pointer sweep</td></tr>
+</table>
+<p><strong>Why does sorting save us?</strong> Without sorting, checking if interval i overlaps with any previous interval requires O(n) work per interval → O(n²) total. Sorting reduces this to O(1) per interval — only check against the last merged.</p>`,
+
+      "Subtypes & Variants": `<h3>Subtypes & Variants</h3>
+<h4>1. Merge Overlapping Intervals</h4>
+<p>Sort by start, greedily merge. Output list of non-overlapping merged intervals.</p>
+<h4>2. Insert Interval</h4>
+<p>Given sorted non-overlapping intervals, insert new interval and merge. Three-phase: before, overlap, after.</p>
+<h4>3. Non-overlapping Intervals (Minimum Removal)</h4>
+<p>Greedily keep intervals that end earliest (sort by end time). Count how many you must remove for no overlaps. This is the interval scheduling maximization problem.</p>
+<h4>4. Meeting Rooms I (Can Attend All)</h4>
+<p>Sort by start, check if any consecutive pair overlaps. If yes, return false.</p>
+<h4>5. Meeting Rooms II (Min Rooms Needed)</h4>
+<p>Sort starts and ends separately. Two pointers: if next start < next end, need a new room (room++); else a meeting ended (room--). Track max rooms ever active.</p>
+<h4>6. Interval List Intersections</h4>
+<p>Two sorted interval lists, find all intersections. Two pointers, advance the pointer whose interval ends first.</p>`,
+
+      "Core Patterns": `<h3>Core Patterns</h3>
+<div class="pattern-card">
+<div class="pattern-name">1. Sort + Greedy Merge</div>
+<p>Sort by start. For each interval: if result is empty OR no overlap → add. If overlap (curr[0] ≤ last[1]) → update last[1] = max(last[1], curr[1]).</p>
+<div class="pattern-trigger">🧠 Trigger: "merge all overlapping intervals" / "collapse time ranges"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">2. Three-Phase Insert</div>
+<p>While intervals end before new start → add. While intervals start before/at new end → merge into new. Add remaining. No sort needed on sorted input.</p>
+<div class="pattern-trigger">🧠 Trigger: "insert new interval into sorted interval list"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">3. Sort by End (Greedy Scheduling)</div>
+<p>Sort by end time. Keep interval if its start ≥ last kept end. Count kept intervals; removals = total - kept.</p>
+<div class="pattern-trigger">🧠 Trigger: "minimum intervals to remove for no overlaps" / "max non-overlapping intervals"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">4. Event Sweep (Meeting Rooms)</div>
+<p>Separate starts[] and ends[], sort both. Two pointers: advance start or end based on which is smaller. Track active meetings count.</p>
+<div class="pattern-trigger">🧠 Trigger: "minimum meeting rooms" / "maximum overlap at any point in time"</div>
+</div>`,
+
+      "Problem Smell → Pattern Map": `<h3>Problem Smell → Pattern Map</h3>
+<div class="smell-map">
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Merge all overlapping intervals"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Sort by start, greedy merge into result list</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Insert interval into sorted list"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Three-phase: before, merge, after</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Minimum meeting rooms needed"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Sort starts+ends, two-pointer sweep counting active meetings</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Minimum removals for no overlaps"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Sort by end, greedy keep shortest-ending intervals</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Find intersection of two interval lists"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Two pointers, advance pointer with smaller end</div></div>
+</div>`,
+
+      "Java Implementation": `<h3>Java Implementation</h3>
+<pre>// ── 1. Merge Intervals ──────────────────────────────────────────
+public int[][] merge(int[][] intervals) {
+    Arrays.sort(intervals, (a, b) -> a[0] - b[0]); // sort by start
+    List&lt;int[]&gt; merged = new ArrayList&lt;&gt;();
+    for (int[] interval : intervals) {
+        if (merged.isEmpty() || merged.get(merged.size()-1)[1] < interval[0]) {
+            merged.add(interval); // no overlap, add new
+        } else {
+            // overlap: extend the end of last merged interval
+            merged.get(merged.size()-1)[1] =
+                Math.max(merged.get(merged.size()-1)[1], interval[1]);
+        }
+    }
+    return merged.toArray(new int[0][]);
+}
+
+// ── 2. Insert Interval ──────────────────────────────────────────
+public int[][] insert(int[][] intervals, int[] newInterval) {
+    List&lt;int[]&gt; res = new ArrayList&lt;&gt;();
+    int i = 0, n = intervals.length;
+    // Phase 1: add all intervals that end before newInterval starts
+    while (i < n && intervals[i][1] < newInterval[0]) res.add(intervals[i++]);
+    // Phase 2: merge all overlapping with newInterval
+    while (i < n && intervals[i][0] <= newInterval[1]) {
+        newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
+        newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
+        i++;
+    }
+    res.add(newInterval);
+    // Phase 3: add remaining
+    while (i < n) res.add(intervals[i++]);
+    return res.toArray(new int[0][]);
+}
+
+// ── 3. Meeting Rooms II (Min Rooms) ─────────────────────────────
+public int minMeetingRooms(int[][] intervals) {
+    int n = intervals.length;
+    int[] starts = new int[n], ends = new int[n];
+    for (int i = 0; i < n; i++) { starts[i]=intervals[i][0]; ends[i]=intervals[i][1]; }
+    Arrays.sort(starts); Arrays.sort(ends);
+    int rooms = 0, maxRooms = 0, e = 0;
+    for (int s = 0; s < n; s++) {
+        if (starts[s] < ends[e]) rooms++; // meeting started before any ended
+        else                       e++;   // a meeting ended, reuse room
+        maxRooms = Math.max(maxRooms, rooms);
+    }
+    return maxRooms;
+}
+
+// ── 4. Non-overlapping Intervals (Min Removal) ──────────────────
+public int eraseOverlapIntervals(int[][] intervals) {
+    Arrays.sort(intervals, (a, b) -> a[1] - b[1]); // sort by END
+    int kept = 1, lastEnd = intervals[0][1];
+    for (int i = 1; i < intervals.length; i++) {
+        if (intervals[i][0] >= lastEnd) { // no overlap with last kept
+            kept++;
+            lastEnd = intervals[i][1];
+        } // else: overlaps, skip (count as removed)
+    }
+    return intervals.length - kept;
+}</pre>`,
+
+      "Worked Example": `<h3>Worked Example — Merge Intervals (LC 56)</h3>
+<h4>Problem</h4>
+<p>Given array of intervals, merge all overlapping intervals and return non-overlapping result.</p>
+<h4>Why Sorting Enables Greedy</h4>
+<p>After sorting by start time, two intervals can only be adjacent in overlap — if interval[i] doesn't overlap with interval[i-1], it can't overlap with any earlier interval (since they have even smaller start times). So we only ever need to look at the LAST merged interval.</p>
+<h4>Trace</h4>
+<pre>Input: [[1,3],[2,6],[8,10],[15,18]]
+After sort by start: [[1,3],[2,6],[8,10],[15,18]]
+
+Process [1,3]: result = [[1,3]]
+Process [2,6]: 2 <= 3 (overlap!) → merge: [1, max(3,6)] = [1,6]
+              result = [[1,6]]
+Process [8,10]: 8 > 6 (no overlap) → add: result = [[1,6],[8,10]]
+Process [15,18]: 15 > 10 (no overlap) → add: result = [[1,6],[8,10],[15,18]]
+
+Output: [[1,6],[8,10],[15,18]] ✓</pre>
+<h4>Edge Cases</h4>
+<ul><li>Single interval → return as is</li><li>All overlapping → return one merged interval</li><li>No overlapping → return input as is</li><li>Contained interval (e.g., [1,10] then [2,5]): max end handles it — [1, max(10,5)] = [1,10]</li></ul>`,
+
+      "Practice Problems": `<h3>Practice Problems</h3>
+<div class="practice-card"><span class="diff-badge tag-green">Easy</span><div><strong>LC 252 — Meeting Rooms I</strong><p>Can one person attend all? Sort by start, check if any consecutive pair overlaps: intervals[i][0] < intervals[i-1][1].</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 57 — Insert Interval</strong><p>Three-phase insert into sorted list. No sorting needed. Key: overlap condition is intervals[i][0] <= newInterval[1] && newInterval[0] <= intervals[i][1].</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 253 — Meeting Rooms II</strong><p>Min rooms needed. Sort starts and ends independently, two-pointer sweep. Elegant O(n log n) solution without a heap.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 435 — Non-overlapping Intervals</strong><p>Sort by end time, keep greedily. This is the classic activity selection problem. Greedy correctness: always keep the earliest-ending valid interval.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 759 — Employee Free Time</strong><p>Merge intervals across all employees, find gaps. Flatten all intervals, sort, merge, then find gaps between merged intervals. Pure merge intervals application.</p></div></div>`,
+
+      "Interview Perspective": `<h3>Interview Perspective</h3>
+<div class="interview-card"><strong>What interviewers test</strong><p>Do you know the overlap condition? Can you handle the "contained interval" edge case (b⊂a)? Do you sort by start (for merge) vs end (for removal)? Can you implement the three-phase insert without bugs?</p></div>
+<div class="interview-card"><strong>How to think out loud</strong><p>"I see intervals — first instinct is to sort by start time. After sorting, two intervals overlap if the current start ≤ previous end. If they overlap, I extend the end. If not, I add the current interval as a new entry. Time O(n log n) dominated by sort."</p></div>
+<div class="interview-card"><strong>Common follow-ups</strong><ul><li>What if you need to track which original intervals made up each merged interval?</li><li>Meeting Rooms II — can you solve with a min-heap instead of two-pointer sweep?</li><li>What's the difference between sorting by start vs end and when do you use each?</li></ul></div>`
+    }
+  },
+  {
+    id: 5,
+    name: "Cyclic Sort",
+    subtitle: "Find missing / duplicate numbers in range [1, n]",
+    sections: {
+      "Definition": `<h3>Cyclic Sort</h3>
+<p>Cyclic Sort is an in-place sorting algorithm optimised for arrays containing numbers in a known range (typically [1, n] or [0, n-1]). It places each number at its correct index (number i goes to index i-1 for 1-indexed) by repeatedly swapping until the current element is in the right position.</p>
+<p>After sorting, any number not at its expected index reveals a missing or duplicate number. It's the only O(n) sort that doesn't need extra space when the domain is known.</p>`,
+
+      "Internal Mechanics": `<h3>Internal Mechanics</h3>
+<h4>Invariant</h4>
+<p>For an array containing values in [1, n]: element with value v belongs at index v-1. Cyclic sort maintains: "place the current element at its correct index by swapping".</p>
+<h4>Algorithm</h4>
+<p>i = 0. While i < n: let j = nums[i] - 1 (correct index for nums[i]). If nums[i] != nums[j]: swap(nums[i], nums[j]) — don't advance i, the swapped-in element may also be wrong. If nums[i] == nums[j]: advance i++ (either correctly placed, or duplicate at its correct slot).</p>
+<h4>Why Cyclic?</h4>
+<p>Each swap places at least one element in its correct position. Total swaps ≤ n (each element moves to its correct index at most once). This guarantees O(n) time even though there's a nested while loop — amortized analysis.</p>
+<h4>Finding Anomalies</h4>
+<p>After cyclic sort: scan array. If nums[i] != i+1, then i+1 is missing and nums[i] is a duplicate.</p>`,
+
+      "Time & Space Complexity": `<h3>Time & Space Complexity</h3>
+<table class="complexity-table">
+<tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Cyclic sort pass</td><td>O(n)</td><td>O(1)</td><td>Each element is swapped at most once to its correct position. Total swaps ≤ n</td></tr>
+<tr><td>Find missing number</td><td>O(n)</td><td>O(1)</td><td>Cyclic sort O(n) + linear scan O(n)</td></tr>
+<tr><td>Find all duplicates</td><td>O(n)</td><td>O(1) extra (output excluded)</td><td>Same sort + scan; output list is not extra space per convention</td></tr>
+<tr><td>Find corrupt pair</td><td>O(n)</td><td>O(1)</td><td>One pass for both missing and duplicate</td></tr>
+</table>
+<p><strong>Amortized O(n):</strong> Even though i doesn't advance on every iteration, each swap moves one element to its final position permanently. Since there are n elements, at most n swaps total occur across all iterations → O(n) amortized.</p>`,
+
+      "Subtypes & Variants": `<h3>Subtypes & Variants</h3>
+<h4>1. Find Missing Number [0, n]</h4>
+<p>Modify for range [0,n]: correct index for nums[i] = nums[i] (0-indexed). After sort: find i where nums[i] != i.</p>
+<h4>2. Find All Missing Numbers</h4>
+<p>Array contains [1,n] but some appear twice, some not at all. After cyclic sort: all indices where nums[i] != i+1 → missing numbers.</p>
+<h4>3. Find Duplicate Number</h4>
+<p>One number appears twice. After sort: find first i where nums[i] != i+1 → nums[i] is the duplicate.</p>
+<h4>4. Find All Duplicates</h4>
+<p>Multiple duplicates, each appearing twice. After sort: collect all nums[i] where nums[i] != i+1.</p>
+<h4>5. Find Missing and Duplicate (Corrupt Pair)</h4>
+<p>One number missing, one appears twice. After sort: find i where nums[i] != i+1 → duplicate=nums[i], missing=i+1.</p>
+<h4>6. First Missing Positive (Not Range-Bounded)</h4>
+<p>Array can contain numbers outside [1,n] — ignore those during sort. After sort: first index where nums[i] != i+1 gives answer. Or return n+1 if all correct.</p>`,
+
+      "Core Patterns": `<h3>Core Patterns</h3>
+<div class="pattern-card">
+<div class="pattern-name">1. Place-Then-Scan</div>
+<p>Phase 1 (sort): while i < n: j = nums[i]-1. if nums[i]!=nums[j]: swap, don't advance i. else: i++. Phase 2 (scan): for each i, if nums[i]!=i+1: record missing/duplicate.</p>
+<div class="pattern-trigger">🧠 Trigger: "find missing/duplicate in range [1,n] with O(1) space"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">2. Ignore Out-of-Range</div>
+<p>When array contains values outside the valid range, add condition: only swap if nums[i] is in range AND nums[i] != i+1. Otherwise advance i.</p>
+<div class="pattern-trigger">🧠 Trigger: "first missing positive" (values can be negative or > n)</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">3. Duplicate-Safe Swap</div>
+<p>The condition nums[i] != nums[j] (NOT just nums[i] != i+1) prevents infinite loop when duplicates exist. Without it, swapping two equal values creates an infinite loop.</p>
+<div class="pattern-trigger">🧠 Trigger: any cyclic sort problem with possible duplicates</div>
+</div>`,
+
+      "Problem Smell → Pattern Map": `<h3>Problem Smell → Pattern Map</h3>
+<div class="smell-map">
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Find missing number in [1,n] array, O(1) space"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Cyclic sort then scan for nums[i]!=i+1</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Find all missing / all duplicates in [1,n]"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Cyclic sort then collect all anomalous indices</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Find the corrupt pair (one missing, one duplicate)"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Cyclic sort: first bad index gives both — nums[i] is dup, i+1 is missing</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"First missing positive (no range guarantee)"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Cyclic sort, skip values outside [1,n], then scan</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"No extra memory, find missing/dup in integer array"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Cyclic sort (not hash set — that uses O(n) space)</div></div>
+</div>`,
+
+      "Java Implementation": `<h3>Java Implementation</h3>
+<pre>// ── Core Cyclic Sort ────────────────────────────────────────────
+private void cyclicSort(int[] nums) {
+    int i = 0;
+    while (i < nums.length) {
+        int j = nums[i] - 1; // correct index for nums[i]
+        if (nums[i] != nums[j]) // not in correct place AND not a duplicate
+            swap(nums, i, j);   // place nums[i] at index j
+        else
+            i++;  // either correctly placed, or duplicate (avoid infinite loop)
+    }
+}
+private void swap(int[] nums, int i, int j) {
+    int t = nums[i]; nums[i] = nums[j]; nums[j] = t;
+}
+
+// ── 1. Find Missing Number [0, n] ───────────────────────────────
+public int missingNumber(int[] nums) {
+    int i = 0, n = nums.length;
+    while (i < n) {
+        int j = nums[i]; // 0-indexed: value nums[i] belongs at index nums[i]
+        if (nums[i] < n && nums[i] != nums[j]) swap(nums, i, j);
+        else i++;
+    }
+    for (i = 0; i < n; i++)
+        if (nums[i] != i) return i; // i is missing
+    return n; // n is missing
+}
+
+// ── 2. Find All Missing Numbers ─────────────────────────────────
+public List&lt;Integer&gt; findDisappearedNumbers(int[] nums) {
+    cyclicSort(nums); // place each number at its correct index
+    List&lt;Integer&gt; missing = new ArrayList&lt;&gt;();
+    for (int i = 0; i < nums.length; i++)
+        if (nums[i] != i + 1) missing.add(i + 1);
+    return missing;
+}
+
+// ── 3. Find Duplicate + Missing (Corrupt Pair) ──────────────────
+public int[] findErrorNums(int[] nums) {
+    cyclicSort(nums);
+    for (int i = 0; i < nums.length; i++)
+        if (nums[i] != i + 1)
+            return new int[]{nums[i], i + 1}; // {duplicate, missing}
+    return new int[]{-1, -1};
+}
+
+// ── 4. First Missing Positive ────────────────────────────────────
+public int firstMissingPositive(int[] nums) {
+    int i = 0, n = nums.length;
+    while (i < n) {
+        int j = nums[i] - 1;
+        // Only sort if value in valid range [1,n] and not already correct
+        if (nums[i] > 0 && nums[i] <= n && nums[i] != nums[j])
+            swap(nums, i, j);
+        else i++;
+    }
+    for (i = 0; i < n; i++)
+        if (nums[i] != i + 1) return i + 1;
+    return n + 1; // all positions 1..n filled, answer is n+1
+}</pre>`,
+
+      "Worked Example": `<h3>Worked Example — Find All Duplicates (LC 442)</h3>
+<h4>Problem</h4>
+<p>Array of n integers, each in [1,n], each appears once or twice. Find all elements that appear twice. O(n) time, O(1) extra space.</p>
+<h4>Brute Force — O(n log n)</h4>
+<pre>Arrays.sort(nums);
+for (int i = 1; i < nums.length; i++)
+    if (nums[i] == nums[i-1]) result.add(nums[i]);</pre>
+<h4>Optimal — Cyclic Sort O(n), O(1) space</h4>
+<pre>public List&lt;Integer&gt; findDuplicates(int[] nums) {
+    // Phase 1: Cyclic sort
+    int i = 0;
+    while (i < nums.length) {
+        int j = nums[i] - 1;
+        if (nums[i] != nums[j]) swap(nums, i, j); // place nums[i] at j
+        else                      i++;             // correct or duplicate
+    }
+    // Phase 2: Scan — any nums[i] != i+1 means nums[i] is a duplicate
+    List&lt;Integer&gt; duplicates = new ArrayList&lt;&gt;();
+    for (i = 0; i < nums.length; i++)
+        if (nums[i] != i + 1) duplicates.add(nums[i]);
+    return duplicates;
+}
+// Trace: nums = [4,3,2,7,8,2,3,1]
+// After cyclic sort: [1,2,3,4,3,2,7,8]
+//                     0 1 2 3 4 5 6 7
+// Index 4: nums[4]=3, expected 5 → 3 is duplicate
+// Index 5: nums[5]=2, expected 6 → 2 is duplicate
+// Output: [3,2] ✓</pre>`,
+
+      "Practice Problems": `<h3>Practice Problems</h3>
+<div class="practice-card"><span class="diff-badge tag-green">Easy</span><div><strong>LC 268 — Missing Number</strong><p>Array [0,n] with one missing. Cyclic sort with 0-indexed adjustment, or XOR trick, or math (n*(n+1)/2 - sum). All three approaches worth knowing.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 448 — Find All Numbers Disappeared in Array</strong><p>All missing in [1,n]. Cyclic sort, then collect indices where nums[i]!=i+1. Alternative: mark visited indices negative (no extra space).</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 442 — Find All Duplicates</strong><p>All elements appearing twice. Cyclic sort approach or sign-marking approach. Key: both O(n) time O(1) space.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 287 — Find Duplicate Number</strong><p>Exactly one duplicate, no modification allowed. Two approaches: (1) Floyd's cycle detection on the "linked list" formed by index→value pointers. (2) Binary search on answer space.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 41 — First Missing Positive</strong><p>No range guarantee. Cyclic sort ignoring out-of-range values [1,n], then scan. The hardest cyclic sort problem — must handle negatives, zeros, and values > n gracefully.</p></div></div>`,
+
+      "Interview Perspective": `<h3>Interview Perspective</h3>
+<div class="interview-card"><strong>What interviewers test</strong><p>Do you know the O(1) space trick (cyclic sort) vs O(n) space (hash set)? Do you handle the duplicate-safe swap condition (nums[i]!=nums[j] not just nums[i]!=i+1)? Can you handle out-of-range values for First Missing Positive?</p></div>
+<div class="interview-card"><strong>How to think out loud</strong><p>"This is a range [1,n] problem asking for missing/duplicate with O(1) space — cyclic sort. I'll place each element at its correct index: value v goes to index v-1. After sorting, scan for any index where the value doesn't match the index. That reveals the anomaly."</p></div>
+<div class="interview-card"><strong>Common follow-ups</strong><ul><li>Why use nums[i]!=nums[j] instead of just i!=j for the swap condition?</li><li>LC 287: what if you can't modify the array? (Floyd's cycle detection on implicit linked list)</li><li>Can you find k missing numbers? (Same approach, collect all anomalous indices)</li></ul></div>`
+    }
+  },
+  {
+    id: 6,
+    name: "Monotonic Stack",
+    subtitle: "Next greater element · Largest rectangle in histogram",
+    sections: {
+      "Definition": `<h3>Monotonic Stack</h3>
+<p>A Monotonic Stack is a stack where elements are maintained in strictly increasing or decreasing order (from bottom to top). As you process each element, you pop elements from the stack that violate the monotonic property — and that "popping moment" is exactly when you can compute useful information about the relationship between elements.</p>
+<p>Think of it as a stack of telescopes pointed at a skyline: a taller building blocks shorter ones behind it. When a taller building appears, you "resolve" all shorter buildings it blocks.</p>`,
+
+      "Internal Mechanics": `<h3>Internal Mechanics</h3>
+<h4>Monotonic Decreasing Stack (Next Greater Element)</h4>
+<p>Process left to right. Maintain stack in decreasing order (top is smallest). For each element x: while stack is not empty AND stack.top() < x → pop. The popped element's "next greater" is x. Then push x. Any element remaining at the end has no next greater element (assign -1 or 0).</p>
+<h4>Monotonic Increasing Stack (Next Smaller Element)</h4>
+<p>Same logic but inverse. Pop when stack.top() > x. Popped element's next smaller is x.</p>
+<h4>Why Popping = Computing</h4>
+<p>The moment we pop element y because of incoming x: x is the FIRST element to the right of y that is greater than y (in a decreasing stack). This "first greater to the right" relationship is computed at exactly the right moment — not before, not after.</p>
+<h4>Largest Rectangle (Area Calculation on Pop)</h4>
+<p>Stack stores indices, not values. When we pop index i, the height is heights[i]. The width is: right boundary (current index j) - left boundary (new top after pop) - 1. Area = heights[i] × width. This uses the stack to efficiently find the "left smaller" and "right smaller" boundaries.</p>`,
+
+      "Time & Space Complexity": `<h3>Time & Space Complexity</h3>
+<table class="complexity-table">
+<tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Next Greater Element</td><td>O(n)</td><td>O(n)</td><td>Each element pushed and popped at most once — amortized O(1) per element</td></tr>
+<tr><td>Largest Rectangle</td><td>O(n)</td><td>O(n)</td><td>Same amortized argument; sentinel 0 at end flushes remaining stack</td></tr>
+<tr><td>Maximal Rectangle (2D)</td><td>O(m×n)</td><td>O(n)</td><td>Build histogram per row (O(n)), run largest-rectangle on it (O(n)), repeat m rows</td></tr>
+<tr><td>Daily Temperatures</td><td>O(n)</td><td>O(n)</td><td>Same as next greater element pattern</td></tr>
+</table>
+<p><strong>Amortized O(n) argument:</strong> Total pushes = n. Total pops ≤ n (each element popped at most once). So total operations = 2n → O(n). This is the same argument as the two-pointer amortized analysis.</p>`,
+
+      "Subtypes & Variants": `<h3>Subtypes & Variants</h3>
+<h4>1. Next Greater Element (Monotonic Decreasing Stack)</h4>
+<p>For each element, find the nearest element to its right that is larger. Classic introduction to the pattern.</p>
+<h4>2. Next Smaller Element (Monotonic Increasing Stack)</h4>
+<p>Inverse. Pop when incoming > stack.top(). Used in problems involving "how many days until a warmer temperature" (inverse).</p>
+<h4>3. Previous Greater / Previous Smaller</h4>
+<p>Process right to left (or use the same stack but record left boundaries at push time instead of pop time).</p>
+<h4>4. Largest Rectangle in Histogram</h4>
+<p>Monotonic increasing stack of indices. Pop to compute rectangle area when a smaller bar is found. Append sentinel 0 to handle leftover elements.</p>
+<h4>5. Stock Span / Visible Buildings</h4>
+<p>How many consecutive days (going left) had a stock price ≤ today? Stack of (price, span) pairs. Merge spans on pop.</p>
+<h4>6. Sum of Subarray Minimums / Maximums</h4>
+<p>For each element, find how many subarrays it is the minimum/maximum of. Stack gives left/right boundaries in O(n).</p>`,
+
+      "Core Patterns": `<h3>Core Patterns</h3>
+<div class="pattern-card">
+<div class="pattern-name">1. Next Greater Element</div>
+<p>Decreasing stack. for each x: while !stack.empty && heights[stack.top()] < x: result[stack.pop()] = x. Push index. Remaining get default (-1).</p>
+<div class="pattern-trigger">🧠 Trigger: "find next larger/smaller element to the right for each element"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">2. Largest Rectangle in Histogram</div>
+<p>Increasing stack of indices. Append 0 sentinel. When popping index i: width = current_j - stack.top() - 1 (or current_j if stack empty). Area = heights[i] × width. Track max.</p>
+<div class="pattern-trigger">🧠 Trigger: "largest rectangle in histogram" / "maximal rectangle" in 2D matrix</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">3. Daily Temperatures / Stock Span</div>
+<p>Stack stores indices waiting to be answered. When a warmer day found: pop and compute answer = current_index - popped_index.</p>
+<div class="pattern-trigger">🧠 Trigger: "how many days until X happens" / "consecutive streaks counting backward"</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">4. Sum of Subarray Min/Max</div>
+<p>For each element, find left boundary (prev smaller) and right boundary (next smaller). Contribution = heights[i] × left_count × right_count. Use monotonic stack for both boundaries in one or two passes.</p>
+<div class="pattern-trigger">🧠 Trigger: "sum of minimums/maximums over all subarrays"</div>
+</div>`,
+
+      "Problem Smell → Pattern Map": `<h3>Problem Smell → Pattern Map</h3>
+<div class="smell-map">
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Next greater / next smaller element"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Monotonic decreasing / increasing stack</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Largest rectangle in histogram"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Monotonic increasing stack, pop to compute area</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"How many days until warmer temperature?"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Decreasing stack, answer on pop</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Maximal rectangle in binary matrix"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Build histogram per row + largest rectangle per row</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Remove k digits to make smallest number"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Monotonic increasing stack, pop when digit > incoming</div></div>
+</div>`,
+
+      "Java Implementation": `<h3>Java Implementation</h3>
+<pre>// ── 1. Next Greater Element I ────────────────────────────────────
+public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+    Map&lt;Integer, Integer&gt; nge = new HashMap&lt;&gt;(); // value → next greater
+    Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;(); // monotonic decreasing
+    for (int x : nums2) {
+        while (!stack.isEmpty() && stack.peek() < x)
+            nge.put(stack.pop(), x); // x is next greater for popped element
+        stack.push(x);
+    }
+    while (!stack.isEmpty()) nge.put(stack.pop(), -1); // no next greater
+    int[] result = new int[nums1.length];
+    for (int i = 0; i < nums1.length; i++) result[i] = nge.get(nums1[i]);
+    return result;
+}
+
+// ── 2. Daily Temperatures ────────────────────────────────────────
+public int[] dailyTemperatures(int[] temps) {
+    int[] ans = new int[temps.length];
+    Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;(); // stores indices (decreasing temps)
+    for (int i = 0; i < temps.length; i++) {
+        while (!stack.isEmpty() && temps[stack.peek()] < temps[i]) {
+            int idx = stack.pop();
+            ans[idx] = i - idx; // days to wait = current - popped index
+        }
+        stack.push(i);
+    }
+    return ans; // remaining indices in stack: ans[i] = 0 (no warmer day)
+}
+
+// ── 3. Largest Rectangle in Histogram ───────────────────────────
+public int largestRectangleArea(int[] heights) {
+    Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;(); // increasing stack of indices
+    int maxArea = 0;
+    for (int i = 0; i <= heights.length; i++) {
+        int h = (i == heights.length) ? 0 : heights[i]; // sentinel 0 at end
+        while (!stack.isEmpty() && heights[stack.peek()] > h) {
+            int height = heights[stack.pop()];
+            int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+            // width: from left boundary (stack.peek()+1) to right boundary (i-1)
+            maxArea = Math.max(maxArea, height * width);
+        }
+        stack.push(i);
+    }
+    return maxArea;
+}
+
+// ── 4. Maximal Rectangle (Binary Matrix) ────────────────────────
+public int maximalRectangle(char[][] matrix) {
+    if (matrix.length == 0) return 0;
+    int[] heights = new int[matrix[0].length];
+    int maxRect = 0;
+    for (char[] row : matrix) {
+        for (int j = 0; j < row.length; j++)
+            heights[j] = row[j] == '1' ? heights[j] + 1 : 0;
+        maxRect = Math.max(maxRect, largestRectangleArea(heights));
+    }
+    return maxRect;
+}</pre>`,
+
+      "Worked Example": `<h3>Worked Example — Largest Rectangle in Histogram (LC 84)</h3>
+<h4>Problem</h4>
+<p>Given array heights representing bars of a histogram, find area of the largest rectangle.</p>
+<h4>Key Insight</h4>
+<p>For each bar as the height of the rectangle, we need to find how far left and right we can extend it (until we hit a shorter bar). The stack efficiently gives us both boundaries simultaneously as elements are popped.</p>
+<h4>Trace</h4>
+<pre>heights = [2,1,5,6,2,3]
+Append sentinel: [2,1,5,6,2,3,0]
+
+i=0, h=2: push 0. stack=[0]
+i=1, h=1: heights[0]=2 > 1 → POP 0:
+  height=2, width=1 (stack empty, width=i=1), area=2. maxArea=2
+  push 1. stack=[1]
+i=2, h=5: push 2. stack=[1,2]
+i=3, h=6: push 3. stack=[1,2,3]
+i=4, h=2: heights[3]=6>2 → POP 3:
+  height=6, width=4-2-1=1, area=6. maxArea=6
+  heights[2]=5>2 → POP 2:
+  height=5, width=4-1-1=2, area=10. maxArea=10
+  push 4. stack=[1,4]
+i=5, h=3: push 5. stack=[1,4,5]
+i=6, h=0 (sentinel): 
+  POP 5: height=3, width=6-4-1=1, area=3.
+  POP 4: height=2, width=6-1-1=4, area=8.
+  POP 1: height=1, width=6 (stack empty), area=6.
+Final maxArea = 10 ✓</pre>`,
+
+      "Practice Problems": `<h3>Practice Problems</h3>
+<div class="practice-card"><span class="diff-badge tag-green">Easy</span><div><strong>LC 496 — Next Greater Element I</strong><p>Classic intro to monotonic stack. Build next-greater map for nums2, look up for nums1. Decreasing stack, pop when greater found.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 739 — Daily Temperatures</strong><p>Stack stores indices (not values). Pop when warmer day found. Answer = current_index - popped_index. Very clean monotonic stack application.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 503 — Next Greater Element II (Circular)</strong><p>Process 2×n by looping twice (or i % n). Stack of indices. Tests ability to adapt the pattern to circular arrays.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 402 — Remove K Digits</strong><p>Keep smallest number: monotonic increasing stack, pop when incoming < top (like next smaller). Remove k digits total. Handle leading zeros, final k deletions from end.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 85 — Maximal Rectangle</strong><p>2D extension of histogram. Build running histogram row by row, apply LC 84 solution on each row. Understanding the reduction to 1D histogram is the key insight.</p></div></div>`,
+
+      "Interview Perspective": `<h3>Interview Perspective</h3>
+<div class="interview-card"><strong>What interviewers test</strong><p>Can you identify when a monotonic stack applies (next greater/smaller pattern)? Do you know whether to use increasing or decreasing? Do you handle the sentinel value correctly for histogram problems? Can you explain why popping is where the computation happens?</p></div>
+<div class="interview-card"><strong>How to think out loud</strong><p>"I need the next greater element for each position — that's a monotonic stack. I'll maintain a decreasing stack. When a new element is greater than the top, the top's 'next greater' has been found. I pop and record. Then push the current element. Any elements remaining at the end have no next greater."</p></div>
+<div class="interview-card"><strong>Common follow-ups</strong><ul><li>Explain why the sentinel value of 0 is appended in the histogram problem</li><li>How would you find the previous greater element instead of next?</li><li>Sum of subarray minimums — can you derive the contribution formula?</li><li>Why is total time O(n) even though there's a while loop inside the for loop?</li></ul></div>`
+    }
+  },
+  {
+    id: 7,
+    name: "Monotonic Deque",
+    subtitle: "Sliding window max/min · O(n) instead of O(n log n)",
+    sections: {
+      "Definition": `<h3>Monotonic Deque</h3>
+<p>A Monotonic Deque (double-ended queue) extends the monotonic stack by allowing efficient removal from BOTH ends. The key use case: sliding window maximum/minimum. The deque maintains indices of "candidate" maximum (or minimum) elements in the current window — in decreasing (or increasing) order.</p>
+<p>As the window slides right: add the new element to the back (removing smaller/larger elements that can never be the max), remove from the front if the front element is outside the current window.</p>`,
+
+      "Internal Mechanics": `<h3>Internal Mechanics</h3>
+<h4>Structure</h4>
+<p>Use <code>Deque&lt;Integer&gt; deque = new ArrayDeque&lt;&gt;()</code> storing INDICES (not values). The front (peekFirst) always holds the index of the current window's maximum.</p>
+<h4>Adding New Element (Back Operation)</h4>
+<p>Before pushing index i: pop all indices j from the back where nums[j] ≤ nums[i] (for max deque). Why? If nums[j] ≤ nums[i] and j < i, then j will leave the window before i, and when it does, nums[i] ≥ nums[j] — so j can NEVER be the window maximum again. It's redundant.</p>
+<h4>Expiring Old Elements (Front Operation)</h4>
+<p>Before querying the front: if deque.peekFirst() ≤ i - k (front index is outside the window), pop from front. This maintains the window boundary.</p>
+<h4>Query</h4>
+<p>After both operations, deque.peekFirst() is the index of the current window's maximum. nums[deque.peekFirst()] is the answer.</p>`,
+
+      "Time & Space Complexity": `<h3>Time & Space Complexity</h3>
+<table class="complexity-table">
+<tr><th>Operation</th><th>Time</th><th>Space</th><th>Why</th></tr>
+<tr><td>Sliding window max (deque)</td><td>O(n)</td><td>O(k)</td><td>Each index pushed/popped from deque at most once — amortized O(1) per element</td></tr>
+<tr><td>Sliding window max (naive)</td><td>O(n×k)</td><td>O(1)</td><td>Scan entire window for max at each position — too slow for large k</td></tr>
+<tr><td>Sliding window max (heap)</td><td>O(n log k)</td><td>O(k)</td><td>Heap operations cost O(log k) each; requires lazy deletion</td></tr>
+<tr><td>Sliding window min</td><td>O(n)</td><td>O(k)</td><td>Same as max, just maintain increasing deque instead</td></tr>
+</table>
+<p><strong>Why deque beats heap:</strong> A max-heap gives O(log k) per operation. The deque gives O(1) amortized by discarding elements that can never be the answer — a stronger pruning. For k close to n, the speedup is O(log n) × n = O(n log n) → O(n).</p>`,
+
+      "Subtypes & Variants": `<h3>Subtypes & Variants</h3>
+<h4>1. Sliding Window Maximum</h4>
+<p>Decreasing deque (front = max). Add from back, expire from front, query front for each window.</p>
+<h4>2. Sliding Window Minimum</h4>
+<p>Increasing deque (front = min). Pop from back when incoming ≤ deque.back(). Query front for each window.</p>
+<h4>3. Constrained Subsequence Sum</h4>
+<p>DP with sliding window optimization: dp[i] = nums[i] + max(dp[j]) for j in [i-k, i-1]. Use deque to maintain max dp value in the window.</p>
+<h4>4. Jump Game VI</h4>
+<p>Score optimisation with jump range constraint. Same DP + deque pattern as constrained subsequence sum.</p>
+<h4>5. Shortest Subarray with Sum ≥ K (with negatives)</h4>
+<p>Prefix sum + monotonic increasing deque. Combine prefix sum (for range queries with negatives) + deque (for O(1) window min).</p>`,
+
+      "Core Patterns": `<h3>Core Patterns</h3>
+<div class="pattern-card">
+<div class="pattern-name">1. Sliding Window Maximum Template</div>
+<p>for each i: while deque not empty AND nums[deque.peekLast()] ≤ nums[i]: pollLast(). offerLast(i). if deque.peekFirst() ≤ i-k: pollFirst(). if i≥k-1: result[i-k+1] = nums[deque.peekFirst()].</p>
+<div class="pattern-trigger">🧠 Trigger: "maximum/minimum in every window of size k" — deque gives O(n) vs O(nk)</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">2. DP Window Optimization</div>
+<p>dp[i] depends on max/min of dp[j] for j in [i-k, i-1]. Maintain deque of "best" j values: front = optimal j. Add dp[i] to deque at end of each iteration (after computing dp[i]).</p>
+<div class="pattern-trigger">🧠 Trigger: "jump from any position within k steps, maximise score" — DP + deque</div>
+</div>
+<div class="pattern-card">
+<div class="pattern-name">3. Shortest Subarray Sum ≥ K (Negatives)</div>
+<p>Prefix sum array. For each r: pop from front while prefix[r] - prefix[deque.front()] ≥ k (update min length, pop). Then pop from back while prefix[r] ≤ prefix[deque.back()] (maintain increasing). Push r.</p>
+<div class="pattern-trigger">🧠 Trigger: "shortest subarray with sum ≥ k AND array has negatives" (sliding window alone fails)</div>
+</div>`,
+
+      "Problem Smell → Pattern Map": `<h3>Problem Smell → Pattern Map</h3>
+<div class="smell-map">
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Maximum in every window of size k"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Monotonic decreasing deque, O(n)</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Minimum in every sliding window"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Monotonic increasing deque, O(n)</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Jump up to k steps, maximize total score"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">DP[i] = nums[i] + max(DP[j]) for j in [i-k,i-1], monotonic deque</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Shortest subarray with sum ≥ k (negatives allowed)"</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Prefix sum + monotonic increasing deque</div></div>
+<div class="smell-card"><div class="smell-if">If problem says...</div><div class="smell-then">"Sliding window + O(n) requirement" (heap is too slow)</div></div>
+<div class="smell-card"><div class="smell-if">Use...</div><div class="smell-then">Monotonic deque — constant amortized time per element</div></div>
+</div>`,
+
+      "Java Implementation": `<h3>Java Implementation</h3>
+<pre>// ── 1. Sliding Window Maximum ────────────────────────────────────
+public int[] maxSlidingWindow(int[] nums, int k) {
+    int n = nums.length;
+    int[] result = new int[n - k + 1];
+    Deque&lt;Integer&gt; deque = new ArrayDeque&lt;&gt;(); // stores indices, decreasing values
+    for (int i = 0; i < n; i++) {
+        // Step 1: Remove indices outside window from FRONT
+        while (!deque.isEmpty() && deque.peekFirst() <= i - k)
+            deque.pollFirst();
+        // Step 2: Remove smaller elements from BACK (they can never be max)
+        while (!deque.isEmpty() && nums[deque.peekLast()] <= nums[i])
+            deque.pollLast();
+        deque.offerLast(i);
+        // Step 3: Record result once window has k elements
+        if (i >= k - 1)
+            result[i - k + 1] = nums[deque.peekFirst()];
+    }
+    return result;
+}
+
+// ── 2. Sliding Window Minimum (Same structure, different comparison) ─
+public int[] minSlidingWindow(int[] nums, int k) {
+    int n = nums.length;
+    int[] result = new int[n - k + 1];
+    Deque&lt;Integer&gt; deque = new ArrayDeque&lt;&gt;(); // stores indices, INCREASING values
+    for (int i = 0; i < n; i++) {
+        while (!deque.isEmpty() && deque.peekFirst() <= i - k)
+            deque.pollFirst();
+        while (!deque.isEmpty() && nums[deque.peekLast()] >= nums[i]) // ≥ for min
+            deque.pollLast();
+        deque.offerLast(i);
+        if (i >= k - 1)
+            result[i - k + 1] = nums[deque.peekFirst()];
+    }
+    return result;
+}
+
+// ── 3. Jump Game VI — DP + Monotonic Deque ──────────────────────
+public int maxResult(int[] nums, int k) {
+    int n = nums.length;
+    int[] dp = new int[n];
+    dp[0] = nums[0];
+    Deque&lt;Integer&gt; deque = new ArrayDeque&lt;&gt;();
+    deque.offerLast(0);
+    for (int i = 1; i < n; i++) {
+        // Remove expired indices (outside jump range)
+        while (!deque.isEmpty() && deque.peekFirst() < i - k)
+            deque.pollFirst();
+        // Best previous position is at front
+        dp[i] = nums[i] + dp[deque.peekFirst()];
+        // Maintain decreasing deque of dp values
+        while (!deque.isEmpty() && dp[deque.peekLast()] <= dp[i])
+            deque.pollLast();
+        deque.offerLast(i);
+    }
+    return dp[n - 1];
+}
+
+// ── 4. Shortest Subarray with Sum ≥ K ──────────────────────────
+public int shortestSubarray(int[] nums, int k) {
+    int n = nums.length;
+    long[] prefix = new long[n + 1]; // prefix sums (long to avoid overflow)
+    for (int i = 0; i < n; i++) prefix[i+1] = prefix[i] + nums[i];
+    Deque&lt;Integer&gt; deque = new ArrayDeque&lt;&gt;(); // increasing prefix sums
+    int minLen = Integer.MAX_VALUE;
+    for (int r = 0; r <= n; r++) {
+        // Check if front gives a valid subarray with sum ≥ k
+        while (!deque.isEmpty() && prefix[r] - prefix[deque.peekFirst()] >= k)
+            minLen = Math.min(minLen, r - deque.pollFirst());
+        // Maintain increasing deque
+        while (!deque.isEmpty() && prefix[deque.peekLast()] >= prefix[r])
+            deque.pollLast();
+        deque.offerLast(r);
+    }
+    return minLen == Integer.MAX_VALUE ? -1 : minLen;
+}</pre>`,
+
+      "Worked Example": `<h3>Worked Example — Sliding Window Maximum (LC 239)</h3>
+<h4>Problem</h4>
+<p>Given array nums and k, return array of maximums for every sliding window of size k.</p>
+<h4>Why Deque Over Heap</h4>
+<p>Max-heap gives O(n log k) — fine, but requires lazy deletion to handle expired elements. Deque gives O(n) amortized by discarding elements that can NEVER be the max (earlier AND smaller).</p>
+<h4>Trace</h4>
+<pre>nums = [1,3,-1,-3,5,3,6,7], k = 3
+
+i=0, nums[0]=1:  deque=[0]
+i=1, nums[1]=3:  pop 0 (1<3), deque=[1]
+i=2, nums[2]=-1: deque=[1,2]. Window [1,3,-1]: max=nums[1]=3. result=[3]
+i=3, nums[3]=-3: deque=[1,2,3]. Window [3,-1,-3]: max=nums[1]=3. result=[3,3]
+i=4, nums[4]=5:  pop 3(-3<5), pop 2(-1<5), pop 1(3<5). deque=[4].
+                 Window [-1,-3,5]: max=nums[4]=5. result=[3,3,5]
+i=5, nums[5]=3:  deque=[4,5]. pop front? 4>5-3=2, still valid.
+                 Window [-3,5,3]: max=nums[4]=5. result=[3,3,5,5]
+i=6, nums[6]=6:  pop 5(3<6), pop 4(5<6). deque=[6].
+                 Window [5,3,6]: max=6. result=[3,3,5,5,6]
+i=7, nums[7]=7:  pop 6(6<7). deque=[7].
+                 Window [3,6,7]: max=7. result=[3,3,5,5,6,7]
+
+Final: [3,3,5,5,6,7] ✓</pre>`,
+
+      "Practice Problems": `<h3>Practice Problems</h3>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 1438 — Longest Subarray with Abs Diff ≤ Limit</strong><p>Maintain both max deque and min deque simultaneously. Window valid when max-min ≤ limit. Two deques, variable window — elegant combination of two patterns.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-blue">Medium</span><div><strong>LC 1696 — Jump Game VI</strong><p>DP + deque. dp[i] = nums[i] + max(dp[j]) for j in [i-k, i-1]. Deque maintains max dp in range. Add dp[i] to deque after computing it.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 239 — Sliding Window Maximum</strong><p>The canonical monotonic deque problem. Master this template cold — it's the foundation for all deque DP problems. O(n) required; O(nk) naive fails.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 862 — Shortest Subarray with Sum ≥ K</strong><p>Negative numbers make sliding window invalid. Combine prefix sum + monotonic increasing deque. One of the hardest sliding window problems because it requires two techniques together.</p></div></div>
+<div class="practice-card"><span class="diff-badge tag-red">Hard</span><div><strong>LC 1499 — Max Value of Equation</strong><p>Maximize yi+yj+|xi-xj| = (yi+xi) + (yj-xj) for xi-xj ≤ k. Monotonic deque on (y-x) values with expiry condition. Binary search on sorted approach also works but deque is O(n).</p></div></div>`,
+
+      "Interview Perspective": `<h3>Interview Perspective</h3>
+<div class="interview-card"><strong>What interviewers test</strong><p>Do you know when to use a deque vs a heap? Can you explain the amortized O(n) argument? Do you store indices (not values) so you can check window expiry? Can you adapt the template to minimum vs maximum?</p></div>
+<div class="interview-card"><strong>How to think out loud</strong><p>"I need max in every window of size k — naive O(nk) is too slow. A max-heap gives O(n log k). But a monotonic deque gives O(n): I keep indices in decreasing value order. Smaller elements behind a larger one are useless — they'll expire before the larger one and are smaller. So I discard them. The deque front is always the current window's max."</p></div>
+<div class="interview-card"><strong>Key distinction from monotonic stack</strong><p>Monotonic Stack: only remove from one end (back). Used when you process each element once and need next/previous greater/smaller. Monotonic Deque: remove from BOTH ends. Back = maintain monotonic order for incoming elements. Front = expire elements that have left the window. Used for sliding window queries.</p></div>
+<div class="interview-card"><strong>Common follow-ups</strong><ul><li>What if you need both max AND min in each window? (Two deques simultaneously)</li><li>How would you handle variable-size windows instead of fixed k? (Same deque, change expiry condition)</li><li>Why can't you use Arrays.binarySearch / TreeMap here? (They'd give O(log n) per op, deque gives O(1) amortized)</li></ul></div>`
+    }
+  }
+];
+
+const SECTION_NAMES = ["Definition","Internal Mechanics","Time & Space Complexity","Subtypes & Variants","Core Patterns","Problem Smell → Pattern Map","Java Implementation","Worked Example","Practice Problems","Interview Perspective"];
+
+let activeTopic = 0, activeSection = "Definition";
+
+function render() {
+  const topic = TOPICS[activeTopic];
+  document.getElementById('topicTitle').textContent = topic.name;
+  document.getElementById('topicSubtitle').textContent = topic.subtitle;
+
+  const nav = document.getElementById('topicNav');
+  nav.innerHTML = TOPICS.map((t,i) =>
+    `<button class="topic-btn${i===activeTopic?' active':''}" onclick="setTopic(${i})">${t.name}</button>`
+  ).join('');
+
+  const tabs = document.getElementById('secTabs');
+  tabs.innerHTML = SECTION_NAMES.map(s =>
+    `<button class="sec-btn${s===activeSection?' active':''}" onclick="setSection('${s.replace(/'/g,"\\'")}')">${s}</button>`
+  ).join('');
+
+  document.getElementById('contentArea').innerHTML = topic.sections[activeSection] || '<p>Section coming soon.</p>';
+}
+
+function setTopic(i) { activeTopic = i; activeSection = "Definition"; render(); }
+function setSection(s) { activeSection = s; render(); }
+
+render();
+</script>

@@ -1,0 +1,1089 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: transparent; color: var(--color-text-primary); }
+
+.shell { display: flex; height: 680px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+
+.sidebar { width: 220px; min-width: 220px; border-right: 0.5px solid var(--color-border-tertiary); overflow-y: auto; padding: 12px 8px; background: var(--color-background-secondary); }
+
+.sidebar-title { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 8px 10px; }
+
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--border-radius-md); cursor: pointer; font-size: 13px; color: var(--color-text-secondary); transition: background 0.15s, color 0.15s; margin-bottom: 2px; }
+.nav-item:hover { background: var(--color-background-primary); color: var(--color-text-primary); }
+.nav-item.active { background: var(--color-background-primary); color: var(--color-text-primary); font-weight: 500; border: 0.5px solid var(--color-border-secondary); }
+.nav-num { font-size: 11px; color: var(--color-text-tertiary); min-width: 16px; }
+.nav-item.active .nav-num { color: var(--color-text-secondary); }
+
+.content { flex: 1; overflow-y: auto; padding: 28px 32px; }
+
+.topic-header { margin-bottom: 24px; }
+.topic-tag { display: inline-block; font-size: 11px; font-weight: 500; color: var(--color-text-info); background: var(--color-background-info); padding: 3px 10px; border-radius: var(--border-radius-md); margin-bottom: 10px; }
+.topic-title { font-size: 22px; font-weight: 500; color: var(--color-text-primary); line-height: 1.2; margin-bottom: 8px; }
+.topic-oneliner { font-size: 15px; color: var(--color-text-secondary); line-height: 1.6; border-left: 2px solid var(--color-border-secondary); padding-left: 12px; }
+
+.section { margin-bottom: 28px; }
+.section-label { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.section-label::after { content: ''; flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
+.section-body { font-size: 14px; line-height: 1.75; color: var(--color-text-primary); }
+.section-body p { margin-bottom: 10px; }
+.section-body p:last-child { margin-bottom: 0; }
+
+.step-list { list-style: none; counter-reset: steps; }
+.step-list li { counter-increment: steps; display: flex; gap: 10px; margin-bottom: 8px; font-size: 14px; line-height: 1.6; }
+.step-list li::before { content: counter(steps); min-width: 22px; height: 22px; border-radius: 50%; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--color-text-secondary); margin-top: 2px; flex-shrink: 0; }
+
+.pill-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.pill { font-size: 12px; padding: 4px 10px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); background: var(--color-background-secondary); }
+.pill.danger { color: var(--color-text-danger); background: var(--color-background-danger); border-color: var(--color-border-danger); }
+.pill.success { color: var(--color-text-success); background: var(--color-background-success); border-color: var(--color-border-success); }
+.pill.info { color: var(--color-text-info); background: var(--color-background-info); border-color: var(--color-border-info); }
+.pill.warn { color: var(--color-text-warning); background: var(--color-background-warning); border-color: var(--color-border-warning); }
+
+.subtopic-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 14px; margin-bottom: 8px; background: var(--color-background-primary); }
+.subtopic-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.subtopic-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+.code-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 14px 16px; font-family: var(--font-mono); font-size: 12px; line-height: 1.7; color: var(--color-text-primary); overflow-x: auto; margin-top: 6px; white-space: pre; }
+
+.analogy-box { background: var(--color-background-secondary); border-left: 2px solid var(--color-border-info); border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 12px 16px; font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; font-style: italic; }
+
+.interview-q { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 14px; margin-bottom: 6px; font-size: 13px; line-height: 1.6; }
+.interview-q .q { font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.interview-q .a { color: var(--color-text-secondary); }
+
+.connects-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.connect-pill { font-size: 12px; padding: 5px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); cursor: pointer; background: var(--color-background-primary); transition: border-color 0.15s; }
+.connect-pill:hover { border-color: var(--color-border-primary); color: var(--color-text-primary); }
+
+.misconception { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13px; line-height: 1.6; }
+.misconception .icon { color: var(--color-text-danger); font-size: 15px; margin-top: 1px; flex-shrink: 0; }
+.misconception .text { color: var(--color-text-primary); }
+.misconception .text strong { color: var(--color-text-danger); font-weight: 500; }
+
+.layer-row { display: flex; align-items: stretch; gap: 0; margin-bottom: 3px; font-size: 13px; }
+.layer-num { width: 28px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); flex-shrink: 0; }
+.layer-box { flex: 1; border-radius: var(--border-radius-md); padding: 9px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.layer-name { font-weight: 500; font-size: 13px; min-width: 90px; }
+.layer-protos { font-size: 12px; opacity: 0.8; }
+.layer-unit { font-size: 11px; opacity: 0.65; font-style: italic; }
+</style>
+</head>
+<body>
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Block 1 — Computer Networks: 13-topic interactive reference covering OSI model through proxies</h2>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="sidebar-title">Block 1 — Networks</div>
+    <div class="nav-item active" onclick="show(0,this)"><span class="nav-num">01</span>OSI Model</div>
+    <div class="nav-item" onclick="show(1,this)"><span class="nav-num">02</span>TCP vs UDP</div>
+    <div class="nav-item" onclick="show(2,this)"><span class="nav-num">03</span>IP Addressing</div>
+    <div class="nav-item" onclick="show(3,this)"><span class="nav-num">04</span>DNS</div>
+    <div class="nav-item" onclick="show(4,this)"><span class="nav-num">05</span>HTTP/1.1</div>
+    <div class="nav-item" onclick="show(5,this)"><span class="nav-num">06</span>HTTP/2</div>
+    <div class="nav-item" onclick="show(6,this)"><span class="nav-num">07</span>HTTP/3 / QUIC</div>
+    <div class="nav-item" onclick="show(7,this)"><span class="nav-num">08</span>WebSocket</div>
+    <div class="nav-item" onclick="show(8,this)"><span class="nav-num">09</span>TLS / HTTPS</div>
+    <div class="nav-item" onclick="show(9,this)"><span class="nav-num">10</span>REST</div>
+    <div class="nav-item" onclick="show(10,this)"><span class="nav-num">11</span>gRPC</div>
+    <div class="nav-item" onclick="show(11,this)"><span class="nav-num">12</span>CDN</div>
+    <div class="nav-item" onclick="show(12,this)"><span class="nav-num">13</span>Proxies</div>
+  </nav>
+  <main class="content" id="content"></main>
+</div>
+
+<script>
+const topics = [
+
+// 0 — OSI
+{
+  tag: "Network Fundamentals",
+  title: "OSI Model",
+  oneliner: "A 7-layer conceptual framework that standardises how data travels from an application on one machine to an application on another, separating concerns so protocols can be developed independently.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>Before OSI (1984), networking stacks were proprietary — IBM's SNA couldn't talk to DEC's DECnet. The ISO created OSI to give vendors a common language and clear contract between layers: each layer only talks to the one directly above and below it.</p><p>TCP/IP predates OSI and doesn't map perfectly to it, but OSI remains the universal vocabulary for diagnosing network problems and designing protocols.</p>`
+    },
+    {
+      label: "The 7 Layers",
+      body: `
+<div class="layer-row"><div class="layer-num">7</div><div class="layer-box" style="background:#EEEDFE;color:#3C3489"><div class="layer-name">Application</div><div class="layer-protos">HTTP, FTP, SMTP, DNS, SSH</div><div class="layer-unit">Data</div></div></div>
+<div class="layer-row"><div class="layer-num">6</div><div class="layer-box" style="background:#E1F5EE;color:#085041"><div class="layer-name">Presentation</div><div class="layer-protos">TLS/SSL, JPEG, MIME, ASCII</div><div class="layer-unit">Data</div></div></div>
+<div class="layer-row"><div class="layer-num">5</div><div class="layer-box" style="background:#E6F1FB;color:#0C447C"><div class="layer-name">Session</div><div class="layer-protos">NetBIOS, RPC, PPTP</div><div class="layer-unit">Data</div></div></div>
+<div class="layer-row"><div class="layer-num">4</div><div class="layer-box" style="background:#FAEEDA;color:#633806"><div class="layer-name">Transport</div><div class="layer-protos">TCP, UDP, SCTP</div><div class="layer-unit">Segment</div></div></div>
+<div class="layer-row"><div class="layer-num">3</div><div class="layer-box" style="background:#FAECE7;color:#712B13"><div class="layer-name">Network</div><div class="layer-protos">IP, ICMP, OSPF, BGP</div><div class="layer-unit">Packet</div></div></div>
+<div class="layer-row"><div class="layer-num">2</div><div class="layer-box" style="background:#FBEAF0;color:#72243E"><div class="layer-name">Data Link</div><div class="layer-protos">Ethernet, Wi-Fi (802.11), ARP</div><div class="layer-unit">Frame</div></div></div>
+<div class="layer-row"><div class="layer-num">1</div><div class="layer-box" style="background:#F1EFE8;color:#444441"><div class="layer-name">Physical</div><div class="layer-protos">Ethernet cable, fibre, radio, USB</div><div class="layer-unit">Bit</div></div></div>
+`
+    },
+    {
+      label: "How it works — Encapsulation",
+      body: `<p>Sending side (top-down): each layer wraps the data from the layer above by prepending (and sometimes appending) its own header. Layer 4 adds a TCP header → Layer 3 adds an IP header → Layer 2 adds an Ethernet frame header + trailer → Layer 1 converts to bits on the wire.</p>
+<p>Receiving side (bottom-up): each layer strips its header and passes the payload up. This is called <strong>de-encapsulation</strong>.</p>
+<p>Key consequence: a router operates at Layer 3 only — it reads the IP header, makes a routing decision, then re-frames at Layer 2. A switch operates at Layer 2. A load balancer can operate at L4 (TCP) or L7 (HTTP).</p>`
+    },
+    {
+      label: "What happens when you type google.com",
+      body: `<ol class="step-list">
+<li><strong>DNS resolution</strong> — browser checks cache → OS cache → /etc/hosts → recursive resolver → root NS → .com NS → google.com NS → returns 142.250.x.x</li>
+<li><strong>TCP 3-way handshake</strong> — SYN → SYN-ACK → ACK to port 443 on Google's IP</li>
+<li><strong>TLS handshake</strong> — certificate exchange, key agreement, session keys negotiated</li>
+<li><strong>HTTP GET /</strong> — encrypted HTTP request sent over the established TLS+TCP connection</li>
+<li><strong>Response</strong> — Google's server returns HTML, browser begins parsing, fires sub-requests for CSS/JS/images (more DNS + TCP + TLS per new origin)</li>
+<li><strong>Rendering</strong> — DOM built, CSSOM built, render tree constructed, layout + paint</li>
+</ol>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">Think of sending a physical letter internationally. You write the content (Layer 7), seal it in an envelope with address (Layer 4–6), put that in a courier bag labelled with city routing (Layer 3), load it on a truck to the nearest hub (Layer 2), and the truck drives on roads (Layer 1). Each carrier only cares about their label — the courier driver doesn't open your letter.</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"TCP/IP maps cleanly to OSI"</strong> — TCP/IP has 4 layers. Application layer in TCP/IP covers OSI's 5+6+7. There's no clean 1:1 mapping.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"OSI is the internet standard"</strong> — OSI is a conceptual reference model. The actual internet runs on TCP/IP, not OSI protocols.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"Each layer always runs separately"</strong> — QUIC collapses Transport+Session+partial TLS into a single UDP-based layer, blurring boundaries deliberately.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">Name the 7 layers. What data unit does each use?</div><div class="a">Expected verbatim: Data / Data / Data / Segment / Packet / Frame / Bit. Know the mnemonic: "All People Seem To Need Data Processing" (top-down) or "Please Do Not Throw Sausage Pizza Away" (bottom-up).</div></div>
+<div class="interview-q"><div class="q">At which layer does a router operate? A switch?</div><div class="a">Router = L3 (reads IP headers). Switch = L2 (reads MAC addresses). L7 load balancers read HTTP headers.</div></div>
+<div class="interview-q"><div class="q">Walk me through what happens when you type a URL in the browser.</div><div class="a">This is a 10-minute answer. Hit: DNS → TCP → TLS → HTTP → Response → Render. Depth signal: mention ARP, the kernel network stack, connection pooling.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">TCP vs UDP</span><span class="connect-pill">DNS</span><span class="connect-pill">HTTP/1.1</span><span class="connect-pill">TLS/HTTPS</span><span class="connect-pill">Load Balancers (System Design)</span><span class="connect-pill">Proxies</span>
+</div>`
+    }
+  ]
+},
+
+// 1 — TCP vs UDP
+{
+  tag: "Transport Layer",
+  title: "TCP vs UDP",
+  oneliner: "TCP is a reliable, ordered, connection-oriented protocol; UDP is an unreliable, connectionless protocol — you choose based on whether you need delivery guarantees or raw speed.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>IP alone delivers packets on a best-effort basis — packets can be lost, duplicated, reordered, or corrupted. Applications need different contracts: a file transfer needs every byte correct; a live video call needs low latency and can tolerate dropped frames. TCP and UDP represent the two ends of that spectrum.</p>`
+    },
+    {
+      label: "TCP — how it works",
+      body: `<p><strong>3-way handshake (connection establishment):</strong></p>
+<ol class="step-list">
+<li>Client sends SYN (seq=x) — "I want to connect, starting sequence x"</li>
+<li>Server replies SYN-ACK (seq=y, ack=x+1) — "OK, my sequence is y, I got your x"</li>
+<li>Client sends ACK (ack=y+1) — "Got it, connection open"</li>
+</ol>
+<p style="margin-top:10px"><strong>4-way termination:</strong> FIN → ACK → FIN → ACK. The half-close (FIN) allows one side to stop sending while still receiving. TIME_WAIT state holds the connection 2×MSL (~60s) to handle delayed packets.</p>
+<p><strong>Reliability mechanisms:</strong></p>
+<ul style="list-style:disc;padding-left:18px;font-size:14px;line-height:1.8">
+<li>Sequence numbers — detect reordering, enable reassembly</li>
+<li>Acknowledgements + retransmission timeout (RTO) — lost segments are resent</li>
+<li>Checksum — detects corruption</li>
+</ul>`
+    },
+    {
+      label: "Flow control & congestion control",
+      body: `<p><strong>Flow control</strong> prevents a fast sender from overwhelming a slow receiver. The receiver advertises a <em>receive window</em> (rwnd) in every ACK — the sender can have at most rwnd unacknowledged bytes in flight.</p>
+<p><strong>Congestion control</strong> prevents the sender from overwhelming the network. TCP maintains a <em>congestion window</em> (cwnd):</p>
+<ol class="step-list">
+<li><strong>Slow start</strong> — cwnd starts at 1 MSS, doubles every RTT until ssthresh</li>
+<li><strong>Congestion avoidance</strong> — above ssthresh, cwnd grows by 1 MSS per RTT (linear)</li>
+<li><strong>Fast retransmit</strong> — 3 duplicate ACKs → packet lost → retransmit immediately</li>
+<li><strong>Fast recovery</strong> (TCP Reno) — halve cwnd instead of resetting to 1</li>
+</ol>
+<p>Modern variants: TCP Cubic (default Linux), TCP BBR (Google — models bandwidth+RTT, not just loss).</p>`
+    },
+    {
+      label: "UDP — how it works",
+      body: `<p>UDP header is 8 bytes: source port, destination port, length, checksum. That's it. No handshake, no sequence numbers, no ACK, no retransmission. The application is fully responsible for any reliability it needs.</p>
+<p><strong>When to use UDP:</strong> DNS queries, video streaming, VoIP, online games, DHCP, QUIC (which builds its own reliability on top). The key insight: UDP is the right base when you need to control exactly how reliability works, or when you can tolerate loss.</p>`
+    },
+    {
+      label: "Comparison",
+      body: `
+<div class="subtopic-card"><div class="subtopic-name">TCP</div><div class="subtopic-desc">Connection-oriented, reliable, ordered, flow-controlled, congestion-controlled. Higher overhead (20-byte header min). Use for: HTTP, SSH, FTP, databases, anything where correctness matters.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">UDP</div><div class="subtopic-desc">Connectionless, unreliable, unordered, no flow/congestion control. 8-byte header. Use for: DNS, video/audio streaming, gaming, QUIC, multicast, broadcast.</div></div>
+`
+    },
+    {
+      label: "Code — TCP handshake in pseudocode",
+      body: `<div class="code-block">// Client side
+socket = new TCPSocket()
+socket.connect("142.250.80.46", 443)      // triggers SYN
+// OS handles SYN-ACK receipt → sends ACK
+// connection.state = ESTABLISHED
+
+socket.send("GET / HTTP/1.1\\r\\nHost: google.com\\r\\n\\r\\n")
+response = socket.recv(4096)
+
+// Termination
+socket.close()   // sends FIN; waits for FIN from server → TIME_WAIT</div>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">TCP is a phone call — you dial, they pick up (handshake), you both speak and confirm you heard each other, and you say goodbye before hanging up. UDP is shouting across a crowded room — you send it, you don't know if they heard it, and there's no "did you get that?"</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"UDP is always faster than TCP"</strong> — On an uncongested LAN, TCP adds ~microseconds. The real cost is latency on loss. UDP wins when you control retransmission logic (like QUIC).</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"TCP prevents all packet loss"</strong> — TCP detects and retransmits, but this adds latency. It doesn't magically prevent the network from dropping packets.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"3-way handshake creates the connection"</strong> — It synchronises sequence numbers and confirms both parties are ready. The OS allocates state (socket buffer, TCB) which is why SYN floods are an attack vector.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">Why does TCP use a 3-way handshake and not 2?</div><div class="a">Two-way can't confirm the server's ISN (initial sequence number) was received. The third ACK (from client) proves the server's SYN-ACK was received — both sides have confirmed their sequence numbers.</div></div>
+<div class="interview-q"><div class="q">What is the TIME_WAIT state and why does it exist?</div><div class="a">After sending the final ACK, the client waits 2×MSL before closing. If the server didn't receive that ACK, it will re-send its FIN — TIME_WAIT ensures we can reply. It also prevents old delayed packets from polluting a new connection on the same 4-tuple.</div></div>
+<div class="interview-q"><div class="q">How does TCP handle a slow receiver?</div><div class="a">Receive window (rwnd) in every ACK. Sender can have at most min(cwnd, rwnd) bytes in flight.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">OSI Model (L4)</span><span class="connect-pill">HTTP/1.1 (runs on TCP)</span><span class="connect-pill">HTTP/3 / QUIC (UDP-based)</span><span class="connect-pill">WebSocket</span><span class="connect-pill">TLS</span><span class="connect-pill">Load Balancing (System Design)</span>
+</div>`
+    }
+  ]
+},
+
+// 2 — IP Addressing
+{
+  tag: "Network Layer",
+  title: "IP Addressing",
+  oneliner: "IP addresses are unique numerical labels assigned to devices on a network that enable routing of packets from source to destination across the internet.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>MAC addresses identify hardware locally but are not routable — they only work within a single LAN segment. IP adds a hierarchical, globally unique addressing scheme that routers can use to make forwarding decisions across interconnected networks.</p>`
+    },
+    {
+      label: "IPv4 — how it works",
+      body: `<p>32-bit address written as 4 octets in dotted-decimal: <code>192.168.1.100</code>. Only 2³² ≈ 4.3 billion unique addresses — exhausted by 2011 at IANA level.</p>
+<p><strong>Structure:</strong> every IP address has a network portion and a host portion, defined by the subnet mask. <code>192.168.1.100/24</code> means the first 24 bits are the network (192.168.1.x) and the last 8 bits identify the host (0-255 range, 254 usable — .0 is network address, .255 is broadcast).</p>
+<p><strong>CIDR (Classless Inter-Domain Routing):</strong> replaced classful addressing (Class A/B/C). Allows any prefix length — /8 through /32. A /32 is a single host; a /0 is the entire internet.</p>`
+    },
+    {
+      label: "Subnetting — worked example",
+      body: `<div class="code-block">Given: 10.0.0.0/24 — split into 4 equal subnets
+
+Original: 10.0.0.0  /24  (256 addresses, 254 usable)
+Borrow 2 bits → /26 (4 subnets, each 64 addresses, 62 usable)
+
+Subnet 1: 10.0.0.0   – 10.0.0.63    /26  (network: .0,  broadcast: .63)
+Subnet 2: 10.0.0.64  – 10.0.0.127   /26  (network: .64, broadcast: .127)
+Subnet 3: 10.0.0.128 – 10.0.0.191   /26
+Subnet 4: 10.0.0.192 – 10.0.0.255   /26
+
+Mask: 255.255.255.192  (/26 = 11111111.11111111.11111111.11000000)</div>`
+    },
+    {
+      label: "Private vs Public & NAT",
+      body: `<p><strong>Private ranges</strong> (RFC 1918) — not routable on the public internet:</p>
+<div class="pill-grid"><span class="pill">10.0.0.0/8 (Class A)</span><span class="pill">172.16.0.0/12 (Class B)</span><span class="pill">192.168.0.0/16 (Class C)</span></div>
+<p style="margin-top:12px"><strong>NAT (Network Address Translation):</strong> your home router has one public IP. All devices behind it share it. When you make a request, the router records {private_ip:port → public_ip:port} in a NAT table, replaces the source address with the public IP, and reverses the translation on response. This is why you can't easily receive incoming connections behind NAT (server problem for P2P — solved by STUN/TURN/hole-punching in WebRTC).</p>`
+    },
+    {
+      label: "IPv6",
+      body: `<div class="subtopic-card"><div class="subtopic-name">128-bit addressing</div><div class="subtopic-desc">Written as 8 groups of 4 hex digits: 2001:0db8:85a3::8a2e:0370:7334. 2¹²⁸ ≈ 3.4×10³⁸ addresses — enough to give every atom on Earth an address. Eliminates need for NAT. Built-in IPSec support, no broadcast (uses multicast). ISPs and cloud providers increasingly assign IPv6 natively.</div></div>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">IP addressing is like a postal system. The network portion is the city+street, the host portion is the house number. A /24 is a street with 256 houses. CIDR lets you carve up streets into alleys (/26) or combine streets into neighbourhoods (/16). NAT is like a corporate mailroom — 500 employees share one street address, and the mailroom sorts inbound mail to the right desk.</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"192.168.x.x is always /24"</strong> — The /24 is the subnet mask, not implied by the address. 192.168.1.0/16 is valid (though unusual).</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"NAT solves IPv4 exhaustion permanently"</strong> — NAT is a workaround, not a solution. It breaks end-to-end connectivity, complicates P2P, and adds latency. IPv6 is the real fix.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"My device has a public IP"</strong> — Most consumer devices sit behind NAT. Only your router's WAN interface has a public IP (and even that might be behind carrier-grade NAT).</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">What is a /27 subnet? How many usable hosts?</div><div class="a">32 addresses (2⁵), minus network + broadcast = 30 usable hosts. Mask: 255.255.255.224.</div></div>
+<div class="interview-q"><div class="q">Why can't two machines with private IPs communicate over the internet directly?</div><div class="a">Private IP ranges are not globally routable. Internet routers will drop packets sourced from or destined to RFC 1918 addresses. NAT translates them to public IPs at the gateway.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">DNS (resolves names to IPs)</span><span class="connect-pill">TCP/UDP (uses IP)</span><span class="connect-pill">CDN (anycast uses IP routing)</span><span class="connect-pill">VPC / Cloud Networking</span><span class="connect-pill">Load Balancers</span>
+</div>`
+    }
+  ]
+},
+
+// 3 — DNS
+{
+  tag: "Application Layer",
+  title: "DNS — Domain Name System",
+  oneliner: "DNS is the internet's distributed hierarchical phonebook that translates human-readable domain names into IP addresses.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>Humans can't memorise IP addresses, and IPs change when servers are moved or scaled. DNS decouples the stable name (google.com) from the volatile address (142.250.80.46), and distributes the lookup responsibility across a global hierarchy instead of one central server.</p>`
+    },
+    {
+      label: "Resolution chain — step by step",
+      body: `<ol class="step-list">
+<li><strong>Browser cache</strong> — checks if it cached google.com recently (within TTL)</li>
+<li><strong>OS cache</strong> — checks /etc/hosts, then OS DNS cache (systemd-resolved on Linux)</li>
+<li><strong>Recursive resolver</strong> (your ISP or 8.8.8.8) — if not cached, it takes over and does the heavy lifting</li>
+<li><strong>Root nameserver</strong> (13 sets, 600+ anycast servers) — resolver asks: "who handles .com?" → returns .com TLD server IPs</li>
+<li><strong>TLD nameserver</strong> (.com) — "who handles google.com?" → returns Google's authoritative NS IPs</li>
+<li><strong>Authoritative nameserver</strong> (ns1.google.com) — the actual answer: 142.250.80.46</li>
+<li><strong>Recursive resolver caches</strong> the response with its TTL, returns it to you</li>
+</ol>`
+    },
+    {
+      label: "Recursive vs Iterative",
+      body: `
+<div class="subtopic-card"><div class="subtopic-name">Recursive resolver</div><div class="subtopic-desc">Does all the work on your behalf — contacts root, TLD, authoritative NS in sequence, returns the final answer. Your stub resolver (OS) sends one query and waits. Risk: single point of failure, DDoS target.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">Iterative (from resolver's perspective)</div><div class="subtopic-desc">The resolver itself iterates: asks root → gets referral → asks TLD → gets referral → asks authoritative → gets answer. Each server gives a referral, not the final answer. This is how the recursive resolver works internally.</div></div>
+`
+    },
+    {
+      label: "Record types",
+      body: `<div class="code-block">A       google.com.    → 142.250.80.46       (IPv4)
+AAAA    google.com.    → 2607:f8b0:4004::200e (IPv6)
+CNAME   www.example.com → example.com         (alias — no IP)
+MX      gmail.com.     → alt1.gmail-smtp-in.l.google.com  (mail server, has priority)
+TXT     google.com.    → "v=spf1 include:..."  (SPF, DKIM, domain verification)
+NS      google.com.    → ns1.google.com        (authoritative nameserver)
+PTR     46.80.250.142.in-addr.arpa → google.com (reverse DNS)
+SOA     google.com.    → start-of-authority (serial, refresh, TTL defaults)</div>`
+    },
+    {
+      label: "TTL",
+      body: `<p>Time-to-Live on a DNS record tells resolvers how long to cache it (in seconds). Low TTL (e.g. 60s) = fast failover/migration but more queries. High TTL (e.g. 86400 = 1 day) = less load, faster resolution, but slow to propagate changes. During a migration, the pattern is: lower TTL days before, make the change, raise TTL again after confirmation.</p>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">DNS is a series of reference librarians. You ask the front desk (recursive resolver) for a book. They don't know, but they know to ask the section head for Fiction (root → .com). The Fiction head says "try the Author shelf" (TLD → google.com NS). The Author shelf has the exact shelf number (authoritative NS → IP). The front desk writes it down (cache) so next time they answer immediately.</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"CNAME can be used at the zone apex"</strong> — You cannot have a CNAME for the root domain (example.com) because it conflicts with SOA/NS records. Use ALIAS or ANAME records (DNS provider-specific) instead.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"DNS is just A records"</strong> — TXT records are critical for SPF/DKIM/DMARC (email security) and domain verification. Interviews often ask about this.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"Lowering TTL propagates instantly"</strong> — The new TTL only takes effect after the old TTL expires. If you change TTL from 24h to 60s, resolvers holding the old record will keep it for up to 24h first.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">How does DNS fit into the "type google.com" flow?</div><div class="a">It's step zero. Without DNS resolving the IP, no TCP connection can be established. Depth signal: mention the resolver hierarchy, TTL caching, and that DNS runs over UDP port 53 (with TCP fallback for large responses >512 bytes).</div></div>
+<div class="interview-q"><div class="q">What's the difference between A and CNAME records?</div><div class="a">A record maps a name directly to an IPv4 address. CNAME maps a name to another name (which must eventually resolve to an A record). CNAME adds one extra lookup hop. You can't use CNAME at the zone apex.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">IP Addressing</span><span class="connect-pill">HTTP/1.1</span><span class="connect-pill">CDN (CNAME-based)</span><span class="connect-pill">TLS (SNI uses domain name)</span><span class="connect-pill">Service Discovery (Kubernetes DNS)</span>
+</div>`
+    }
+  ]
+},
+
+// 4 — HTTP/1.1
+{
+  tag: "Application Protocol",
+  title: "HTTP/1.1",
+  oneliner: "HTTP/1.1 is the text-based request/response protocol that powers the web, running over TCP, with persistent connections and a well-defined message structure.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>HTTP/1.0 opened a new TCP connection for every single request — expensive (3-way handshake + TLS each time). HTTP/1.1 (1997, RFC 2068) introduced persistent connections, the Host header (enabling virtual hosting), chunked transfer, and better caching. It remained the dominant protocol for nearly 20 years.</p>`
+    },
+    {
+      label: "Request/Response structure",
+      body: `<div class="code-block">// REQUEST
+GET /search?q=dns HTTP/1.1         ← request line: method + path + version
+Host: www.google.com               ← required in HTTP/1.1
+Accept: text/html,application/json
+Connection: keep-alive
+User-Agent: Mozilla/5.0
+                                   ← blank line separates headers from body
+// (GET has no body; POST body follows here)
+
+// RESPONSE
+HTTP/1.1 200 OK                    ← status line: version + code + reason
+Content-Type: text/html; charset=UTF-8
+Content-Length: 5312
+Cache-Control: max-age=3600
+                                   ← blank line
+<!DOCTYPE html>...                 ← body</div>`
+    },
+    {
+      label: "Methods & status codes",
+      body: `<p><strong>Safe methods</strong> (no side effects): GET, HEAD, OPTIONS<br><strong>Idempotent</strong> (same result if repeated): GET, PUT, DELETE, HEAD, OPTIONS<br><strong>Neither</strong>: POST (creates new resource each time), PATCH (partial update)</p>
+<div class="pill-grid">
+<span class="pill success">200 OK</span><span class="pill success">201 Created</span><span class="pill success">204 No Content</span><span class="pill info">301 Moved Permanently</span><span class="pill info">304 Not Modified</span><span class="pill warn">400 Bad Request</span><span class="pill warn">401 Unauthorized</span><span class="pill warn">403 Forbidden</span><span class="pill warn">404 Not Found</span><span class="pill warn">429 Too Many Requests</span><span class="pill danger">500 Internal Server Error</span><span class="pill danger">502 Bad Gateway</span><span class="pill danger">503 Service Unavailable</span>
+</div>`
+    },
+    {
+      label: "Keep-alive & pipelining",
+      body: `
+<div class="subtopic-card"><div class="subtopic-name">Keep-alive (persistent connections)</div><div class="subtopic-desc">Connection: keep-alive tells both sides to reuse the TCP connection for multiple request/response cycles. Avoids TCP+TLS overhead per request. Default in HTTP/1.1. Server may set Keep-Alive: timeout=5, max=100.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">Pipelining</div><div class="subtopic-desc">Send multiple requests without waiting for each response. Problem: responses must arrive in order (HOL blocking at HTTP level). Almost no servers/clients implement this correctly — effectively abandoned. HTTP/2 multiplexing solved this properly.</div></div>
+`
+    },
+    {
+      label: "Important headers",
+      body: `<div class="code-block">Cache-Control: max-age=3600, no-cache, no-store, public, private
+ETag: "abc123"           // fingerprint of resource; used with If-None-Match
+Last-Modified: ...       // used with If-Modified-Since (conditional GET → 304)
+Authorization: Bearer eyJhb...   // JWT auth
+Content-Type: application/json
+CORS: Access-Control-Allow-Origin: *
+Transfer-Encoding: chunked   // unknown content-length; stream in chunks</div>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">HTTP/1.1 is a waiter taking orders one at a time at a table. Keep-alive means the waiter stays at your table between courses (no re-seating fee each time). Pipelining would be shouting all your courses at once — but the kitchen still cooks in order, so if the starter is slow, everything else waits. HTTP/2 fixes this by having multiple cooks (streams).</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"POST is always used for creation"</strong> — POST is just "not idempotent, not safe." It's used for creation but also for any non-idempotent operation (search with a large body, RPC-style calls, etc).</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"401 and 403 are interchangeable"</strong> — 401 means "not authenticated" (send credentials). 403 means "authenticated but not authorised" (you don't have permission even with valid credentials).</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"HTTP/1.1 HOL blocking is solved by pipelining"</strong> — Pipelining was the attempt; it failed in practice. True multiplexing required HTTP/2.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">What is the difference between PUT and PATCH?</div><div class="a">PUT replaces the entire resource (idempotent). PATCH applies a partial update (not necessarily idempotent, though implementations often make it so). If you PUT a user without the email field, the email is gone. PATCH only changes what you send.</div></div>
+<div class="interview-q"><div class="q">What is HOL blocking in HTTP/1.1?</div><div class="a">Head-of-line blocking: in a persistent connection, responses must arrive in request order. If request 1 is slow, requests 2 and 3 wait even if they're ready. Browsers work around this by opening 6 parallel connections per origin — wasteful but effective.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">TCP (HTTP runs over TCP)</span><span class="connect-pill">HTTP/2 (solves HOL)</span><span class="connect-pill">TLS (HTTPS)</span><span class="connect-pill">REST principles</span><span class="connect-pill">CDN (cache-control headers)</span><span class="connect-pill">WebSocket (upgrade mechanism)</span>
+</div>`
+    }
+  ]
+},
+
+// 5 — HTTP/2
+{
+  tag: "Application Protocol",
+  title: "HTTP/2",
+  oneliner: "HTTP/2 is a binary, multiplexed protocol that sends multiple requests and responses concurrently over a single TCP connection, eliminating HTTP/1.1's head-of-line blocking at the HTTP layer.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>HTTP/1.1 had three main performance problems: HOL blocking, redundant headers on every request (headers not compressed), and the inability to push resources proactively. Browsers hacked around this with 6 parallel connections per origin — wasteful and complex. HTTP/2 (2015, derived from Google's SPDY) solved all three architecturally.</p>`
+    },
+    {
+      label: "Multiplexing — the core innovation",
+      body: `<p>HTTP/2 introduces the concept of <strong>streams</strong> — independent, bidirectional sequences of frames within a single TCP connection. Each request gets a stream ID (odd for client-initiated: 1, 3, 5...). Frames from different streams are interleaved on the wire and reassembled at the receiver.</p>
+<div class="code-block">Single TCP connection:
+Stream 1: [GET /index.html ]→  ←[ 200 HTML      ]
+Stream 3: [GET /style.css  ]→  ←[ 200 CSS       ]
+Stream 5: [GET /app.js     ]→  ←[ 200 JS        ]
+                    ↑ all concurrent, no waiting</div>
+<p>Result: eliminates HTTP-level HOL blocking. Important: TCP-level HOL blocking still exists in HTTP/2 — a dropped TCP packet stalls all streams. This is why HTTP/3 moved to UDP.</p>`
+    },
+    {
+      label: "Header compression — HPACK",
+      body: `<p>HTTP/1.1 sends full headers with every request (cookies, User-Agent etc. can be kilobytes). HPACK maintains a shared static table (61 common header/value pairs pre-defined) and a dynamic table (headers seen this session). After the first request, recurring headers are sent as 1-byte indices instead of full strings.</p>
+<p>Example: <code>:method GET</code> → 1 byte (index 2 in static table). Savings of 80-90% on header size after the first request.</p>`
+    },
+    {
+      label: "Server Push",
+      body: `<div class="subtopic-card"><div class="subtopic-name">Server Push</div><div class="subtopic-desc">Server can proactively send resources the client will need before it asks. When you request index.html, the server can push style.css and app.js immediately. In practice: underused and often harmful (server can't know browser cache state). HTTP/2 push is deprecated in Chrome and most CDNs. Early Hints (103 status) is the replacement.</div></div>`
+    },
+    {
+      label: "Stream prioritisation",
+      body: `<p>Clients can assign weights (1–256) and dependencies to streams. A browser might prioritise the HTML stream over images. In practice, most servers implement this partially or poorly — it's one of HTTP/2's underdelivered promises.</p>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">HTTP/1.1 is a single-lane road — one car at a time per lane, and you need 6 parallel roads (connections) to get throughput. HTTP/2 is a highway with HOV lanes — all cars share one road, each labelled with a stream ID, and they merge at the destination. TCP HOL blocking means if there's an accident on the highway (packet loss), all cars stop — HTTP/3 puts each car on its own track (UDP streams).</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"HTTP/2 fully solves HOL blocking"</strong> — Only at the HTTP layer. TCP-level HOL blocking remains. One lost TCP segment blocks all streams. This is the key motivation for HTTP/3/QUIC.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"HTTP/2 requires HTTPS"</strong> — The spec allows cleartext (h2c), but every major browser only implements HTTP/2 over TLS. In practice: yes, HTTPS required.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"Domain sharding is still needed"</strong> — Domain sharding (multiple subdomains to bypass 6-connection limit) is actually harmful with HTTP/2. It creates multiple connections, defeating multiplexing.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">How does HTTP/2 multiplexing differ from HTTP/1.1 pipelining?</div><div class="a">Pipelining sends requests in order, responses must come in the same order — server-side HOL blocking remains. Multiplexing uses independent streams; responses can arrive in any order, interleaved at frame level. Completely different mechanism.</div></div>
+<div class="interview-q"><div class="q">What problem does HTTP/2 NOT solve that HTTP/3 does?</div><div class="a">TCP-level HOL blocking. HTTP/2 streams over TCP — one lost packet stalls all streams. HTTP/3 uses QUIC over UDP, where each stream is independent even at the transport level.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">HTTP/1.1 (replaces)</span><span class="connect-pill">HTTP/3 / QUIC (next evolution)</span><span class="connect-pill">TLS (required in practice)</span><span class="connect-pill">gRPC (uses HTTP/2)</span><span class="connect-pill">CDN (HTTP/2 support)</span>
+</div>`
+    }
+  ]
+},
+
+// 6 — HTTP/3 / QUIC
+{
+  tag: "Application Protocol",
+  title: "HTTP/3 / QUIC",
+  oneliner: "HTTP/3 runs over QUIC — a UDP-based transport that builds reliability, multiplexing, and TLS 1.3 into the protocol itself, eliminating TCP's head-of-line blocking and handshake latency.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>HTTP/2's multiplexing is great, but it's built on TCP. TCP is a single byte stream — one lost packet stalls the whole connection until it's retransmitted. On a 1% packet loss network, HTTP/2 can be worse than HTTP/1.1. QUIC (developed by Google, standardised RFC 9000) rebuilds the transport layer on UDP to get independent streams, faster handshakes, and connection migration.</p>`
+    },
+    {
+      label: "QUIC — how it works",
+      body: `<p>QUIC is implemented in userspace (not the OS kernel like TCP). This means it can be iterated faster and customised per application. It builds on UDP but adds:</p>
+<ol class="step-list">
+<li><strong>Independent streams</strong> — each QUIC stream is independently flow-controlled. A lost packet in stream 1 does not block stream 3. True multiplexing without HOL blocking.</li>
+<li><strong>Integrated TLS 1.3</strong> — QUIC handshake combines transport + TLS in one round trip. No separate TCP handshake then TLS handshake.</li>
+<li><strong>Connection IDs</strong> — QUIC connections are identified by a connection ID, not the 4-tuple (src-ip:port, dst-ip:port) like TCP. Switching from Wi-Fi to 4G doesn't break the connection — the connection ID persists.</li>
+<li><strong>0-RTT resumption</strong> — if you've connected before, QUIC can send data in the very first packet (0-RTT) using a pre-shared session ticket. First-time connections are 1-RTT.</li>
+</ol>`
+    },
+    {
+      label: "0-RTT vs 1-RTT",
+      body: `<div class="code-block">TCP + TLS 1.2:  SYN → SYN-ACK → ACK → TLS(2 RTT) = 3 RTT before data
+TCP + TLS 1.3:  SYN → SYN-ACK → ACK → TLS(1 RTT) = 2 RTT before data
+QUIC 1-RTT:     QUIC Initial → QUIC Handshake → data = 1 RTT
+QUIC 0-RTT:     QUIC Initial + data (using cached session ticket) = 0 RTT
+
+Note: 0-RTT is vulnerable to replay attacks — only safe for idempotent requests</div>`
+    },
+    {
+      label: "Connection migration",
+      body: `<p>On TCP, if your IP changes (phone moves from Wi-Fi to LTE), the 4-tuple changes, the connection breaks, and you start over. QUIC's connection ID is opaque to the network — the server identifies you by it, not by your IP. The connection migrates transparently. Critical for mobile users and long-lived connections (video calls, file downloads).</p>`
+    },
+    {
+      label: "HOL blocking — the fix",
+      body: `<div class="subtopic-card"><div class="subtopic-name">TCP HOL blocking (HTTP/2 problem)</div><div class="subtopic-desc">TCP is a single ordered byte stream. Packet loss triggers retransmit and all data after the gap waits, including data from unrelated HTTP/2 streams. Affects all streams equally.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">QUIC streams (HTTP/3 fix)</div><div class="subtopic-desc">Each QUIC stream is independently ordered. A lost packet only stalls the stream it belongs to. Other streams continue flowing. HOL blocking is eliminated at the transport level.</div></div>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">TCP is like a conveyor belt — all items must stay in order, so if one item falls off, the whole belt stops. QUIC is like separate delivery trucks, one per stream — if one truck has a flat tyre, the others keep driving. And QUIC's connection ID means if a truck changes its number plate (IP), the warehouse still knows which driver it is.</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"QUIC is unreliable because it uses UDP"</strong> — QUIC implements its own reliability, ordering, and congestion control on top of UDP. It's more reliable than TCP in lossy conditions because HOL blocking doesn't cascade.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"0-RTT is always safe"</strong> — 0-RTT data can be replayed by an attacker. Only use it for idempotent operations (GET, HEAD). POST with 0-RTT is a security risk.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"HTTP/3 is only for mobile"</strong> — It benefits any lossy or high-latency network. Google serves ~25% of its traffic over QUIC. Cloudflare, Fastly, and AWS all support it.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">Why did HTTP/3 switch from TCP to UDP?</div><div class="a">TCP's HOL blocking meant one lost packet stalls all HTTP/2 streams. By building on UDP, QUIC can implement its own per-stream ordering — packet loss only affects the stream it belongs to. Also: faster handshake (1-RTT vs 2), connection migration via connection IDs, and faster iteration (userspace vs kernel).</div></div>
+<div class="interview-q"><div class="q">What is 0-RTT and what's the security trade-off?</div><div class="a">0-RTT reuses a pre-shared session ticket from a previous connection to send data with the first packet. Trade-off: replay attacks — an adversary can resend the 0-RTT packet to trigger the same server action. Only safe for idempotent requests.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">HTTP/2 (predecessor)</span><span class="connect-pill">TCP vs UDP</span><span class="connect-pill">TLS 1.3 (integrated)</span><span class="connect-pill">WebRTC (also QUIC-influenced)</span><span class="connect-pill">CDN (QUIC at edge)</span>
+</div>`
+    }
+  ]
+},
+
+// 7 — WebSocket
+{
+  tag: "Application Protocol",
+  title: "WebSocket",
+  oneliner: "WebSocket is a full-duplex, persistent communication protocol over a single TCP connection, enabling the server to push data to clients without the client polling.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>HTTP is fundamentally request/response — the client always initiates. For real-time apps (chat, live scores, collaborative editing, stock prices), you need the server to push updates. Polling (repeated HTTP requests) wastes bandwidth. Long-polling (hold a request open) is hacky. WebSocket provides a proper bidirectional channel.</p>`
+    },
+    {
+      label: "Upgrade handshake",
+      body: `<div class="code-block">// Client HTTP request (upgrade)
+GET /chat HTTP/1.1
+Host: example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==   ← base64 random 16 bytes
+Sec-WebSocket-Version: 13
+
+// Server response (101 Switching Protocols)
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=  ← SHA1(key + magic GUID)
+
+// Connection is now full-duplex WebSocket. HTTP is gone.</div>`
+    },
+    {
+      label: "Frames",
+      body: `<p>After the handshake, data is exchanged as frames — binary envelopes with: FIN bit (is this the last frame?), opcode (text=1, binary=2, close=8, ping=9, pong=10), masking (client→server frames must be masked with a 4-byte key), payload length.</p>
+<p>Messages can be fragmented across multiple frames. The application reassembles them using the FIN bit.</p>`
+    },
+    {
+      label: "Heartbeat (ping/pong)",
+      body: `<p>TCP connections can be silently dropped by NAT devices or firewalls after inactivity. WebSocket heartbeats use opcode 9 (ping) / opcode 10 (pong): server sends ping, client must reply with pong. If no pong within a timeout, connection is considered dead and closed. Keeps NAT mappings alive and detects dead connections.</p>`
+    },
+    {
+      label: "vs SSE vs Long-polling",
+      body: `
+<div class="subtopic-card"><div class="subtopic-name">Long-polling</div><div class="subtopic-desc">Client sends a request; server holds it open until data is available, then responds. Client immediately opens another request. Simulates push over HTTP. Works everywhere but wasteful — new TCP connection each cycle, high latency tail.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">Server-Sent Events (SSE)</div><div class="subtopic-desc">HTTP/1.1 streaming: server sends text/event-stream; client reads indefinitely. One-directional (server→client only). Simple, uses regular HTTP (works with CDNs, proxies). Ideal for live dashboards, notifications. Auto-reconnects on drop.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">WebSocket</div><div class="subtopic-desc">Full-duplex. Both sides send anytime. Custom framing protocol. Requires stateful server (sticky sessions or pub/sub backend). Use for: chat, multiplayer games, collaborative editing, trading terminals.</div></div>
+`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">HTTP is like sending letters — you always write first, the server replies, done. Long-polling is like calling a restaurant and staying on hold until your table is ready. SSE is a radio broadcast — station (server) talks, you listen. WebSocket is a phone call — both people can speak and listen simultaneously, anytime.</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"WebSocket is always better than SSE"</strong> — If you only need server→client push (notifications, live feeds), SSE is simpler, HTTP-native, auto-reconnects, works with standard proxies. WebSocket is overkill.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"WebSocket is stateless"</strong> — WebSocket maintains persistent state (connection object, session, subscriptions). Horizontal scaling requires shared state (Redis pub/sub) or sticky sessions.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">How would you design a chat system — WebSocket, SSE, or long-polling?</div><div class="a">WebSocket: full-duplex needed (user sends and receives). Scale with Redis pub/sub (each server subscribes to user channels). Long-polling as degraded fallback. Mention: sticky sessions or connection IDs for routing.</div></div>
+<div class="interview-q"><div class="q">What happens when a WebSocket server is behind a load balancer?</div><div class="a">WebSocket connections are long-lived and stateful — the LB must route a client's reconnect to the same server (sticky sessions/consistent hashing) OR the app must externalise state (Redis, Kafka) so any server can handle any connection.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">HTTP/1.1 (upgrade from)</span><span class="connect-pill">TCP (underlying)</span><span class="connect-pill">Redis pub/sub (scaling)</span><span class="connect-pill">Load Balancers (sticky sessions)</span><span class="connect-pill">Zombie Hunt project</span>
+</div>`
+    }
+  ]
+},
+
+// 8 — TLS/HTTPS
+{
+  tag: "Security Protocol",
+  title: "TLS / HTTPS",
+  oneliner: "TLS is a cryptographic protocol that provides authentication, confidentiality, and integrity for data in transit by combining asymmetric key exchange with symmetric encryption.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>HTTP sends everything in plaintext. Anyone on the network path (ISP, coffee shop Wi-Fi, rogue router) can read or modify data. TLS (Transport Layer Security, successor to SSL) solves three problems: prove the server is who it claims to be (authentication), ensure nobody can read the data (confidentiality), ensure nobody tampered with it (integrity).</p>`
+    },
+    {
+      label: "TLS 1.3 handshake — step by step",
+      body: `<ol class="step-list">
+<li><strong>ClientHello</strong> — client sends: TLS version, random nonce, list of supported cipher suites, key share (public key for ECDHE)</li>
+<li><strong>ServerHello</strong> — server picks cipher suite, sends its key share, session ticket if resuming. Both sides now compute the shared secret (ECDHE). All subsequent messages encrypted.</li>
+<li><strong>Server Certificate + Verify</strong> — server sends its X.509 cert chain, proves ownership via digital signature with private key. Client verifies cert chain up to a trusted CA.</li>
+<li><strong>Server Finished</strong> — MAC over the entire handshake transcript</li>
+<li><strong>Client Finished</strong> — MAC over transcript. Both sides now have symmetric session keys. Data flows.</li>
+</ol>
+<p><strong>Total: 1 RTT</strong> (vs 2 RTT in TLS 1.2). With 0-RTT resumption: 0 RTT.</p>`
+    },
+    {
+      label: "Asymmetric vs symmetric",
+      body: `
+<div class="subtopic-card"><div class="subtopic-name">Asymmetric (RSA, ECDHE) — key exchange only</div><div class="subtopic-desc">Public key encrypts, private key decrypts. Or: private key signs, public key verifies. Slow — used ONLY to establish a shared secret and verify identity. Never used for bulk data encryption.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">Symmetric (AES-256-GCM) — actual data encryption</div><div class="subtopic-desc">Same key encrypts and decrypts. Fast (hardware-accelerated on modern CPUs). Used for all application data after handshake. The session key is ephemeral — derived during handshake, discarded after session.</div></div>
+`
+    },
+    {
+      label: "Certificate chain & CA",
+      body: `<div class="code-block">Browser trusts ~150 Root CAs (pre-installed in OS/browser)
+
+Certificate chain:
+  Root CA (self-signed, offline, very secure)
+    └── Intermediate CA (signed by Root CA)
+          └── End-entity cert: google.com (signed by Intermediate CA)
+
+Verification: browser verifies each signature up the chain.
+If any cert is expired, revoked, or chain is broken → TLS alert → connection aborted.
+
+Revocation:
+  CRL (Certificate Revocation List) — download a list; stale
+  OCSP (Online Certificate Status Protocol) — real-time check; privacy concern
+  OCSP Stapling — server fetches OCSP response, staples it to TLS handshake</div>`
+    },
+    {
+      label: "HSTS",
+      body: `<p>HTTP Strict Transport Security: server sends <code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code>. Browser stores this: for the next year, always connect over HTTPS, never HTTP — even if user types http://. Prevents SSL stripping attacks. Chrome/Firefox maintain an HSTS preload list (hardcoded sites that are always HTTPS).</p>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">TLS is like a diplomatic handshake followed by a secret language. Before talking, both sides prove their identity (passport check via CA). They agree on a secret codebook (session keys via ECDHE — even if eavesdropped, the shared secret can't be computed without private keys). Then they speak in code (AES). If someone tampers with a message, the MAC detects it immediately. HSTS is like having a standing rule: "I only meet this diplomat in secure rooms, always."</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"HTTPS means the site is safe"</strong> — HTTPS means the connection is encrypted. The site itself can still be malicious. The padlock = encrypted channel, not trustworthy content.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"RSA is used to encrypt data"</strong> — RSA (or ECDHE) is only used during key exchange/authentication. Actual data uses AES — orders of magnitude faster.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"TLS 1.2 and 1.3 are similar"</strong> — TLS 1.3 dropped support for weak cipher suites (RC4, 3DES, RSA key exchange without forward secrecy), reduced handshake to 1-RTT, and mandates ephemeral keys (forward secrecy). TLS 1.2 is the minimum acceptable today; 1.0/1.1 are deprecated.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">Explain the TLS handshake at a high level.</div><div class="a">ClientHello (cipher suites, key share) → ServerHello (choice + key share) → both compute shared secret via ECDHE → server sends cert + proof of ownership → Finished messages confirm handshake integrity. 1-RTT total in TLS 1.3. Then symmetric AES for data.</div></div>
+<div class="interview-q"><div class="q">What is forward secrecy and why does TLS 1.3 require it?</div><div class="a">Forward secrecy means if the server's long-term private key is compromised, past sessions can't be decrypted — because each session used an ephemeral key pair discarded after the session. TLS 1.3 mandates ECDHE (ephemeral), eliminating RSA key exchange which had no forward secrecy.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">HTTP/2 (requires TLS)</span><span class="connect-pill">HTTP/3 (TLS 1.3 integrated in QUIC)</span><span class="connect-pill">JWT / OAuth2 (Java topic)</span><span class="connect-pill">Cryptography (CS Fundamentals)</span><span class="connect-pill">CDN (TLS termination at edge)</span>
+</div>`
+    }
+  ]
+},
+
+// 9 — REST
+{
+  tag: "API Design",
+  title: "REST Principles",
+  oneliner: "REST is an architectural style for distributed hypermedia systems defined by six constraints — statelessness, uniform interface, and resource-based URLs being the three you'll use every day.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>Roy Fielding defined REST in his 2000 PhD dissertation as a set of architectural constraints that, when applied to web services, produce scalable, decoupled, and evolvable systems. REST isn't a protocol or a standard — it's a design philosophy that maps naturally to HTTP.</p>`
+    },
+    {
+      label: "The 6 constraints",
+      body: `
+<div class="subtopic-card"><div class="subtopic-name">1. Client-Server</div><div class="subtopic-desc">Separation of concerns. UI/client handles presentation, server handles data. They evolve independently.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">2. Stateless</div><div class="subtopic-desc">Every request contains all information needed to process it. No server-side session state. Session state lives on the client (JWT, cookies). Enables horizontal scaling — any server can handle any request.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">3. Cacheable</div><div class="subtopic-desc">Responses must declare themselves cacheable or not (Cache-Control headers). Enables CDN and client-side caching, reduces server load.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">4. Uniform Interface</div><div class="subtopic-desc">Resources identified by URI. Manipulated through representations (JSON/XML). Self-descriptive messages (Content-Type, status codes). HATEOAS (links in response).</div></div>
+<div class="subtopic-card"><div class="subtopic-name">5. Layered System</div><div class="subtopic-desc">Client doesn't know if it's talking to origin server or a load balancer/CDN/proxy. Enables independent deployment of intermediaries.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">6. Code on Demand (optional)</div><div class="subtopic-desc">Server can extend client functionality by sending executable code (JavaScript). The only optional constraint.</div></div>
+`
+    },
+    {
+      label: "Resource design & HTTP method mapping",
+      body: `<div class="code-block">// Resource-based (nouns, not verbs)
+GET    /users          → list users
+POST   /users          → create user
+GET    /users/123      → get user 123
+PUT    /users/123      → replace user 123
+PATCH  /users/123      → update fields on user 123
+DELETE /users/123      → delete user 123
+
+GET    /users/123/orders      → user's orders (nested resource)
+POST   /users/123/orders      → create order for user 123
+
+// Anti-patterns (RPC style, not RESTful)
+POST /getUser          ✗
+POST /createUser       ✗
+GET  /deleteUser/123   ✗</div>`
+    },
+    {
+      label: "HATEOAS",
+      body: `<p>Hypermedia As The Engine Of Application State: responses include links to related actions, so clients don't need to hardcode URLs. In practice, most "REST" APIs don't implement HATEOAS. Fielding considers them not truly RESTful. In interviews, know what it is but note it's rarely used.</p>
+<div class="code-block">// HATEOAS response
+{ "id": 123, "name": "Somesh",
+  "_links": {
+    "self": { "href": "/users/123" },
+    "orders": { "href": "/users/123/orders" },
+    "delete": { "href": "/users/123", "method": "DELETE" }
+  }
+}</div>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">REST treats the web like a filing cabinet. Every drawer (resource) has an address (/users/123). You use standard tools to interact: pull out (GET), add to (POST), replace (PUT), update a field (PATCH), throw away (DELETE). The cabinet doesn't remember who you are between visits (stateless) — you always show your ID (token) with each request.</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"Any JSON API over HTTP is REST"</strong> — REST requires statelessness, uniform interface, and proper HTTP semantics. Most "REST" APIs are actually just HTTP+JSON RPC.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"REST is always better than gRPC"</strong> — REST is better for public APIs, human-readable debugging, and browser-native use. gRPC is better for internal service-to-service calls, streaming, and performance-critical paths.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">What makes an API RESTful? Name the key constraints.</div><div class="a">Stateless (every request self-contained), uniform interface (resource URLs, HTTP verbs, standard status codes), cacheable, client-server separation, layered system. HATEOAS technically required but rarely implemented.</div></div>
+<div class="interview-q"><div class="q">When would you choose gRPC over REST?</div><div class="a">Internal microservices needing high throughput (Protobuf is 3-10x smaller than JSON), bidirectional streaming, strongly-typed contracts, polyglot teams. REST for public APIs, browser clients, simpler CRUD.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">HTTP/1.1 (REST over HTTP)</span><span class="connect-pill">gRPC (alternative)</span><span class="connect-pill">JWT / Auth (stateless auth)</span><span class="connect-pill">API Gateway (System Design)</span><span class="connect-pill">EngineX project (API design)</span>
+</div>`
+    }
+  ]
+},
+
+// 10 — gRPC
+{
+  tag: "RPC Framework",
+  title: "gRPC",
+  oneliner: "gRPC is a high-performance RPC framework from Google that uses Protocol Buffers for serialisation and HTTP/2 for transport, enabling strongly-typed, efficient service-to-service communication.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>REST+JSON is human-friendly but inefficient: JSON is verbose, lacks a schema, requires parsing, and doesn't support streaming natively. For internal microservices making thousands of calls per second, Google needed something faster, smaller, and contract-first. gRPC (2015) is what they built and open-sourced.</p>`
+    },
+    {
+      label: "Protocol Buffers (Protobuf)",
+      body: `<p>Protobuf is gRPC's IDL (interface definition language) and binary serialisation format. You define messages and services in a .proto file; the protoc compiler generates type-safe client and server stubs in any language.</p>
+<div class="code-block">// user.proto
+syntax = "proto3";
+
+message User {
+  int32 id = 1;          // field number, not value
+  string name = 2;
+  string email = 3;
+}
+
+service UserService {
+  rpc GetUser(UserRequest) returns (User);
+  rpc ListUsers(Empty) returns (stream User);      // server streaming
+  rpc CreateUsers(stream User) returns (Summary);  // client streaming
+  rpc Chat(stream Message) returns (stream Message); // bidirectional
+}
+
+// Binary: User{id:1, name:"Somesh"} = ~10 bytes vs JSON ~30 bytes</div>`
+    },
+    {
+      label: "4 streaming types",
+      body: `
+<div class="subtopic-card"><div class="subtopic-name">Unary</div><div class="subtopic-desc">One request, one response. Equivalent to a REST call. Most common.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">Server streaming</div><div class="subtopic-desc">Client sends one request, server streams multiple responses. Use case: subscribe to live stock prices, large dataset export.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">Client streaming</div><div class="subtopic-desc">Client streams multiple requests, server sends one response. Use case: upload a large file in chunks, batch insert.</div></div>
+<div class="subtopic-card"><div class="subtopic-name">Bidirectional streaming</div><div class="subtopic-desc">Both sides stream simultaneously. Use case: chat applications, real-time collaborative features, gaming. Runs over a single HTTP/2 stream.</div></div>
+`
+    },
+    {
+      label: "gRPC vs REST comparison",
+      body: `<div class="code-block">                gRPC                    REST
+Transport:      HTTP/2                  HTTP/1.1 or HTTP/2
+Payload:        Binary (Protobuf)       Text (JSON/XML)
+Schema:         Strict (.proto file)    Optional (OpenAPI)
+Streaming:      4 types built-in        Workarounds only
+Browser support:Limited (grpc-web)      Full native
+Performance:    ~10x faster             Slower
+Learning curve: Higher (proto + codegen) Lower
+Use case:       Internal microservices  Public APIs, browser</div>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">REST is a public post office: anyone can send a letter, addresses are human-readable, any format accepted. gRPC is a private pneumatic tube system inside a skyscraper — blazing fast, binary messages, both sides must agree on the tube diameter (proto schema), but it doesn't work outside the building (limited browser support).</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"gRPC is always faster"</strong> — For small payloads and low-frequency calls, the overhead of Protobuf encoding can exceed savings. gRPC wins at high throughput and large payloads.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"gRPC works in browsers"</strong> — Not natively. Browsers can't control HTTP/2 framing. grpc-web is a workaround using a proxy (Envoy). WebSockets are usually better for browser bidirectional needs.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">When would you choose gRPC over REST for a microservices system?</div><div class="a">Internal service calls with high throughput, need for streaming (logs, events), polyglot teams benefiting from auto-generated stubs, or when you want contract-first API design with compile-time type safety.</div></div>
+<div class="interview-q"><div class="q">What is Protobuf and why is it more efficient than JSON?</div><div class="a">Binary serialisation with a schema. Fields are identified by numbers, not strings — saves space. No quotes, no field name repetition, fixed-width encoding for numbers. Typically 3-10x smaller and 5-10x faster to parse than equivalent JSON.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">HTTP/2 (gRPC transport)</span><span class="connect-pill">REST (comparison)</span><span class="connect-pill">Microservices (System Design)</span><span class="connect-pill">Protocol design</span>
+</div>`
+    }
+  ]
+},
+
+// 11 — CDN
+{
+  tag: "Infrastructure",
+  title: "CDN — Content Delivery Network",
+  oneliner: "A CDN is a globally distributed network of edge servers that cache and serve content from locations physically close to users, reducing latency and offloading traffic from origin servers.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>Physics: light travels ~200,000 km/s in fibre. A request from Mumbai to a server in Virginia adds ~150ms of latency, minimum, just for the round trip. CDNs solve this by caching content at Points of Presence (PoPs) worldwide — a Mumbai user hits a PoP in Mumbai, not Virginia.</p>`
+    },
+    {
+      label: "How it works",
+      body: `<ol class="step-list">
+<li><strong>DNS-based routing</strong>: your domain's CNAME points to the CDN (e.g., example.com CNAME → example.com.cloudfront.net). CDN's DNS returns the IP of the nearest PoP using anycast or GeoDNS.</li>
+<li><strong>Cache hit</strong>: PoP has the asset → serves immediately from edge (e.g., 5ms round-trip from same city)</li>
+<li><strong>Cache miss</strong>: PoP forwards request to origin server, caches the response, serves it. Subsequent requests to that PoP hit cache.</li>
+<li><strong>Cache-Control</strong>: origin response headers (max-age, s-maxage, Vary) tell the CDN how long to cache and under what conditions to vary the cached copy.</li>
+</ol>`
+    },
+    {
+      label: "Anycast routing",
+      body: `<p>Multiple PoPs advertise the same IP address via BGP. The internet's routing protocols automatically route traffic to the topologically nearest PoP. If a PoP goes down, traffic automatically fails over to the next nearest. Cloudflare uses anycast for all its PoPs — 100+ locations all reachable via the same IP.</p>`
+    },
+    {
+      label: "Cache-Control headers",
+      body: `<div class="code-block">Cache-Control: public, max-age=86400          // cache 1 day, anywhere
+Cache-Control: private, max-age=3600          // browser only, not CDN
+Cache-Control: s-maxage=3600                  // CDN-specific TTL (overrides max-age for CDN)
+Cache-Control: no-cache                       // must revalidate (304 check)
+Cache-Control: no-store                       // never cache (sensitive data)
+Cache-Control: stale-while-revalidate=60      // serve stale for 60s while refreshing
+Surrogate-Key: product-123 user-456           // Fastly: tag-based purging</div>`
+    },
+    {
+      label: "Origin shield",
+      body: `<p>Without an origin shield: a CDN with 100 PoPs might have 100 concurrent cache misses for a new/expired asset, sending 100 simultaneous requests to your origin (thundering herd). Origin shield designates one central PoP as the "shield" — all other PoPs fetch from the shield instead of origin, collapsing 100 requests to 1.</p>`
+    },
+    {
+      label: "Cache purging",
+      body: `<p>When you deploy new code/content, old CDN-cached versions must be invalidated. Methods: URL-based purge (purge specific paths), wildcard purge, tag-based purge (Fastly surrogate keys — tag all assets for product-123, purge by tag on update), cache versioning (embed hash in filename: app.a3f2c1.js — old URLs simply expire naturally).</p>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">CDN is like a franchise restaurant chain. The head office (origin) has the master recipe. Each city has its own franchise (PoP) with pre-made dishes (cached content). You order locally — fast. If your city doesn't have that dish, the franchise calls head office, gets the recipe, and now serves it locally too. Purging is head office calling all franchises: "the recipe changed, throw out the old stock."</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"CDNs are only for static assets"</strong> — Modern CDNs (Cloudflare Workers, Lambda@Edge, Fastly Compute) run custom code at the edge. Dynamic personalisation, A/B testing, auth checks — all at the edge.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"Cache-Control: no-cache means don't cache"</strong> — It means "cache it, but validate with origin before using" (conditional GET). Use no-store to truly prevent caching.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">How would you design a CDN for YouTube videos?</div><div class="a">PoPs in major metros via anycast. Large objects (video chunks) cached by popularity + recency. Cache-Control: s-maxage=86400. Origin shield to prevent thundering herd on viral videos. Separate CDN tiers for hot/warm/cold content. Purge on video deletion/update.</div></div>
+<div class="interview-q"><div class="q">What is a cache stampede and how does a CDN prevent it?</div><div class="a">When a cached item expires, many simultaneous requests reach origin before the first response is cached. Solutions: origin shield (collapses to 1 origin request), stale-while-revalidate (serve stale while fetching fresh), request coalescing (CDN deduplicates concurrent misses).</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">DNS (CNAME to CDN)</span><span class="connect-pill">HTTP/1.1 (cache headers)</span><span class="connect-pill">TLS (termination at edge)</span><span class="connect-pill">Caching strategies (System Design)</span><span class="connect-pill">URL shortener design</span>
+</div>`
+    }
+  ]
+},
+
+// 12 — Proxies
+{
+  tag: "Network Infrastructure",
+  title: "Proxies",
+  oneliner: "A proxy is an intermediary server that sits between client and server, forwarding requests on behalf of one side — forward proxies act on behalf of clients, reverse proxies on behalf of servers.",
+  sections: [
+    {
+      label: "Why it exists",
+      body: `<p>Proxies decouple clients from servers, enabling: anonymity, access control, caching, load balancing, SSL termination, security filtering, and protocol translation. The direction (who the proxy represents) determines the type and use case.</p>`
+    },
+    {
+      label: "Forward proxy",
+      body: `<div class="subtopic-card"><div class="subtopic-name">Forward proxy</div><div class="subtopic-desc">Sits in front of clients. Client configures it explicitly (browser proxy settings) or it's transparent. Client → Forward Proxy → Internet. Uses: corporate internet filtering (block social media), anonymity (Tor is a chain of proxies), bypassing geo-restrictions, caching in offices. The server sees the proxy's IP, not the client's IP.</div></div>`
+    },
+    {
+      label: "Reverse proxy",
+      body: `<div class="subtopic-card"><div class="subtopic-name">Reverse proxy</div><div class="subtopic-desc">Sits in front of servers. Clients don't know it exists — they think they're talking to the server. Client → Internet → Reverse Proxy → Server(s). Uses: load balancing, SSL termination (decrypt TLS once, internal HTTP), caching, compression, rate limiting, WAF. Examples: Nginx, HAProxy, AWS ALB, Cloudflare. The server sees the proxy's IP; X-Forwarded-For header carries original client IP.</div></div>`
+    },
+    {
+      label: "Transparent proxy",
+      body: `<div class="subtopic-card"><div class="subtopic-name">Transparent proxy (intercepting proxy)</div><div class="subtopic-desc">Client doesn't know it exists and doesn't need to be configured. Network infrastructure (ISP, corporate gateway) redirects traffic through it. Used for: ISP caching, corporate filtering, traffic monitoring. Problem: breaks with HTTPS (client certificate mismatch) unless the proxy does SSL inspection by installing a custom CA cert on clients.</div></div>`
+    },
+    {
+      label: "SOCKS5",
+      body: `<div class="subtopic-card"><div class="subtopic-name">SOCKS5 proxy</div><div class="subtopic-desc">Layer 5 (session) proxy — works at TCP/UDP level, not application level. Protocol-agnostic: proxies any TCP or UDP traffic (HTTP, FTP, SMTP, anything). Supports authentication. Used by: SSH tunnels, VPN clients, Tor. Unlike HTTP proxies which only handle HTTP, SOCKS5 can proxy any protocol. No content inspection — fully opaque tunnel.</div></div>`
+    },
+    {
+      label: "Reverse proxy as load balancer",
+      body: `<div class="code-block">// Nginx reverse proxy + load balancer config
+upstream backend {
+    least_conn;                    // routing algorithm
+    server 10.0.0.1:8080;
+    server 10.0.0.2:8080;
+    server 10.0.0.3:8080;
+}
+
+server {
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/ssl/cert.pem;   // TLS termination here
+
+    location / {
+        proxy_pass http://backend;             // forward to upstream (HTTP internally)
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header Host $host;
+    }
+}</div>`
+    },
+    {
+      label: "Mental model",
+      body: `<div class="analogy-box">Forward proxy: a personal assistant who calls restaurants on your behalf — the restaurant knows the assistant's number, not yours. Reverse proxy: a hotel concierge — guests interact with the concierge, who routes to the right department (restaurant, spa, housekeeping). Guests don't know (or care) which specific staff member handles it. SOCKS5: a universal phone extension that patches through any type of call, regardless of language spoken.</div>`
+    },
+    {
+      label: "Common misconceptions",
+      body: `
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"VPN and proxy are the same"</strong> — A VPN encrypts all traffic at OS level and creates a virtual network interface. A proxy is application-level (configured per app/browser). VPNs are more comprehensive but heavier. SOCKS5 proxy can be lighter-weight for specific use cases.</div></div>
+<div class="misconception"><span class="icon">✕</span><div class="text"><strong>"Reverse proxy is just a load balancer"</strong> — Load balancing is one function. Reverse proxies also do: SSL termination, compression, caching, authentication, WAF, rate limiting, A/B routing, canary deployments. Nginx/Envoy as reverse proxy is a full traffic management layer.</div></div>
+`
+    },
+    {
+      label: "Interview perspective",
+      body: `
+<div class="interview-q"><div class="q">What's the difference between a forward and reverse proxy?</div><div class="a">Forward proxy represents clients (client-side). Clients configure it; servers don't know clients' real IPs. Reverse proxy represents servers (server-side). Clients don't know it exists; it routes to backend servers. Nginx in production is almost always a reverse proxy.</div></div>
+<div class="interview-q"><div class="q">Where does SSL termination happen in a typical production setup?</div><div class="a">At the reverse proxy (Nginx / AWS ALB). It terminates TLS, then forwards plaintext HTTP to backend services on the internal network. This offloads crypto computation from app servers and centralises certificate management. Internal traffic over VPC is considered trusted.</div></div>
+`
+    },
+    {
+      label: "Connects to",
+      body: `<div class="connects-grid">
+<span class="connect-pill">Load Balancing (System Design)</span><span class="connect-pill">TLS (termination)</span><span class="connect-pill">CDN (reverse proxy at scale)</span><span class="connect-pill">OSI Model (L4 vs L7 proxy)</span><span class="connect-pill">API Gateway</span>
+</div>`
+    }
+  ]
+}
+];
+
+function show(idx, el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  render(idx);
+}
+
+function render(idx) {
+  const t = topics[idx];
+  let html = `
+    <div class="topic-header">
+      <span class="topic-tag">${t.tag}</span>
+      <div class="topic-title">${t.title}</div>
+      <div class="topic-oneliner">${t.oneliner}</div>
+    </div>
+  `;
+  for (const s of t.sections) {
+    html += `
+      <div class="section">
+        <div class="section-label">${s.label}</div>
+        <div class="section-body">${s.body}</div>
+      </div>
+    `;
+  }
+  document.getElementById('content').innerHTML = html;
+  document.getElementById('content').scrollTop = 0;
+}
+
+render(0);
+</script>
+</body>
+</html>

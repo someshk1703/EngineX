@@ -1,0 +1,764 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);background:transparent}
+.shell{display:flex;height:100vh;min-height:600px;overflow:hidden}
+.nav{width:220px;min-width:220px;border-right:0.5px solid var(--color-border-tertiary);padding:12px 0;overflow-y:auto;background:var(--color-background-secondary)}
+.nav-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);padding:6px 16px 4px;letter-spacing:.06em;text-transform:uppercase}
+.nav-item{display:block;padding:7px 16px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border-left:2px solid transparent;line-height:1.4;transition:all .15s}
+.nav-item:hover{color:var(--color-text-primary);background:var(--color-background-primary)}
+.nav-item.active{color:var(--color-text-primary);border-left-color:#7F77DD;background:var(--color-background-primary);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+.topic{display:none}
+.topic.visible{display:block}
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin-right:4px;margin-bottom:4px}
+.tag-vital{background:#EEEDFE;color:#3C3489}
+.tag-perf{background:#E1F5EE;color:#085041}
+.tag-warn{background:#FAEEDA;color:#633806}
+h1.topic-title{font-size:20px;font-weight:500;margin-bottom:4px;color:var(--color-text-primary)}
+.topic-num{font-size:12px;color:var(--color-text-tertiary);margin-bottom:16px}
+.section{margin:20px 0 0}
+.section-label{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.section-label::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:14px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{font-weight:500;color:var(--color-text-primary)}
+.sub-block{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;margin:8px 0}
+.sub-block h4{font-size:13px;font-weight:500;margin-bottom:4px}
+.sub-block p{font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.code-block{background:#1e1e2e;border-radius:var(--border-radius-md);padding:14px 16px;margin:10px 0;overflow-x:auto}
+.code-block pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.7;color:#cdd6f4;white-space:pre}
+.kw{color:#cba6f7}.fn{color:#89b4fa}.cm{color:#6c7086;font-style:italic}.str{color:#a6e3a1}.num{color:#fab387}.var{color:#f38ba8}
+.pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:10px;font-weight:500;margin:2px}
+.pill-q{background:var(--color-background-info);color:var(--color-text-info)}
+.pill-gap{background:#FCEBEB;color:#791F1F}
+.pill-cs{background:#E1F5EE;color:#085041}
+.mistake{border-left:2px solid #E24B4A;padding:6px 10px;margin:6px 0;font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.tradeoff{border-left:2px solid #EF9F27;padding:6px 10px;margin:6px 0;font-size:13px;color:var(--color-text-secondary);line-height:1.6}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:28px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.arch-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.arch-box h4{font-size:12px;font-weight:500;margin-bottom:3px}
+.arch-box p{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.interview-q{font-size:13px;padding:8px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin:5px 0;border:0.5px solid var(--color-border-tertiary)}
+.interview-q .q{font-weight:500;margin-bottom:3px}
+.interview-q .depth{font-size:12px;color:var(--color-text-tertiary)}
+.connects{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+</style>
+
+<div class="shell">
+<nav class="nav" aria-label="Topics">
+  <div class="nav-title">Block 1 — Browser Internals</div>
+  <div class="nav-item active" onclick="show(0,this)">1. Browser Architecture</div>
+  <div class="nav-item" onclick="show(1,this)">2. Critical Rendering Path</div>
+  <div class="nav-item" onclick="show(2,this)">3. Reflow vs Repaint vs Composite</div>
+  <div class="nav-item" onclick="show(3,this)">4. JavaScript Engine (V8)</div>
+  <div class="nav-item" onclick="show(4,this)">5. Event Loop</div>
+  <div class="nav-item" onclick="show(5,this)">6. Web APIs vs JS Engine</div>
+  <div class="nav-item" onclick="show(6,this)">7. Memory Management</div>
+  <div class="nav-item" onclick="show(7,this)">8. Browser Caching</div>
+</nav>
+
+<main class="content">
+
+<div class="topic visible" id="t0">
+  <div class="topic-num">Topic 1 of 8 — Block 1: Browser Internals</div>
+  <h1 class="topic-title">Browser Architecture</h1>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-vital">LCP</span><span class="tag tag-vital">TTFB</span><span class="tag tag-vital">INP</span><span class="tag tag-perf">Security</span>
+  </div>
+
+  <div class="section"><div class="section-label">Definition</div>
+  <p class="prose">Modern browsers (Chrome, Edge) use a <strong>multi-process architecture</strong>. Rather than running the entire browser in one process (which meant a single rogue tab could crash the browser), Chrome's engineers split functionality across isolated OS processes: a <strong>Browser Process</strong> (the coordinator), one or more <strong>Renderer Processes</strong> (one per site, where your JS and DOM live), a <strong>GPU Process</strong> (handles compositing and drawing), a <strong>Network Process</strong> (fetches resources, independent of tabs), and <strong>Utility Processes</strong> (audio, extensions). Each process has its own memory space. Communication happens over IPC (inter-process communication) channels. This is Chromium's "Site Isolation" model, introduced as a full default post-Spectre (2018).</p></div>
+
+  <div class="section"><div class="section-label">How it works internally</div>
+  <p class="prose">When you open a tab, the Browser Process spawns a Renderer Process for that site origin. The Renderer Process contains the <strong>Blink rendering engine</strong> (HTML/CSS parsing, DOM), the <strong>V8 JS engine</strong>, and the <strong>Compositor thread</strong>. These run the main thread and compositor thread within that process. The Browser Process intercepts navigation requests and hands them to the Network Process, which performs DNS lookup, TLS, HTTP — entirely outside the renderer. When a response arrives, the Browser Process decides whether it needs a new Renderer Process (different origin = new process under Site Isolation). The GPU Process receives "draw quads" (layer tiles) from the compositor and calls into OpenGL/Vulkan/Metal to push pixels. <strong>The main thread and compositor thread are the two most important threads you'll be profiling.</strong> Long tasks on the main thread block rendering. Work on the compositor thread (CSS transforms, opacity) is fast because it never touches the main thread.</p></div>
+
+  <div class="section"><div class="section-label">Subtopics</div>
+  <div class="grid2">
+    <div class="sub-block"><h4>Browser Process</h4><p>Owns the UI chrome, address bar, tab management. Coordinates all other processes. Runs as a privileged OS process.</p></div>
+    <div class="sub-block"><h4>Renderer Process</h4><p>One per site origin (Site Isolation). Contains Blink + V8. Sandboxed — can't access disk or network directly. This is where your code runs.</p></div>
+    <div class="sub-block"><h4>GPU Process</h4><p>Single shared process. Receives rasterized tiles and composites them. Handles hardware-accelerated layers. GPU crashes don't take down tabs.</p></div>
+    <div class="sub-block"><h4>Network Process</h4><p>Owns all HTTP, WebSocket, fetch. Applies caching policies. Handles cookies, CORS, HSTS. Isolated from renderer for security.</p></div>
+    <div class="sub-block"><h4>Sandboxing</h4><p>Renderer processes run in OS sandbox (no syscalls to disk/network). Exploiting a JS bug can't escalate without a separate sandbox-escape exploit. This is why browser vulns chain two CVEs.</p></div>
+    <div class="sub-block"><h4>Site Isolation</h4><p>Enabled post-Spectre. Cross-origin iframes get their own Renderer Process. Prevents one origin from timing-attacking another's memory via speculative execution.</p></div>
+  </div></div>
+
+  <div class="section"><div class="section-label">Performance implications</div>
+  <p class="prose">Process isolation adds IPC overhead — postMessage across origins, structured-clone serialization cost. Memory cost: each Renderer Process has its own V8 heap, which inflates RAM per tab. <strong>TTFB</strong>: Network Process has dedicated resources — parallel DNS preresolution is possible because the Network Process isn't blocked by JS. <strong>INP</strong>: Long tasks on the main thread (Renderer Process) directly tank INP — the OS can't preempt it. <strong>LCP</strong>: Resource fetching in the Network Process overlaps with parsing in the Renderer, enabling the "preload scanner" to fetch ahead of parser blockage.</p></div>
+
+  <div class="section"><div class="section-label">Code example</div>
+  <div class="code-block"><pre><span class="cm">// Measuring main thread blocking — what kills INP</span>
+<span class="kw">const</span> <span class="var">observer</span> = <span class="kw">new</span> <span class="fn">PerformanceObserver</span>((list) => {
+  <span class="kw">for</span> (<span class="kw">const</span> entry <span class="kw">of</span> list.getEntries()) {
+    <span class="cm">// Long tasks: anything > 50ms blocks the main thread</span>
+    <span class="cm">// Renderer Process main thread = single-threaded JS + layout</span>
+    console.<span class="fn">warn</span>(<span class="str">`Long task: ${entry.duration.toFixed(1)}ms`</span>);
+  }
+});
+observer.<span class="fn">observe</span>({ type: <span class="str">'longtask'</span>, buffered: <span class="kw">true</span> });
+
+<span class="cm">// Offload work to a Worker — separate thread in same process</span>
+<span class="kw">const</span> worker = <span class="kw">new</span> <span class="fn">Worker</span>(<span class="str">'/heavy-worker.js'</span>);
+<span class="cm">// Worker runs in Renderer Process but on a separate OS thread</span>
+<span class="cm">// It has NO access to DOM (sandboxed within the process)</span>
+worker.<span class="fn">postMessage</span>({ data: largeArray });
+worker.onmessage = (e) => <span class="fn">updateUI</span>(e.data);
+<span class="cm">// Cross-process: structured-clone serializes the payload</span>
+<span class="cm">// Transferable objects (ArrayBuffer) avoid the copy cost</span></pre></div></div>
+
+  <div class="section"><div class="section-label">Real-world architecture use case</div>
+  <div class="sub-block"><h4>Micro-frontends & iframes at scale</h4><p class="prose" style="margin-top:4px">In micro-frontend architectures (e.g., Spotify's Web Player, Google Docs plugin system), different features load in different origins inside iframes. Post-Site Isolation, each iframe origin gets its own Renderer Process. This means one sluggish micro-frontend can't block another's main thread. Cross-MFE communication via <code>postMessage</code> pays an IPC + structured-clone cost — smart teams serialize with MessagePack instead of JSON and use SharedArrayBuffer (requires COOP/COEP headers) for zero-copy data sharing between Renderer Processes.</p></div></div>
+
+  <div class="section"><div class="section-label">Trade-offs</div>
+  <div class="tradeoff">Process isolation increases RAM usage significantly. A browser with 20 tabs can consume 2-4GB because each renderer has its own V8 heap (~50-100MB baseline). Chrome's "Tab Freezing" and "Memory Saver" features are direct mitigations.</div>
+  <div class="tradeoff">IPC between Browser/Renderer/GPU adds latency. Synchronous IPC calls (Mojo) block the calling thread. This is why Chrome moved rendering to be async-first — the compositor thread can draw without waiting on the main thread.</div>
+  <div class="tradeoff">Site Isolation breaks some legitimate uses of <code>document.domain</code> for same-site cross-origin access. Legacy single-sign-on systems that depended on parent-frame DOM access are broken under full Site Isolation.</div></div>
+
+  <div class="section"><div class="section-label">Common mistakes</div>
+  <div class="mistake">Conflating "thread" and "process" — Web Workers are threads within the Renderer Process. Service Workers run in their own separate Renderer-like context (distinct process). Shared Workers can be shared across tabs of the same origin.</div>
+  <div class="mistake">Assuming <code>postMessage</code> is free — structured clone is O(n) in data size. For large ArrayBuffers, use <code>transfer</code>: <code>worker.postMessage(buf, [buf])</code>. After transfer, the sender's reference is neutered.</div>
+  <div class="mistake">Placing CPU-heavy work in a Service Worker for "performance" — SW runs on the network fetch path, blocking it. Heavy CPU work in SW delays resource delivery.</div></div>
+
+  <div class="section"><div class="section-label">Interview perspective</div>
+  <div class="interview-q"><div class="q">"Why does Chrome use multiple processes instead of multiple threads?"</div><div class="depth">Expected depth: OS sandbox isolation, crash isolation, Spectre mitigation via Site Isolation. Mention Mojo IPC. Differentiate from multi-threaded design (no memory isolation between threads).</div></div>
+  <div class="interview-q"><div class="q">"What happens in the browser when you type a URL and press Enter?"</div><div class="depth">Classic. Most candidates stop at DNS → TCP → HTTP. Senior answer adds: Browser Process intercepts, Network Process DNS+TLS, Site Isolation check, new Renderer Process spawned, preload scanner fires, CRP begins. Connect to TTFB.</div></div>
+  <div class="interview-q"><div class="q">"How does browser architecture affect micro-frontend isolation?"</div><div class="depth">Practical system design bridge. Same-origin = same process, different origin = separate process. postMessage IPC cost. COOP/COEP for SharedArrayBuffer. Connects to micro-frontend architecture decisions.</div></div></div>
+
+  <div class="section"><div class="section-label">Connects to</div>
+  <div class="connects">
+    <span class="pill pill-cs">OS Processes vs Threads</span>
+    <span class="pill pill-cs">Memory isolation (virtual address space)</span>
+    <span class="pill pill-cs">Spectre/Meltdown (hardware side-channels)</span>
+    <span class="pill pill-q">Micro-frontend architecture</span>
+    <span class="pill pill-q">COOP/COEP security headers</span>
+    <span class="pill pill-q">SharedArrayBuffer</span>
+    <span class="pill pill-cs">IPC mechanisms</span>
+  </div></div>
+</div>
+
+<div class="topic" id="t1">
+  <div class="topic-num">Topic 2 of 8 — Block 1: Browser Internals</div>
+  <h1 class="topic-title">Critical Rendering Path</h1>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-vital">LCP</span><span class="tag tag-vital">FCP</span><span class="tag tag-vital">CLS</span><span class="tag tag-vital">TTI</span><span class="tag tag-vital">TTFB</span>
+  </div>
+
+  <div class="section"><div class="section-label">Definition</div>
+  <p class="prose">The Critical Rendering Path (CRP) is the sequence of steps the browser must complete before it can paint the first pixel to screen: parse HTML → build DOM → parse CSS → build CSSOM → merge into Render Tree → Layout (geometry calculation) → Paint (pixels into layers) → Composite (layers merged onto screen). The length of this pipeline — measured in bytes, round trips, and compute time — directly determines <strong>First Contentful Paint (FCP)</strong> and <strong>Largest Contentful Paint (LCP)</strong>. Optimizing the CRP means either reducing resources that block it, deferring work that's off the critical path, or shortening the network round-trip chain.</p></div>
+
+  <div class="section"><div class="section-label">How it works internally</div>
+  <p class="prose">The HTML parser (in Blink) is incremental — it emits DOM nodes as bytes arrive. When it encounters a <code>&lt;script&gt;</code> without <code>async</code>/<code>defer</code>, it <strong>stops parsing</strong> and waits for the script to download and execute (because JS can call <code>document.write</code> or modify the DOM). CSS is "render-blocking" but not "parser-blocking" — the parser keeps running, but the browser will not build the Render Tree until CSSOM is complete (because JS may query computed styles). The <strong>preload scanner</strong> is a second lightweight parser that runs ahead of the main parser, speculatively fetching <code>&lt;link&gt;</code>, <code>&lt;script&gt;</code>, and <code>&lt;img&gt;</code> tags while the main parser is blocked. Layout computes the exact position and size of every box (box model, floats, flexbox, grid) in a tree traversal. Paint records drawing commands into a <strong>display list</strong>. Compositing splits the page into GPU-uploaded layers and the GPU blends them — this step can happen on the compositor thread, off the main thread.</p></div>
+
+  <div class="section"><div class="section-label">Subtopics</div>
+  <div class="grid2">
+    <div class="sub-block"><h4>DOM Construction</h4><p>Bytes → tokens → nodes → DOM tree. Incremental. Parser halts on synchronous <code>&lt;script&gt;</code>.</p></div>
+    <div class="sub-block"><h4>CSSOM Construction</h4><p>CSS is not incremental for rendering — partial CSSOM is unusable. Render tree waits for full CSSOM. All stylesheets (not <code>media="print"</code>) are render-blocking.</p></div>
+    <div class="sub-block"><h4>Render Tree</h4><p>Merges DOM + CSSOM. Excludes <code>display:none</code> elements (visibility:hidden stays). Maps visible nodes to computed styles.</p></div>
+    <div class="sub-block"><h4>Layout (Reflow)</h4><p>Box model geometry for every visible node. Block formatting context. Percentage → absolute px resolution. A full layout traversal is O(n) but partial dirty-region relayouts are targeted.</p></div>
+    <div class="sub-block"><h4>Paint</h4><p>Converts Render Tree to display list commands (fill, stroke, shadow). Happens per layer. Not actual pixel rasterization yet.</p></div>
+    <div class="sub-block"><h4>Compositing</h4><p>Layers are rasterized (on raster threads or GPU), then the GPU compositor blends them. <code>transform</code>, <code>opacity</code> animations skip layout+paint entirely.</p></div>
+    <div class="sub-block"><h4>Render-blocking resources</h4><p>Synchronous <code>&lt;script&gt;</code> in <code>&lt;head&gt;</code>, non-media CSS. Use <code>async</code>/<code>defer</code>/<code>rel=preload</code> to get off the critical path.</p></div>
+    <div class="sub-block"><h4>Preload Scanner</h4><p>Lookahead parser. Fires <code>&lt;link rel=preload&gt;</code> equivalent for fonts, images, scripts before main parser reaches them. Critical for waterfall optimization.</p></div>
+  </div></div>
+
+  <div class="section"><div class="section-label">Performance implications</div>
+  <p class="prose"><strong>LCP</strong> is the primary victim: every render-blocking resource adds one RTT minimum before any paint. <strong>CLS</strong>: layout shifts happen when images without dimensions push content, or when late-loading fonts cause FOUT (Flash of Unstyled Text), triggering relayout. <strong>TTI</strong>: large JS bundles parsed synchronously delay interactivity. <strong>FCP</strong>: inlining critical CSS removes a round trip. The CRP length is roughly: <code>RTTs_for_critical_resources × RTT_latency + parse_time + layout_time</code>. On mobile (150ms RTT), every additional blocking resource costs 300ms (request + response).</p></div>
+
+  <div class="section"><div class="section-label">Code example</div>
+  <div class="code-block"><pre><span class="cm"><!-- WRONG: blocks parser, blocks render, all in &lt;head&gt; --></span>
+<span class="kw">&lt;head&gt;</span>
+  <span class="str">&lt;link rel="stylesheet" href="/all-styles.css"&gt;</span>  <span class="cm">&lt;!-- render-blocking --&gt;</span>
+  <span class="str">&lt;script src="/app.js"&gt;&lt;/script&gt;</span>              <span class="cm">&lt;!-- parser-blocking --&gt;</span>
+<span class="kw">&lt;/head&gt;</span>
+
+<span class="cm"><!-- RIGHT: CRP-optimized --></span>
+<span class="kw">&lt;head&gt;</span>
+  <span class="cm">&lt;!-- 1. Inline critical CSS (above-fold only) --&gt;</span>
+  <span class="str">&lt;style&gt;/* critical path styles only */&lt;/style&gt;</span>
+
+  <span class="cm">&lt;!-- 2. Preload LCP image — tells preload scanner early --&gt;</span>
+  <span class="str">&lt;link rel="preload" as="image" href="/hero.webp" fetchpriority="high"&gt;</span>
+
+  <span class="cm">&lt;!-- 3. Defer non-critical JS — doesn't block parser --&gt;</span>
+  <span class="str">&lt;script src="/app.js" defer&gt;&lt;/script&gt;</span>
+
+  <span class="cm">&lt;!-- 4. Lazy-load non-critical CSS via JS trick --&gt;</span>
+  <span class="str">&lt;link rel="stylesheet" href="/rest.css" media="print"
+    onload="this.media='all'"&gt;</span>
+<span class="kw">&lt;/head&gt;</span>
+
+<span class="cm">// In JS: measure CRP metrics</span>
+<span class="kw">const</span> [fcp] = performance.<span class="fn">getEntriesByName</span>(<span class="str">'first-contentful-paint'</span>);
+<span class="kw">const</span> [lcp] = performance.<span class="fn">getEntriesByType</span>(<span class="str">'largest-contentful-paint'</span>);
+console.<span class="fn">log</span>(<span class="str">`FCP: ${fcp?.startTime}ms, LCP: ${lcp?.startTime}ms`</span>);</pre></div></div>
+
+  <div class="section"><div class="section-label">Real-world architecture use case</div>
+  <div class="sub-block"><h4>Next.js streaming SSR + React Suspense</h4><p class="prose" style="margin-top:4px">Next.js 13+ uses HTTP streaming (chunked transfer encoding) to send HTML shell → flush critical above-fold HTML → stream in Suspense boundaries as they resolve. This maps directly to CRP optimization: the shell contains inlined critical CSS and sets up the render tree immediately. LCP element (e.g. hero image) arrives in the first flush with <code>fetchpriority="high"</code>. Non-critical content arrives in later chunks, avoiding blocking the initial paint. The network process receives chunks, the renderer parses and paints progressively — true parallel CRP.</p></div></div>
+
+  <div class="section"><div class="section-label">Trade-offs</div>
+  <div class="tradeoff">Inlining critical CSS blooms HTML payload size and breaks long-term caching of CSS files. Requires build-time extraction (Critters, penthouse) and must be regenerated when above-fold styles change.</div>
+  <div class="tradeoff"><code>rel=preload</code> on the wrong resource wastes bandwidth and can compete with the actual LCP resource. Preloading everything is worse than preloading nothing — priority scheduler gets confused.</div>
+  <div class="tradeoff">Streaming SSR with Suspense requires careful data-fetching architecture. Waterfalls in server-side fetches delay chunk streaming and negate the CRP benefit.</div></div>
+
+  <div class="section"><div class="section-label">Common mistakes</div>
+  <div class="mistake">Treating all CSS as render-blocking — <code>media="print"</code> CSS is not render-blocking. Adding <code>media</code> attributes to non-applicable CSS files removes them from the critical path.</div>
+  <div class="mistake">Using <code>async</code> on scripts that depend on the DOM or on other scripts — <code>async</code> executes immediately on download, which may be before DOMContentLoaded. <code>defer</code> respects document order and waits for parsing to complete.</div>
+  <div class="mistake">Not setting explicit width/height on images — causes CLS because the browser can't reserve layout space. The browser computes the aspect ratio box from HTML attributes before the image loads.</div>
+  <div class="mistake">Forgetting that <code>rel=preload</code> without <code>as=</code> is useless — the browser doesn't know the content type and uses the wrong priority queue.</div></div>
+
+  <div class="section"><div class="section-label">Interview perspective</div>
+  <div class="interview-q"><div class="q">"Walk me through everything that happens from the moment an HTML byte arrives to pixels on screen."</div><div class="depth">Don't skip steps. Bytes → tokenize → DOM nodes → CSSOM parallel build → Render Tree merge → Layout (box model) → Paint (display list) → Composite (GPU layers). Call out what blocks what.</div></div>
+  <div class="interview-q"><div class="q">"Why is CSS render-blocking but not parser-blocking?"</div><div class="depth">Key insight: the parser keeps going (preload scanner also fires), but Render Tree construction halts. Reason: JS can query computed styles (getComputedStyle), so CSSOM must be ready before any JS runs that follows a stylesheet.</div></div>
+  <div class="interview-q"><div class="q">"How would you optimize LCP for a Next.js e-commerce product page?"</div><div class="depth">System design answer: SSR with streaming, inline critical CSS, fetchpriority=high on hero image, preconnect to image CDN, aggressive image compression (AVIF/WebP), edge caching for HTML (low TTFB), remove render-blocking third-party scripts.</div></div></div>
+
+  <div class="section"><div class="section-label">Connects to</div>
+  <div class="connects">
+    <span class="pill pill-cs">HTTP/2 multiplexing (parallel resource fetching)</span>
+    <span class="pill pill-cs">TCP slow start (first RTT byte limit)</span>
+    <span class="pill pill-q">CDN edge caching (TTFB reduction)</span>
+    <span class="pill pill-q">React Suspense streaming</span>
+    <span class="pill pill-q">Core Web Vitals (LCP, CLS, FCP)</span>
+    <span class="pill pill-cs">Browser preload scanner</span>
+  </div></div>
+</div>
+
+<div class="topic" id="t2">
+  <div class="topic-num">Topic 3 of 8 — Block 1: Browser Internals</div>
+  <h1 class="topic-title">Reflow vs Repaint vs Compositing</h1>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-vital">INP</span><span class="tag tag-vital">CLS</span><span class="tag tag-perf">Frame budget</span><span class="tag tag-perf">Jank</span>
+  </div>
+
+  <div class="section"><div class="section-label">Definition</div>
+  <p class="prose">After the initial CRP, subsequent changes to the DOM or styles trigger one of three update pipelines, each with dramatically different costs. <strong>Reflow (Layout)</strong>: geometry must be recalculated — the browser traverses the DOM subtree recomputing positions, widths, heights. <strong>Repaint</strong>: geometry is unchanged but visual appearance changes (color, background, visibility) — the browser re-executes paint commands for affected layers without touching layout. <strong>Compositing</strong>: only layer transform or opacity changes — the GPU repositions or blends pre-rasterized layer tiles without touching the CPU-side pipeline at all. These three form a strict cost hierarchy: Reflow > Repaint > Compositing. The goal is to keep animations and interactions on the compositor thread, off the main thread.</p></div>
+
+  <div class="section"><div class="section-label">How it works internally</div>
+  <p class="prose">Blink maintains a <strong>dirty bit</strong> system. When a style or attribute changes, affected nodes are marked dirty. Before the next paint frame, Blink resolves dirty nodes bottom-up. If any geometry property changed (<code>width</code>, <code>height</code>, <code>top</code>, <code>margin</code>, <code>padding</code>, font metrics), it triggers a Layout pass — potentially reflowing the entire document if the change affects block formatting contexts. After Layout, Blink compares what changed against cached paint records; only dirty layers are repainted into their display lists. These display lists are then rasterized (on raster threads, via SkiaRenderer or Vulkan). The Compositor thread then takes the rasterized tiles and, for <strong>compositor-only properties</strong> (<code>transform</code>, <code>opacity</code>, <code>filter</code> on promoted layers), it can apply changes directly — the GPU repositions or alpha-blends tiles without involving the main thread at all. This is why <code>transform: translateX(100px)</code> is 60fps even when the main thread is busy.</p></div>
+
+  <div class="section"><div class="section-label">Subtopics</div>
+  <div class="grid2">
+    <div class="sub-block"><h4>Layout Thrashing</h4><p>Reading a layout property (<code>offsetWidth</code>) after a style write forces synchronous reflow mid-JS. Blink must flush the dirty queue immediately to return an accurate value.</p></div>
+    <div class="sub-block"><h4>Layer Promotion</h4><p>Elements get their own GPU layer (promoted) when: <code>will-change: transform</code>, <code>position: fixed</code>, 3D transforms, <code>&lt;video&gt;</code>/<code>&lt;canvas&gt;</code>, or overlapping elements with opacity. More layers = more GPU memory, not always faster.</p></div>
+    <div class="sub-block"><h4>Compositor-only properties</h4><p><code>transform</code> and <code>opacity</code> on promoted layers skip Layout and Paint entirely. Ideal for animations. <code>filter</code> can be compositor-only if layer is promoted.</p></div>
+    <div class="sub-block"><h4>Invalidation regions</h4><p>Blink tracks which parts of which layers are dirty. Only invalid regions are repainted. Changing a deeply nested element's color only repaints that layer's dirty rect.</p></div>
+    <div class="sub-block"><h4>requestAnimationFrame</h4><p>rAF callbacks fire before the browser's next paint, after all event handlers. Batching DOM reads and writes inside rAF prevents layout thrashing.</p></div>
+    <div class="sub-block"><h4>FastDOM / Batching</h4><p>Pattern for preventing layout thrashing: batch all DOM reads together (layout flushed once), then batch all writes. Never interleave read-write-read-write.</p></div>
+  </div></div>
+
+  <div class="section"><div class="section-label">Performance implications</div>
+  <p class="prose"><strong>INP</strong>: Layout thrashing during event handlers directly bloats interaction latency. A single <code>el.offsetWidth</code> read after a style write can force a synchronous 5-20ms reflow. <strong>CLS</strong>: Reflows that shift content (late image loads, dynamically inserted banners) cause layout shifts measured by CLS. <strong>Frame budget</strong>: At 60fps, each frame has 16.7ms. Layout + Paint + Composite must fit. A reflow of a complex DOM can easily exceed 10ms alone. Compositor-thread animations are immune to main-thread jank — they have their own 60fps budget independent of the main thread. This is why GSAP, Framer Motion, and CSS transitions prefer <code>transform</code>.</p></div>
+
+  <div class="section"><div class="section-label">Code example</div>
+  <div class="code-block"><pre><span class="cm">// ❌ Layout thrashing — forces synchronous reflow 3 times</span>
+<span class="kw">function</span> <span class="fn">badUpdate</span>(elements) {
+  elements.<span class="fn">forEach</span>(el => {
+    <span class="kw">const</span> w = el.offsetWidth;     <span class="cm">// READ: forces reflow #1</span>
+    el.style.width = w + <span class="num">10</span> + <span class="str">'px'</span>; <span class="cm">// WRITE</span>
+    <span class="kw">const</span> h = el.offsetHeight;    <span class="cm">// READ after write: reflow #2</span>
+    el.style.height = h + <span class="num">10</span> + <span class="str">'px'</span>;
+  });
+}
+
+<span class="cm">// ✅ Batch reads then writes</span>
+<span class="kw">function</span> <span class="fn">goodUpdate</span>(elements) {
+  <span class="kw">const</span> dims = elements.<span class="fn">map</span>(el => ({     <span class="cm">// All reads first</span>
+    w: el.offsetWidth, h: el.offsetHeight
+  }));
+  elements.<span class="fn">forEach</span>((el, i) => {           <span class="cm">// Then all writes</span>
+    el.style.width  = dims[i].w + <span class="num">10</span> + <span class="str">'px'</span>;
+    el.style.height = dims[i].h + <span class="num">10</span> + <span class="str">'px'</span>;
+  });
+}
+
+<span class="cm">// ✅ Compositor-only animation — zero layout/paint cost</span>
+<span class="cm">// CSS: .slide { transition: transform 300ms ease; will-change: transform; }</span>
+<span class="cm">// JS:</span>
+el.style.transform = <span class="str">`translateX(${offset}px)`</span>;
+<span class="cm">// Animator runs on compositor thread, main thread untouched</span>
+
+<span class="cm">// ❌ Equivalent but causes reflow every frame:</span>
+el.style.left = offset + <span class="str">'px'</span>; <span class="cm">// triggers layout → paint → composite</span></pre></div></div>
+
+  <div class="section"><div class="section-label">Real-world architecture use case</div>
+  <div class="sub-block"><h4>Virtual scroll in large data tables (e.g. AG Grid, TanStack Virtual)</h4><p class="prose" style="margin-top:4px">Rendering 100k rows in a DOM would trigger catastrophic reflows on every scroll event. Virtual list libraries maintain a fixed DOM window (~30 rows) and update only which rows are visible. Critically: they use <code>transform: translateY</code> to position the content container — this is a compositor-only operation. The scroll event calculates new visible range (JS, main thread), updates DOM nodes (write batch), and sets the container's translateY. The translation itself happens on the GPU compositor — the visible repositioning is smooth even if the JS data-swapping takes 5ms. This is the canonical "hybrid" performance pattern: main thread for logic, compositor for motion.</p></div></div>
+
+  <div class="section"><div class="section-label">Trade-offs</div>
+  <div class="tradeoff">Layer promotion (<code>will-change: transform</code>) consumes GPU memory per layer. Promoting every element is a memory leak pattern — GPU memory is limited (especially mobile). Only promote elements that actually animate.</div>
+  <div class="tradeoff">Over-use of <code>will-change</code> hints causes the browser to pre-allocate layer backing before any animation, increasing memory pressure and potentially hurting performance on low-end devices more than the animation would have.</div>
+  <div class="tradeoff">CSS <code>contain: strict</code> creates layout isolation but prevents elements inside from contributing to the document's scroll height — a footgun in dynamic content containers.</div></div>
+
+  <div class="section"><div class="section-label">Common mistakes</div>
+  <div class="mistake">Using <code>position: left/top</code> for animations instead of <code>transform: translate</code> — left/top trigger full Layout + Paint on every frame. This is the single most common cause of animation jank in production apps.</div>
+  <div class="mistake">Reading <code>scrollTop</code>, <code>getBoundingClientRect()</code>, or any computed geometry inside a rAF write phase — these force a synchronous layout flush mid-frame, wasting the entire frame budget.</div>
+  <div class="mistake">Animating <code>box-shadow</code> or <code>border-radius</code> on a large element — these trigger repaint on every frame (not compositor-only). Fade a pseudo-element with opacity instead.</div>
+  <div class="mistake">Forgetting that <code>filter</code> only avoids repaint when the element is on its own compositor layer. Without promotion, filter changes force repaint.</div></div>
+
+  <div class="section"><div class="section-label">Interview perspective</div>
+  <div class="interview-q"><div class="q">"What CSS properties can you animate without triggering layout or paint?"</div><div class="depth">Answer: <code>transform</code> and <code>opacity</code> (on promoted layers). Everything else causes at minimum repaint. The follow-up is always "why" — compositor thread, GPU tile blending, no main thread involvement.</div></div>
+  <div class="interview-q"><div class="q">"What is layout thrashing and how do you fix it?"</div><div class="depth">Interleaved DOM reads and writes that each force synchronous reflow. Fix: batch reads, then writes. Use rAF. FastDOM library pattern. Interview often follows up with "show me code" so be ready.</div></div>
+  <div class="interview-q"><div class="q">"How does will-change work, and when should you NOT use it?"</div><div class="depth">Creates a new stacking context and compositor layer. Don't use it on static elements, don't use it on too many elements simultaneously, don't leave it on after animation ends. Add/remove dynamically around animation lifecycle.</div></div></div>
+
+  <div class="section"><div class="section-label">Connects to</div>
+  <div class="connects">
+    <span class="pill pill-cs">GPU rendering pipeline</span>
+    <span class="pill pill-cs">CPU vs GPU memory tradeoffs</span>
+    <span class="pill pill-q">Core Web Vitals — INP, CLS</span>
+    <span class="pill pill-q">React reconciler batching (state updates → DOM writes)</span>
+    <span class="pill pill-q">Virtual scrolling architecture</span>
+    <span class="pill pill-cs">Frame budget (16.7ms at 60fps)</span>
+  </div></div>
+</div>
+
+<hr class="divider">
+<div style="text-align:center;font-size:12px;color:var(--color-text-tertiary);margin:-10px 0 20px">─── Topics 1–3 complete ───</div>
+
+<div class="topic" id="t3">
+  <div class="topic-num">Topic 4 of 8 — Block 1: Browser Internals</div>
+  <h1 class="topic-title">JavaScript Engine — V8 Internals</h1>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-vital">INP</span><span class="tag tag-vital">TTI</span><span class="tag tag-perf">Parse time</span><span class="tag tag-perf">JIT</span>
+  </div>
+
+  <div class="section"><div class="section-label">Definition</div>
+  <p class="prose">V8 is Google's open-source JavaScript (and WebAssembly) engine, used in Chrome and Node.js. It compiles JS to machine code using a two-tier pipeline: <strong>Ignition</strong> (an interpreter that generates and executes bytecode) and <strong>TurboFan</strong> (an optimizing JIT compiler that compiles "hot" functions to highly optimized machine code). V8 also uses <strong>hidden classes</strong> and <strong>inline caches</strong> to give dynamically-typed JS the performance characteristics of statically-typed languages — when your objects have consistent shapes. V8 is why "write predictable, shape-consistent objects" is a performance rule, not just a style preference.</p></div>
+
+  <div class="section"><div class="section-label">How it works internally</div>
+  <p class="prose">Source JS → <strong>Scanner + Parser</strong> → AST → <strong>Ignition</strong> generates bytecode and begins interpreting. V8 profiles which functions are called frequently ("hot functions"). Hot functions are passed to <strong>TurboFan</strong>, which uses <strong>speculative optimization</strong>: it assumes the types it's seen so far are stable and generates type-specialized machine code (e.g., assuming <code>x</code> is always a Smi — small integer). This code runs at near-native speed. If the type assumption breaks (<code>x</code> suddenly becomes a string), TurboFan <strong>deoptimizes</strong> — throws away the compiled code and falls back to Ignition. <strong>Hidden classes (Shapes)</strong>: V8 assigns a "shape" to each object based on its property layout. Objects with the same properties in the same order share a shape, allowing V8 to store properties at fixed offsets (like a C struct) rather than doing hash lookups. <strong>Inline caches (ICs)</strong>: call sites remember the shapes they've seen. A monomorphic IC (one shape) is fastest; polymorphic (2-4 shapes) is slower; megamorphic (5+ shapes) falls back to hash lookup.</p></div>
+
+  <div class="section"><div class="section-label">Subtopics</div>
+  <div class="grid2">
+    <div class="sub-block"><h4>Ignition (Interpreter)</h4><p>Generates compact bytecode. Starts executing immediately. Collects type feedback. Lower startup overhead than compiling everything upfront.</p></div>
+    <div class="sub-block"><h4>TurboFan (JIT)</h4><p>Sea-of-nodes IR compiler. Speculative optimization based on Ignition's type feedback. Inlines functions, eliminates bounds checks, vectorizes loops.</p></div>
+    <div class="sub-block"><h4>Hidden Classes (Shapes/Maps)</h4><p>Objects with the same property order share a shape. Shape transitions occur when properties are added out of order. Shapes enable fixed-offset property access — critical for JIT perf.</p></div>
+    <div class="sub-block"><h4>Inline Caching</h4><p>Property access sites cache the last shape(s) seen. Monomorphic → Polymorphic → Megamorphic. Megamorphic = generic hash map lookup. Shape consistency = monomorphic ICs = fast.</p></div>
+    <div class="sub-block"><h4>Deoptimization</h4><p>When a type assumption is violated, TurboFan discards compiled code, re-executes in Ignition, relearns types, and may recompile. Deopts appear in Chrome's "Optimize JavaScript" DevTools panel.</p></div>
+    <div class="sub-block"><h4>Heap Zones</h4><p>V8 heap: Young generation (nursery + intermediate — short-lived objects), Old generation (survived GC cycles), Large object space (>256KB), Code space (compiled bytecode/machine code).</p></div>
+  </div></div>
+
+  <div class="section"><div class="section-label">Performance implications</div>
+  <p class="prose"><strong>TTI</strong>: Script parse and compile time is often ignored. V8 must parse all JS before executing it (unless code splitting is used). A 500KB bundle takes ~300-500ms to parse on mobile. <strong>INP</strong>: Functions that repeatedly deoptimize add latency on every call. JIT-compiled code is 10-100x faster than interpreted bytecode. <strong>Memory</strong>: Shape explosion (many object shapes) inflates V8's internal metadata structures. Each shape has a transition tree — pathological code can generate thousands of shapes for what looks like simple object creation.</p></div>
+
+  <div class="section"><div class="section-label">Code example</div>
+  <div class="code-block"><pre><span class="cm">// ❌ Shape inconsistency — breaks hidden class optimization</span>
+<span class="kw">function</span> <span class="fn">makePoint</span>(x, y, hasZ) {
+  <span class="kw">const</span> p = { x, y };
+  <span class="kw">if</span> (hasZ) p.z = <span class="num">0</span>; <span class="cm">// Added conditionally → two different shapes</span>
+  <span class="kw">return</span> p;            <span class="cm">// ICs see 2 shapes → polymorphic</span>
+}
+
+<span class="cm">// ✅ Shape consistent — always same property order</span>
+<span class="kw">function</span> <span class="fn">makePoint</span>(x, y, z = <span class="num">0</span>) {
+  <span class="kw">return</span> { x, y, z }; <span class="cm">// Always same shape → monomorphic ICs</span>
+}
+
+<span class="cm">// ❌ Type confusion — forces deoptimization</span>
+<span class="kw">function</span> <span class="fn">add</span>(a, b) { <span class="kw">return</span> a + b; }
+<span class="fn">add</span>(<span class="num">1</span>, <span class="num">2</span>);       <span class="cm">// Smi + Smi → TurboFan optimizes for integers</span>
+<span class="fn">add</span>(<span class="str">'a'</span>, <span class="str">'b'</span>);   <span class="cm">// String + String → DEOPT → recompile</span>
+
+<span class="cm">// ✅ Monomorphic call site — stable types</span>
+<span class="kw">function</span> <span class="fn">addInt</span>(a, b) { <span class="kw">return</span> (a | <span class="num">0</span>) + (b | <span class="num">0</span>); } <span class="cm">// Force int32</span>
+
+<span class="cm">// Check deopt reasons in Node.js:</span>
+<span class="cm">// node --trace-deopt --trace-opt yourScript.js</span>
+<span class="cm">// In Chrome: DevTools → Performance → "Optimize JavaScript"</span></pre></div></div>
+
+  <div class="section"><div class="section-label">Real-world architecture use case</div>
+  <div class="sub-block"><h4>React's reconciler and V8 shape optimization</h4><p class="prose" style="margin-top:4px">React's Fiber node objects are created with consistent property layouts — the team explicitly designed Fiber to have stable shapes so V8's hidden class system gives monomorphic ICs on Fiber property accesses. In the React source, you'll see properties initialized to <code>null</code> even when not used — this ensures every Fiber has the same shape from construction. This is not cargo-culted OOP: it's a deliberate V8 optimization. Similarly, Redux's reducers returning plain objects with the same shape every time ensure the ICs on <code>state.someKey</code> stay monomorphic across renders.</p></div></div>
+
+  <div class="section"><div class="section-label">Trade-offs</div>
+  <div class="tradeoff">V8's speculative compilation trades correctness for speed, then corrects when wrong. In type-diverse code (third-party integrations, dynamic APIs), deopts are unavoidable — don't over-optimize for V8 at the cost of code clarity.</div>
+  <div class="tradeoff">Hidden class optimization only helps for object property access. Array access uses a separate element kind system (Smi array, Double array, generic array). Mixing types in arrays causes the array to become "holey" and lose fast-element optimizations.</div></div>
+
+  <div class="section"><div class="section-label">Common mistakes</div>
+  <div class="mistake">Deleting object properties with <code>delete obj.key</code> — this creates a "dictionary mode" object that abandons the hidden class system entirely. Set to <code>undefined</code> or <code>null</code> instead.</div>
+  <div class="mistake">Mixing numbers and objects in arrays — <code>[1, 2, 'three']</code> forces V8 to use a generic array element kind, losing Smi or Double array fast paths. Keep arrays homogeneous.</div>
+  <div class="mistake">Assuming "modern JS = slow" or "classes are slow" — V8 heavily optimizes class syntax since shapes are more predictable with <code>class</code> than dynamic prototypal patterns.</div></div>
+
+  <div class="section"><div class="section-label">Interview perspective</div>
+  <div class="interview-q"><div class="q">"How does V8 compile JavaScript to fast code?"</div><div class="depth">Walk: Ignition bytecode → type feedback → TurboFan speculation → deopt path. Hidden classes = shape stability = monomorphic ICs. This is a senior/staff-level question — most candidates stop at "JIT compiles it".</div></div>
+  <div class="interview-q"><div class="q">"Why is `delete` bad for performance?"</div><div class="depth">Dictionary mode — V8 demotes the object from its hidden class to a hash-map-backed slow object. Object ceases to benefit from shape optimization. All subsequent property accesses on that object are hash lookups.</div></div>
+  <div class="interview-q"><div class="q">"What does 'deoptimization' mean in V8 and what causes it?"</div><div class="depth">Type-specialized machine code gets invalidated when a type assumption is violated. V8 bails out to Ignition, re-profiles, may re-JIT. Common causes: type-polymorphic functions, mixed arrays, argument count mismatches.</div></div></div>
+
+  <div class="section"><div class="section-label">Connects to</div>
+  <div class="connects">
+    <span class="pill pill-cs">JIT compilation theory</span>
+    <span class="pill pill-cs">Type inference systems</span>
+    <span class="pill pill-cs">CPU branch prediction (speculation analogy)</span>
+    <span class="pill pill-q">Node.js performance profiling</span>
+    <span class="pill pill-q">WebAssembly (V8's Wasm tier)</span>
+    <span class="pill pill-cs">Garbage collection (same V8 heap)</span>
+  </div></div>
+</div>
+
+<div class="topic" id="t4">
+  <div class="topic-num">Topic 5 of 8 — Block 1: Browser Internals</div>
+  <h1 class="topic-title">Event Loop</h1>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-vital">INP</span><span class="tag tag-vital">TTI</span><span class="tag tag-perf">Concurrency model</span>
+  </div>
+
+  <div class="section"><div class="section-label">Definition</div>
+  <p class="prose">The event loop is the mechanism by which JavaScript achieves concurrency despite running on a single thread. It continuously checks whether the call stack is empty and, if so, pulls the next task from its task queues and pushes it onto the stack. The critical architectural insight: JS itself is single-threaded, but the <em>environment</em> (browser, Node.js) is multi-threaded. Web APIs execute asynchronous work on separate threads and deposit callbacks into the event loop's queues. The event loop's job is sequencing these callbacks onto the JS thread in a defined priority order: <strong>microtask queue</strong> (Promises, MutationObserver) is drained completely before the next <strong>macrotask</strong> (setTimeout, setInterval, I/O, UI events). <code>requestAnimationFrame</code> sits between macrotask execution and the browser's rendering step.</p></div>
+
+  <div class="section"><div class="section-label">How it works internally</div>
+  <p class="prose">One iteration of the event loop ("tick"): (1) Pick one <strong>macrotask</strong> from the task queue and execute it to completion on the call stack. (2) After the macrotask completes, drain the entire <strong>microtask queue</strong> — run every microtask, including any microtasks queued by microtasks, until the queue is empty. (3) If rendering is due (frame budget), the browser runs <code>requestAnimationFrame</code> callbacks, then performs style recalculation, layout, paint, composite. (4) Return to step 1. The HTML spec mandates that the microtask checkpoint runs after <em>every</em> task and after every <em>script</em> evaluation — which means Promise chains execute entirely before any setTimeout callback, even a <code>setTimeout(fn, 0)</code>. In V8, microtasks are processed by <code>v8::MicrotasksScope</code> — a scope that flushes the microtask queue on scope exit.</p></div>
+
+  <div class="section"><div class="section-label">Subtopics</div>
+  <div class="grid2">
+    <div class="sub-block"><h4>Call Stack</h4><p>LIFO stack of execution contexts. Functions push frames; return pops them. Stack overflow = exceeding maximum depth (~10k frames in V8). JS executes synchronously within a single stack frame.</p></div>
+    <div class="sub-block"><h4>Macrotask Queue (Task Queue)</h4><p>setTimeout, setInterval, setImmediate (Node), I/O callbacks, UI events (click, input), MessageChannel. One macrotask per event loop iteration.</p></div>
+    <div class="sub-block"><h4>Microtask Queue</h4><p>Promise callbacks (.then/.catch/.finally), queueMicrotask(), MutationObserver callbacks, async/await continuations. Entire queue drained between macrotasks. Starvation risk: infinite microtask loops block rendering forever.</p></div>
+    <div class="sub-block"><h4>requestAnimationFrame</h4><p>Fires after macrotask + microtask drain, before the rendering pipeline. Guaranteed to run once per frame (not per event loop tick). The right place for DOM writes before paint.</p></div>
+    <div class="sub-block"><h4>requestIdleCallback</h4><p>Runs when the browser has idle time after a frame. No frame-budget pressure. Correct for analytics, prefetching, non-urgent work. Can be cancelled if frame overruns.</p></div>
+    <div class="sub-block"><h4>async/await desugaring</h4><p><code>await x</code> suspends the async function, schedules the continuation as a microtask when x resolves. The function is paused but the event loop continues. Continuation is a Promise .then callback.</p></div>
+  </div></div>
+
+  <div class="section"><div class="section-label">Performance implications</div>
+  <p class="prose"><strong>INP</strong>: Event handlers are macrotasks. A long-running event handler (>50ms) delays the next task and all rendering. The browser cannot paint mid-task — so a 200ms synchronous computation in a click handler will freeze the UI for 200ms regardless of how many Promises you use inside it. <strong>TTI</strong>: Heavy JS initialization in macrotasks (parsing, hydration) blocks the event loop, delaying the point where the browser can respond to user input. <strong>Microtask starvation</strong>: A recursive Promise chain that always creates a new Promise can monopolize the event loop — nothing gets rendered while microtasks run.</p></div>
+
+  <div class="section"><div class="section-label">Code example</div>
+  <div class="code-block"><pre><span class="cm">// Execution order quiz — critical for interviews</span>
+console.<span class="fn">log</span>(<span class="str">'1'</span>);                         <span class="cm">// sync</span>
+
+<span class="fn">setTimeout</span>(() => console.<span class="fn">log</span>(<span class="str">'2'</span>), <span class="num">0</span>);  <span class="cm">// macrotask</span>
+
+Promise.<span class="fn">resolve</span>().<span class="fn">then</span>(() => {
+  console.<span class="fn">log</span>(<span class="str">'3'</span>);                       <span class="cm">// microtask</span>
+  <span class="fn">queueMicrotask</span>(() => console.<span class="fn">log</span>(<span class="str">'4'</span>)); <span class="cm">// microtask nested in microtask</span>
+});
+
+console.<span class="fn">log</span>(<span class="str">'5'</span>);                         <span class="cm">// sync</span>
+<span class="cm">// Output: 1, 5, 3, 4, 2</span>
+<span class="cm">// Sync → microtask drain (3,4) → macrotask (2)</span>
+
+<span class="cm">// ❌ Blocking the event loop — kills INP</span>
+button.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, () => {
+  <span class="kw">const</span> result = <span class="fn">heavyComputation</span>(); <span class="cm">// 300ms sync work</span>
+  <span class="fn">updateUI</span>(result);                  <span class="cm">// Browser can't render until this returns</span>
+});
+
+<span class="cm">// ✅ Yield to event loop with scheduler API</span>
+button.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, <span class="kw">async</span> () => {
+  <span class="kw">const</span> first = <span class="fn">processChunk</span>(data, <span class="num">0</span>, <span class="num">1000</span>);
+  <span class="kw">await</span> scheduler.<span class="fn">yield</span>();   <span class="cm">// Yield: flush pending tasks/rendering</span>
+  <span class="kw">const</span> second = <span class="fn">processChunk</span>(data, <span class="num">1000</span>, <span class="num">2000</span>);
+  <span class="fn">updateUI</span>([...first, ...second]);
+});</pre></div></div>
+
+  <div class="section"><div class="section-label">Real-world architecture use case</div>
+  <div class="sub-block"><h4>React's concurrent mode scheduler</h4><p class="prose" style="margin-top:4px">React's concurrent mode (via its own <code>Scheduler</code> package) implements cooperative multitasking on the event loop. It slices React's reconciliation work into 5ms chunks, yielding to the event loop between chunks using <code>MessageChannel</code> (a macrotask — chosen because it has lower overhead than setTimeout(0) in most browsers and fires before requestAnimationFrame). This means user input (another macrotask) can interrupt reconciliation. The scheduler tracks elapsed time with <code>performance.now()</code> and breaks out of the work loop when a deadline is exceeded. <code>startTransition</code> marks updates as low-priority — they're processed in background chunks, interruptible by high-priority input events.</p></div></div>
+
+  <div class="section"><div class="section-label">Trade-offs</div>
+  <div class="tradeoff">Splitting work into async chunks (chunked processing via yielding) adds overhead: each chunk resumption is a new macrotask, meaning rendering can occur between chunks. This is usually desirable but can cause visual tearing if the intermediate state is visible.</div>
+  <div class="tradeoff">Web Workers move computation off the main thread entirely — but they can't touch the DOM. The serialization cost of postMessage for large data can exceed the computation savings for small work.</div></div>
+
+  <div class="section"><div class="section-label">Common mistakes</div>
+  <div class="mistake">Thinking <code>async/await</code> makes code non-blocking — <code>await</code> only yields at the await point. Synchronous code before the first await in an async function still runs synchronously and blocks the call stack.</div>
+  <div class="mistake">Using <code>setTimeout(fn, 0)</code> to "defer to next tick" — this schedules a macrotask, not the next microtask. If you need the next microtask checkpoint, use <code>queueMicrotask(fn)</code> or <code>Promise.resolve().then(fn)</code>.</div>
+  <div class="mistake">Infinite Promise chains as "event loops" — mutually recursive async functions with no base case drain the microtask queue indefinitely, starving rendering and input handling.</div></div>
+
+  <div class="section"><div class="section-label">Interview perspective</div>
+  <div class="interview-q"><div class="q">"What is the output of [code with setTimeout, Promise, sync]? Explain why."</div><div class="depth">Order: sync code → microtask drain → macrotask. Be precise about nested microtasks (queued microtasks run before the next macrotask but after the outer microtask returns). Interviewers test this at FAANG consistently.</div></div>
+  <div class="interview-q"><div class="q">"How does async/await work under the hood?"</div><div class="depth">Syntax sugar over Promise + generator pattern. Each <code>await</code> suspends the function, registers .then on the awaited promise, and the continuation is a microtask. The async function frame is preserved on the heap (not the stack) while suspended.</div></div>
+  <div class="interview-q"><div class="q">"How does React's concurrent mode relate to the event loop?"</div><div class="depth">Senior-level. React scheduler uses MessageChannel macrotasks for work slicing. Concurrent mode makes React's reconciliation preemptible by yielding the event loop between chunks. startTransition marks low-priority updates.</div></div></div>
+
+  <div class="section"><div class="section-label">Connects to</div>
+  <div class="connects">
+    <span class="pill pill-cs">OS scheduling (cooperative vs preemptive)</span>
+    <span class="pill pill-cs">Coroutines / generators</span>
+    <span class="pill pill-q">React concurrent mode</span>
+    <span class="pill pill-q">Node.js event loop (libuv)</span>
+    <span class="pill pill-cs">Single-threaded concurrency model</span>
+    <span class="pill pill-cs">Back-pressure in streams</span>
+  </div></div>
+</div>
+
+<div class="topic" id="t5">
+  <div class="topic-num">Topic 6 of 8 — Block 1: Browser Internals</div>
+  <h1 class="topic-title">Web APIs vs JS Engine</h1>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-perf">Concurrency</span><span class="tag tag-perf">Threading model</span><span class="tag tag-vital">INP</span>
+  </div>
+
+  <div class="section"><div class="section-label">Definition</div>
+  <p class="prose">The JavaScript engine (V8) knows nothing about the DOM, network, timers, or file system. These are provided by the <strong>host environment</strong> (browser or Node.js) via <strong>Web APIs</strong> — C++ implementations that live outside V8. When your JS code calls <code>setTimeout</code>, <code>fetch</code>, or <code>addEventListener</code>, it's calling into the browser's C++ layer, not V8. V8 only handles pure ECMAScript. The browser's Web APIs execute asynchronous work on their own threads (the Network Process for <code>fetch</code>, the OS timer thread for <code>setTimeout</code>) and when complete, deposit the callback into the event loop's task queue for V8 to eventually execute. This separation is the architectural reason JS can be non-blocking despite being single-threaded.</p></div>
+
+  <div class="section"><div class="section-label">How it works internally</div>
+  <p class="prose"><code>setTimeout(fn, 100)</code>: V8 passes <code>fn</code> and the delay to the browser's timer Web API (implemented in the Browser Process, backed by OS high-resolution timers). V8 continues executing. After 100ms, the timer Web API pushes a macrotask containing <code>fn</code> into the event loop's task queue. V8 pulls it at the next available iteration. <code>fetch(url)</code>: V8 passes the request to the Network Process via IPC. The Network Process performs DNS, TLS, HTTP independently of V8. On response, it posts a task back to the Renderer Process's event loop with the response data, which resolves the Promise. <code>addEventListener('click', fn)</code>: The browser registers the listener in a C++ event dispatch table. When the OS reports a mouse event, the browser routes it to the correct Renderer Process and posts a task for <code>fn</code> onto the event loop. The key: <em>V8 never polls, never blocks waiting, never owns a timer</em> — it only processes callbacks when the event loop hands them over.</p></div>
+
+  <div class="section"><div class="section-label">Subtopics</div>
+  <div class="grid2">
+    <div class="sub-block"><h4>Timer APIs (setTimeout, setInterval)</h4><p>Minimum delay is ~1ms (4ms in nested/background tabs per spec). Delay is minimum, not guarantee — if the call stack is busy, firing is delayed. setInterval can skip fires if callback exceeds interval.</p></div>
+    <div class="sub-block"><h4>fetch / XHR</h4><p>Handled by the Network Process. Returns a Promise. Response streaming (ReadableStream) allows processing chunks before full download. fetch does NOT fire XHR progress events — use ReadableStream for progress.</p></div>
+    <div class="sub-block"><h4>DOM Events</h4><p>OS input → Browser Process → Renderer IPC → event dispatch. addEventListener is a C++ binding. Event bubbling and capture happen in C++ (Blink's event system), callbacks are JS. Touch events have special coalescing behavior to avoid flooding the event loop.</p></div>
+    <div class="sub-block"><h4>Web Workers</h4><p>Separate thread with its own JS context (separate V8 isolate). No shared memory by default — only postMessage. Can use SharedArrayBuffer + Atomics for shared memory with explicit synchronization.</p></div>
+    <div class="sub-block"><h4>Service Worker</h4><p>A special type of Worker that intercepts network requests. Lives in its own Renderer-like context. Acts as a client-side proxy — can cache, modify, or fabricate responses. Critical for PWA offline behavior.</p></div>
+    <div class="sub-block"><h4>WebSocket</h4><p>Persistent TCP connection managed by the browser (Network Process). <code>onmessage</code> fires a macrotask per message. High-frequency messages can flood the event loop — throttle in the handler.</p></div>
+  </div></div>
+
+  <div class="section"><div class="section-label">Performance implications</div>
+  <p class="prose"><strong>INP</strong>: DOM events land as macrotasks, so a long-running prior macrotask will delay event handling. Passive event listeners (touch/scroll) — declaring <code>{ passive: true }</code> tells the browser the handler won't call <code>preventDefault()</code>, allowing the compositor to scroll immediately without waiting for the JS handler to run. This is critical for scroll performance. <strong>fetch vs XHR</strong>: Both use the Network Process, but <code>fetch</code> is Promise-based (microtask continuations), giving it slightly different scheduling than XHR's onload macrotask. <strong>Timers in background tabs</strong>: Chrome throttles setTimeout to ≥1000ms in background tabs to save CPU — don't rely on precise timers for background work.</p></div>
+
+  <div class="section"><div class="section-label">Code example</div>
+  <div class="code-block"><pre><span class="cm">// The separation: V8 handles none of this directly</span>
+<span class="fn">setTimeout</span>(() => {}, <span class="num">0</span>);   <span class="cm">// → Browser timer API → macrotask queue</span>
+<span class="fn">fetch</span>(<span class="str">'/api'</span>);              <span class="cm">// → Network Process → Promise microtask</span>
+document.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, cb); <span class="cm">// → C++ event table</span>
+
+<span class="cm">// Passive listeners — critical for scroll performance</span>
+window.<span class="fn">addEventListener</span>(<span class="str">'touchstart'</span>, handler, { passive: <span class="kw">true</span> });
+<span class="cm">// Without passive: browser waits for handler to check preventDefault()</span>
+<span class="cm">// before scrolling → janky scrolling on mobile</span>
+<span class="cm">// With passive: compositor scrolls immediately, handler fires async</span>
+
+<span class="cm">// Fetch with streaming response — Network Process sends chunks</span>
+<span class="kw">const</span> resp = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">'/large-data'</span>);
+<span class="kw">const</span> reader = resp.body.<span class="fn">getReader</span>();
+<span class="kw">while</span> (<span class="kw">true</span>) {
+  <span class="kw">const</span> { done, value } = <span class="kw">await</span> reader.<span class="fn">read</span>();
+  <span class="kw">if</span> (done) <span class="kw">break</span>;
+  <span class="fn">processChunk</span>(value); <span class="cm">// Process before full download</span>
+  <span class="cm">// Each read() resolves as a microtask when the Network Process delivers data</span>
+}
+
+<span class="cm">// Web Worker: off-main-thread compute</span>
+<span class="cm">// worker.js has its own V8 isolate, own event loop, own microtask queue</span>
+<span class="kw">const</span> w = <span class="kw">new</span> <span class="fn">Worker</span>(<span class="str">'/worker.js'</span>);
+w.<span class="fn">postMessage</span>({ payload: bigArray.<span class="fn">buffer</span> }, [bigArray.<span class="fn">buffer</span>]); <span class="cm">// Transfer</span>
+w.onmessage = (e) => <span class="fn">applyResult</span>(e.data);</pre></div></div>
+
+  <div class="section"><div class="section-label">Real-world architecture use case</div>
+  <div class="sub-block"><h4>Real-time collaborative apps (Figma-style)</h4><p class="prose" style="margin-top:4px">Figma uses a WebSocket (Network Process managed) for operation sync, a Web Worker running a WebAssembly C++ engine for geometry computation, and the main thread for rendering. The Web Worker uses <code>SharedArrayBuffer</code> to share state with the main thread (zero-copy, no serialization). WebSocket <code>onmessage</code> fires on the main thread, dispatches to the Worker via postMessage. The Worker does all heavy vector math, writes results into SharedArrayBuffer, signals the main thread via <code>Atomics.notify()</code>. The main thread reads from the buffer in a rAF callback. This is the canonical architecture for computation-heavy web apps: Web API (WebSocket) → main thread coordination → Worker computation → SharedArrayBuffer → main thread render.</p></div></div>
+
+  <div class="section"><div class="section-label">Trade-offs</div>
+  <div class="tradeoff">Web Workers avoid main thread blocking but add postMessage serialization cost and programming complexity. For small tasks, the overhead exceeds the benefit. Rule of thumb: use Workers when work exceeds ~10ms and runs repeatedly.</div>
+  <div class="tradeoff">Service Workers add network request interception overhead. Every fetch() goes through the SW scope check. On first load, the SW isn't active yet (requires an activate event). Cache-first strategies can serve stale content — requires careful versioning.</div></div>
+
+  <div class="section"><div class="section-label">Common mistakes</div>
+  <div class="mistake">Using <code>setInterval</code> for animation — it's not synchronized with the frame budget. Callbacks can fire mid-frame or be skipped. Use <code>requestAnimationFrame</code> for any visual update.</div>
+  <div class="mistake">Forgetting that <code>fetch</code> doesn't timeout by default — a hung request will hold the connection indefinitely. Always wrap with <code>AbortController</code> and a timeout.</div>
+  <div class="mistake">Calling DOM APIs inside a Web Worker — Workers have no access to the DOM. They can use <code>fetch</code>, <code>WebSocket</code>, <code>IndexedDB</code>, and some Canvas APIs (OffscreenCanvas), but never <code>document</code> or <code>window</code>.</div></div>
+
+  <div class="section"><div class="section-label">Interview perspective</div>
+  <div class="interview-q"><div class="q">"Who handles `setTimeout` — is it V8 or the browser?"</div><div class="depth">The browser's timer Web API (C++ in the Browser Process). V8 just calls into it and moves on. The callback lands back in V8 via the event loop when the timer fires. Interviewers check if you know the JS engine / host environment boundary.</div></div>
+  <div class="interview-q"><div class="q">"What are passive event listeners and why do they matter?"</div><div class="depth">Allows the compositor to scroll without waiting for the JS handler. Matters for touch scroll jank on mobile. Chrome warns in DevTools about missing passive declarations on touchstart/wheel handlers.</div></div></div>
+
+  <div class="section"><div class="section-label">Connects to</div>
+  <div class="connects">
+    <span class="pill pill-cs">C++ / browser engine internals</span>
+    <span class="pill pill-cs">OS I/O multiplexing (epoll, kqueue)</span>
+    <span class="pill pill-cs">Network Process architecture</span>
+    <span class="pill pill-q">Service Worker / PWA</span>
+    <span class="pill pill-q">WebAssembly (another V8 tier)</span>
+    <span class="pill pill-q">SharedArrayBuffer + Atomics</span>
+  </div></div>
+</div>
+
+<hr class="divider">
+<div style="text-align:center;font-size:12px;color:var(--color-text-tertiary);margin:-10px 0 20px">─── Topics 4–6 complete ───</div>
+
+<div class="topic" id="t6">
+  <div class="topic-num">Topic 7 of 8 — Block 1: Browser Internals</div>
+  <h1 class="topic-title">Memory Management in Browser</h1>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-vital">TTI</span><span class="tag tag-perf">Heap memory</span><span class="tag tag-perf">GC pauses</span><span class="tag tag-perf">Memory leaks</span>
+  </div>
+
+  <div class="section"><div class="section-label">Definition</div>
+  <p class="prose">V8 manages the JavaScript heap using a generational garbage collector — based on the empirical observation that most objects die young. Memory is divided into zones with different GC strategies. Unlike languages with manual memory management, V8 automatically frees unreachable objects via tracing GC. In browser applications, memory management failures manifest as: (1) <strong>memory leaks</strong> (heap grows without bound, eventually causing OOM crashes), (2) <strong>GC pauses</strong> (stop-the-world collection freezes the main thread, causing jank), and (3) <strong>heap bloat</strong> (excessive live objects keeping GC pressure high). Understanding V8's GC is essential for debugging production memory issues in long-lived SPAs.</p></div>
+
+  <div class="section"><div class="section-label">How it works internally</div>
+  <p class="prose">V8's heap has zones: <strong>Young Generation</strong> (new space, 1-8MB) — most objects are allocated here. Young GC is called <strong>Scavenger</strong> (minor GC): a copying collector that copies live objects from "from-space" to "to-space", discarding dead ones. Fast (~1ms) because it only touches the small young gen. Objects that survive multiple Scavenges are promoted to the <strong>Old Generation</strong> (old space, 128MB-2GB+). Old gen GC is <strong>Mark-Compact</strong> (major GC): mark all reachable objects (tracing from roots: stack, globals, DOM references), compact the heap to remove fragmentation. Major GC is expensive (can be 50-200ms on large heaps). V8 uses <strong>incremental marking</strong> (breaks marking into small steps interleaved with JS execution), <strong>lazy sweeping</strong>, and <strong>concurrent marking</strong> (GC worker threads mark while JS runs) to reduce pause times. The DOM is part of Blink's C++ heap, not V8's. V8 and Blink share ownership of DOM nodes via a cross-heap tracing mechanism — a JS object holding a DOM node reference keeps the C++ node alive.</p></div>
+
+  <div class="section"><div class="section-label">Subtopics</div>
+  <div class="grid2">
+    <div class="sub-block"><h4>Young Generation (Scavenger)</h4><p>Copy collector. Fast. Short-lived objects. "From-space" to "to-space" flip. Most allocations die here. Promotes survivors to old gen after 2 collections.</p></div>
+    <div class="sub-block"><h4>Old Generation (Mark-Compact)</h4><p>Tri-color incremental marking. Sweeps dead objects. Compacts live objects. Can run concurrently on helper threads. Full GC here is the source of production jank.</p></div>
+    <div class="sub-block"><h4>Detached DOM nodes</h4><p>A DOM node removed from the document but still referenced by a JS variable. Blink frees the C++ node, but the JS wrapper remains alive, preventing GC. Classic leak pattern in SPAs.</p></div>
+    <div class="sub-block"><h4>Closure leaks</h4><p>Closures capture the entire scope chain. A large object captured in a closure that's attached to a long-lived reference (event listener, Promise) will never be GC'd even if you only needed a small part of it.</p></div>
+    <div class="sub-block"><h4>Event listener leaks</h4><p>addEventListener without removeEventListener keeps the callback (and its closure scope) alive as long as the element exists in the DOM (or longer if the element is detached but referenced).</p></div>
+    <div class="sub-block"><h4>WeakRef / FinalizationRegistry</h4><p>WeakRef allows a reference that doesn't prevent GC. FinalizationRegistry fires a callback when a weakly-referenced object is collected. Used for cache cleanup, not lifecycle management.</p></div>
+  </div></div>
+
+  <div class="section"><div class="section-label">Performance implications</div>
+  <p class="prose"><strong>TTI</strong>: Heavy allocation at startup (hydration, data parsing) triggers Scavenger GCs which, while fast, add up. <strong>Long-session jank</strong>: As SPAs run for hours, heap grows. Major GCs (Mark-Compact) become more frequent and longer. A 500MB heap can trigger 200ms GC pauses — visible as periodic freezes. <strong>Memory pressure</strong>: Mobile devices have 1-2GB RAM for the entire system. A tab consuming 300MB competes with the OS and other apps, triggering aggressive GC and potentially tab suspension. Memory leaks in SPAs are particularly insidious — they accumulate slowly and are hard to spot in development (short sessions).</p></div>
+
+  <div class="section"><div class="section-label">Code example</div>
+  <div class="code-block"><pre><span class="cm">// ❌ Classic detached DOM node leak</span>
+<span class="kw">let</span> detachedTree;
+<span class="kw">function</span> <span class="fn">createLeak</span>() {
+  <span class="kw">const</span> ul = document.<span class="fn">createElement</span>(<span class="str">'ul'</span>);
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < <span class="num">1000</span>; i++) ul.<span class="fn">appendChild</span>(document.<span class="fn">createElement</span>(<span class="str">'li'</span>));
+  detachedTree = ul; <span class="cm">// Global ref → never GC'd even after removal from DOM</span>
+}
+
+<span class="cm">// ❌ Closure capturing large object unnecessarily</span>
+<span class="kw">function</span> <span class="fn">setup</span>() {
+  <span class="kw">const</span> hugeData = <span class="kw">new</span> <span class="fn">Array</span>(<span class="num">1000000</span>).<span class="fn">fill</span>(<span class="num">0</span>);
+  <span class="kw">const</span> smallValue = hugeData[<span class="num">0</span>]; <span class="cm">// Only need this</span>
+  <span class="kw">return</span> () => console.<span class="fn">log</span>(smallValue); <span class="cm">// But closure keeps hugeData alive!</span>
+}
+<span class="cm">// Fix: extract the value before closing over it (as shown)</span>
+<span class="cm">// The returned fn only closes over smallValue, not hugeData</span>
+
+<span class="cm">// ❌ Event listener leak in SPA routing</span>
+<span class="kw">function</span> <span class="fn">ComponentMount</span>() {
+  window.<span class="fn">addEventListener</span>(<span class="str">'resize'</span>, <span class="fn">onResize</span>); <span class="cm">// Added on mount</span>
+  <span class="cm">// But never removed on unmount → accumulates on every route visit</span>
+}
+
+<span class="cm">// ✅ React useEffect cleanup</span>
+<span class="fn">useEffect</span>(() => {
+  window.<span class="fn">addEventListener</span>(<span class="str">'resize'</span>, <span class="fn">onResize</span>);
+  <span class="kw">return</span> () => window.<span class="fn">removeEventListener</span>(<span class="str">'resize'</span>, <span class="fn">onResize</span>); <span class="cm">// Cleanup</span>
+}, []);
+
+<span class="cm">// WeakRef cache — doesn't prevent GC of cached values</span>
+<span class="kw">const</span> cache = <span class="kw">new</span> <span class="fn">Map</span>();
+<span class="kw">function</span> <span class="fn">getCached</span>(key, compute) {
+  <span class="kw">const</span> ref = cache.<span class="fn">get</span>(key);
+  <span class="kw">const</span> cached = ref?.<span class="fn">deref</span>();        <span class="cm">// null if GC collected it</span>
+  <span class="kw">if</span> (cached) <span class="kw">return</span> cached;
+  <span class="kw">const</span> value = <span class="fn">compute</span>();
+  cache.<span class="fn">set</span>(key, <span class="kw">new</span> <span class="fn">WeakRef</span>(value)); <span class="cm">// GC can collect if memory pressure</span>
+  <span class="kw">return</span> value;
+}</pre></div></div>
+
+  <div class="section"><div class="section-label">Real-world architecture use case</div>
+  <div class="sub-block"><h4>Long-running SPA memory profiling workflow</h4><p class="prose" style="margin-top:4px">Production SPAs at companies like Notion or Linear run for hours without page reload. Teams use Chrome DevTools Memory tab → "Allocation timeline" to catch leaks. The workflow: take a heap snapshot, perform a user action (navigate to a route and back), force GC, take another snapshot. Objects that appear in "Objects allocated between snapshots" but shouldn't exist are leaks. A key pattern at scale: React component trees that hold references to WebSocket instances, EventSource objects, or interval handles without cleanup in <code>useEffect</code> destructors. Each route mount adds another listener; after 50 route navigations, there are 50 resize listeners all firing simultaneously.</p></div></div>
+
+  <div class="section"><div class="section-label">Trade-offs</div>
+  <div class="tradeoff">WeakMap/WeakSet are useful for private data associated with objects (the key doesn't prevent GC), but they're not iterable — you can't enumerate all keys. This makes debugging harder.</div>
+  <div class="tradeoff">Aggressive use of object pooling (reusing objects instead of allocating new ones) reduces GC pressure but adds complexity and can introduce subtle bugs if objects are not properly reset before reuse.</div></div>
+
+  <div class="section"><div class="section-label">Common mistakes</div>
+  <div class="mistake">Global variables as caches without expiration — any object reachable from a global is a GC root, i.e., it will never be collected. Unbounded Maps/Sets on window are slow memory leaks.</div>
+  <div class="mistake">Assuming <code>null</code>-ing a reference immediately frees memory — GC is non-deterministic. Setting a reference to null makes the object eligible for collection, but collection happens at V8's discretion (during idle time or under pressure).</div>
+  <div class="mistake">Using <code>setInterval</code> without clearInterval in component teardown — the callback closure keeps the component's state and props alive, preventing GC of the entire component closure scope.</div></div>
+
+  <div class="section"><div class="section-label">Interview perspective</div>
+  <div class="interview-q"><div class="q">"How do you debug a memory leak in a React SPA?"</div><div class="depth">DevTools Memory tab → Allocation timeline → heap snapshots. Look for detached DOM nodes, retained event listeners. Mention useEffect cleanup, WeakRef for caches. Describe a generational GC and why old-gen objects are problematic.</div></div>
+  <div class="interview-q"><div class="q">"What is a detached DOM node and why does it leak?"</div><div class="depth">Node removed from document but still referenced by JS. Blink's C++ node may be freed but V8's JS wrapper is alive → cross-heap reference keeps both alive in practice. Show with DevTools: look for "Detached" in heap snapshot constructors.</div></div>
+  <div class="interview-q"><div class="q">"How does V8's generational GC work?"</div><div class="depth">Young gen (Scavenger, copy collector, ~1ms), old gen (Mark-Compact, incremental marking, 50-200ms). Promotion on survival. Concurrent marking on helper threads. Incremental marking breaks pauses into sub-ms steps.</div></div></div>
+
+  <div class="section"><div class="section-label">Connects to</div>
+  <div class="connects">
+    <span class="pill pill-cs">Garbage collection algorithms (tracing, ref-counting)</span>
+    <span class="pill pill-cs">Generational hypothesis</span>
+    <span class="pill pill-cs">Stop-the-world pauses</span>
+    <span class="pill pill-q">React useEffect cleanup patterns</span>
+    <span class="pill pill-q">WeakMap / WeakRef / FinalizationRegistry</span>
+    <span class="pill pill-cs">Memory-mapped files, virtual memory</span>
+  </div></div>
+</div>
+
+<div class="topic" id="t7">
+  <div class="topic-num">Topic 8 of 8 — Block 1: Browser Internals</div>
+  <h1 class="topic-title">Browser Caching</h1>
+  <div style="margin-bottom:12px">
+    <span class="tag tag-vital">LCP</span><span class="tag tag-vital">TTFB</span><span class="tag tag-vital">TTI</span><span class="tag tag-perf">Network</span>
+  </div>
+
+  <div class="section"><div class="section-label">Definition</div>
+  <p class="prose">The browser maintains a hierarchy of caches, each with different scope, eviction behavior, and lookup priority. In order from fastest to slowest: <strong>Memory cache</strong> (in-process, cleared on tab close), <strong>Service Worker cache</strong> (programmatic, persistent, JS-controlled), <strong>HTTP cache</strong> (disk, governed by HTTP response headers), <strong>Push cache</strong> (HTTP/2 server push, session-scoped, very short-lived). The browser consults them in a defined order for every resource request. Understanding this hierarchy is fundamental to building zero-TTFB repeat visits, progressive loading strategies, and avoiding stale-content bugs in production deployments.</p></div>
+
+  <div class="section"><div class="section-label">How it works internally</div>
+  <p class="prose">When the Network Process receives a resource request, it first checks the <strong>memory cache</strong> — if the resource was fetched during this page session and is still in-process memory, it returns instantly (0ms). If not, it checks the <strong>Service Worker</strong> (if one is registered for the origin) — the SW intercepts the fetch event and can return from <code>caches</code> API (Cache Storage), fabricate a response, or forward to network. If SW passes through, the Network Process checks the <strong>HTTP cache</strong> (disk cache): if the response has a valid <code>Cache-Control: max-age</code> that hasn't expired, it returns without a network request (cache hit, "200 from cache"). If <code>max-age</code> is expired but an <code>ETag</code> or <code>Last-Modified</code> is present, the browser sends a conditional request (<code>If-None-Match</code> / <code>If-Modified-Since</code>) — if the server says 304 Not Modified, the browser uses the cached body without re-downloading it. If no cache applies, a full network request is made.</p></div>
+
+  <div class="section"><div class="section-label">Subtopics</div>
+  <div class="grid2">
+    <div class="sub-block"><h4>Memory Cache</h4><p>In-memory, per-tab, cleared on close. Duplicate requests in the same page session served from here. <code>preload</code> puts resources here. No headers needed — implicit.</p></div>
+    <div class="sub-block"><h4>HTTP Cache (Disk Cache)</h4><p>Governed by <code>Cache-Control</code>, <code>Expires</code>, <code>ETag</code>, <code>Last-Modified</code>. Persistent across sessions. Shared across tabs. Primary cache for static assets.</p></div>
+    <div class="sub-block"><h4>Cache-Control directives</h4><p><code>max-age=N</code>: fresh for N seconds. <code>no-cache</code>: always revalidate (not "no caching"). <code>no-store</code>: truly no caching. <code>immutable</code>: never revalidate during max-age. <code>stale-while-revalidate</code>: serve stale, refresh in background.</p></div>
+    <div class="sub-block"><h4>ETag / Conditional Requests</h4><p>ETag is a server-generated hash of the resource content. Browser sends <code>If-None-Match: &lt;etag&gt;</code>. Server returns 304 (no body, saves bandwidth) or 200 with new content. Saves re-download, still costs an RTT.</p></div>
+    <div class="sub-block"><h4>Service Worker Cache</h4><p>Explicit JS-controlled cache via Cache Storage API. Survives tab close. Can implement cache-first, network-first, stale-while-revalidate strategies programmatically. Intercepts all fetch events for the origin.</p></div>
+    <div class="sub-block"><h4>Cache busting</h4><p>Changing the filename/URL (content hash) forces the browser to treat it as a new resource, bypassing HTTP cache. Vite/webpack append <code>[contenthash]</code> to JS/CSS filenames. The HTML document itself should have <code>no-cache</code> so it always revalidates.</p></div>
+    <div class="sub-block"><h4>Vary header</h4><p>Tells the cache that the same URL may have different responses based on request headers (e.g., <code>Vary: Accept-Encoding</code> caches gzip and brotli separately). Misuse causes cache fragmentation.</p></div>
+    <div class="sub-block"><h4>stale-while-revalidate</h4><p>Serve the stale cached response immediately (0 TTFB), then fetch fresh content in the background for the next request. Best of both worlds for content that can tolerate one revision of staleness.</p></div>
+  </div></div>
+
+  <div class="section"><div class="section-label">Performance implications</div>
+  <p class="prose"><strong>TTFB</strong>: HTTP cache hits serve resources with 0 network time — the dominant TTFB optimization for repeat visits. <strong>LCP</strong>: The LCP image must be either in memory cache (preloaded earlier) or HTTP-cached locally, or it needs a full network fetch. The difference is 100-500ms on typical connections. <strong>TTI</strong>: JS bundles cached with <code>max-age=31536000, immutable</code> (after content-hash naming) load from disk with zero network overhead, dramatically shortening parse time on repeat visits since even disk read is faster than a round-trip.</p></div>
+
+  <div class="section"><div class="section-label">Code example</div>
+  <div class="code-block"><pre><span class="cm">// HTTP headers — what the server should send</span>
+<span class="cm">// Static assets (JS/CSS with content hash in filename)</span>
+<span class="cm">Cache-Control: public, max-age=31536000, immutable</span>
+<span class="cm">// "Never check back for a year, asset name won't change unless content changes"</span>
+
+<span class="cm">// HTML document — always revalidate</span>
+<span class="cm">Cache-Control: no-cache</span>
+<span class="cm">// "Before using cached copy, check if server has a newer version"</span>
+<span class="cm">// (NOT the same as no-store — the browser still caches it, just always revalidates)</span>
+
+<span class="cm">// API responses with stale-while-revalidate</span>
+<span class="cm">Cache-Control: max-age=60, stale-while-revalidate=300</span>
+<span class="cm">// "Fresh for 60s, up to 300s serve stale while refreshing in background"</span>
+
+<span class="cm">// Service Worker — cache-first strategy</span>
+self.<span class="fn">addEventListener</span>(<span class="str">'fetch'</span>, (event) => {
+  event.<span class="fn">respondWith</span>(
+    caches.<span class="fn">match</span>(event.request).<span class="fn">then</span>((cached) => {
+      <span class="cm">// Return cached immediately, fetch fresh in background</span>
+      <span class="kw">const</span> fetchPromise = <span class="fn">fetch</span>(event.request).<span class="fn">then</span>((res) => {
+        <span class="kw">const</span> clone = res.<span class="fn">clone</span>();
+        caches.<span class="fn">open</span>(<span class="str">'v1'</span>).<span class="fn">then</span>(c => c.<span class="fn">put</span>(event.request, clone));
+        <span class="kw">return</span> res;
+      });
+      <span class="kw">return</span> cached || fetchPromise; <span class="cm">// Cache-first with background refresh</span>
+    })
+  );
+});
+
+<span class="cm">// Cache busting: Vite output</span>
+<span class="cm">// /assets/index-B3k2mX9P.js — content hash in filename</span>
+<span class="cm">// HTML is no-cache → always fetches new HTML → new content-hash filename</span>
+<span class="cm">// → browser fetches new JS, old JS served from cache (immutable)</span></pre></div></div>
+
+  <div class="section"><div class="section-label">Real-world architecture use case</div>
+  <div class="sub-block"><h4>Next.js ISR + CDN caching strategy</h4><p class="prose" style="margin-top:4px">Next.js Incremental Static Regeneration combines server-side stale-while-revalidate with CDN edge caching. A product page is statically rendered, served from the CDN with <code>s-maxage=60, stale-while-revalidate</code> headers. The CDN serves cached HTML instantly (near-zero TTFB), then in the background revalidates with the Next.js origin server. The browser receives the HTML which references content-hashed JS/CSS bundles (immutable in browser HTTP cache). The result: sub-100ms TTFB, sub-200ms LCP on repeat visits, and pages that auto-update within 60 seconds of content changes — without a full CDN purge. The Service Worker layer (via next-pwa) adds offline support by caching the SW cache separately from the HTTP cache.</p></div></div>
+
+  <div class="section"><div class="section-label">Trade-offs</div>
+  <div class="tradeoff"><code>no-cache</code> on the HTML document means every navigation costs one conditional request RTT to verify freshness — on mobile (150ms RTT), this is 150ms added to every navigation. Acceptable for content freshness but measurable in TTFB.</div>
+  <div class="tradeoff">Service Worker cache is powerful but adds complexity: stale SW can serve outdated content after a deployment if the SW update flow isn't handled correctly. <code>skipWaiting()</code> + <code>clients.claim()</code> + versioned cache names are required for safe updates.</div>
+  <div class="tradeoff"><code>Vary: Accept-Encoding</code> correctly separates brotli/gzip caches, but <code>Vary: Cookie</code> or <code>Vary: Authorization</code> effectively disables CDN caching since every user's request varies — a common misconfiguration.</div></div>
+
+  <div class="section"><div class="section-label">Common mistakes</div>
+  <div class="mistake">Confusing <code>no-cache</code> and <code>no-store</code> — <code>no-cache</code> means "cache but always revalidate". <code>no-store</code> means "never write to cache". Using <code>no-store</code> on assets that only change on deployment wastes all the performance benefits of caching.</div>
+  <div class="mistake">Not using content hashes in asset filenames — deploying new JS with the same filename (<code>app.js</code>) with long <code>max-age</code> means users get cached old code. Content hashing is non-negotiable for static assets with long cache TTLs.</div>
+  <div class="mistake">Caching API responses without understanding <code>Vary</code> — a JSON API response that differs based on <code>Accept-Language</code> or <code>Authorization</code> must include these in <code>Vary</code>, or the cache will return the wrong variant to users.</div>
+  <div class="mistake">Service Worker intercepting requests without proper cache versioning — on SW update, old cached assets continue to serve until the cache name changes. Teams burn production incidents on this monthly.</div></div>
+
+  <div class="section"><div class="section-label">Interview perspective</div>
+  <div class="interview-q"><div class="q">"What's the difference between no-cache and no-store?"</div><div class="depth">no-cache = cache it, but always validate with server before using (304 path). no-store = never write to any cache, ever. Interviewers test this constantly because it's counterintuitively named.</div></div>
+  <div class="interview-q"><div class="q">"How would you design the caching strategy for a high-traffic e-commerce site?"</div><div class="depth">System design answer: CDN for HTML (stale-while-revalidate, purge on publish), immutable + content-hash for JS/CSS/images, no-cache for HTML document itself, API responses vary by user auth (no CDN cache, browser max-age=30), Service Worker for offline shell. Mention cache invalidation as the hard problem — always purge by deploying new content-hash URLs.</div></div>
+  <div class="interview-q"><div class="q">"What is the browser cache lookup order?"</div><div class="depth">Memory cache → Service Worker cache → HTTP disk cache → Push cache → Network. Know which layer each resource type typically lives in. Static assets with long TTL: HTTP disk cache on repeat. Preloaded resources: memory cache. SW-controlled: SW cache first.</div></div></div>
+
+  <div class="section"><div class="section-label">Connects to</div>
+  <div class="connects">
+    <span class="pill pill-cs">HTTP/1.1 vs HTTP/2 caching behavior</span>
+    <span class="pill pill-cs">CDN edge caching (s-maxage)</span>
+    <span class="pill pill-q">Service Worker / PWA architecture</span>
+    <span class="pill pill-q">Next.js ISR / cache-first patterns</span>
+    <span class="pill pill-cs">Cache invalidation (hardest problem in CS)</span>
+    <span class="pill pill-cs">ETag / content negotiation</span>
+    <span class="pill pill-cs">Distributed caching (Redis) — same patterns, different layer</span>
+  </div></div>
+</div>
+
+<hr class="divider">
+<div style="text-align:center;font-size:12px;color:var(--color-text-tertiary);margin:-10px 0 20px">─── Topics 7–8 complete · Block 1 done ───</div>
+
+</main>
+</div>
+
+<script>
+function show(idx, el) {
+  document.querySelectorAll('.topic').forEach(t => t.classList.remove('visible'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('t' + idx).classList.add('visible');
+  el.classList.add('active');
+  document.querySelector('.content').scrollTop = 0;
+}
+</script>

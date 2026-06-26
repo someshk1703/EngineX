@@ -1,0 +1,708 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;height:800px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary)}
+.sidebar{width:210px;min-width:210px;border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;background:var(--color-background-secondary)}
+.sh{padding:14px 16px 10px;font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.06em;text-transform:uppercase;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ni{padding:9px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-left:2px solid transparent;line-height:1.3}
+.ni:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ni.active{background:var(--color-background-primary);color:var(--color-text-primary);border-left-color:var(--color-text-primary);font-weight:500}
+.ni .num{font-size:11px;color:var(--color-text-tertiary);display:block;margin-bottom:1px}
+.content{flex:1;overflow-y:auto;padding:24px 28px}
+.topic{display:none}.topic.active{display:block}
+.tt{font-size:19px;font-weight:500;margin-bottom:3px}
+.ts2{font-size:13px;color:var(--color-text-tertiary);margin-bottom:20px}
+.sec{margin-bottom:20px}
+.sl{font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sl::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.prose{font-size:13.5px;line-height:1.75;color:var(--color-text-secondary)}
+.prose strong{color:var(--color-text-primary);font-weight:500}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kvc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px}
+.kvl{font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px;font-weight:500}
+.kvv{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.to{display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.to:last-child{border-bottom:none}
+.tos{font-size:12px;flex:1}
+.tos .lb{font-weight:500;margin-bottom:2px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.gain .lb{color:#3B6D11}.lose .lb{color:#A32D2D}
+.tos p{font-size:12.5px;color:var(--color-text-secondary);line-height:1.5}
+.fi{padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12.5px;line-height:1.6;color:var(--color-text-secondary)}
+.fi:last-child{border-bottom:none}
+.fi strong{color:var(--color-text-primary);font-weight:500}
+.ib{background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px}
+.ib ol{padding-left:16px;font-size:12.5px;line-height:1.9;color:var(--color-text-secondary)}
+.ib li strong{color:var(--color-text-primary);font-weight:500}
+.cx{display:flex;flex-wrap:wrap;gap:6px}
+.cx a{font-size:11.5px;padding:3px 10px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);cursor:pointer;text-decoration:none}
+.cx a:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ab{font-family:var(--font-mono);font-size:11.5px;line-height:1.6;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:14px;color:var(--color-text-secondary);white-space:pre;overflow-x:auto}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sc{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px}
+.sn{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.sd{font-size:11.5px;color:var(--color-text-tertiary);line-height:1.4}
+.tr{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:14px}
+.tab{font-size:12px;padding:7px 12px;cursor:pointer;color:var(--color-text-tertiary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tp{display:none}.tp.active{display:block}
+.nb{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:7px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;margin-top:20px}
+.nb:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.cb-state{border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:12px;margin-bottom:8px}
+.cb-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.cb-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;margin-right:4px}
+.b-green{background:#EAF3DE;color:#27500A}
+.b-red{background:#FCEBEB;color:#791F1F}
+.b-amber{background:#FAEEDA;color:#633806}
+.b-blue{background:#E6F1FB;color:#0C447C}
+.b-purple{background:#EEEDFE;color:#3C3489}
+.b-teal{background:#E1F5EE;color:#085041}
+.rl-vis{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px}
+.token-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.token{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;border:0.5px solid var(--color-border-tertiary)}
+.token.full{background:#EAF3DE;border-color:#97C459;color:#27500A}
+.token.empty{background:var(--color-background-primary);color:var(--color-text-tertiary)}
+.obs-pillar{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px}
+.obs-pillar .ph{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.obs-pillar .pd{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.chaos-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:6px}
+.chaos-card .ct{font-size:12.5px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.chaos-card .cd{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+</style>
+
+<h2 class="sr-only">System Design Reliability and Operations — Block 7 covering rate limiting algorithms, circuit breaker pattern, bulkhead isolation, retry strategies, health checks, observability (RED method, OpenTelemetry), and chaos engineering.</h2>
+
+<div class="shell">
+<nav class="sidebar">
+  <div class="sh">Block 7 — Reliability</div>
+  <div class="ni active" onclick="show(0)"><span class="num">01</span>Rate limiting</div>
+  <div class="ni" onclick="show(1)"><span class="num">02</span>Circuit breaker</div>
+  <div class="ni" onclick="show(2)"><span class="num">03</span>Bulkhead pattern</div>
+  <div class="ni" onclick="show(3)"><span class="num">04</span>Retry strategies</div>
+  <div class="ni" onclick="show(4)"><span class="num">05</span>Health checks</div>
+  <div class="ni" onclick="show(5)"><span class="num">06</span>Observability</div>
+  <div class="ni" onclick="show(6)"><span class="num">07</span>Chaos engineering</div>
+</nav>
+
+<main class="content">
+
+<!-- ══ T0: Rate Limiting ══ -->
+<div class="topic active" id="t0">
+  <div class="tt">Rate limiting</div>
+  <div class="ts2">Token bucket · leaky bucket · fixed window · sliding window log · Redis implementation</div>
+
+  <div class="sec">
+    <div class="sl">Why rate limiting exists</div>
+    <div class="prose">Rate limiting protects your service from three threats: accidental overload (a buggy client in a tight loop), deliberate abuse (scraping, credential stuffing, DDoS), and fair resource distribution (one tenant shouldn't starve others). Without it, a single bad actor can collapse your entire service.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">The four algorithms</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'rl','r0')">Token bucket</div>
+      <div class="tab" onclick="stab(this,'rl','r1')">Leaky bucket</div>
+      <div class="tab" onclick="stab(this,'rl','r2')">Fixed window</div>
+      <div class="tab" onclick="stab(this,'rl','r3')">Sliding window</div>
+    </div>
+    <div id="rl">
+      <div class="tp active" id="r0">
+        <div class="prose"><strong>Token bucket — the most common production algorithm.</strong><br><br>A bucket holds up to <code>capacity</code> tokens. Tokens are added at a fixed rate (<code>refill_rate</code> tokens/sec). Each request consumes one token. If the bucket is empty, the request is rejected (429).<br><br><strong>Key property: allows bursting.</strong> If no requests come for 10 seconds (bucket fills to capacity), a client can then send a burst of <code>capacity</code> requests at full speed. This is realistic — users have natural bursty patterns.<br><br><strong>Redis implementation:</strong><br><code>tokens = GET rate:user:42</code><br>If tokens > 0: decrement and allow. Else: reject.<br>Background job or Lua script refills tokens at the configured rate. A single Lua script makes the check-and-decrement atomic.<br><br><strong>Used by:</strong> Stripe (API), GitHub (API), AWS (all services).</div>
+      </div>
+      <div class="tp" id="r1">
+        <div class="prose"><strong>Leaky bucket — constant output rate.</strong><br><br>Requests enter a queue (bucket) and are processed at a fixed rate (<code>leak_rate</code>). If the queue is full, new requests are dropped. Unlike token bucket, the output rate is constant regardless of burst input.<br><br><strong>Key property: smooths traffic.</strong> Even if 1000 requests arrive simultaneously, they're processed one by one at <code>leak_rate</code>. Downstream services see a constant, predictable load.<br><br><strong>Use when:</strong> You need to protect a downstream service from bursty load — e.g., a payment gateway that charges per-second rate. The "bucket" is literally a queue; leaked = processed.<br><br><strong>Difference from token bucket:</strong> Token bucket allows bursting (multiple tokens consumed rapidly). Leaky bucket enforces a constant outgoing rate regardless of how many tokens are available.</div>
+      </div>
+      <div class="tp" id="r2">
+        <div class="prose"><strong>Fixed window counter — simplest algorithm.</strong><br><br>Divide time into fixed windows (e.g., each 60-second window). Count requests per window per user. If count exceeds limit, reject. Counter resets at the start of each window.<br><br><strong>Redis:</strong> <code>INCR rate:user:42:window:1703001600</code> with TTL = window duration. Single atomic operation. Very cheap.<br><br><strong>Fatal flaw — window boundary burst:</strong> Limit = 100/min. A client sends 100 requests at 11:59:50, then 100 more at 12:00:10. Both windows show exactly 100 — both allowed. But the client actually sent 200 requests in a 20-second span. This 2× burst at window boundaries is a real attack vector.<br><br><strong>Use when:</strong> Approximate limiting is acceptable, extreme simplicity is required, and the boundary burst isn't a security concern (internal services, loose limits).</div>
+      </div>
+      <div class="tp" id="r3">
+        <div class="prose"><strong>Sliding window log — most accurate, most expensive.</strong><br><br>Store a timestamp for every request in a sorted set. When a new request arrives, count timestamps in the last <code>window</code> seconds. If count exceeds limit, reject. Clean up timestamps older than the window.<br><br><strong>Redis implementation:</strong><br><code>ZADD rate:user:42 {now_ms} {request_id}</code><br><code>ZREMRANGEBYSCORE rate:user:42 0 {now_ms - window_ms}</code><br><code>count = ZCARD rate:user:42</code><br>Execute as a Lua script for atomicity.<br><br><strong>Accurate:</strong> No boundary burst problem. Exactly <code>limit</code> requests per any rolling window.<br><br><strong>Cost:</strong> O(log N) per request (sorted set operations). Memory scales with requests per window (each timestamp stored). At 10K RPS × 60s window = 600K entries per user. Practical limit: medium traffic services.<br><br><strong>Sliding window counter (hybrid):</strong> Track current and previous window counts. Approximate the sliding window as: <code>prev_count × (1 - elapsed/window) + curr_count</code>. O(1), very cheap, ~0.003% error rate. This is what Cloudflare and Nginx use in production.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Token bucket — interactive</div>
+    <div class="rl-vis">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary);min-width:80px">Capacity</label>
+        <input type="range" min="5" max="20" step="1" value="10" id="cap" oninput="drawBucket()" style="flex:1">
+        <span id="cap-out" style="font-weight:500;min-width:20px;color:var(--color-text-primary)">10</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary);min-width:80px">Tokens now</label>
+        <input type="range" min="0" max="20" step="1" value="7" id="cur" oninput="drawBucket()" style="flex:1">
+        <span id="cur-out" style="font-weight:500;min-width:20px;color:var(--color-text-primary)">7</span>
+      </div>
+      <div class="token-row" id="bucket-vis"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="nb" style="margin-top:0;font-size:12px" onclick="consume()">Send request (consume 1)</button>
+        <button class="nb" style="margin-top:0;font-size:12px" onclick="refill()">Refill +3</button>
+      </div>
+      <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:8px" id="bucket-msg">Green = available tokens. Empty slots = consumed capacity.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — Redis rate limiter</div>
+    <div class="ab">Lua script (atomic token bucket):
+
+local key = KEYS[1]           -- "rate:user:42"
+local capacity = tonumber(ARGV[1])    -- 100
+local refill_rate = tonumber(ARGV[2]) -- tokens/second
+local now = tonumber(ARGV[3])         -- current timestamp (ms)
+
+local data = redis.call('HMGET', key, 'tokens', 'last_refill')
+local tokens = tonumber(data[1]) or capacity
+local last = tonumber(data[2]) or now
+
+-- Refill based on elapsed time
+local elapsed = (now - last) / 1000
+tokens = math.min(capacity, tokens + elapsed * refill_rate)
+
+if tokens >= 1 then
+  tokens = tokens - 1
+  redis.call('HMSET', key, 'tokens', tokens, 'last_refill', now)
+  redis.call('EXPIRE', key, 3600)
+  return 1  -- allowed
+else
+  return 0  -- rejected (429)
+end
+
+-- 429 response headers (standard):
+-- X-RateLimit-Limit: 100
+-- X-RateLimit-Remaining: 0
+-- X-RateLimit-Reset: 1703001660  (unix timestamp when tokens refill)
+-- Retry-After: 3</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Default answer: token bucket.</strong> "I'd use token bucket — it's standard, allows realistic burst behaviour, and is straightforward to implement atomically in Redis with a Lua script."</li>
+      <li><strong>Know the fixed window boundary attack.</strong> "Fixed window has a 2× burst vulnerability at window boundaries. For security-critical limiting (login attempts, payment initiation), I'd use sliding window log or the sliding window counter approximation."</li>
+      <li><strong>Always mention 429 + retry-after headers.</strong> "The rate limited response must include Retry-After so well-behaved clients back off correctly instead of hammering you harder."</li>
+      <li><strong>Probe: "Rate limit per user, per IP, or per API key?"</strong> → All three, in layers. Per IP catches unauthenticated abuse. Per API key catches authenticated misuse. Per user prevents one user's multiple clients from multiplying their effective limit.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">Circuit breaker →</a><a onclick="sendPrompt('Explain distributed rate limiting across multiple API servers')">Distributed rate limiting</a><a onclick="sendPrompt('Explain Redis Lua scripting for atomic operations')">Redis Lua atomicity</a></div></div>
+  <button class="nb" onclick="show(1)">Next: Circuit breaker <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T1: Circuit Breaker ══ -->
+<div class="topic" id="t1">
+  <div class="tt">Circuit breaker pattern</div>
+  <div class="ts2">Closed · open · half-open states · Resilience4j</div>
+
+  <div class="sec">
+    <div class="sl">The problem it solves</div>
+    <div class="prose">When a downstream service is failing (database down, third-party API returning 500s), every call to it fails after a timeout — say, 5 seconds. Without a circuit breaker, your service keeps making those calls: each request ties up a thread for 5 seconds, threads exhaust, your service cascades into failure too. The circuit breaker short-circuits those calls the moment it detects the downstream is unhealthy, returning an immediate error (or fallback) instead of waiting.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">The three states</div>
+    <div class="cb-state" style="background:#EAF3DE;border-color:#97C459">
+      <div class="cb-name" style="color:#27500A"><span class="badge b-green">Closed</span> — normal operation</div>
+      <div class="cb-desc" style="color:#3B6D11">All requests pass through to the downstream service. The circuit breaker monitors a rolling window of results. When the failure rate exceeds the threshold (e.g., 50% failures in last 10 calls), it trips to OPEN.</div>
+    </div>
+    <div class="cb-state" style="background:#FCEBEB;border-color:#F09595">
+      <div class="cb-name" style="color:#791F1F"><span class="badge b-red">Open</span> — fail fast</div>
+      <div class="cb-desc" style="color:#A32D2D">All requests are immediately rejected without calling the downstream service. Returns a fallback (cached data, default value, or explicit error). After a configured wait duration (e.g., 30s), transitions to HALF-OPEN to test if the downstream recovered.</div>
+    </div>
+    <div class="cb-state" style="background:#FAEEDA;border-color:#EF9F27">
+      <div class="cb-name" style="color:#633806"><span class="badge b-amber">Half-open</span> — probing recovery</div>
+      <div class="cb-desc" style="color:#854F0B">A limited number of probe requests (e.g., 5) are allowed through. If they succeed → circuit returns to CLOSED. If they fail → circuit returns to OPEN and resets the wait timer. This prevents a recovered-but-fragile service from being immediately overwhelmed.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interactive circuit breaker</div>
+    <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary);min-width:100px">Failure threshold</label>
+        <input type="range" min="20" max="80" step="10" value="50" id="ft" oninput="updateCB()" style="flex:1">
+        <span id="ft-out" style="font-weight:500;min-width:32px;color:var(--color-text-primary)">50%</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="nb" style="margin-top:0;font-size:12px" onclick="cbCall(true)">Simulate success</button>
+        <button class="nb" style="margin-top:0;font-size:12px" onclick="cbCall(false)">Simulate failure</button>
+        <button class="nb" style="margin-top:0;font-size:12px" onclick="cbReset()">Reset</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="font-size:12px;color:var(--color-text-secondary)">State:</div>
+        <div id="cb-state-badge" class="badge b-green">CLOSED</div>
+        <div style="font-size:12px;color:var(--color-text-secondary)">Failures:</div>
+        <div id="cb-fail-count" style="font-size:12px;font-weight:500;color:var(--color-text-primary)">0 / 10</div>
+        <div style="font-size:12px;color:var(--color-text-secondary)">Fail rate:</div>
+        <div id="cb-fail-rate" style="font-size:12px;font-weight:500;color:var(--color-text-primary)">0%</div>
+      </div>
+      <div id="cb-history" style="display:flex;gap:3px;flex-wrap:wrap"></div>
+      <div style="font-size:11.5px;color:var(--color-text-tertiary);margin-top:8px" id="cb-msg">Circuit is closed. All requests pass through.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Resilience4j configuration (Spring Boot)</div>
+    <div class="ab">resilience4j:
+  circuitbreaker:
+    instances:
+      paymentService:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10           # last 10 calls
+        failureRateThreshold: 50        # open if >= 50% fail
+        waitDurationInOpenState: 30s    # try half-open after 30s
+        permittedNumberOfCallsInHalfOpenState: 5
+        slowCallDurationThreshold: 3s   # slow calls count as failures
+        slowCallRateThreshold: 50       # open if >= 50% slow
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+// Java usage:
+@CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+public PaymentResult chargeCard(PaymentRequest req) {
+    return paymentGateway.charge(req);  // this can fail
+}
+
+public PaymentResult paymentFallback(PaymentRequest req, Exception e) {
+    log.warn("Circuit open, using fallback for user {}", req.userId());
+    return PaymentResult.pending(req.orderId()); // queue for retry
+}</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Circuit breaker prevents cascading failure.</strong> "Without it, a slow payment gateway causes thread exhaustion in my order service, which then causes thread exhaustion in my API gateway — the whole system falls like dominoes. The breaker stops that chain."</li>
+      <li><strong>Always define a fallback.</strong> "Open state must return something useful — cached last-known result, a 'service temporarily unavailable' message, or queue the request for async retry. Silent failure is not a fallback."</li>
+      <li><strong>Slow calls as failures.</strong> "A payment gateway that takes 8 seconds to respond is as damaging as one that returns errors — threads are blocked either way. I configure slowCallDurationThreshold so slow calls trip the circuit too."</li>
+      <li><strong>Probe: "Database goes down for 2 minutes. Walk me through what happens."</strong> → First 10 calls fail → failure rate hits 50% → circuit opens → all subsequent calls get immediate fallback → threads freed → service stays responsive → after 30s, half-open → 5 probe calls → DB recovered → circuit closes → normal operation resumes. Zero cascading failure.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(3)">Retry strategies →</a><a onclick="show(2)">Bulkhead →</a><a onclick="sendPrompt('Explain Resilience4j bulkhead and time limiter configuration')">Resilience4j full config</a></div></div>
+  <button class="nb" onclick="show(2)">Next: Bulkhead pattern <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T2: Bulkhead ══ -->
+<div class="topic" id="t2">
+  <div class="tt">Bulkhead pattern</div>
+  <div class="ts2">Isolating failures · thread pool isolation · semaphore isolation</div>
+
+  <div class="sec">
+    <div class="sl">The ship analogy</div>
+    <div class="prose">A ship's hull is divided into watertight compartments — bulkheads. If one section is breached, only that section floods. The ship stays afloat. The same principle applies to services: isolate resources per dependency so that a failing dependency can only consume its own allocated resources, not the entire system's thread pool.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Two isolation mechanisms</div>
+    <div class="tr">
+      <div class="tab active" onclick="stab(this,'bh','b0')">Thread pool isolation</div>
+      <div class="tab" onclick="stab(this,'bh','b1')">Semaphore isolation</div>
+    </div>
+    <div id="bh">
+      <div class="tp active" id="b0">
+        <div class="prose"><strong>Thread pool isolation (Hystrix classic):</strong> Each external dependency gets its own dedicated thread pool. Calls to that dependency run on those threads. If the dependency hangs, only those threads are occupied — the main service thread pool is free to handle other requests.<br><br><strong>Example:</strong> 200-thread main pool. PaymentService gets its own 10-thread pool. InventoryService gets its own 10-thread pool. If PaymentService hangs, at most 10 threads are stuck. The remaining 180 threads + InventoryService's 10 continue serving other traffic.<br><br><strong>Cost:</strong> Context switching overhead between thread pools. Not suitable for very high throughput (thousands of requests/sec) where context switching dominates. Each additional pool consumes memory (stack space per thread, typically 256KB–1MB each).</div>
+      </div>
+      <div class="tp" id="b1">
+        <div class="prose"><strong>Semaphore isolation (lightweight):</strong> Rather than separate thread pools, use a semaphore to limit concurrent calls to a dependency. The calling thread is used directly (no context switch), but at most N threads can be calling the dependency simultaneously. If N threads are already in-flight, new callers get an immediate rejection.<br><br><strong>Example:</strong> Semaphore limit = 10 for PaymentService. The 11th concurrent payment call gets immediate BulkheadFullException. The 10 in-flight calls continue.<br><br><strong>Cost:</strong> No thread isolation — if the dependency blocks the calling thread, you're still occupying a main pool thread. Works for non-blocking or fast calls. Doesn't protect against slow dependencies as effectively as thread pool isolation.<br><br><strong>Use when:</strong> High throughput, non-blocking I/O, or when thread pool overhead is too costly. Thread pool isolation for slow/unreliable dependencies, semaphore for lightweight limiting.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Architecture — bulkhead + circuit breaker together</div>
+    <div class="ab">Order Service (200 main threads)
+  │
+  ├── Payment calls → [Thread pool: 10 threads] → PaymentGateway
+  │                       ↓ circuit breaker wraps this pool
+  │                   If all 10 busy OR circuit open → fallback
+  │
+  ├── Inventory calls → [Thread pool: 15 threads] → InventoryService
+  │                       ↓ if InventoryService hangs
+  │                   Only 15 threads blocked, 185 unaffected
+  │
+  └── All other requests → [Main pool: 175 threads] → normal processing
+
+Scenario: PaymentGateway goes down for 60s
+  - 10 payment threads hang for timeout duration (30s each)
+  - Circuit opens after failure threshold
+  - New payment calls → immediate fallback (no threads consumed)
+  - Inventory, catalog, user calls → completely unaffected
+  - Service continues at ~95% capacity (only payment feature degraded)</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Bulkhead + circuit breaker = defence in depth.</strong> "Bulkhead limits blast radius (max threads per dependency). Circuit breaker prevents repeated calls to a known-dead dependency. Together they make cascading failure nearly impossible."</li>
+      <li><strong>Size thread pools based on expected concurrency, not maximum.</strong> "If payment calls take ~200ms and I expect 50/sec, I need 50 × 0.2 = 10 concurrent calls. Pool size = 10–15 (with some headroom). Never size to handle the maximum burst — the bulkhead's job is to limit, not absorb."</li>
+      <li><strong>Probe: "All your payment threads are always full even when things are healthy."</strong> → Pool is undersized for the load, or payment calls are slower than expected. Fix: profile call latency, increase pool proportionally, or add a timeout so hung calls release threads faster.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">← Circuit breaker</a><a onclick="show(3)">Retry strategies →</a><a onclick="sendPrompt('Explain Resilience4j bulkhead annotation and configuration in Spring Boot')">Resilience4j bulkhead</a></div></div>
+  <button class="nb" onclick="show(3)">Next: Retry strategies <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T3: Retry Strategies ══ -->
+<div class="topic" id="t3">
+  <div class="tt">Retry strategies</div>
+  <div class="ts2">Exponential backoff with jitter · idempotency requirement</div>
+
+  <div class="sec">
+    <div class="sl">When retrying is appropriate</div>
+    <div class="prose">Retries are for transient failures — temporary conditions that resolve on their own. A network blip, a brief timeout, a 429 (rate limited), a 503 (temporarily unavailable). They are <strong>not</strong> for permanent failures: 400 (bad request), 401 (unauthorized), 404 (not found). Retrying a 400 will never succeed — the request is wrong. Blindly retrying all errors amplifies load on already-struggling downstream systems.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Exponential backoff with jitter — the correct formula</div>
+    <div class="prose"><strong>Naive exponential backoff:</strong> <code>wait = base × 2ⁿ</code>. Problem: if 1000 clients all fail at t=0, they all retry at t=1s simultaneously, then t=3s simultaneously. Synchronized retry storms crush the recovering service.<br><br><strong>Full jitter (correct):</strong> <code>wait = random(0, min(cap, base × 2ⁿ))</code>. Picks a random value between 0 and the exponential ceiling. Spreads retries evenly across the time window. AWS recommends this; it's been demonstrated to reduce total system load under failure conditions vs other backoff schemes.<br><br><strong>Equal jitter:</strong> <code>temp = min(cap, base × 2ⁿ); wait = temp/2 + random(0, temp/2)</code>. Guarantees minimum wait (avoids hammering the service immediately) while still adding randomness. Good when very fast retries are acceptable sometimes but you want some minimum delay.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Backoff calculator</div>
+    <div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary);min-width:80px">Base (ms)</label>
+        <input type="range" min="100" max="2000" step="100" value="500" id="b-base" oninput="calcBackoff()" style="flex:1">
+        <span id="b-base-out" style="font-weight:500;min-width:44px;color:var(--color-text-primary)">500ms</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12.5px">
+        <label style="color:var(--color-text-secondary);min-width:80px">Cap (ms)</label>
+        <input type="range" min="2000" max="60000" step="1000" value="30000" id="b-cap" oninput="calcBackoff()" style="flex:1">
+        <span id="b-cap-out" style="font-weight:500;min-width:44px;color:var(--color-text-primary)">30000ms</span>
+      </div>
+      <div id="backoff-table" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Idempotency — the mandatory prerequisite</div>
+    <div class="prose"><strong>Retrying a non-idempotent operation is dangerous.</strong> If you retry a payment charge that actually succeeded (but whose response was lost in a network blip), the customer gets double-charged.<br><br><strong>Idempotency key pattern:</strong> Client generates a unique UUID for the operation (<code>X-Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000</code>). Server stores the result of the first execution keyed on this UUID. If the same key arrives again, return the stored result without re-executing. Client can safely retry any number of times.<br><br><strong>Implementation:</strong> Insert into a DB table <code>(idempotency_key, result, created_at)</code> with a unique constraint on <code>idempotency_key</code>. First insert → execute and store result. Second insert → unique constraint violation → return stored result. Use TTL to expire old keys (24h typical).</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Always pair retries with idempotency.</strong> "Retries without idempotency are dangerous — they risk duplicate operations. Before enabling retries on any mutation, I ensure the endpoint accepts an idempotency key."</li>
+      <li><strong>Retry only on the right status codes.</strong> "I retry on 429, 503, 502, 504, and network timeouts. Never on 400, 401, 403, 404 — those are client errors that won't fix themselves."</li>
+      <li><strong>Retry budget.</strong> "I set a maximum retry count (3–5) and a total time budget. If the total time exceeds the caller's SLO, I fail fast rather than keep retrying into the caller's deadline."</li>
+      <li><strong>Probe: "Your retry storm is making a degraded service worse."</strong> → Immediate problem: switch to circuit breaker — stop retrying at all when the service is known-bad. Longer term: add exponential backoff with full jitter, cap retries at 3, and ensure retry budget doesn't exceed the upstream timeout.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">← Circuit breaker</a><a onclick="sendPrompt('Explain idempotency key implementation in a payment API')">Idempotency in payments</a><a onclick="sendPrompt('Explain Resilience4j retry configuration with exponential backoff')">Resilience4j retry</a></div></div>
+  <button class="nb" onclick="show(4)">Next: Health checks <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T4: Health Checks ══ -->
+<div class="topic" id="t4">
+  <div class="tt">Health checks</div>
+  <div class="ts2">Liveness vs readiness probes · Kubernetes context</div>
+
+  <div class="sec">
+    <div class="sl">The distinction — liveness vs readiness</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Liveness probe</div><div class="kvv">Answers: "Is this container alive (not crashed/deadlocked)?" If it fails, Kubernetes kills the container and restarts it. Use for: detecting infinite loops, deadlocks, memory leaks that prevent the JVM from responding at all.</div></div>
+      <div class="kvc"><div class="kvl">Readiness probe</div><div class="kvv">Answers: "Is this container ready to serve traffic?" If it fails, Kubernetes removes the pod from the service's endpoint list — no new traffic routed to it. The pod is NOT restarted. Use for: startup warm-up, temporary degradation (cache miss storm, DB overloaded).</div></div>
+    </div>
+    <div class="prose" style="margin-top:10px">The critical difference: a failing liveness probe kills the pod (recovery via restart). A failing readiness probe quarantines the pod (recovery via getting healthy again without restart). Misusing them is a common ops mistake — using liveness for temporary overload causes restart storms.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">A third probe: startup</div>
+    <div class="prose"><strong>Startup probe:</strong> Kubernetes won't start checking liveness or readiness until the startup probe passes. For slow-starting JVM applications (Spring Boot takes 30–60s to warm up), without a startup probe: the liveness probe fails 5 times during startup → Kubernetes restarts the pod → it never starts. With startup probe: liveness/readiness are disabled until the app signals it's done initialising. Kubernetes 1.16+.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">What each probe should actually check</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Liveness endpoint: /health/live</div><div class="kvv">Should be trivial — just return 200 OK if the JVM is responsive. Do NOT check external dependencies. If your DB is down, you don't want Kubernetes restarting all your pods in a loop.</div></div>
+      <div class="kvc"><div class="kvl">Readiness endpoint: /health/ready</div><div class="kvv">Should check: can this pod serve traffic? Checks: DB connection pool has connections, required caches are warm, thread pools aren't exhausted. If any dependency is broken, return 503.</div></div>
+      <div class="kvc"><div class="kvl">Startup endpoint: /health/started</div><div class="kvv">Returns 200 once all initialisation is complete: schema migrations done, caches pre-warmed, connection pools established. Once 200, Kubernetes starts liveness/readiness checks.</div></div>
+      <div class="kvc"><div class="kvl">Deep health: /health</div><div class="kvv">Actuator full health — all components with detail. Used by monitoring systems, NOT by Kubernetes probes. Never use the deep endpoint as a probe — checking all dependencies on every probe interval is expensive.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Kubernetes configuration</div>
+    <div class="ab">livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 8080
+  initialDelaySeconds: 30    # wait for JVM startup
+  periodSeconds: 10          # check every 10s
+  failureThreshold: 3        # restart after 3 failures (30s window)
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8080
+  initialDelaySeconds: 20    # check readiness sooner than liveness
+  periodSeconds: 5           # check every 5s
+  failureThreshold: 3        # remove from endpoints after 3 failures
+  successThreshold: 1        # re-add after 1 success
+
+startupProbe:
+  httpGet:
+    path: /health/started
+    port: 8080
+  failureThreshold: 30       # allow 30 × 10s = 5 min for startup
+  periodSeconds: 10</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Liveness ≠ readiness.</strong> Say this immediately. "Liveness asks if the container is alive — failure triggers restart. Readiness asks if it should receive traffic — failure just removes it from rotation."</li>
+      <li><strong>Never check external dependencies in liveness.</strong> "If I check DB connectivity in the liveness probe and the DB goes down, Kubernetes will restart all my pods in a loop — which makes the outage worse. Liveness should only test the JVM itself."</li>
+      <li><strong>Startup probe prevents restart storms on slow JVMs.</strong> "Spring Boot with a large context takes 45 seconds to start. Without a startup probe, the liveness probe would kill it before it finishes. The startup probe tells Kubernetes to wait."</li>
+      <li><strong>EngineX connection:</strong> "For EngineX, I'd expose /health/live (trivial 200), /health/ready (checks OpenAI connectivity + DB pool), and /health/started (checks all services initialised). Readiness failing means the pod gets no traffic until OpenAI is reachable again."</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">← Circuit breaker (readiness)</a><a onclick="show(5)">Observability →</a><a onclick="sendPrompt('Explain Spring Boot Actuator health endpoints configuration')">Spring Actuator health</a></div></div>
+  <button class="nb" onclick="show(5)">Next: Observability <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T5: Observability ══ -->
+<div class="topic" id="t5">
+  <div class="tt">Observability</div>
+  <div class="ts2">Logging (structured) · metrics (RED method) · tracing (distributed) · OpenTelemetry</div>
+
+  <div class="sec">
+    <div class="sl">The three pillars</div>
+    <div class="prose">Observability is the ability to understand what your system is doing from the outside, without having to redeploy or change code. The three pillars are complementary — logs tell you what happened, metrics tell you how often and how fast, and traces tell you where the time went across services.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Pillar 1 — structured logging</div>
+    <div class="obs-pillar">
+      <div class="ph">Structured logs — JSON, not plaintext</div>
+      <div class="pd">Plaintext: <code>2024-01-15 10:23:01 ERROR Payment failed for user 42</code>. Impossible to query programmatically.<br><br>Structured: <code>{"timestamp":"2024-01-15T10:23:01Z","level":"ERROR","service":"payment","user_id":42,"order_id":"ord-9f3a","error":"timeout","duration_ms":5003,"trace_id":"abc123"}</code>. Queryable in Elasticsearch/Loki by any field.<br><br>Key fields every log line should have: <code>service</code>, <code>trace_id</code> (links to distributed trace), <code>span_id</code>, <code>user_id</code> (where applicable), <code>request_id</code>, <code>duration_ms</code>. The <code>trace_id</code> is the glue — one value to pull all logs for a single user request across 10 microservices simultaneously.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Pillar 2 — the RED method for metrics</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">R — Rate</div><div class="kvv">Requests per second. The throughput of each service. Alert if drops significantly (service down or no traffic). The heartbeat metric.</div></div>
+      <div class="kvc"><div class="kvl">E — Errors</div><div class="kvv">Percentage of requests that fail (5xx, timeouts). Alert threshold: varies by SLO. For a 99.9% availability SLO, error rate > 0.1% sustained for 5 minutes should page.</div></div>
+      <div class="kvc"><div class="kvl">D — Duration</div><div class="kvv">Latency distribution — p50, p95, p99, p999. Never alert on averages (a spike hides in them). Alert on p99. "p99 of /checkout > 500ms for 5 minutes = page."</div></div>
+      <div class="kvc"><div class="kvl">USE method (infra)</div><div class="kvv">Complementary to RED for infrastructure resources: Utilization (% busy), Saturation (queue depth), Errors. RED for services, USE for servers, DBs, queues.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Pillar 3 — distributed tracing</div>
+    <div class="prose">A user request triggers calls across 5 microservices. Something is slow — but which service? Distributed tracing assigns a <code>trace_id</code> to the incoming request and propagates it through every downstream call (via HTTP headers: <code>traceparent</code> in W3C Trace Context standard). Each service records a span (start time, end time, service name, operation name) tagged with the trace_id. A tracing backend (Jaeger, Tempo, Zipkin) assembles all spans into a flame graph showing exactly where time was spent.<br><br><strong>Sampling:</strong> Recording every trace is expensive at high traffic. Use head-based sampling (sample 1% of all requests) or tail-based sampling (sample 100% of slow/error requests, 1% of normal requests). Tail-based is better for debugging but more complex.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">OpenTelemetry — the unifying standard</div>
+    <div class="prose">Before OTel: every vendor had their own SDK. Switching from Datadog to Grafana meant rewriting all instrumentation. OpenTelemetry is the open standard for emitting telemetry data (traces, metrics, logs). Write OTel-compatible instrumentation once — export to any backend (Datadog, Grafana, Jaeger, Honeycomb) by changing the exporter configuration, not the code.<br><br><strong>Components:</strong> OTel API (what you instrument against), OTel SDK (implementation), OTel Collector (receives telemetry, processes, exports to backends). Auto-instrumentation agents (Java agent) inject tracing into Spring Boot, JDBC, Redis clients without code changes.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">The standard observability stack</div>
+    <div class="ab">Logs:    Structured JSON → Fluentd/Fluentbit → Elasticsearch → Kibana (ELK)
+              or JSON → Loki → Grafana (cheaper, simpler)
+
+Metrics: Prometheus (scrapes /metrics endpoint) → Grafana dashboards
+         Alert: Prometheus AlertManager → PagerDuty/OpsGenie
+
+Traces:  OpenTelemetry SDK → OTel Collector → Jaeger / Tempo → Grafana
+
+Unified: Grafana stack (Loki + Prometheus + Tempo) — one UI for all three
+         Datadog — commercial all-in-one (expensive but powerful)
+
+Spring Boot setup:
+  - spring-boot-starter-actuator → exposes /metrics (Prometheus format)
+  - micrometer-registry-prometheus → Prometheus scrape endpoint
+  - opentelemetry-javaagent.jar → auto-instruments traces (zero code change)
+  - logback + logstash-logback-encoder → JSON structured logs</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>RED method is the default answer for "how do you monitor a service?"</strong> Rate, Errors, Duration (p99). Mention that you alert on p99, never averages.</li>
+      <li><strong>Trace ID is the key to cross-service debugging.</strong> "When a user reports slowness, I take their request ID → find the trace → see a flame graph → identify that the inventory service DB query is taking 4 seconds. Without tracing, I'd be guessing."</li>
+      <li><strong>OpenTelemetry for portability.</strong> "I'd use OTel auto-instrumentation so I'm not locked into any vendor's SDK. We can switch from Datadog to Grafana without touching application code."</li>
+      <li><strong>Zombie Hunt connection.</strong> "For Zombie Hunt, I'd track: Rate (WebSocket messages/sec), Errors (disconnect rate, game error rate), Duration (game loop tick latency p99). A p99 game loop latency > 50ms means players feel lag — that's my primary SLO."</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(6)">Chaos engineering →</a><a onclick="show(4)">← Health checks</a><a onclick="sendPrompt('Explain OpenTelemetry Java auto-instrumentation setup with Spring Boot')">OTel Spring Boot setup</a></div></div>
+  <button class="nb" onclick="show(6)">Next: Chaos engineering <i class="ti ti-arrow-right"></i></button>
+</div>
+
+<!-- ══ T6: Chaos Engineering ══ -->
+<div class="topic" id="t6">
+  <div class="tt">Chaos engineering</div>
+  <div class="ts2">Netflix Chaos Monkey · failure injection · game days</div>
+
+  <div class="sec">
+    <div class="sl">The core principle</div>
+    <div class="prose">Chaos engineering is the practice of deliberately injecting failures into a production (or production-like) system to verify that it handles them gracefully. The key insight: if you don't test your failure modes, your first exposure to them is a real outage. It's better to cause a controlled, well-observed failure on a Tuesday afternoon than to discover you can't survive one on Black Friday at 11 PM.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">The Netflix approach</div>
+    <div class="chaos-card"><div class="ct"><span class="badge b-red">Chaos Monkey</span> Random instance termination</div><div class="cd">Randomly kills EC2 instances in production during business hours. Forces engineers to build services that survive instance loss automatically. If something breaks, it breaks during office hours when people are around to fix it — not at 3 AM.</div></div>
+    <div class="chaos-card"><div class="ct"><span class="badge b-amber">Chaos Kong</span> Region evacuation</div><div class="cd">Kills an entire AWS region. Tests multi-region failover. Netflix runs this periodically to validate that their global traffic can shift from us-east-1 to us-west-2 in under 90 seconds. Documented multiple times publicly.</div></div>
+    <div class="chaos-card"><div class="ct"><span class="badge b-purple">Latency Monkey</span> Network delay injection</div><div class="cd">Injects artificial latency into service calls. Tests timeout configurations and circuit breakers. "Does our payment service correctly time out after 3s, or does it hang indefinitely?"</div></div>
+    <div class="chaos-card"><div class="ct"><span class="badge b-blue">Conformity Monkey</span> Config compliance</div><div class="cd">Terminates instances not conforming to best practices (missing health checks, wrong instance types, missing auto-scaling). Automated policy enforcement through chaos.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Failure injection taxonomy</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Infrastructure failures</div><div class="kvv">Kill pods/instances, terminate AZs, run out of disk space, exhaust file descriptors, OOM kill processes. Tests: auto-scaling, failover, health check response.</div></div>
+      <div class="kvc"><div class="kvl">Network failures</div><div class="kvv">Add latency (tc netem), introduce packet loss, partition network segments, block specific ports. Tests: timeouts, circuit breakers, retries with backoff.</div></div>
+      <div class="kvc"><div class="kvl">Dependency failures</div><div class="kvv">Return errors from downstream services (via mock or proxy), slow down DB queries, fill Kafka queue, return 429s. Tests: circuit breakers, fallbacks, DLQ processing.</div></div>
+      <div class="kvc"><div class="kvl">State failures</div><div class="kvv">Corrupt data in cache, fill Redis memory, lose leader election, cause split-brain in a DB cluster. Tests: data validation, cache miss handling, consensus recovery.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Game days — structured chaos exercises</div>
+    <div class="prose">A game day is a planned, facilitated exercise where a team deliberately causes a failure and practices their incident response. Not automated — humans run the failure and humans respond to it.<br><br><strong>Structure:</strong> Define the hypothesis ("if we lose the primary DB, checkout will fail gracefully within 30 seconds"). Define the blast radius (only staging, or limited production users). Inject the failure. Observe and measure. Compare to hypothesis. Document gaps.<br><br><strong>Why game days matter beyond automation:</strong> They test the human system (on-call rotation, runbooks, communication channels, escalation paths) not just the technical system. An automated chaos test that kills a pod tests your software. A game day that kills a pod at 10 AM tests whether your on-call engineer knows what to do, whether your runbooks are accurate, and whether your Slack channels are organized correctly.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Chaos tooling</div>
+    <div class="kv">
+      <div class="kvc"><div class="kvl">Chaos Monkey for Spring Boot</div><div class="kvv">Library that injects failures into Spring beans: latency, exceptions, memory pressure, kill application. Configure per-service, per-endpoint. Non-invasive — add to existing Spring Boot apps.</div></div>
+      <div class="kvc"><div class="kvl">AWS Fault Injection Simulator</div><div class="kvv">Managed AWS service. Inject EC2 terminations, AZ failures, RDS failovers, EKS node drains. Supports steady-state hypothesis and automatic rollback.</div></div>
+      <div class="kvc"><div class="kvl">Chaos Mesh (Kubernetes)</div><div class="kvv">CNCF project. Injects pod failures, network partition, disk I/O faults into Kubernetes workloads. Declarative via CRDs. Good for k8s-native teams.</div></div>
+      <div class="kvc"><div class="kvl">Principles of Chaos Engineering</div><div class="kvv">The formal discipline: define steady state, form hypothesis, introduce variables, disprove hypothesis. The goal is to find weaknesses before they cause outages, not to cause outages.</div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sl">Interview perspective</div>
+    <div class="ib"><ol>
+      <li><strong>Frame chaos engineering as confidence building.</strong> "The goal isn't to break things — it's to prove that our reliability investments actually work. If circuit breakers trip correctly under chaos, I'm confident they'll work in a real incident."</li>
+      <li><strong>Start in staging, graduate to production.</strong> "I'd run chaos tests in staging first, validate they surface the expected failures, then introduce production chaos on a small percentage of traffic with automatic rollback triggers."</li>
+      <li><strong>Chaos engineering requires good observability.</strong> "You can't run meaningful chaos experiments without solid metrics, logging, and tracing. You need to see the system's response clearly, otherwise you're just breaking things randomly."</li>
+      <li><strong>Probe: "How would you use chaos engineering to validate your Razorpay payment service design?"</strong> → Define hypothesis: "If the payment gateway returns 503, all payment requests complete within 2 seconds via the circuit breaker fallback, and the DLQ processes the retries within 60 seconds." Inject: return 503 from payment gateway mock. Measure: circuit breaker open time, fallback latency, DLQ depth growth and clearance. Compare to hypothesis. This is a complete answer at the senior level.</li>
+    </ol></div>
+  </div>
+
+  <div class="sec"><div class="sl">Connects to</div><div class="cx"><a onclick="show(1)">← Circuit breaker</a><a onclick="show(5)">← Observability</a><a onclick="sendPrompt('Continue with Block 8: Full system design problems — URL shortener, Twitter/X feed, WhatsApp, YouTube, Uber, payment system, notification system')">Continue to Block 8 ↗</a></div></div>
+  <button class="nb" onclick="sendPrompt('Continue with Block 8: Full system design walkthroughs — URL shortener, Twitter/X feed design, WhatsApp messaging system, YouTube video platform, Uber ride matching, payment processing system, and notification system')">Continue to Block 8 ↗</button>
+</div>
+
+</main>
+</div>
+
+<script>
+function show(i){
+  document.querySelectorAll('.topic').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.querySelectorAll('.ni').forEach((n,j)=>n.classList.toggle('active',j===i));
+  document.querySelector('.content').scrollTop=0;
+}
+function stab(el,gid,pid){
+  document.getElementById(gid).querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pid).classList.add('active');
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+let curTokens=7;
+function drawBucket(){
+  const cap=+document.getElementById('cap').value;
+  const cur=Math.min(+document.getElementById('cur').value,cap);
+  document.getElementById('cap-out').textContent=cap;
+  document.getElementById('cur-out').textContent=cur;
+  curTokens=cur;
+  document.getElementById('cur').max=cap;
+  let h='';
+  for(let i=0;i<cap;i++){
+    h+=`<div class="token ${i<curTokens?'full':'empty'}">${i<curTokens?'T':''}</div>`;
+  }
+  document.getElementById('bucket-vis').innerHTML=h;
+  document.getElementById('bucket-msg').textContent=`${curTokens}/${cap} tokens available. ${curTokens>0?'Request allowed.':'Request REJECTED (429).'}`;
+}
+function consume(){
+  const cap=+document.getElementById('cap').value;
+  if(curTokens>0){curTokens--;document.getElementById('cur').value=curTokens;drawBucket();}
+  else{document.getElementById('bucket-msg').textContent='Bucket empty — request REJECTED (429). Wait for refill.';}
+}
+function refill(){
+  const cap=+document.getElementById('cap').value;
+  curTokens=Math.min(cap,curTokens+3);
+  document.getElementById('cur').value=curTokens;
+  drawBucket();
+}
+drawBucket();
+
+let cbHistory=[];
+let cbState='CLOSED';
+let cbFails=0;
+let cbTotal=0;
+const WINDOW=10;
+function updateCB(){}
+function cbCall(success){
+  const ft=+document.getElementById('ft').value/100;
+  cbHistory.push(success?1:0);
+  if(cbHistory.length>WINDOW) cbHistory.shift();
+  cbTotal=cbHistory.length;
+  cbFails=cbHistory.filter(x=>x===0).length;
+  const rate=cbTotal>0?cbFails/cbTotal:0;
+  const badge=document.getElementById('cb-state-badge');
+  const msg=document.getElementById('cb-msg');
+  if(cbState==='CLOSED'){
+    if(cbTotal>=5&&rate>=ft){
+      cbState='OPEN';
+      badge.className='badge b-red';badge.textContent='OPEN';
+      msg.textContent=`Failure rate ${Math.round(rate*100)}% exceeded ${Math.round(ft*100)}% threshold. Circuit OPEN — requests fail fast.`;
+    } else {
+      msg.textContent=`Circuit closed. Failure rate: ${Math.round(rate*100)}%. Threshold: ${Math.round(ft*100)}%.`;
+    }
+  } else if(cbState==='OPEN'){
+    badge.className='badge b-amber';badge.textContent='HALF-OPEN (click success to close)';
+    cbState='HALF-OPEN';
+    msg.textContent='Probing recovery with limited requests.';
+  } else {
+    if(success){cbState='CLOSED';cbHistory=[];cbFails=0;cbTotal=0;badge.className='badge b-green';badge.textContent='CLOSED';msg.textContent='Recovery confirmed. Circuit closed.';}
+    else{cbState='OPEN';badge.className='badge b-red';badge.textContent='OPEN';msg.textContent='Probe failed. Back to OPEN.';}
+  }
+  document.getElementById('cb-fail-count').textContent=`${cbFails} / ${cbTotal}`;
+  document.getElementById('cb-fail-rate').textContent=`${Math.round(rate*100)}%`;
+  let hhtml='';
+  cbHistory.forEach(v=>{hhtml+=`<div style="width:16px;height:16px;border-radius:3px;background:${v?'#EAF3DE':'#FCEBEB'};border:0.5px solid ${v?'#97C459':'#F09595'}"></div>`;});
+  document.getElementById('cb-history').innerHTML=hhtml;
+}
+function cbReset(){
+  cbHistory=[];cbState='CLOSED';cbFails=0;cbTotal=0;
+  document.getElementById('cb-state-badge').className='badge b-green';
+  document.getElementById('cb-state-badge').textContent='CLOSED';
+  document.getElementById('cb-fail-count').textContent='0 / 0';
+  document.getElementById('cb-fail-rate').textContent='0%';
+  document.getElementById('cb-history').innerHTML='';
+  document.getElementById('cb-msg').textContent='Circuit is closed. All requests pass through.';
+}
+
+function calcBackoff(){
+  const base=+document.getElementById('b-base').value;
+  const cap=+document.getElementById('b-cap').value;
+  document.getElementById('b-base-out').textContent=base+'ms';
+  document.getElementById('b-cap-out').textContent=cap+'ms';
+  let h='';
+  for(let n=1;n<=5;n++){
+    const exp=Math.min(cap,base*Math.pow(2,n-1));
+    const jittered=Math.round(Math.random()*exp);
+    h+=`<div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px;text-align:center">
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:2px">Attempt ${n}</div>
+      <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">${jittered}ms</div>
+      <div style="font-size:10px;color:var(--color-text-tertiary)">cap: ${Math.round(exp)}ms</div>
+    </div>`;
+  }
+  document.getElementById('backoff-table').innerHTML=h;
+}
+calcBackoff();
+</script>
