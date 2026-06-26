@@ -11,6 +11,85 @@
 import { useState, useRef, useMemo } from 'react'
 import { HTML_SECTIONS } from '../data/htmlContent'
 
+// ── Parchment/sandal light theme — CSS vars injected into every iframe ────────
+const THEME_VARS = `<style id="__ex-theme">
+:root {
+  /* backgrounds */
+  --color-background-primary:   #fbf9e1;
+  --color-background-secondary: #f2eec8;
+  --color-background-info:      #ede7fb;
+  --color-background-danger:    #fdecea;
+
+  /* text */
+  --color-text-primary:   #2d2a1e;
+  --color-text-secondary: #5a5340;
+  --color-text-tertiary:  #8c8060;
+  --color-text-info:      #5b3fa6;
+  --color-text-danger:    #b91c1c;
+
+  /* borders */
+  --color-border-primary:   #c8be8a;
+  --color-border-secondary: #d9d09a;
+  --color-border-tertiary:  #e8e2b8;
+  --color-border-info:      #9b79e0;
+
+  /* typography */
+  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* radii */
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 10px;
+}
+
+/* base */
+html, body { background: #fbf9e1 !important; color: #2d2a1e !important; }
+body { font-family: var(--font-sans); font-size: 14px; line-height: 1.7; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f2eec8; }
+::-webkit-scrollbar-thumb { background: #c8be8a; border-radius: 3px; }
+
+/* accent overrides — purple */
+a { color: #6d3fc7; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* active nav */
+.nav-item.active,
+.nav-item:hover { color: #5b3fa6 !important; }
+.nav-item.active { border-color: #9b79e0 !important; background: #ede7fb !important; }
+
+/* code blocks — light card */
+.code, pre, code {
+  background: #eeebd0 !important;
+  border: 1px solid #d9d09a !important;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #2d2a1e !important;
+}
+pre { padding: 14px 16px; overflow-x: auto; white-space: pre; }
+
+/* section labels with purple left-border */
+.sec-label { color: #5b3fa6 !important; }
+.sec-label::after { background: #c8be8a !important; }
+.topic-oneliner { border-color: #9b79e0 !important; }
+.topic-tag { background: #ede7fb !important; color: #5b3fa6 !important; border: 1px solid #c4aef5; }
+
+/* analogy callout */
+.analogy { border-color: #9b79e0 !important; background: #ede7fb !important; color: #3d2970 !important; }
+
+/* tables */
+table.ct th { color: #5b3fa6 !important; border-color: #c8be8a !important; }
+table.ct td { border-color: #e8e2b8 !important; }
+
+/* sidebar */
+.sidebar, nav { background: #f2eec8 !important; border-color: #d9d09a !important; }
+</style>`
+
 // ── Inject heading IDs + scroll listener into the HTML string ─────────────────
 function processHtml(raw) {
   if (!raw) return ''
@@ -20,8 +99,10 @@ function processHtml(raw) {
     if (/\bid=/i.test(attrs)) return match
     return `<${tag}${attrs} id="ex-h${idx++}">`
   })
+  // Inject theme vars at the very top, then the scroll bridge before </body>
   const bridge = `<script>window.addEventListener('message',function(e){if(e.data&&e.data._ex==='scroll'){var el=document.getElementById(e.data.id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}});</script>`
-  return withIds.includes('</body>') ? withIds.replace('</body>', bridge + '</body>') : withIds + bridge
+  const themed = THEME_VARS + withIds
+  return themed.includes('</body>') ? themed.replace('</body>', bridge + '</body>') : themed + bridge
 }
 
 // ── Parse h2/h3 headings from raw HTML for the TOC ───────────────────────────
@@ -147,7 +228,7 @@ export default function StaticContentViewer({ categoryId }) {
             srcDoc={html}
             title={item.title}
             sandbox="allow-scripts allow-same-origin"
-            style={{ flex: 1, border: 'none', background: '#fff', height: '100%', width: '100%' }}
+            style={{ flex: 1, border: 'none', background: '#fbf9e1', height: '100%', width: '100%' }}
           />
         )}
       </div>
