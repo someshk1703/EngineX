@@ -50,6 +50,14 @@ body { font-family: var(--font-sans); font-size: 14px; line-height: 1.7; padding
 /* outer shell/app wrappers — respect the 5px body padding */
 .shell, .app { box-sizing: border-box; width: 100%; }
 
+/* content area + individual sections */
+.content, main { padding: 20px 24px !important; }
+.sec { padding: 14px 16px; background: rgba(255,255,255,0.45); border-radius: var(--border-radius-md); margin-bottom: 20px; }
+.card { padding: 14px 16px !important; }
+.iq  { padding: 12px 16px !important; }
+.analogy { padding: 14px 18px !important; }
+.code, pre { padding: 14px 16px !important; }
+
 /* scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #f2eec8; }
