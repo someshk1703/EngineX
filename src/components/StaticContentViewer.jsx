@@ -45,7 +45,10 @@ const THEME_VARS = `<style id="__ex-theme">
 
 /* base */
 html, body { background: #fbf9e1 !important; color: #2d2a1e !important; }
-body { font-family: var(--font-sans); font-size: 14px; line-height: 1.7; }
+body { font-family: var(--font-sans); font-size: 14px; line-height: 1.7; padding: 5px; box-sizing: border-box; }
+
+/* outer shell/app wrappers — respect the 5px body padding */
+.shell, .app { box-sizing: border-box; width: 100%; }
 
 /* scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
