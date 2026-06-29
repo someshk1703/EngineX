@@ -854,19 +854,17 @@ function QuestionsPanel({ questions = [], type = 'dsa' }) {
 
 // ─── Category View (Theory | Questions | Flashcards) ─────────────────────────
 function CategoryView({ category, progress, onOpenChapter, onBack }) {
-  const theoryItems  = HTML_SECTIONS[category.id] || []
   const questions    = QUESTIONS_MAP[category.id] || []
   const chaptersInCat = CHAPTERS.filter(c => c.category === category.id)
   const hasQuestions = questions.length > 0
   const hasChapters  = chaptersInCat.length > 0
   const qType        = category.id === 'Java' ? 'java' : 'dsa'
 
-  // Default tab priority: theory → questions → flashcards → chapters
-  const defaultTab = theoryItems.length ? 'theory' : hasQuestions ? 'questions' : 'flashcards'
+  // Default tab priority: questions → flashcards → chapters
+  const defaultTab = hasQuestions ? 'questions' : 'flashcards'
   const [activeTab, setActiveTab] = useState(defaultTab)
 
   const tabs = [
-    theoryItems.length  && { key: 'theory',    label: '📚 Theory',    count: theoryItems.length },
     hasQuestions        && { key: 'questions',  label: '💡 Questions', count: questions.length },
     true                && { key: 'flashcards', label: '📌 Flashcards' },
     hasChapters         && { key: 'chapters',   label: '◈ AI Chapters', count: chaptersInCat.length },
@@ -887,7 +885,6 @@ function CategoryView({ category, progress, onOpenChapter, onBack }) {
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{category.name}</h1>
           </div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
-            {theoryItems.length > 0 && `${theoryItems.length} guides · `}
             {questions.length > 0 && `${questions.length} questions · `}
             {hasChapters && `${readCount}/${chaptersInCat.length} chapters read`}
           </div>
@@ -921,10 +918,6 @@ function CategoryView({ category, progress, onOpenChapter, onBack }) {
       </div>
 
       {/* Tab content */}
-      {activeTab === 'theory' && (
-        <StaticContentViewer categoryId={category.id} />
-      )}
-
       {activeTab === 'questions' && (
         <QuestionsPanel questions={questions} type={qType} />
       )}
@@ -949,6 +942,84 @@ function CategoryView({ category, progress, onOpenChapter, onBack }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── Theory View ──────────────────────────────────────────────────────────────
+const THEORY_SUBJECTS = [
+  { id: 'DSA',            name: 'Data Structures & Algorithms', icon: '󱃔', desc: '8 guides — trees, graphs, DP, patterns, bit manipulation' },
+  { id: 'Java',           name: 'Java Deep Dive',               icon: '☕', desc: '8 guides — JVM, collections, concurrency, design patterns' },
+  { id: 'CS Fundamentals',name: 'CS Fundamentals',              icon: '󰓙', desc: '8 guides — networks, OS, compilers, cryptography, distributed systems' },
+  { id: 'Full Stack',     name: 'Frontend & Full Stack',        icon: '󰜎', desc: '8 guides — browser internals, React, performance, security' },
+  { id: 'System Design',  name: 'System Design',                icon: '󱗿', desc: '9 guides — architecture, caching, databases, messaging, reliability' },
+]
+
+function TheoryView({ onOpenSubject }) {
+  return (
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: 6, color: 'var(--text-primary)' }}>Theory Library</h1>
+        <p style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+          Structured deep-dive guides for each subject — sidebar navigation, tabbed sections, worked examples.
+        </p>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+        {THEORY_SUBJECTS.map(subj => {
+          const items = HTML_SECTIONS[subj.id] || []
+          return (
+            <button
+              key={subj.id}
+              onClick={() => onOpenSubject(subj)}
+              style={{
+                background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+                borderRadius: 10, padding: '24px', cursor: 'pointer', textAlign: 'left',
+                display: 'flex', flexDirection: 'column', gap: 14, transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-cyan)'; e.currentTarget.style.boxShadow = '0 0 16px var(--accent-cyan-glow)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.boxShadow = 'none' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '1.6rem' }}>{subj.icon}</span>
+                <span style={{
+                  fontFamily: 'var(--font-mono)', fontSize: '0.68rem', padding: '3px 8px',
+                  borderRadius: 4, background: 'rgba(0,212,255,0.1)', color: 'var(--accent-cyan)',
+                  border: '1px solid rgba(0,212,255,0.25)',
+                }}>
+                  {items.length} guides
+                </span>
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.05rem', marginBottom: 6 }}>
+                  {subj.name}
+                </div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                  {subj.desc}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {items.slice(0, 4).map(item => (
+                  <span
+                    key={item.id}
+                    style={{
+                      fontSize: '0.68rem', padding: '2px 7px', borderRadius: 3,
+                      background: 'var(--bg-primary)', border: '1px solid var(--border-color)',
+                      color: 'var(--text-muted)', fontFamily: 'var(--font-mono)',
+                    }}
+                  >
+                    {item.title}
+                  </span>
+                ))}
+                {items.length > 4 && (
+                  <span style={{ fontSize: '0.68rem', padding: '2px 7px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    +{items.length - 4} more
+                  </span>
+                )}
+              </div>
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -2218,9 +2289,10 @@ function LoginScreen() {
 }
 
 export default function App() {
-  const [view, setView] = useState('library')   // 'library' | 'category' | 'chapter' | 'quiz' | 'dashboard'
+  const [view, setView] = useState('library')   // 'library' | 'category' | 'chapter' | 'quiz' | 'dashboard' | 'theory' | 'theory-subject'
   const [selectedChapter, setSelectedChapter] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedTheoryCategory, setSelectedTheoryCategory] = useState(null)
   // selectedHtmlItem removed — theory is now inline via StaticContentViewer
   const [progress, setProgress] = useState(loadProgress)
   const [showSettings, setShowSettings] = useState(false)
@@ -2350,23 +2422,30 @@ export default function App() {
           <nav style={{ display: 'flex', gap: 4 }}>
             {[
               { label: 'Library', val: 'library' },
+              { label: 'Theory',  val: 'theory' },
               { label: 'Dashboard', val: 'dashboard' },
-            ].map(({ label, val }) => (
-              <button
-                key={val}
-                onClick={() => setView(val)}
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  padding: '6px 14px', borderRadius: 4,
-                  fontFamily: 'var(--font-mono)', fontSize: '0.85rem', letterSpacing: 0.5,
-                  color: (view === val || (val === 'library' && ['category','html','chapter','quiz'].includes(view))) ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                  borderBottom: (view === val || (val === 'library' && ['category','html','chapter','quiz'].includes(view))) ? '2px solid var(--accent-cyan)' : '2px solid transparent',
-                  transition: 'all 0.2s',
-                }}
-              >
-                {label}
-              </button>
-            ))}
+            ].map(({ label, val }) => {
+              const isActive =
+                view === val ||
+                (val === 'library' && ['category','html','chapter','quiz'].includes(view)) ||
+                (val === 'theory'  && view === 'theory-subject')
+              return (
+                <button
+                  key={val}
+                  onClick={() => setView(val)}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    padding: '6px 14px', borderRadius: 4,
+                    fontFamily: 'var(--font-mono)', fontSize: '0.85rem', letterSpacing: 0.5,
+                    color: isActive ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                    borderBottom: isActive ? '2px solid var(--accent-cyan)' : '2px solid transparent',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {label}
+                </button>
+              )
+            })}
           </nav>
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -2449,6 +2528,31 @@ export default function App() {
       <main style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: '32px 28px' }}>
         {view === 'library' && (
           <LibraryView progress={progress} onOpenChapter={handleOpenChapter} onOpenCategory={handleOpenCategory} />
+        )}
+        {view === 'theory' && (
+          <TheoryView
+            onOpenSubject={(subj) => {
+              setSelectedTheoryCategory(subj)
+              setView('theory-subject')
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+          />
+        )}
+        {view === 'theory-subject' && selectedTheoryCategory && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+              <button className="btn-console" onClick={() => setView('theory')} style={{ padding: '5px 12px', fontSize: '0.78rem' }}>
+                ← THEORY
+              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: '1.4rem' }}>{selectedTheoryCategory.icon}</span>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+                  {selectedTheoryCategory.name}
+                </h1>
+              </div>
+            </div>
+            <StaticContentViewer categoryId={selectedTheoryCategory.id} />
+          </div>
         )}
         {view === 'category' && selectedCategory && (
           <CategoryView
