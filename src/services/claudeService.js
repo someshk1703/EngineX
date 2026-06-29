@@ -356,78 +356,168 @@ async function callAI(systemPrompt, userMessage, maxTokens = 3500) {
 }
 
 // ─── Generate Chapter Content ─────────────────────────────────────────────────
+
+const CATEGORY_TABS = {
+  'DSA':             ['Definition','Mechanics','Complexity','Variants','Patterns','Smell→Pattern','Java Code','Worked Example','Practice','Interview'],
+  'Java':            ['Definition','Internals','Subtopics','Code Example','Real-World','Mistakes','Interview','Connects To'],
+  'System Design':   ['Definition','How It Works','Subtypes','Scale Estimation','Architecture','Trade-Offs','Failure Modes','Real-World','Interview','Connects To'],
+  'CS Fundamentals': ['Definition','Why It Exists','How It Works','Subtopics','Mental Model','Real-World','Code','Misconceptions','Interview','Connects To'],
+  'Full Stack':      ['Definition','Internals','Subtopics','Performance','Code','Architecture','Trade-Offs','Mistakes','Interview','Connects To'],
+  'Cloud & DevOps':  ['Definition','Why It Exists','How It Works','Core Services','Architecture','Hands-On','Trade-Offs','Real-World','Interview','Connects To'],
+  'Databases':       ['Definition','Internals','Schema Design','Query Patterns','Indexing','Scaling','Trade-Offs','Real-World','Interview','Connects To'],
+  'Security':        ['Definition','Why It Matters','How It Works','Attack Vectors','Defense','Code Example','Common Mistakes','Real-World','Interview','Connects To'],
+  'Soft Skills':     ['Overview','Why It Matters','Framework','Examples','Common Mistakes','STAR Template','Interview Tips','Connects To'],
+};
+
 export async function generateChapterContent(chapter) {
   const refContext = buildRefContext(chapter);
 
-  const systemPrompt = `You are a world-class software engineering educator and technical interview coach with 15+ years of experience at FAANG companies and Big 4 consulting firms. Your student is a Full Stack engineer preparing to break into top-tier tech companies like Google, Meta, Amazon, and Deloitte.
+  const tabs = CATEGORY_TABS[chapter.category] || ['Definition','Overview','Key Concepts','Examples','Trade-Offs','Real-World','Interview','Connects To'];
+  const tabsJson = JSON.stringify(tabs);
 
-Generate a complete, thorough chapter using EXACTLY this structure (use these exact ## headings):
+  const systemPrompt = `You are a world-class software engineering educator and FAANG interview coach. Generate content for Full Stack engineers preparing for top-tier tech interviews.
 
-## 1. WHAT IS IT & WHY IT MATTERS
-- Define the concept clearly in plain English
-- Explain exactly why FAANG and Big 4 interviewers care about this topic
-- Include a real-world analogy to make it stick
+━━ OUTPUT FORMAT ━━
+Respond with a SINGLE complete self-contained HTML file. No prose, no markdown, no explanation before or after. The response MUST start with <!DOCTYPE html> and end with </html>.
 
-## 2. CORE CONCEPTS (THE THEORY)
-- Break down every fundamental idea with bullet points and sub-sections
-- Explain the "why" behind every concept — no hand-waving
-- Include ASCII diagrams where helpful (especially for data structures, system design, memory layout)
+Use this EXACT skeleton:
 
-## 3. HOW IT WORKS UNDER THE HOOD
-- Go deeper than surface level — explain internal mechanics
-- Cover memory layout, performance implications, and internal state
-- Mention how popular runtimes/engines/databases implement this internally
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>TOPIC</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#fbf9e1;color:#2d2a1e;font-size:14px;line-height:1.7}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;min-width:180px;overflow-y:auto;background:#f2eec8;border-right:1px solid #c8be8a;padding:16px 0}
+.sidebar-title{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8c8060;padding:0 16px 10px}
+.topic-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 16px;background:none;border:none;cursor:pointer;font-size:.82rem;color:#5a5340;text-align:left;transition:background .15s}
+.topic-btn:hover{background:rgba(0,0,0,.06)}
+.topic-btn.active{background:#ede7fb;color:#5b3fa6;font-weight:600}
+.topic-num{font-size:.7rem;color:#8c8060;min-width:20px}
+.main{flex:1;overflow-y:auto}
+.section-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:16px 24px 12px;border-bottom:1px solid #e8e2b8;position:sticky;top:0;background:#fbf9e1;z-index:10}
+.tab{padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;border:1.5px solid #d9d09a;background:none;color:#5a5340;transition:all .15s}
+.tab:hover{border-color:#9b79e0;color:#5b3fa6}
+.tab.active{background:#ede7fb;border-color:#9b79e0;color:#5b3fa6}
+.content{padding:24px;max-width:860px}
+.topic-header{margin-bottom:24px}
+.topic-title{font-size:1.4rem;font-weight:700;color:#2d2a1e}
+.topic-subtitle{font-size:.9rem;color:#5a5340;margin-top:4px}
+.card{background:rgba(255,255,255,.6);border:1px solid #d9d09a;border-radius:8px;padding:16px;margin-bottom:14px}
+.card-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5b3fa6;margin-bottom:6px}
+.card-text{font-size:.88rem;color:#5a5340}
+.highlight{background:#ede7fb;border-left:3px solid #9b79e0;padding:12px 16px;border-radius:0 6px 6px 0;margin-bottom:14px;font-size:.88rem}
+.code-block{background:#eeebd0;border:1px solid #d9d09a;border-radius:6px;padding:14px 16px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:.82rem;overflow-x:auto;margin-bottom:14px;white-space:pre}
+.complexity-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:.82rem}
+.complexity-table th{background:#f2eec8;padding:8px 12px;text-align:left;border-bottom:2px solid #c8be8a}
+.complexity-table td{padding:6px 12px;border-bottom:1px solid #e8e2b8}
+.o-good{color:#15803d;font-weight:700}
+.o-mid{color:#b45309;font-weight:700}
+.o-bad{color:#b91c1c;font-weight:700}
+.pattern-card{border:1px solid #d9d09a;border-radius:8px;padding:14px;margin-bottom:12px}
+.pattern-name{font-weight:700;font-size:.9rem;margin-bottom:4px}
+.trigger{font-size:.8rem;color:#5a5340;margin-bottom:6px}
+.pattern-when{font-size:.82rem}
+.smell-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.smell-if,.smell-then,.smell-why{background:rgba(255,255,255,.5);border:1px solid #e8e2b8;border-radius:6px;padding:10px 12px;font-size:.82rem}
+.smell-if::before{content:"IF";display:block;font-size:.65rem;font-weight:700;letter-spacing:.1em;color:#5b3fa6;margin-bottom:4px}
+.smell-then::before{content:"THEN";display:block;font-size:.65rem;font-weight:700;letter-spacing:.1em;color:#15803d;margin-bottom:4px}
+.smell-why::before{content:"WHY";display:block;font-size:.65rem;font-weight:700;letter-spacing:.1em;color:#b45309;margin-bottom:4px}
+.problem-card{border:1px solid #d9d09a;border-radius:8px;padding:12px 14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.problem-diff{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;margin-top:2px}
+.easy{background:#dcfce7;color:#15803d}
+.medium{background:#fef9c3;color:#b45309}
+.hard{background:#fee2e2;color:#b91c1c}
+.problem-name{font-weight:600;font-size:.88rem}
+.problem-meta{font-size:.78rem;color:#8c8060;margin-top:2px}
+.interview-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #d9d09a;border-radius:20px;padding:6px 14px;margin:4px;font-size:.8rem}
+.pill-dot{width:6px;height:6px;border-radius:50%;background:#9b79e0}
+h2{font-size:1rem;font-weight:700;color:#2d2a1e;margin:18px 0 10px}
+h3{font-size:.9rem;font-weight:600;color:#5b3fa6;margin:14px 0 8px}
+p{margin-bottom:10px;font-size:.88rem}
+ul,ol{padding-left:20px;margin-bottom:10px;font-size:.88rem}
+li{margin-bottom:4px}
+strong{font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-title">Topics</div>
+    <div id="topic-list"></div>
+  </div>
+  <div class="main">
+    <div id="tab-bar" class="section-tabs"></div>
+    <div class="content" id="content-area"></div>
+  </div>
+</div>
+<script>
+const TABS = /* INSERT TABS ARRAY */;
+const DATA = [/* INSERT DATA ARRAY */];
 
-## 4. CODE EXAMPLES
-- Use modern JavaScript/TypeScript (ES2022+) unless the topic demands otherwise
-- Start with a simple example, then progressively build to a complex real-world example
-- Every code block must have inline comments explaining key lines
-- After each block, state the Time Complexity and Space Complexity explicitly
+let currentTopic = 0, currentTab = 0;
 
-## 5. REAL-WORLD USAGE
-- Where is this used in production systems?
-- Which companies use it and in what context?
-- Name specific tools, libraries, or services that rely on this concept
+function renderTabs() {
+  document.getElementById('tab-bar').innerHTML = TABS.map(function(t,i){
+    return '<button class="tab'+(i===currentTab?' active':'')+'" onclick="selectSection('+i+')">'+t+'</button>';
+  }).join('');
+}
+function renderContent() {
+  var topic = DATA[currentTopic];
+  document.getElementById('content-area').innerHTML =
+    '<div class="topic-header"><div class="topic-title">'+topic.title+'</div><div class="topic-subtitle">'+topic.subtitle+'</div></div>'+
+    '<div class="section">'+(topic.sections[currentTab]||'')+'</div>';
+}
+function selectTopic(i) {
+  currentTopic=i; currentTab=0;
+  renderTabs(); renderContent();
+  document.querySelectorAll('.topic-btn').forEach(function(b,j){b.classList.toggle('active',j===i);});
+}
+function selectSection(i) {
+  currentTab=i; renderContent();
+  document.querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('active',j===i);});
+}
+document.getElementById('topic-list').innerHTML = DATA.map(function(d,i){
+  return '<button class="topic-btn'+(i===0?' active':'')+'" onclick="selectTopic('+i+')">'+
+    '<span class="topic-num">'+String(i+1).padStart(2,'0')+'</span>'+d.title+'</button>';
+}).join('');
+renderTabs(); renderContent();
+</script>
+</body>
+</html>
 
-## 6. COMMON MISTAKES & PITFALLS
-- What do junior engineers get wrong about this?
-- What are the most common bugs, misunderstandings, or anti-patterns?
-- What would make an interviewer raise a red flag?
-
-## 7. INTERVIEW PATTERNS & TIPS
-- What types of questions appear at FAANG vs Big 4 for this topic?
-- Key phrases and terminology to use in interviews
-- Step-by-step approach to answering a question on this topic
-- List 3-5 example interview questions (without answers — those go in the quiz)
-
-## 8. QUICK REVISION CHEATSHEET
-- Tight bullet-point summary of everything important
-- Key terms defined in one line each
-- The 5 things you must never forget about this topic
-
-RULES:
-- Use technical precision — do not oversimplify or add filler text
-- Use JavaScript/TypeScript for code unless topic requires otherwise
-- Tone: like a brilliant senior engineer mentoring a junior — direct, clear, no fluff
-- Length: comprehensive and thorough — do not cut corners
-- Format: proper Markdown with headers, fenced code blocks, bullet points${refContext}`;
+━━ DATA ARRAY RULES ━━
+- Each object = one sidebar topic: { title, subtitle, sections: string[] }
+- sections[] must have exactly one HTML string per tab, in TABS order
+- Each sections[i] is raw inner HTML — no <html>/<body> wrapper
+- Use .card, .highlight, .code-block, .complexity-table, .pattern-card, .smell-row, .problem-card, .interview-pill as appropriate
+- For code use .code-block (no markdown fences — raw text inside the div)
+- Be substantive: each section 200–500 words of real content
+- No markdown syntax anywhere in the output${refContext}`;
 
   const userMessage = `CATEGORY: ${chapter.category}
 TOPIC: ${chapter.title}
 DIFFICULTY: ${chapter.complexity}
-TAGS: ${chapter.tags.join(", ")}
+TAGS: ${chapter.tags.join(', ')}
 DESCRIPTION: ${chapter.description}
 
-Additional context:
-- For DSA topics: include time and space complexity for every solution shown
-- For System Design topics: include an ASCII architecture diagram
-- For Full Stack topics: use React/Node.js patterns
-- Focus extra attention on interview patterns specific to this exact topic
+TABS (use exactly, in this order): ${tabsJson}
+Number of tabs: ${tabs.length}
 
-Generate the full chapter now following the exact structure in your instructions.`;
+Generate 4–6 DATA entries:
+- Entry 0: the main topic "${chapter.title}"
+- Entries 1–N: key subtopics / variants / related concepts
+
+Each entry needs sections[] with exactly ${tabs.length} strings (one per tab).
+Last tab ("${tabs[tabs.length - 1]}"): use .interview-pill elements for 3–5 FAANG questions + a step-by-step answering framework.
+
+Output the complete HTML file now. Start with <!DOCTYPE html> — nothing else before or after.`;
 
   try {
-    return await callAI(systemPrompt, userMessage, 3500);
+    return await callAI(systemPrompt, userMessage, 8000);
   } catch (error) {
     console.error("Error generating chapter content:", error);
     throw error;

@@ -489,6 +489,11 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 }
 
 /* Animations */
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
 @keyframes pulseGlow {
   0%, 100% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); }
   50% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }

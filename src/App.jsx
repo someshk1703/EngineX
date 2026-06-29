@@ -1094,6 +1094,9 @@ function LibraryView({ progress, onOpenChapter }) {
   const [sortBy, setSortBy]   = useState('default')
   const [activeCat, setActiveCat] = useState('ALL')
 
+  // Hamburger topic drawer
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
   // Flashcards tab
   const [flashCat, setFlashCat] = useState(CATEGORIES[0].id)
 
@@ -1132,9 +1135,134 @@ function LibraryView({ progress, onOpenChapter }) {
   })
 
   return (
-    <div>
-      {/* Library tab bar */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 28 }}>
+    <div style={{ position: 'relative' }}>
+
+      {/* ── Topic Drawer (hamburger sidebar) ─────────────────────────────── */}
+      {drawerOpen && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}
+          onClick={() => setDrawerOpen(false)}
+        >
+          {/* backdrop */}
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(3px)' }} />
+          {/* drawer panel */}
+          <div
+            style={{
+              position: 'relative', zIndex: 1,
+              width: 280, height: '100%',
+              background: 'var(--bg-secondary)',
+              borderRight: '1px solid var(--border-color)',
+              display: 'flex', flexDirection: 'column',
+              boxShadow: '4px 0 32px rgba(0,0,0,0.4)',
+              animation: 'slideInLeft 0.22s ease',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* drawer header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '16px 20px', borderBottom: '1px solid var(--border-color)',
+            }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--accent-cyan)', letterSpacing: 1 }}>
+                TOPICS
+              </span>
+              <button
+                onClick={() => setDrawerOpen(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1, padding: 4 }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* ALL option */}
+            <button
+              onClick={() => { setActiveCat('ALL'); setLibTab('chapters'); setDrawerOpen(false) }}
+              style={{
+                background: activeCat === 'ALL' ? 'rgba(0,212,255,0.08)' : 'none',
+                border: 'none', borderLeft: activeCat === 'ALL' ? '3px solid var(--accent-cyan)' : '3px solid transparent',
+                cursor: 'pointer', padding: '12px 20px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                color: activeCat === 'ALL' ? 'var(--accent-cyan)' : 'var(--text-primary)',
+                fontFamily: 'var(--font-mono)', fontSize: '0.82rem',
+                transition: 'all 0.15s', textAlign: 'left',
+              }}
+            >
+              <span>All Topics</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{CHAPTERS.length}</span>
+            </button>
+
+            {/* category list */}
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              {CATEGORIES.map(cat => {
+                const n = CHAPTERS.filter(c => c.category === cat.id).length
+                if (n === 0) return null
+                const isActive = activeCat === cat.id
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => { setActiveCat(cat.id); setLibTab('chapters'); setDrawerOpen(false) }}
+                    style={{
+                      width: '100%', background: isActive ? 'rgba(0,212,255,0.08)' : 'none',
+                      border: 'none', borderLeft: isActive ? '3px solid var(--accent-cyan)' : '3px solid transparent',
+                      cursor: 'pointer', padding: '12px 20px',
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      color: isActive ? 'var(--accent-cyan)' : 'var(--text-primary)',
+                      fontFamily: 'var(--font-mono)', fontSize: '0.82rem',
+                      transition: 'all 0.15s', textAlign: 'left',
+                    }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--bg-primary)' }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'none' }}
+                  >
+                    <span style={{ fontSize: '1rem', flexShrink: 0 }}>{cat.icon}</span>
+                    <span style={{ flex: 1, lineHeight: 1.3 }}>{cat.name}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', flexShrink: 0 }}>{n}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* progress bar at bottom */}
+            <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                <span>Overall Progress</span>
+                <span>{CHAPTERS.filter(c => progress[c.id]?.read).length} / {CHAPTERS.length}</span>
+              </div>
+              <div style={{ height: 4, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%', borderRadius: 2, background: 'var(--accent-cyan)',
+                  width: `${Math.round((CHAPTERS.filter(c => progress[c.id]?.read).length / CHAPTERS.length) * 100)}%`,
+                  transition: 'width 0.4s',
+                }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Library tab bar + hamburger ──────────────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 28 }}>
+        {/* Hamburger button */}
+        <button
+          onClick={() => setDrawerOpen(true)}
+          title="Browse topics"
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 4,
+            alignItems: 'center', justifyContent: 'center',
+            color: 'var(--text-secondary)', borderBottom: '2px solid transparent',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-cyan)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+        >
+          <span style={{ display: 'block', width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} />
+          <span style={{ display: 'block', width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} />
+          <span style={{ display: 'block', width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} />
+        </button>
+
+        {/* divider */}
+        <div style={{ width: 1, height: 24, background: 'var(--border-color)', marginRight: 4 }} />
+
         {LIB_TABS.map(tab => (
           <button
             key={tab.key}
@@ -1157,6 +1285,24 @@ function LibraryView({ progress, onOpenChapter }) {
             )}
           </button>
         ))}
+
+        {/* active topic badge */}
+        {activeCat !== 'ALL' && (
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.72rem',
+              background: 'rgba(0,212,255,0.1)', border: '1px solid var(--accent-cyan)',
+              color: 'var(--accent-cyan)', borderRadius: 12, padding: '2px 10px',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}>
+              {CATEGORIES.find(c => c.id === activeCat)?.icon} {activeCat}
+              <button
+                onClick={() => setActiveCat('ALL')}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent-cyan)', padding: 0, lineHeight: 1, fontSize: '0.8rem' }}
+              >✕</button>
+            </span>
+          </div>
+        )}
       </div>
 
       {/* ── AI Chapters tab ── */}
@@ -1520,7 +1666,10 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
   const handleTtsPlay = () => {
     if (!ttsSupported) return
     window.speechSynthesis.cancel()
-    const text = contentRef.current?.innerText || ''
+    const isHtmlContent = content.trimStart().toLowerCase().startsWith('<!doctype') || content.trimStart().toLowerCase().startsWith('<html')
+    const text = isHtmlContent
+      ? (contentRef.current?.contentDocument?.body?.innerText || '')
+      : (contentRef.current?.innerText || '')
     utteranceRef.current = new SpeechSynthesisUtterance(text)
     utteranceRef.current.rate = 1
     const voices = window.speechSynthesis.getVoices()
@@ -1634,11 +1783,20 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
         {/* Content */}
         {!isLoading && content && (
           <>
-            <div
-              ref={contentRef}
-              className="markdown-body"
-              dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }}
-            />
+            {content.trimStart().toLowerCase().startsWith('<!doctype') || content.trimStart().toLowerCase().startsWith('<html') ? (
+              <iframe
+                ref={contentRef}
+                srcDoc={content}
+                title={chapter.title}
+                style={{ width: '100%', height: 'calc(100vh - 180px)', border: 'none', borderRadius: 6, display: 'block' }}
+              />
+            ) : (
+              <div
+                ref={contentRef}
+                className="markdown-body"
+                dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }}
+              />
+            )}
 
             {/* Quiz CTA */}
             <div style={{
