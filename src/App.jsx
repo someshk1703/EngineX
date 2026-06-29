@@ -946,6 +946,64 @@ function CategoryView({ category, progress, onOpenChapter, onBack }) {
   )
 }
 
+// ─── Theory Subject View ──────────────────────────────────────────────────────
+function TheorySubjectView({ subject, onBack }) {
+  const subjectQuestions = QUESTIONS_MAP[subject.id] || []
+  const [subTab, setSubTab] = useState('guides')
+  const qType = subject.id === 'Java' ? 'java' : 'dsa'
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+        <button className="btn-console" onClick={onBack} style={{ padding: '5px 12px', fontSize: '0.78rem' }}>
+          ← THEORY
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: '1.4rem' }}>{subject.icon}</span>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+            {subject.name}
+          </h1>
+        </div>
+      </div>
+
+      {subjectQuestions.length > 0 && (
+        <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 24 }}>
+          {[
+            { key: 'guides',    label: '📚 Theory Guides' },
+            { key: 'questions', label: '💡 Questions', count: subjectQuestions.length },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setSubTab(tab.key)}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '8px 18px',
+                fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: 0.5,
+                color: subTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                borderBottom: `2px solid ${subTab === tab.key ? 'var(--accent-cyan)' : 'transparent'}`,
+                transition: 'all 0.15s',
+                display: 'flex', alignItems: 'center', gap: 6,
+              }}
+            >
+              {tab.label}
+              {tab.count !== undefined && (
+                <span style={{ fontSize: '0.68rem', color: subTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)' }}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {subTab === 'guides' && <StaticContentViewer categoryId={subject.id} />}
+      {subTab === 'questions' && subjectQuestions.length > 0 && (
+        <QuestionsPanel questions={subjectQuestions} type={qType} />
+      )}
+    </div>
+  )
+}
+
 // ─── Theory View ──────────────────────────────────────────────────────────────
 const THEORY_SUBJECTS = [
   { id: 'DSA',            name: 'Data Structures & Algorithms', icon: '󱃔', desc: '8 guides — trees, graphs, DP, patterns, bit manipulation' },
@@ -1025,16 +1083,29 @@ function TheoryView({ onOpenSubject }) {
 }
 
 // ─── Library View ─────────────────────────────────────────────────────────────
-function CategoryGroup({ cat, progress, sortBy, onOpenChapter, onOpenCategory, onOpenTheory }) {
-  const [showFlashcards, setShowFlashcards] = useState(false)
-  const catChaps  = CHAPTERS.filter(c => c.category === cat.id)
-  const readCount = catChaps.filter(c => progress[c.id]?.read).length
-  const pct       = catChaps.length ? Math.round((readCount / catChaps.length) * 100) : 0
-  const theory    = hasTheory(cat.id)
-  const qCount    = (QUESTIONS_MAP[cat.id] || []).length
-  const section   = cat.id.toLowerCase().replace(/\s+/g, '-')
+const QUESTION_CATS = CATEGORIES.filter(cat => (QUESTIONS_MAP[cat.id] || []).length > 0)
+const TOTAL_QUESTIONS = Object.values(QUESTIONS_MAP).reduce((s, a) => s + a.length, 0)
 
-  const sorted = [...catChaps].sort((a, b) => {
+function LibraryView({ progress, onOpenChapter }) {
+  const [libTab, setLibTab] = useState('chapters') // 'chapters' | 'flashcards' | 'questions'
+
+  // Chapters tab
+  const [search, setSearch]   = useState('')
+  const [sortBy, setSortBy]   = useState('default')
+  const [activeCat, setActiveCat] = useState('ALL')
+
+  // Flashcards tab
+  const [flashCat, setFlashCat] = useState(CATEGORIES[0].id)
+
+  // Questions tab
+  const [qCat, setQCat] = useState(QUESTION_CATS[0]?.id || 'DSA')
+
+  const filtered = CHAPTERS.filter(c => {
+    const matchCat = activeCat === 'ALL' || c.category === activeCat
+    const q = search.toLowerCase().trim()
+    const matchSearch = !q || c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q))
+    return matchCat && matchSearch
+  }).sort((a, b) => {
     if (sortBy === 'quiz-asc')  return (progress[a.id]?.quizScore ?? Infinity)  - (progress[b.id]?.quizScore ?? Infinity)
     if (sortBy === 'quiz-desc') return (progress[b.id]?.quizScore ?? -Infinity) - (progress[a.id]?.quizScore ?? -Infinity)
     if (sortBy === 'recent') {
@@ -1045,203 +1116,141 @@ function CategoryGroup({ cat, progress, sortBy, onOpenChapter, onOpenCategory, o
     return 0
   })
 
-  return (
-    <div style={{ marginBottom: 44 }}>
-      {/* Category header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-        <button
-          onClick={() => onOpenCategory(cat)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, padding: 0 }}
-        >
-          <span style={{ fontSize: '1.3rem' }}>{cat.icon}</span>
-          <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)' }}>{cat.name}</span>
-        </button>
-        {/* Progress */}
-        {catChaps.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 56, height: 3, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-cyan)', borderRadius: 2 }} />
-            </div>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-              {readCount}/{catChaps.length}
-            </span>
-          </div>
-        )}
-        {/* Badges */}
-        <div style={{ display: 'flex', gap: 6, marginLeft: 4 }}>
-          {theory && (
-            <button
-              onClick={() => onOpenTheory(cat)}
-              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: 3, background: 'rgba(0,212,255,0.08)', color: 'var(--accent-cyan)', border: '1px solid rgba(0,212,255,0.25)', cursor: 'pointer', transition: 'all 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.18)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.08)' }}
-            >📚 Theory</button>
-          )}
-          {qCount > 0 && (
-            <button
-              onClick={() => onOpenCategory(cat)}
-              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: 3, background: 'rgba(0,255,102,0.08)', color: 'var(--accent-green)', border: '1px solid rgba(0,255,102,0.25)', cursor: 'pointer', transition: 'all 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,255,102,0.18)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,255,102,0.08)' }}
-            >💡 {qCount} Q&amp;A</button>
-          )}
-          <button
-            onClick={() => setShowFlashcards(f => !f)}
-            style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: 3, background: showFlashcards ? 'rgba(255,204,0,0.18)' : 'rgba(255,204,0,0.08)', color: 'var(--accent-yellow)', border: `1px solid ${showFlashcards ? 'rgba(255,204,0,0.5)' : 'rgba(255,204,0,0.25)'}`, cursor: 'pointer', transition: 'all 0.15s' }}
-          >
-            📌 Flashcards {showFlashcards ? '▲' : '▼'}
-          </button>
-        </div>
-      </div>
+  const LIB_TABS = [
+    { key: 'chapters',   label: '◈ AI Chapters',  count: CHAPTERS.length },
+    { key: 'flashcards', label: '📌 Flashcards' },
+    { key: 'questions',  label: '💡 Questions', count: TOTAL_QUESTIONS },
+  ]
 
-      {/* Flashcards panel */}
-      {showFlashcards && (
-        <div style={{ marginBottom: 16, border: '1px solid var(--border-color)', borderRadius: 8, padding: '16px', background: 'var(--bg-secondary)' }}>
-          <FlashcardManager section={section} />
-        </div>
-      )}
-
-      {/* Chapter cards grid */}
-      {sorted.length > 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-          {sorted.map(chapter => (
-            <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
-          ))}
-        </div>
-      ) : (
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', padding: '12px 0' }}>
-          No AI chapters yet — use Theory or Flashcards above.
-        </div>
-      )}
-    </div>
-  )
-}
-
-function LibraryView({ progress, onOpenChapter, onOpenCategory, onOpenTheory }) {
-  const [activeCategory, setActiveCategory] = useState('ALL')
-  const [search, setSearch] = useState('')
-  const [sortBy, setSortBy] = useState('default') // 'default' | 'quiz-asc' | 'quiz-desc' | 'recent'
-
-  const filtered = CHAPTERS.filter(c => {
-    const matchCat = activeCategory === 'ALL' || c.category === activeCategory
-    const q = search.toLowerCase().trim()
-    const matchSearch = !q || c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q))
-    return matchCat && matchSearch
-  }).sort((a, b) => {
-    if (sortBy === 'quiz-asc') {
-      const sa = progress[a.id]?.quizScore ?? Infinity
-      const sb = progress[b.id]?.quizScore ?? Infinity
-      return sa - sb
-    }
-    if (sortBy === 'quiz-desc') {
-      const sa = progress[a.id]?.quizScore ?? -Infinity
-      const sb = progress[b.id]?.quizScore ?? -Infinity
-      return sb - sa
-    }
-    if (sortBy === 'recent') {
-      const da = progress[a.id]?.quizDate || progress[a.id]?.readDate || ''
-      const db = progress[b.id]?.quizDate || progress[b.id]?.readDate || ''
-      return db > da ? 1 : -1
-    }
-    return 0
+  const pillStyle = (active) => ({
+    background: active ? 'rgba(0,212,255,0.12)' : 'var(--bg-secondary)',
+    border: `1px solid ${active ? 'var(--accent-cyan)' : 'var(--border-color)'}`,
+    color: active ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+    borderRadius: 20, padding: '4px 14px', cursor: 'pointer',
+    fontFamily: 'var(--font-mono)', fontSize: '0.73rem',
+    transition: 'all 0.15s',
   })
-
-  // When searching/filtering, show the sidebar+grid. Otherwise show grouped landing.
-  const showGrid = search.trim().length > 0 || activeCategory !== 'ALL'
 
   return (
     <div>
-      {/* Search + sort bar */}
-      <div style={{ marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center' }}>
-        <input
-          className="search-bar"
-          type="text"
-          placeholder="🔍  Search chapters, tags, topics..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ flex: 1 }}
-        />
-        <select
-          value={sortBy}
-          onChange={e => setSortBy(e.target.value)}
-          style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '8px 10px', cursor: 'pointer', outline: 'none', flexShrink: 0 }}
-        >
-          <option value="default">Default order</option>
-          <option value="recent">Recently viewed</option>
-          <option value="quiz-asc">Score: Low → High</option>
-          <option value="quiz-desc">Score: High → Low</option>
-        </select>
+      {/* Library tab bar */}
+      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 28 }}>
+        {LIB_TABS.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setLibTab(tab.key)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: '10px 20px',
+              fontFamily: 'var(--font-mono)', fontSize: '0.82rem', letterSpacing: 0.5,
+              color: libTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+              borderBottom: `2px solid ${libTab === tab.key ? 'var(--accent-cyan)' : 'transparent'}`,
+              transition: 'all 0.15s',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            {tab.label}
+            {tab.count !== undefined && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: libTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)' }}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
-      {!showGrid ? (
-        /* ── Grouped-by-category landing ── */
+      {/* ── AI Chapters tab ── */}
+      {libTab === 'chapters' && (
         <div>
-          {CATEGORIES.map(cat => (
-            <CategoryGroup
-              key={cat.id}
-              cat={cat}
-              progress={progress}
-              sortBy={sortBy}
-              onOpenChapter={onOpenChapter}
-              onOpenCategory={onOpenCategory}
-              onOpenTheory={onOpenTheory}
+          {/* Search + sort */}
+          <div style={{ marginBottom: 16, display: 'flex', gap: 10, alignItems: 'center' }}>
+            <input
+              className="search-bar"
+              type="text"
+              placeholder="🔍  Search chapters, tags, topics..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ flex: 1 }}
             />
-          ))}
-        </div>
-      ) : (
-        /* ── Filtered Chapter Grid ── */
-        <div style={{ display: 'flex', gap: 28, minHeight: 'calc(100vh - 200px)' }}>
-          {/* Sidebar */}
-          <div style={{ width: 220, flexShrink: 0 }}>
-            <div style={{ position: 'sticky', top: 24 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: 2, marginBottom: 10 }}>
-                CATEGORIES
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <button
-                  className={`category-btn ${activeCategory === 'ALL' ? 'active' : ''}`}
-                  onClick={() => setActiveCategory('ALL')}
-                >
-                  <span>◈</span><span>All Topics</span>
-                  <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>{CHAPTERS.length}</span>
-                </button>
-                {CATEGORIES.map(cat => {
-                  const count     = CHAPTERS.filter(c => c.category === cat.id).length
-                  const completed = CHAPTERS.filter(c => c.category === cat.id && progress[c.id]?.read).length
-                  return (
-                    <button
-                      key={cat.id}
-                      className={`category-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                      onClick={() => setActiveCategory(cat.id)}
-                    >
-                      <span>{cat.icon}</span>
-                      <span style={{ flex: 1, fontSize: '0.86rem' }}>{cat.name}</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: completed === count ? 'var(--accent-green)' : 'var(--text-muted)' }}>
-                        {completed}/{count}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '8px 10px', cursor: 'pointer', outline: 'none', flexShrink: 0 }}
+            >
+              <option value="default">Default order</option>
+              <option value="recent">Recently viewed</option>
+              <option value="quiz-asc">Score: Low → High</option>
+              <option value="quiz-desc">Score: High → Low</option>
+            </select>
           </div>
-
-          {/* Chapter grid */}
-          <div style={{ flex: 1 }}>
-            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                {filtered.length} chapter{filtered.length !== 1 ? 's' : ''}
+          {/* Category filter pills */}
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+            <button style={pillStyle(activeCat === 'ALL')} onClick={() => setActiveCat('ALL')}>All ({CHAPTERS.length})</button>
+            {CATEGORIES.map(cat => {
+              const n = CHAPTERS.filter(c => c.category === cat.id).length
+              return n > 0 && (
+                <button key={cat.id} style={pillStyle(activeCat === cat.id)} onClick={() => setActiveCat(cat.id)}>
+                  {cat.icon} {cat.name} ({n})
+                </button>
+              )
+            })}
+          </div>
+          {/* Count + clear */}
+          {(search || activeCat !== 'ALL') && (
+            <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                {filtered.length} result{filtered.length !== 1 ? 's' : ''}
               </span>
-              <button className="btn-console" onClick={() => { setSearch(''); setActiveCategory('ALL') }} style={{ padding: '4px 12px', fontSize: '0.75rem' }}>
+              <button className="btn-console" onClick={() => { setSearch(''); setActiveCat('ALL') }} style={{ padding: '4px 12px', fontSize: '0.75rem' }}>
                 ✕ Clear
               </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-              {filtered.map(chapter => (
-                <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
+          )}
+          {/* Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+            {filtered.map(chapter => (
+              <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
+            ))}
+          </div>
+          {filtered.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+              No chapters match your search.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Flashcards tab ── */}
+      {libTab === 'flashcards' && (
+        <div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 24 }}>
+            {CATEGORIES.map(cat => (
+              <button key={cat.id} style={pillStyle(flashCat === cat.id)} onClick={() => setFlashCat(cat.id)}>
+                {cat.icon} {cat.name}
+              </button>
+            ))}
+          </div>
+          <FlashcardManager section={flashCat.toLowerCase().replace(/\s+/g, '-')} />
+        </div>
+      )}
+
+      {/* ── Questions tab ── */}
+      {libTab === 'questions' && (
+        <div>
+          {QUESTION_CATS.length > 1 && (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 24 }}>
+              {QUESTION_CATS.map(cat => (
+                <button key={cat.id} style={pillStyle(qCat === cat.id)} onClick={() => setQCat(cat.id)}>
+                  {cat.icon} {cat.name}
+                  <span style={{ marginLeft: 5, fontSize: '0.68rem', opacity: 0.7 }}>({(QUESTIONS_MAP[cat.id] || []).length})</span>
+                </button>
               ))}
             </div>
-          </div>
+          )}
+          <QuestionsPanel
+            questions={QUESTIONS_MAP[qCat] || []}
+            type={qCat === 'Java' ? 'java' : 'dsa'}
+          />
         </div>
       )}
     </div>
@@ -2562,7 +2571,7 @@ export default function App() {
       {/* Main */}
       <main style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: '32px 28px' }}>
         {view === 'library' && (
-          <LibraryView progress={progress} onOpenChapter={handleOpenChapter} onOpenCategory={handleOpenCategory} onOpenTheory={handleOpenTheory} />
+          <LibraryView progress={progress} onOpenChapter={handleOpenChapter} />
         )}
         {view === 'theory' && (
           <TheoryView
@@ -2574,20 +2583,10 @@ export default function App() {
           />
         )}
         {view === 'theory-subject' && selectedTheoryCategory && (
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
-              <button className="btn-console" onClick={() => setView('theory')} style={{ padding: '5px 12px', fontSize: '0.78rem' }}>
-                ← THEORY
-              </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: '1.4rem' }}>{selectedTheoryCategory.icon}</span>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-                  {selectedTheoryCategory.name}
-                </h1>
-              </div>
-            </div>
-            <StaticContentViewer categoryId={selectedTheoryCategory.id} />
-          </div>
+          <TheorySubjectView
+            subject={selectedTheoryCategory}
+            onBack={() => setView('theory')}
+          />
         )}
         {view === 'category' && selectedCategory && (
           <CategoryView
