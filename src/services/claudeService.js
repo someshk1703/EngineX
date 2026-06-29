@@ -357,22 +357,14 @@ async function callAI(systemPrompt, userMessage, maxTokens = 3500) {
 
 // ─── Generate Chapter Content ─────────────────────────────────────────────────
 
-const CATEGORY_TABS = {
-  'DSA':             ['Definition','Mechanics','Complexity','Variants','Patterns','Smell→Pattern','Java Code','Worked Example','Practice','Interview'],
-  'Java':            ['Definition','Internals','Subtopics','Code Example','Real-World','Mistakes','Interview','Connects To'],
-  'System Design':   ['Definition','How It Works','Subtypes','Scale Estimation','Architecture','Trade-Offs','Failure Modes','Real-World','Interview','Connects To'],
-  'CS Fundamentals': ['Definition','Why It Exists','How It Works','Subtopics','Mental Model','Real-World','Code','Misconceptions','Interview','Connects To'],
-  'Full Stack':      ['Definition','Internals','Subtopics','Performance','Code','Architecture','Trade-Offs','Mistakes','Interview','Connects To'],
-  'Cloud & DevOps':  ['Definition','Why It Exists','How It Works','Core Services','Architecture','Hands-On','Trade-Offs','Real-World','Interview','Connects To'],
-  'Databases':       ['Definition','Internals','Schema Design','Query Patterns','Indexing','Scaling','Trade-Offs','Real-World','Interview','Connects To'],
-  'Security':        ['Definition','Why It Matters','How It Works','Attack Vectors','Defense','Code Example','Common Mistakes','Real-World','Interview','Connects To'],
-  'Soft Skills':     ['Overview','Why It Matters','Framework','Examples','Common Mistakes','STAR Template','Interview Tips','Connects To'],
-};
+// Universal tab set — same order for every category so content is predictable
+const UNIVERSAL_TABS = ['Definition','How It Works','Complexity','Variants','Patterns','Smell→Pattern','Real-World','Code','Worked Example','Practice','Interview'];
+const CATEGORY_TABS = {}; // kept for future per-category overrides
 
 export async function generateChapterContent(chapter) {
   const refContext = buildRefContext(chapter);
 
-  const tabs = CATEGORY_TABS[chapter.category] || ['Definition','Overview','Key Concepts','Examples','Trade-Offs','Real-World','Interview','Connects To'];
+  const tabs = CATEGORY_TABS[chapter.category] || UNIVERSAL_TABS;
   const tabsJson = JSON.stringify(tabs);
 
   const systemPrompt = `You are a world-class software engineering educator and FAANG interview coach. Generate content for Full Stack engineers preparing for top-tier tech interviews.
