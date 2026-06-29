@@ -1730,6 +1730,10 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
 
   const chProg = progress[chapter.id]
   const quizScore = chProg?.quizScore
+  const isHtmlContent = !isLoading && !!content && (
+    content.trimStart().toLowerCase().startsWith('<!doctype') ||
+    content.trimStart().toLowerCase().startsWith('<html')
+  )
 
   return (
     <>
@@ -1738,96 +1742,124 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
         <div style={{ height: '100%', width: `${scrollPct}%`, background: 'var(--accent-cyan)', transition: 'width 0.1s', boxShadow: '0 0 8px var(--accent-cyan-glow)' }} />
       </div>
 
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        {/* Breadcrumb + action bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-          <button className="btn-console" onClick={onBack} style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
-            ← LIBRARY
-          </button>
-          <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {chapter.category} / {chapter.title}
-          </span>
+      {isHtmlContent ? (
+        /* ── HTML mode: full-viewport sidebar+tabs layout ── */
+        <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 66px)', overflow: 'hidden' }}>
+          {/* Slim breadcrumb bar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', borderBottom: '1px solid var(--border-color)', flexShrink: 0, flexWrap: 'wrap', background: 'var(--bg-primary)' }}>
+            <button className="btn-console" onClick={onBack} style={{ padding: '4px 12px', fontSize: '0.78rem' }}>
+              ← LIBRARY
+            </button>
+            <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {chapter.category} / {chapter.title}
+            </span>
+            {ttsSupported && (
+              <div style={{ display: 'flex', gap: 4 }}>
+                <button className="tts-btn" onClick={ttsPlaying ? handleTtsPause : handleTtsPlay} title={ttsPlaying ? 'Pause' : 'Play'}>
+                  {ttsPlaying ? '⏸' : '▶'}
+                </button>
+                <button className="tts-btn" onClick={handleTtsStop} title="Stop" disabled={!ttsPlaying}>⏹</button>
+              </div>
+            )}
+            <button className="btn-console" onClick={() => setShowDocs(true)} style={{ padding: '4px 10px', fontSize: '0.76rem' }}>
+              📄 DOCS
+            </button>
+            <button className="btn-console btn-console-success" onClick={onStartQuiz} style={{ padding: '4px 10px', fontSize: '0.76rem' }}>
+              ▶ QUIZ
+            </button>
+          </div>
+          {/* Full-height iframe — fills remaining viewport */}
+          <iframe
+            ref={contentRef}
+            srcDoc={content}
+            title={chapter.title}
+            style={{ flex: 1, width: '100%', border: 'none', display: 'block' }}
+          />
+        </div>
+      ) : (
+        /* ── Markdown / loading mode ── */
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          {/* Breadcrumb + action bar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
+            <button className="btn-console" onClick={onBack} style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+              ← LIBRARY
+            </button>
+            <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {chapter.category} / {chapter.title}
+            </span>
 
-          {/* TTS controls */}
-          {ttsSupported && !isLoading && content && (
-            <div style={{ display: 'flex', gap: 4 }}>
-              <button className="tts-btn" onClick={ttsPlaying ? handleTtsPause : handleTtsPlay} title={ttsPlaying ? 'Pause' : 'Play'}>
-                {ttsPlaying ? '⏸' : '▶'}
-              </button>
-              <button className="tts-btn" onClick={handleTtsStop} title="Stop" disabled={!ttsPlaying}>⏹</button>
+            {/* TTS controls */}
+            {ttsSupported && !isLoading && content && (
+              <div style={{ display: 'flex', gap: 4 }}>
+                <button className="tts-btn" onClick={ttsPlaying ? handleTtsPause : handleTtsPlay} title={ttsPlaying ? 'Pause' : 'Play'}>
+                  {ttsPlaying ? '⏸' : '▶'}
+                </button>
+                <button className="tts-btn" onClick={handleTtsStop} title="Stop" disabled={!ttsPlaying}>⏹</button>
+              </div>
+            )}
+
+            {/* Official Docs */}
+            <button className="btn-console" onClick={() => setShowDocs(true)} style={{ padding: '6px 12px', fontSize: '0.78rem' }}>
+              📄 DOCS
+            </button>
+
+            {!hasApiKey() && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--accent-yellow)', border: '1px solid rgba(255,204,0,0.3)', padding: '2px 10px', borderRadius: 4 }}>
+                DEMO
+              </span>
+            )}
+          </div>
+
+          {/* Loading */}
+          {isLoading && <TerminalLoader logs={logs} visibleCount={visibleLogs} />}
+
+          {/* Error banner */}
+          {error && !isLoading && (
+            <div style={{ background: 'rgba(255,51,102,0.08)', border: '1px solid var(--accent-red)', borderRadius: 6, padding: '12px 16px', marginBottom: 20, fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--accent-red)' }}>
+              ⚠ API Error: {error} — Displaying demo content.
             </div>
           )}
 
-          {/* Official Docs */}
-          <button className="btn-console" onClick={() => setShowDocs(true)} style={{ padding: '6px 12px', fontSize: '0.78rem' }}>
-            📄 DOCS
-          </button>
-
-          {!hasApiKey() && (
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--accent-yellow)', border: '1px solid rgba(255,204,0,0.3)', padding: '2px 10px', borderRadius: 4 }}>
-              DEMO
-            </span>
-          )}
-        </div>
-
-        {/* Loading */}
-        {isLoading && <TerminalLoader logs={logs} visibleCount={visibleLogs} />}
-
-        {/* Error banner */}
-        {error && !isLoading && (
-          <div style={{ background: 'rgba(255,51,102,0.08)', border: '1px solid var(--accent-red)', borderRadius: 6, padding: '12px 16px', marginBottom: 20, fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--accent-red)' }}>
-            ⚠ API Error: {error} — Displaying demo content.
-          </div>
-        )}
-
-        {/* Content */}
-        {!isLoading && content && (
-          <>
-            {content.trimStart().toLowerCase().startsWith('<!doctype') || content.trimStart().toLowerCase().startsWith('<html') ? (
-              <iframe
-                ref={contentRef}
-                srcDoc={content}
-                title={chapter.title}
-                style={{ width: '100%', height: 'calc(100vh - 180px)', border: 'none', borderRadius: 6, display: 'block' }}
-              />
-            ) : (
+          {/* Markdown content */}
+          {!isLoading && content && (
+            <>
               <div
                 ref={contentRef}
                 className="markdown-body"
                 dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }}
               />
-            )}
 
-            {/* Quiz CTA */}
-            <div style={{
-              marginTop: 48, padding: 28, background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)', borderRadius: 8,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              flexWrap: 'wrap', gap: 16,
-            }}>
-              <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: 2, marginBottom: 4 }}>
-                  KNOWLEDGE CHECK
-                </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  Test your understanding
-                </div>
-                {quizScore !== undefined && (
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: quizScore >= 70 ? 'var(--accent-green)' : 'var(--accent-yellow)', marginTop: 4 }}>
-                    Last score: {quizScore}%
+              {/* Quiz CTA */}
+              <div style={{
+                marginTop: 48, padding: 28, background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)', borderRadius: 8,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                flexWrap: 'wrap', gap: 16,
+              }}>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', letterSpacing: 2, marginBottom: 4 }}>
+                    KNOWLEDGE CHECK
                   </div>
-                )}
+                  <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    Test your understanding
+                  </div>
+                  {quizScore !== undefined && (
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: quizScore >= 70 ? 'var(--accent-green)' : 'var(--accent-yellow)', marginTop: 4 }}>
+                      Last score: {quizScore}%
+                    </div>
+                  )}
+                </div>
+                <button className="btn-console btn-console-success" onClick={onStartQuiz} style={{ fontSize: '0.95rem', padding: '12px 24px' }}>
+                  ▶ TAKE QUIZ
+                </button>
               </div>
-              <button className="btn-console btn-console-success" onClick={onStartQuiz} style={{ fontSize: '0.95rem', padding: '12px 24px' }}>
-                ▶ TAKE QUIZ
-              </button>
-            </div>
 
-            {/* Notes */}
-            <NotesPanel chapterId={chapter.id} />
-          </>
-        )}
-      </div>
+              {/* Notes */}
+              <NotesPanel chapterId={chapter.id} />
+            </>
+          )}
+        </div>
+      )}
 
     {/* Chatbot FAB */}
     {hasApiKey() && (
