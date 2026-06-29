@@ -1025,7 +1025,99 @@ function TheoryView({ onOpenSubject }) {
 }
 
 // ─── Library View ─────────────────────────────────────────────────────────────
-function LibraryView({ progress, onOpenChapter, onOpenCategory }) {
+function CategoryGroup({ cat, progress, sortBy, onOpenChapter, onOpenCategory, onOpenTheory }) {
+  const [showFlashcards, setShowFlashcards] = useState(false)
+  const catChaps  = CHAPTERS.filter(c => c.category === cat.id)
+  const readCount = catChaps.filter(c => progress[c.id]?.read).length
+  const pct       = catChaps.length ? Math.round((readCount / catChaps.length) * 100) : 0
+  const theory    = hasTheory(cat.id)
+  const qCount    = (QUESTIONS_MAP[cat.id] || []).length
+  const section   = cat.id.toLowerCase().replace(/\s+/g, '-')
+
+  const sorted = [...catChaps].sort((a, b) => {
+    if (sortBy === 'quiz-asc')  return (progress[a.id]?.quizScore ?? Infinity)  - (progress[b.id]?.quizScore ?? Infinity)
+    if (sortBy === 'quiz-desc') return (progress[b.id]?.quizScore ?? -Infinity) - (progress[a.id]?.quizScore ?? -Infinity)
+    if (sortBy === 'recent') {
+      const da = progress[a.id]?.quizDate || progress[a.id]?.readDate || ''
+      const db = progress[b.id]?.quizDate || progress[b.id]?.readDate || ''
+      return db > da ? 1 : -1
+    }
+    return 0
+  })
+
+  return (
+    <div style={{ marginBottom: 44 }}>
+      {/* Category header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+        <button
+          onClick={() => onOpenCategory(cat)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, padding: 0 }}
+        >
+          <span style={{ fontSize: '1.3rem' }}>{cat.icon}</span>
+          <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)' }}>{cat.name}</span>
+        </button>
+        {/* Progress */}
+        {catChaps.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 56, height: 3, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-cyan)', borderRadius: 2 }} />
+            </div>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+              {readCount}/{catChaps.length}
+            </span>
+          </div>
+        )}
+        {/* Badges */}
+        <div style={{ display: 'flex', gap: 6, marginLeft: 4 }}>
+          {theory && (
+            <button
+              onClick={() => onOpenTheory(cat)}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: 3, background: 'rgba(0,212,255,0.08)', color: 'var(--accent-cyan)', border: '1px solid rgba(0,212,255,0.25)', cursor: 'pointer', transition: 'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.18)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.08)' }}
+            >📚 Theory</button>
+          )}
+          {qCount > 0 && (
+            <button
+              onClick={() => onOpenCategory(cat)}
+              style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: 3, background: 'rgba(0,255,102,0.08)', color: 'var(--accent-green)', border: '1px solid rgba(0,255,102,0.25)', cursor: 'pointer', transition: 'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,255,102,0.18)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,255,102,0.08)' }}
+            >💡 {qCount} Q&amp;A</button>
+          )}
+          <button
+            onClick={() => setShowFlashcards(f => !f)}
+            style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', padding: '2px 8px', borderRadius: 3, background: showFlashcards ? 'rgba(255,204,0,0.18)' : 'rgba(255,204,0,0.08)', color: 'var(--accent-yellow)', border: `1px solid ${showFlashcards ? 'rgba(255,204,0,0.5)' : 'rgba(255,204,0,0.25)'}`, cursor: 'pointer', transition: 'all 0.15s' }}
+          >
+            📌 Flashcards {showFlashcards ? '▲' : '▼'}
+          </button>
+        </div>
+      </div>
+
+      {/* Flashcards panel */}
+      {showFlashcards && (
+        <div style={{ marginBottom: 16, border: '1px solid var(--border-color)', borderRadius: 8, padding: '16px', background: 'var(--bg-secondary)' }}>
+          <FlashcardManager section={section} />
+        </div>
+      )}
+
+      {/* Chapter cards grid */}
+      {sorted.length > 0 ? (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+          {sorted.map(chapter => (
+            <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
+          ))}
+        </div>
+      ) : (
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', padding: '12px 0' }}>
+          No AI chapters yet — use Theory or Flashcards above.
+        </div>
+      )}
+    </div>
+  )
+}
+
+function LibraryView({ progress, onOpenChapter, onOpenCategory, onOpenTheory }) {
   const [activeCategory, setActiveCategory] = useState('ALL')
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('default') // 'default' | 'quiz-asc' | 'quiz-desc' | 'recent'
@@ -1051,114 +1143,50 @@ function LibraryView({ progress, onOpenChapter, onOpenCategory }) {
       const db = progress[b.id]?.quizDate || progress[b.id]?.readDate || ''
       return db > da ? 1 : -1
     }
-    return 0 // default order
+    return 0
   })
 
-  // When searching, show the chapter grid. Otherwise show the category cards landing page.
+  // When searching/filtering, show the sidebar+grid. Otherwise show grouped landing.
   const showGrid = search.trim().length > 0 || activeCategory !== 'ALL'
 
   return (
     <div>
-      {/* Search bar always visible */}
-      <div style={{ marginBottom: 20 }}>
+      {/* Search + sort bar */}
+      <div style={{ marginBottom: 20, display: 'flex', gap: 10, alignItems: 'center' }}>
         <input
           className="search-bar"
           type="text"
           placeholder="🔍  Search chapters, tags, topics..."
           value={search}
           onChange={e => setSearch(e.target.value)}
+          style={{ flex: 1 }}
         />
+        <select
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value)}
+          style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '8px 10px', cursor: 'pointer', outline: 'none', flexShrink: 0 }}
+        >
+          <option value="default">Default order</option>
+          <option value="recent">Recently viewed</option>
+          <option value="quiz-asc">Score: Low → High</option>
+          <option value="quiz-desc">Score: High → Low</option>
+        </select>
       </div>
 
       {!showGrid ? (
-        /* ── Category Cards Landing ── */
+        /* ── Grouped-by-category landing ── */
         <div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: 2, marginBottom: 16 }}>
-            CHOOSE A TOPIC TO EXPLORE
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-            {CATEGORIES.map(cat => {
-              const catChaps  = CHAPTERS.filter(c => c.category === cat.id)
-              const readCount = catChaps.filter(c => progress[c.id]?.read).length
-              const pct       = catChaps.length ? Math.round((readCount / catChaps.length) * 100) : 0
-              const theory    = hasTheory(cat.id)
-              const qCount    = (QUESTIONS_MAP[cat.id] || []).length
-
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => onOpenCategory(cat)}
-                  style={{
-                    background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
-                    borderRadius: 10, padding: '20px', cursor: 'pointer', textAlign: 'left',
-                    display: 'flex', flexDirection: 'column', gap: 12, transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-cyan)'; e.currentTarget.style.boxShadow = '0 0 16px var(--accent-cyan-glow)' }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.boxShadow = 'none' }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '1.5rem' }}>{cat.icon}</span>
-                    <div style={{ display: 'flex', gap: 5 }}>
-                      {theory   && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', padding: '2px 6px', borderRadius: 3, background: 'rgba(0,212,255,0.1)', color: 'var(--accent-cyan)', border: '1px solid rgba(0,212,255,0.25)' }}>📚 Theory</span>}
-                      {qCount>0 && <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', padding: '2px 6px', borderRadius: 3, background: 'rgba(0,255,102,0.1)', color: 'var(--accent-green)', border: '1px solid rgba(0,255,102,0.25)' }}>💡 Q&A</span>}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem', marginBottom: 4 }}>{cat.name}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      {catChaps.length > 0 ? `${readCount}/${catChaps.length} chapters` : 'Theory & Practice'}
-                      {qCount > 0 && ` · ${qCount} questions`}
-                    </div>
-                  </div>
-                  {catChaps.length > 0 && (
-                    <div className="progress-bar-container" style={{ height: 3 }}>
-                      <div className="progress-bar-fill" style={{ width: `${pct}%` }} />
-                    </div>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Quick-access: All chapters */}
-          <div style={{ marginTop: 32, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: 2 }}>
-              OR BROWSE ALL AI CHAPTERS
-            </div>
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value)}
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '4px 10px', cursor: 'pointer', outline: 'none' }}
-            >
-              <option value="default">Default order</option>
-              <option value="recent">Recently viewed</option>
-              <option value="quiz-asc">Score: Low → High</option>
-              <option value="quiz-desc">Score: High → Low</option>
-            </select>
-          </div>
-          {/* Category filter pills */}
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                style={{
-                  background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 20,
-                  padding: '4px 12px', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: '0.73rem',
-                  color: 'var(--text-secondary)', transition: 'all 0.15s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-cyan)'; e.currentTarget.style.color = 'var(--accent-cyan)' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-            {CHAPTERS.slice(0, 12).map(chapter => (
-              <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
-            ))}
-          </div>
+          {CATEGORIES.map(cat => (
+            <CategoryGroup
+              key={cat.id}
+              cat={cat}
+              progress={progress}
+              sortBy={sortBy}
+              onOpenChapter={onOpenChapter}
+              onOpenCategory={onOpenCategory}
+              onOpenTheory={onOpenTheory}
+            />
+          ))}
         </div>
       ) : (
         /* ── Filtered Chapter Grid ── */
@@ -2357,6 +2385,13 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const handleOpenTheory = (cat) => {
+    const subj = THEORY_SUBJECTS.find(s => s.id === cat.id) || { id: cat.id, name: cat.name, icon: cat.icon }
+    setSelectedTheoryCategory(subj)
+    setView('theory-subject')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
 
   const handleMarkRead = (chapterId) => {
     updateProgress(prev => ({
@@ -2527,7 +2562,7 @@ export default function App() {
       {/* Main */}
       <main style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: '32px 28px' }}>
         {view === 'library' && (
-          <LibraryView progress={progress} onOpenChapter={handleOpenChapter} onOpenCategory={handleOpenCategory} />
+          <LibraryView progress={progress} onOpenChapter={handleOpenChapter} onOpenCategory={handleOpenCategory} onOpenTheory={handleOpenTheory} />
         )}
         {view === 'theory' && (
           <TheoryView
