@@ -330,14 +330,11 @@ function SettingsModal({ onClose, onSave }) {
 
   const models = MODEL_LISTS[provider] || ANTHROPIC_MODELS
 
-  // Keep model in sync when switching provider.
-  // "auto" is valid for all providers so it's always preserved.
+  // Always reset model to "auto" when switching provider so the best model
+  // for that subscription is selected automatically.
   const handleProviderChange = (p) => {
     setProviderState(p)
-    if (model !== 'auto') {
-      const list = MODEL_LISTS[p] || ANTHROPIC_MODELS
-      if (!list.find(m => m.id === model)) setModelState('auto')
-    }
+    setModelState('auto')
   }
 
   const handleSave = () => {
