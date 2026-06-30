@@ -1506,10 +1506,6 @@ function ChatbotPanel({ chapter, isOpen, onClose }) {
 
   return (
     <div className={`chatbot-panel ${isOpen ? '' : 'hidden'}`}>
-      {/* Mobile drag handle */}
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px', flexShrink: 0 }}>
-        <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--border-color)' }} />
-      </div>
       {/* Header */}
       <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
