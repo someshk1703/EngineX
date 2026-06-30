@@ -56,6 +56,7 @@ import jsArch        from '../../html/js/architecture_patterns_block8.html?raw'
 // ─── Export map keyed by CATEGORIES[*].id ─────────────────────────────────────
 export const HTML_SECTIONS = {
   DSA: [
+    { id: 'dsa-master',    title: 'DSA Master Reference',            icon: '🗂️', tags: ['cheatsheet','patterns','all'],   html: dsaMaster  },
     { id: 'dsa-nonlinear', title: 'Non-Linear Data Structures',      icon: '🌲', tags: ['trees','heaps','tries'],         html: dsaBlock2 },
     { id: 'dsa-graphs',    title: 'Graphs — BFS, DFS & Pathfinding', icon: '🕸️', tags: ['graphs','bfs','dfs','dijkstra'],  html: dsaBlock3 },
     { id: 'dsa-sorting',   title: 'Sorting & Searching',             icon: '📊', tags: ['sorting','binary-search'],       html: dsaBlock4 },
@@ -63,7 +64,6 @@ export const HTML_SECTIONS = {
     { id: 'dsa-dp',        title: 'Dynamic Programming',             icon: '🧮', tags: ['dp','memoization','tabulation'], html: dsaBlock6 },
     { id: 'dsa-greedy',    title: 'Greedy Algorithms',               icon: '💹', tags: ['greedy','intervals'],            html: dsaBlock7 },
     { id: 'dsa-bitmanip',  title: 'Bit Manipulation',                icon: '⚡', tags: ['bitwise','xor','shifts'],        html: dsaBlock8 },
-    { id: 'dsa-master',    title: 'DSA Master Reference',            icon: '🗂️', tags: ['cheatsheet','patterns','all'],   html: dsaMaster  },
   ],
   Java: [
     { id: 'java-oop',      title: 'OOP — Visual Bible',          icon: '🏗️', tags: ['oop','classes','inheritance','polymorphism'], html: javaOop },

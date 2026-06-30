@@ -330,14 +330,11 @@ function SettingsModal({ onClose, onSave }) {
 
   const models = MODEL_LISTS[provider] || ANTHROPIC_MODELS
 
-  // Keep model in sync when switching provider.
-  // "auto" is valid for all providers so it's always preserved.
+  // Always reset model to "auto" when switching provider so the best model
+  // for that subscription is selected automatically.
   const handleProviderChange = (p) => {
     setProviderState(p)
-    if (model !== 'auto') {
-      const list = MODEL_LISTS[p] || ANTHROPIC_MODELS
-      if (!list.find(m => m.id === model)) setModelState('auto')
-    }
+    setModelState('auto')
   }
 
   const handleSave = () => {
@@ -1022,7 +1019,7 @@ function TheoryView({ onOpenSubject }) {
           Structured deep-dive guides for each subject — sidebar navigation, tabbed sections, worked examples.
         </p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+      <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
         {THEORY_SUBJECTS.map(subj => {
           const items = HTML_SECTIONS[subj.id] || []
           return (
@@ -1147,6 +1144,7 @@ function LibraryView({ progress, onOpenChapter }) {
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(3px)' }} />
           {/* drawer panel */}
           <div
+            className="topic-drawer"
             style={{
               position: 'relative', zIndex: 1,
               width: 280, height: '100%',
@@ -1154,6 +1152,8 @@ function LibraryView({ progress, onOpenChapter }) {
               borderRight: '1px solid var(--border-color)',
               display: 'flex', flexDirection: 'column',
               boxShadow: '4px 0 32px rgba(0,0,0,0.4)',
+              borderRadius: '0 20px 20px 0',
+              overflow: 'hidden',
               animation: 'slideInLeft 0.22s ease',
             }}
             onClick={e => e.stopPropagation()}
@@ -1330,7 +1330,7 @@ function LibraryView({ progress, onOpenChapter }) {
             </select>
           </div>
           {/* Category filter pills */}
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
+          <div className="pill-row" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
             <button style={pillStyle(activeCat === 'ALL')} onClick={() => setActiveCat('ALL')}>All ({CHAPTERS.length})</button>
             {CATEGORIES.map(cat => {
               const n = CHAPTERS.filter(c => c.category === cat.id).length
@@ -1353,7 +1353,7 @@ function LibraryView({ progress, onOpenChapter }) {
             </div>
           )}
           {/* Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
             {filtered.map(chapter => (
               <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
             ))}
@@ -1506,6 +1506,10 @@ function ChatbotPanel({ chapter, isOpen, onClose }) {
 
   return (
     <div className={`chatbot-panel ${isOpen ? '' : 'hidden'}`}>
+      {/* Mobile drag handle */}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 4px', flexShrink: 0 }}>
+        <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--border-color)' }} />
+      </div>
       {/* Header */}
       <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div>
@@ -1866,6 +1870,19 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
       <button className="chatbot-fab" onClick={() => setChatOpen(o => !o)} title="AI Coach">
         {chatOpen ? '✕' : '💬'}
       </button>
+    )}
+
+    {/* Chatbot backdrop (mobile only — tap outside to close) */}
+    {hasApiKey() && chatOpen && (
+      <div
+        onClick={() => setChatOpen(false)}
+        style={{
+          display: 'none', // shown via CSS media query
+          position: 'fixed', inset: 0, zIndex: 89,
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(2px)',
+        }}
+        className="chatbot-mobile-backdrop"
+      />
     )}
 
     {/* Chatbot Panel */}
@@ -2526,6 +2543,7 @@ export default function App() {
   const [apiConfigured, setApiConfigured] = useState(hasApiKey)
   const [providerLabel, setProviderLabel] = useState(() => getProvider().toUpperCase())
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem(THEME_KEY) !== 'light')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [user, setUser] = useState(undefined)
   const [authLoading, setAuthLoading] = useState(true)
 
@@ -2637,11 +2655,12 @@ export default function App() {
         position: 'sticky', top: 0, zIndex: 100,
       }}>
         <div className="header-glow-line" />
-        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 28px', height: 60, display: 'flex', alignItems: 'center', gap: 28 }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', gap: 16, position: 'relative' }}>
+
           {/* Logo */}
           <button
-            onClick={() => setView('library')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: 0 }}
+            onClick={() => { setView('library'); setMobileMenuOpen(false) }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: 0, flexShrink: 0 }}
           >
             <span style={{
               fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '1.2rem',
@@ -2652,8 +2671,8 @@ export default function App() {
             </span>
           </button>
 
-          {/* Nav */}
-          <nav style={{ display: 'flex', gap: 4 }}>
+          {/* Desktop Nav */}
+          <nav className="header-nav" style={{ display: 'flex', gap: 4 }}>
             {[
               { label: 'Library', val: 'library' },
               { label: 'Theory',  val: 'theory' },
@@ -2682,7 +2701,8 @@ export default function App() {
             })}
           </nav>
 
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
+          {/* Desktop right actions */}
+          <div className="header-actions-desktop" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
             {/* Progress pill */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 20, padding: '4px 12px' }}>
               <div style={{ width: 60, height: 4, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden' }}>
@@ -2690,7 +2710,6 @@ export default function App() {
               </div>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{overallPct}%</span>
             </div>
-
             {/* API status */}
             <div style={{
               fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: 1,
@@ -2701,35 +2720,20 @@ export default function App() {
             }}>
               {apiConfigured ? `● LIVE · ${providerLabel}` : '● DEMO MODE'}
             </div>
-
             {/* Theme toggle */}
-            <button
-              className="theme-toggle"
-              onClick={() => setDarkMode(d => !d)}
-              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
+            <button className="theme-toggle" onClick={() => setDarkMode(d => !d)} title={darkMode ? 'Light Mode' : 'Dark Mode'}>
               {darkMode ? '☀' : '🌙'}
             </button>
-
             {/* Settings */}
-            <button
-              className="btn-console"
-              onClick={() => setShowSettings(true)}
-              style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-            >
+            <button className="btn-console" onClick={() => setShowSettings(true)} style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
               ⚙ SETTINGS
             </button>
-
             {/* User avatar + logout */}
             {user && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 {user.user_metadata?.avatar_url ? (
-                  <img
-                    src={user.user_metadata.avatar_url}
-                    alt={user.user_metadata?.full_name || user.email}
-                    referrerPolicy="no-referrer"
-                    style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid var(--border-color)', objectFit: 'cover' }}
-                  />
+                  <img src={user.user_metadata.avatar_url} alt="" referrerPolicy="no-referrer"
+                    style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid var(--border-color)', objectFit: 'cover' }} />
                 ) : (
                   <div style={{
                     width: 30, height: 30, borderRadius: '50%', border: '1px solid var(--border-color)',
@@ -2739,27 +2743,80 @@ export default function App() {
                     {(user.user_metadata?.full_name || user.email || '?')[0].toUpperCase()}
                   </div>
                 )}
-                <button
-                  onClick={() => signOut()}
-                  style={{
-                    background: 'none', border: '1px solid var(--border-color)', borderRadius: 6,
-                    color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px 10px',
-                    fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: 0.5,
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--text-secondary)' }}
-                  onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-color)' }}
-                >
-                  Sign out
-                </button>
+                <button onClick={() => signOut()} style={{
+                  background: 'none', border: '1px solid var(--border-color)', borderRadius: 6,
+                  color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px 10px',
+                  fontFamily: 'var(--font-mono)', fontSize: '0.72rem',
+                }}>Sign out</button>
               </div>
             )}
+          </div>
+
+          {/* Mobile right: theme + hamburger */}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button className="theme-toggle" style={{ display: 'none' /* shown via .header-actions-mobile CSS */ }}
+              onClick={() => setDarkMode(d => !d)}>{darkMode ? '☀' : '🌙'}</button>
+            <button
+              className="mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(m => !m)}
+              aria-label="Open menu"
+            >
+              <span style={{ display: 'block', width: 18, height: 2, background: mobileMenuOpen ? 'var(--accent-cyan)' : 'currentColor', borderRadius: 1, transform: mobileMenuOpen ? 'rotate(45deg) translate(4px,4px)' : 'none', transition: 'transform 0.2s' }} />
+              <span style={{ display: 'block', width: 18, height: 2, background: 'currentColor', borderRadius: 1, opacity: mobileMenuOpen ? 0 : 1, transition: 'opacity 0.15s' }} />
+              <span style={{ display: 'block', width: 18, height: 2, background: mobileMenuOpen ? 'var(--accent-cyan)' : 'currentColor', borderRadius: 1, transform: mobileMenuOpen ? 'rotate(-45deg) translate(4px,-4px)' : 'none', transition: 'transform 0.2s' }} />
+            </button>
+          </div>
+
+          {/* Mobile nav dropdown */}
+          <div className={`mobile-nav-panel ${mobileMenuOpen ? 'open' : ''}`}>
+            {[
+              { label: '◈ Library', val: 'library' },
+              { label: '📚 Theory',  val: 'theory' },
+              { label: '📊 Dashboard', val: 'dashboard' },
+            ].map(({ label, val }) => {
+              const isActive = view === val ||
+                (val === 'library' && ['category','html','chapter','quiz'].includes(view)) ||
+                (val === 'theory'  && view === 'theory-subject')
+              return (
+                <button
+                  key={val}
+                  className={`mobile-nav-btn ${isActive ? 'active' : ''}`}
+                  onClick={() => { setView(val); setMobileMenuOpen(false) }}
+                >
+                  {label}
+                </button>
+              )
+            })}
+            <div className="mobile-nav-divider" />
+            <div style={{ display: 'flex', gap: 8, padding: '4px 0', flexWrap: 'wrap' }}>
+              <button className="theme-toggle" onClick={() => setDarkMode(d => !d)}>{darkMode ? '☀ Light' : '🌙 Dark'}</button>
+              <button className="btn-console" onClick={() => { setShowSettings(true); setMobileMenuOpen(false) }} style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+                ⚙ Settings
+              </button>
+              {user && (
+                <button onClick={() => signOut()} style={{
+                  background: 'none', border: '1px solid var(--border-color)', borderRadius: 6,
+                  color: 'var(--text-secondary)', cursor: 'pointer', padding: '6px 14px',
+                  fontFamily: 'var(--font-mono)', fontSize: '0.8rem',
+                }}>Sign out</button>
+              )}
+            </div>
+            {/* API status in mobile menu */}
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: 1,
+              padding: '3px 10px', borderRadius: 4, border: '1px solid', display: 'inline-flex', alignSelf: 'flex-start',
+              borderColor: apiConfigured ? 'rgba(0,255,102,0.3)' : 'rgba(255,204,0,0.3)',
+              color: apiConfigured ? 'var(--accent-green)' : 'var(--accent-yellow)',
+              background: apiConfigured ? 'rgba(0,255,102,0.05)' : 'rgba(255,204,0,0.05)',
+            }}>
+              {apiConfigured ? `● LIVE · ${providerLabel}` : '● DEMO MODE'}
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main */}
-      <main style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: '32px 28px' }}>
+      <main className="main-content" style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: '32px 28px' }}>
         {view === 'library' && (
           <LibraryView progress={progress} onOpenChapter={handleOpenChapter} />
         )}
