@@ -1868,7 +1868,7 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
     {/* Chatbot FAB */}
     {hasApiKey() && (
       <button className="chatbot-fab" onClick={() => setChatOpen(o => !o)} title="AI Coach">
-        {chatOpen ? '✕' : '💬'}
+        💬
       </button>
     )}
 
