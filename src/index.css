@@ -630,17 +630,14 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
     padding: 20px 16px !important;
   }
 
-  /* Chatbot as bottom sheet overlay */
+  /* Chatbot as full-width bottom sheet on mobile */
   .chatbot-panel {
-    top: auto !important;
-    bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    height: 72vh;
+    height: 60vh !important;
     border-left: none;
-    border-top: 1px solid var(--border-color);
-    border-radius: 20px 20px 0 0;
+    border-radius: 20px 20px 0 0 !important;
     box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
   }
   .chatbot-panel.hidden {
@@ -683,19 +680,25 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 /* ─── Chatbot Panel ──────────────────────────────────────────────────────────── */
 .chatbot-panel {
   position: fixed;
-  top: 60px;
+  bottom: 0;
   right: 0;
   width: 380px;
-  height: calc(100vh - 60px);
-  background: var(--bg-secondary);
+  height: 50vh;
+  background: rgba(18, 18, 21, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border-left: 1px solid var(--border-color);
-  border-radius: 16px 0 0 16px;
+  border-top: 1px solid var(--border-color);
+  border-radius: 16px 0 0 0;
   display: flex;
   flex-direction: column;
   z-index: 90;
-  box-shadow: -6px 0 32px rgba(0,0,0,0.35);
+  box-shadow: -6px -4px 32px rgba(0,0,0,0.4);
   transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
   overflow: hidden;
+}
+[data-theme="light"] .chatbot-panel {
+  background: rgba(255, 255, 255, 0.72);
 }
 .chatbot-panel.hidden {
   transform: translateX(100%);
@@ -730,6 +733,7 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: transparent;
 }
 .chat-bubble {
   max-width: 88%;
@@ -764,7 +768,8 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
   gap: 8px;
   padding: 12px 14px;
   border-top: 1px solid var(--border-color);
-  background: var(--bg-tertiary);
+  background: var(--bg-primary);
+  opacity: 1;
 }
 .chat-input-bar input {
   flex: 1;
