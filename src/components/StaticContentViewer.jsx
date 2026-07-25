@@ -8,7 +8,7 @@
  *   • postMessage scroll-to-section bridge
  *   • Read-time estimate
  */
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import { HTML_SECTIONS } from '../data/htmlContent'
 
 // ── Parchment/sandal light theme — CSS vars injected into every iframe ────────
@@ -101,18 +101,44 @@ table.ct td { border-color: #e8e2b8 !important; }
 .sidebar, nav { background: #f2eec8 !important; border-color: #d9d09a !important; }
 </style>`
 
-// ── Inject heading IDs + scroll listener into the HTML string ─────────────────
+// ── sendPrompt bridge — injected into every iframe ────────────────────────────
+const SEND_PROMPT_BRIDGE = `<script>
+(function(){
+  // Define sendPrompt so inline onclick="sendPrompt(...)" calls in the HTML work
+  window.sendPrompt = function(question) {
+    window.parent.postMessage({ type: 'enginex-ask-bot', question: question }, '*');
+  };
+  // Also intercept any element with data-ask attribute on click
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('[data-ask]');
+    if (el) { window.sendPrompt(el.getAttribute('data-ask')); }
+  });
+})();
+<\/script>`
+
+// ── Inject theme + sendPrompt bridge ─────────────────────────────────────────
 function processHtml(raw) {
   if (!raw) return ''
-  return THEME_VARS + raw
+  return THEME_VARS + SEND_PROMPT_BRIDGE + raw
 }
 
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-export default function StaticContentViewer({ categoryId }) {
+export default function StaticContentViewer({ categoryId, onAskBot }) {
   const items = HTML_SECTIONS[categoryId] || []
   const [activeId, setActiveId] = useState(items[0]?.id)
   const iframeRef = useRef(null)
+
+  // Listen for sendPrompt messages from the iframe
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === 'enginex-ask-bot' && e.data.question) {
+        onAskBot?.(e.data.question)
+      }
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [onAskBot])
 
   const item = items.find(i => i.id === activeId) || items[0]
 
@@ -138,7 +164,7 @@ export default function StaticContentViewer({ categoryId }) {
         {items.map(it => (
           <button
             key={it.id}
-            onClick={() => { setActiveId(it.id); setSection(null) }}
+            onClick={() => { setActiveId(it.id) }}
             style={{
               background:   activeId === it.id ? 'rgba(0,212,255,0.07)' : 'none',
               color:        activeId === it.id ? 'var(--accent-cyan)'   : 'var(--text-secondary)',

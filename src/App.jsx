@@ -35,10 +35,11 @@ import {
 } from './services/claudeService'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const PROGRESS_KEY = 'enginex_progress'
-const NOTES_KEY    = 'enginex_notes'
-const STREAK_KEY   = 'enginex_streak'
-const THEME_KEY    = 'enginex_theme'
+const PROGRESS_KEY  = 'enginex_progress'
+const NOTES_KEY     = 'enginex_notes'
+const STREAK_KEY    = 'enginex_streak'
+const THEME_KEY     = 'enginex_theme'
+const CONTENT_CACHE = 'enginex_content_cache'
 
 // Questions per category
 const QUESTIONS_MAP = { DSA: DSA_QUESTIONS, Java: JAVA_QUESTIONS }
@@ -363,18 +364,13 @@ function SettingsModal({ onClose, onSave }) {
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="terminal-window" style={{ width: '100%', maxWidth: 620 }}>
+      <div className="terminal-window" style={{ width: '100%', maxWidth: 540 }}>
         <div className="terminal-header">
-          <div className="terminal-dots">
-            <div className="terminal-dot" />
-            <div className="terminal-dot yellow" />
-            <div className="terminal-dot green" />
-          </div>
           <span className="terminal-title">⚙ SETTINGS — AI PROVIDER</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem' }}>✕</button>
         </div>
 
-        <div className="terminal-body">
+        <div className="terminal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {/* Provider tabs */}
           <div style={{ display: 'flex', marginBottom: 24, flexWrap: 'wrap', gap: 2 }}>
             <button style={tabStyle(provider === 'anthropic')} onClick={() => handleProviderChange('anthropic')}>
@@ -947,7 +943,23 @@ function CategoryView({ category, progress, onOpenChapter, onBack }) {
 function TheorySubjectView({ subject, onBack }) {
   const subjectQuestions = QUESTIONS_MAP[subject.id] || []
   const [subTab, setSubTab] = useState('guides')
+  const [chatOpen, setChatOpen] = useState(false)
+  const [pendingQuestion, setPendingQuestion] = useState(null)
   const qType = subject.id === 'Java' ? 'java' : 'dsa'
+
+  const handleDeepDive = (question) => {
+    setChatOpen(true)
+    setPendingQuestion(question)
+  }
+
+  // Synthetic chapter object for ChatbotPanel
+  const theoryChapter = { title: subject.name, category: subject.id, tags: [], description: '' }
+
+  const subTabs = [
+    { key: 'guides',     label: '📚 Theory Guides' },
+    { key: 'flashcards', label: '📌 Flashcards' },
+    ...(subjectQuestions.length > 0 ? [{ key: 'questions', label: '💡 Questions', count: subjectQuestions.length }] : []),
+  ]
 
   return (
     <div>
@@ -963,39 +975,62 @@ function TheorySubjectView({ subject, onBack }) {
         </div>
       </div>
 
-      {subjectQuestions.length > 0 && (
-        <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 24 }}>
-          {[
-            { key: 'guides',    label: '📚 Theory Guides' },
-            { key: 'questions', label: '💡 Questions', count: subjectQuestions.length },
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setSubTab(tab.key)}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                padding: '8px 18px',
-                fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: 0.5,
-                color: subTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                borderBottom: `2px solid ${subTab === tab.key ? 'var(--accent-cyan)' : 'transparent'}`,
-                transition: 'all 0.15s',
-                display: 'flex', alignItems: 'center', gap: 6,
-              }}
-            >
-              {tab.label}
-              {tab.count !== undefined && (
-                <span style={{ fontSize: '0.68rem', color: subTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)' }}>
-                  {tab.count}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
+      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 24 }}>
+        {subTabs.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setSubTab(tab.key)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: '8px 18px',
+              fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: 0.5,
+              color: subTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+              borderBottom: `2px solid ${subTab === tab.key ? 'var(--accent-cyan)' : 'transparent'}`,
+              transition: 'all 0.15s',
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            {tab.label}
+            {tab.count !== undefined && (
+              <span style={{ fontSize: '0.68rem', color: subTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)' }}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
 
-      {subTab === 'guides' && <StaticContentViewer categoryId={subject.id} />}
+      {subTab === 'guides' && <StaticContentViewer categoryId={subject.id} onAskBot={handleDeepDive} />}
+      {subTab === 'flashcards' && (
+        <FlashcardManager section={subject.id.toLowerCase().replace(/\s+/g, '-')} />
+      )}
       {subTab === 'questions' && subjectQuestions.length > 0 && (
         <QuestionsPanel questions={subjectQuestions} type={qType} />
+      )}
+
+      {/* Chatbot FAB */}
+      {hasApiKey() && (
+        <button className="chatbot-fab" onClick={() => setChatOpen(o => !o)} title="AI Coach">
+          💬
+        </button>
+      )}
+
+      {/* Chatbot backdrop (mobile only) */}
+      {hasApiKey() && chatOpen && (
+        <div
+          onClick={() => setChatOpen(false)}
+          style={{
+            display: 'none',
+            position: 'fixed', inset: 0, zIndex: 89,
+            background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(2px)',
+          }}
+          className="chatbot-mobile-backdrop"
+        />
+      )}
+
+      {/* Chatbot Panel */}
+      {hasApiKey() && (
+        <ChatbotPanel chapter={theoryChapter} isOpen={chatOpen} onClose={() => setChatOpen(false)} pendingQuestion={pendingQuestion} onPendingConsumed={() => setPendingQuestion(null)} />
       )}
     </div>
   )
@@ -1003,11 +1038,11 @@ function TheorySubjectView({ subject, onBack }) {
 
 // ─── Theory View ──────────────────────────────────────────────────────────────
 const THEORY_SUBJECTS = [
-  { id: 'DSA',            name: 'Data Structures & Algorithms', icon: '󱃔', desc: '8 guides — trees, graphs, DP, patterns, bit manipulation' },
+  { id: 'DSA',            name: 'Data Structures & Algorithms', icon: '🧩', desc: '8 guides — trees, graphs, DP, patterns, bit manipulation' },
   { id: 'Java',           name: 'Java Deep Dive',               icon: '☕', desc: '8 guides — JVM, collections, concurrency, design patterns' },
-  { id: 'CS Fundamentals',name: 'CS Fundamentals',              icon: '󰓙', desc: '8 guides — networks, OS, compilers, cryptography, distributed systems' },
-  { id: 'Full Stack',     name: 'Frontend & Full Stack',        icon: '󰜎', desc: '8 guides — browser internals, React, performance, security' },
-  { id: 'System Design',  name: 'System Design',                icon: '󱗿', desc: '9 guides — architecture, caching, databases, messaging, reliability' },
+  { id: 'CS Fundamentals',name: 'CS Fundamentals',              icon: '💡', desc: '8 guides — networks, OS, compilers, cryptography, distributed systems' },
+  { id: 'Full Stack',     name: 'Frontend & Full Stack',        icon: '🌐', desc: '8 guides — browser internals, React, performance, security' },
+  { id: 'System Design',  name: 'System Design',                icon: '🏗️', desc: '9 guides — architecture, caching, databases, messaging, reliability' },
 ]
 
 function TheoryView({ onOpenSubject }) {
@@ -1239,30 +1274,8 @@ function LibraryView({ progress, onOpenChapter }) {
         </div>
       )}
 
-      {/* ── Library tab bar + hamburger ──────────────────────────────────── */}
+      {/* ── Library tab bar ──────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 28 }}>
-        {/* Hamburger button */}
-        <button
-          onClick={() => setDrawerOpen(true)}
-          title="Browse topics"
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 4,
-            alignItems: 'center', justifyContent: 'center',
-            color: 'var(--text-secondary)', borderBottom: '2px solid transparent',
-            transition: 'color 0.15s',
-          }}
-          onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-cyan)'}
-          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
-        >
-          <span style={{ display: 'block', width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} />
-          <span style={{ display: 'block', width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} />
-          <span style={{ display: 'block', width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} />
-        </button>
-
-        {/* divider */}
-        <div style={{ width: 1, height: 24, background: 'var(--border-color)', marginRight: 4 }} />
-
         {LIB_TABS.map(tab => (
           <button
             key={tab.key}
@@ -1347,9 +1360,6 @@ function LibraryView({ progress, onOpenChapter }) {
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                 {filtered.length} result{filtered.length !== 1 ? 's' : ''}
               </span>
-              <button className="btn-console" onClick={() => { setSearch(''); setActiveCat('ALL') }} style={{ padding: '4px 12px', fontSize: '0.75rem' }}>
-                ✕ Clear
-              </button>
             </div>
           )}
           {/* Grid */}
@@ -1468,7 +1478,7 @@ const STARTER_QUESTIONS = {
 }
 
 // ─── Chatbot Panel ────────────────────────────────────────────────────────────
-function ChatbotPanel({ chapter, isOpen, onClose }) {
+function ChatbotPanel({ chapter, isOpen, onClose, pendingQuestion, onPendingConsumed }) {
   const [messages, setMessages] = useState([
     { role: 'assistant', content: `Hi! I'm your AI coach for **${chapter.title}**. Ask me anything about this topic — concepts, code examples, interview tips, or quick quiz questions!` }
   ])
@@ -1479,6 +1489,20 @@ function ChatbotPanel({ chapter, isOpen, onClose }) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Auto-send a pending question from a Deep Dive button
+  useEffect(() => {
+    if (pendingQuestion && isOpen && !sending) {
+      setInput('')
+      setMessages(prev => [...prev, { role: 'user', content: pendingQuestion }])
+      onPendingConsumed?.()
+      setSending(true)
+      generateChatMessage(chapter, messages, pendingQuestion)
+        .then(reply => setMessages(prev => [...prev, { role: 'assistant', content: reply }]))
+        .catch(err => setMessages(prev => [...prev, { role: 'assistant', content: `⚠ Error: ${err.message}` }]))
+        .finally(() => setSending(false))
+    }
+  }, [pendingQuestion, isOpen]) // eslint-disable-line
 
   const send = async () => {
     const text = input.trim()
@@ -1666,10 +1690,7 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
   const handleTtsPlay = () => {
     if (!ttsSupported) return
     window.speechSynthesis.cancel()
-    const isHtmlContent = content.trimStart().toLowerCase().startsWith('<!doctype') || content.trimStart().toLowerCase().startsWith('<html')
-    const text = isHtmlContent
-      ? (contentRef.current?.contentDocument?.body?.innerText || '')
-      : (contentRef.current?.innerText || '')
+    const text = contentRef.current?.innerText || ''
     utteranceRef.current = new SpeechSynthesisUtterance(text)
     utteranceRef.current.rate = 1
     const voices = window.speechSynthesis.getVoices()
@@ -1691,7 +1712,34 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
     setTtsPlaying(false)
   }
 
-  const loadContent = useCallback(async () => {
+  const getCached = () => {
+    try {
+      const cache = JSON.parse(localStorage.getItem(CONTENT_CACHE) || '{}')
+      return cache[chapter.id] || null
+    } catch { return null }
+  }
+
+  const setCached = (text) => {
+    try {
+      const cache = JSON.parse(localStorage.getItem(CONTENT_CACHE) || '{}')
+      cache[chapter.id] = text
+      localStorage.setItem(CONTENT_CACHE, JSON.stringify(cache))
+    } catch {}
+  }
+
+  const loadContent = useCallback(async (forceRefresh = false) => {
+    // Use cached content if available and not forcing refresh
+    if (!forceRefresh) {
+      const cached = getCached()
+      if (cached) {
+        setContent(cached)
+        setIsLoading(false)
+        setVisibleLogs(logs.length + 1)
+        onMarkRead(chapter.id)
+        return
+      }
+    }
+
     setIsLoading(true)
     setError(null)
     setVisibleLogs(0)
@@ -1707,6 +1755,7 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
       let text
       if (hasApiKey()) {
         text = await generateChapterContent(chapter)
+        setCached(text)
       } else {
         await new Promise(r => setTimeout(r, logs.length * 320 + 400))
         text = chapter.fallbackContent
@@ -1724,16 +1773,12 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
   }, [chapter])
 
   useEffect(() => {
-    loadContent()
+    loadContent(false)
     return () => clearInterval(intervalRef.current)
   }, [loadContent])
 
   const chProg = progress[chapter.id]
   const quizScore = chProg?.quizScore
-  const isHtmlContent = !isLoading && !!content && (
-    content.trimStart().toLowerCase().startsWith('<!doctype') ||
-    content.trimStart().toLowerCase().startsWith('<html')
-  )
 
   return (
     <>
@@ -1742,42 +1787,7 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
         <div style={{ height: '100%', width: `${scrollPct}%`, background: 'var(--accent-cyan)', transition: 'width 0.1s', boxShadow: '0 0 8px var(--accent-cyan-glow)' }} />
       </div>
 
-      {isHtmlContent ? (
-        /* ── HTML mode: full-viewport sidebar+tabs layout ── */
-        <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 66px)', overflow: 'hidden' }}>
-          {/* Slim breadcrumb bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px', borderBottom: '1px solid var(--border-color)', flexShrink: 0, flexWrap: 'wrap', background: 'var(--bg-primary)' }}>
-            <button className="btn-console" onClick={onBack} style={{ padding: '4px 12px', fontSize: '0.78rem' }}>
-              ← LIBRARY
-            </button>
-            <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {chapter.category} / {chapter.title}
-            </span>
-            {ttsSupported && (
-              <div style={{ display: 'flex', gap: 4 }}>
-                <button className="tts-btn" onClick={ttsPlaying ? handleTtsPause : handleTtsPlay} title={ttsPlaying ? 'Pause' : 'Play'}>
-                  {ttsPlaying ? '⏸' : '▶'}
-                </button>
-                <button className="tts-btn" onClick={handleTtsStop} title="Stop" disabled={!ttsPlaying}>⏹</button>
-              </div>
-            )}
-            <button className="btn-console" onClick={() => setShowDocs(true)} style={{ padding: '4px 10px', fontSize: '0.76rem' }}>
-              📄 DOCS
-            </button>
-            <button className="btn-console btn-console-success" onClick={onStartQuiz} style={{ padding: '4px 10px', fontSize: '0.76rem' }}>
-              ▶ QUIZ
-            </button>
-          </div>
-          {/* Full-height iframe — fills remaining viewport */}
-          <iframe
-            ref={contentRef}
-            srcDoc={content}
-            title={chapter.title}
-            style={{ flex: 1, width: '100%', border: 'none', display: 'block' }}
-          />
-        </div>
-      ) : (
-        /* ── Markdown / loading mode ── */
+        {/* ── Markdown / loading mode ── */}
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           {/* Breadcrumb + action bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
@@ -1803,6 +1813,16 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
               📄 DOCS
             </button>
 
+            {hasApiKey() && !isLoading && (
+              <button
+                className="btn-console"
+                onClick={() => loadContent(true)}
+                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+                title="Clear cache and regenerate content"
+              >
+                ↺ REGEN
+              </button>
+            )}
             {!hasApiKey() && (
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--accent-yellow)', border: '1px solid rgba(255,204,0,0.3)', padding: '2px 10px', borderRadius: 4 }}>
                 DEMO
@@ -1859,7 +1879,6 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
             </>
           )}
         </div>
-      )}
 
     {/* Chatbot FAB */}
     {hasApiKey() && (
@@ -2000,11 +2019,6 @@ function QuizView({ chapter, onBack, onComplete }) {
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
         <div className="terminal-window">
           <div className="terminal-header">
-            <div className="terminal-dots">
-              <div className="terminal-dot" />
-              <div className="terminal-dot yellow" />
-              <div className="terminal-dot green" />
-            </div>
             <span className="terminal-title">QUIZ COMPLETE — {chapter.title.toUpperCase()}</span>
           </div>
           <div className="terminal-body">
@@ -2410,6 +2424,212 @@ function DashboardView({ progress, onOpenChapter }) {
   )
 }
 
+// ─── Landing Page ─────────────────────────────────────────────────────────────
+function LandingPage({ onNavigate, onOpenSettings, progress }) {
+  const readCount  = CHAPTERS.filter(c => progress[c.id]?.read).length
+  const totalChaps = CHAPTERS.length
+  const streak     = loadStreak()
+
+  const FEATURES = [
+    {
+      icon: '◈',
+      title: 'Library',
+      subtitle: 'AI Chapter Engine',
+      desc: 'AI-generated deep-dive chapters across DSA, System Design, Full Stack, Java and more. Persisted locally so you never regenerate.',
+      badge: `${totalChaps} chapters`,
+      color: 'var(--accent-cyan)',
+      action: () => onNavigate('library'),
+      cta: 'Open Library →',
+    },
+    {
+      icon: '📚',
+      title: 'Theory',
+      subtitle: 'Structured Guides',
+      desc: 'Hand-crafted visual guides with sidebar navigation, worked examples, and a Deep Dive AI chatbot wired to every topic.',
+      badge: '40+ guides',
+      color: '#a78bfa',
+      action: () => onNavigate('theory'),
+      cta: 'Browse Theory →',
+    },
+    {
+      icon: '👥',
+      title: 'Collab Coder',
+      subtitle: 'Coming Soon',
+      desc: 'Real-time collaborative coding environment. Pair-program with peers, share sessions, and tackle interview problems together.',
+      badge: 'Coming Soon',
+      color: 'var(--accent-green)',
+      action: null,
+      cta: 'Join Waitlist',
+    },
+    {
+      icon: '🖊',
+      title: 'EX-Draw',
+      subtitle: 'Coming Soon',
+      desc: 'Infinite whiteboard for system design interviews. Draw architectures, annotate diagrams, and export to share with interviewers.',
+      badge: 'Coming Soon',
+      color: 'var(--accent-yellow)',
+      action: null,
+      cta: 'Join Waitlist',
+    },
+    {
+      icon: '◑',
+      title: 'Dashboard',
+      subtitle: 'Progress Tracker',
+      desc: 'Track your study streak, quiz scores, activity heatmap, and spaced-repetition review queue. Know exactly where you stand.',
+      badge: `${readCount}/${totalChaps} read`,
+      color: '#f97316',
+      action: () => onNavigate('dashboard'),
+      cta: 'View Dashboard →',
+    },
+    {
+      icon: '⚙',
+      title: 'Settings',
+      subtitle: 'AI Provider',
+      desc: 'Plug in your Anthropic, GitHub Copilot, Gemini (free tier!), or OpenAI key. All keys stay in your browser — nothing hits a server.',
+      badge: 'Configure AI',
+      color: 'var(--text-secondary)',
+      action: onOpenSettings,
+      cta: 'Configure →',
+    },
+  ]
+
+  return (
+    <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+
+      {/* ── Hero ── */}
+      <div style={{ textAlign: 'center', padding: '72px 24px 56px', position: 'relative' }}>
+        {/* faint grid bg */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 65%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20,
+            background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.2)',
+            borderRadius: 20, padding: '5px 16px',
+            fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--accent-cyan)', letterSpacing: 1,
+          }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-green)', display: 'inline-block' }} />
+            FAANG &amp; Big 4 Interview Prep Console
+          </div>
+
+          <h1 style={{ fontSize: 'clamp(2.4rem, 6vw, 4rem)', fontWeight: 800, margin: '0 0 20px', lineHeight: 1.1, letterSpacing: -1 }}>
+            <span style={{ color: 'var(--accent-cyan)', textShadow: '0 0 40px rgba(0,212,255,0.3)' }}>Engineer</span>
+            {' '}your way<br />to your dream offer.
+          </h1>
+
+          <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto 36px', lineHeight: 1.7 }}>
+            AI-powered study chapters, visual theory guides, flashcards, quizzes, and a smart progress dashboard — all in one dark-themed console.
+          </p>
+
+          {/* Streak + progress pills */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 40 }}>
+            {streak.count > 0 && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,204,0,0.08)', border: '1px solid rgba(255,204,0,0.25)', borderRadius: 20, padding: '6px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-yellow)' }}>
+                🔥 {streak.count}-day streak
+              </div>
+            )}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.2)', borderRadius: 20, padding: '6px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>
+              📖 {readCount} / {totalChaps} chapters read
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              className="btn-console btn-console-success"
+              onClick={() => onNavigate('library')}
+              style={{ padding: '13px 32px', fontSize: '1rem', letterSpacing: 1 }}
+            >
+              ▶ START STUDYING
+            </button>
+            <button
+              className="btn-console"
+              onClick={() => onNavigate('dashboard')}
+              style={{ padding: '13px 28px', fontSize: '1rem' }}
+            >
+              ◑ MY PROGRESS
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Feature Cards Grid ── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: 20,
+        padding: '0 24px 80px',
+      }}>
+        {FEATURES.map((f) => (
+          <div
+            key={f.title}
+            style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 12, padding: '28px',
+              display: 'flex', flexDirection: 'column', gap: 16,
+              transition: 'border-color 0.2s, box-shadow 0.2s',
+              cursor: f.action ? 'pointer' : 'default',
+              opacity: !f.action ? 0.75 : 1,
+            }}
+            onClick={f.action || undefined}
+            onMouseEnter={e => {
+              if (!f.action) return
+              e.currentTarget.style.borderColor = f.color
+              e.currentTarget.style.boxShadow = `0 0 24px ${f.color}18`
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = 'var(--border-color)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            {/* Card header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <span style={{ fontSize: '2rem', lineHeight: 1 }}>{f.icon}</span>
+              <span style={{
+                fontFamily: 'var(--font-mono)', fontSize: '0.68rem', letterSpacing: 1,
+                padding: '3px 10px', borderRadius: 20,
+                background: `${f.color}15`, border: `1px solid ${f.color}40`,
+                color: f.color,
+              }}>
+                {f.badge}
+              </span>
+            </div>
+
+            {/* Title */}
+            <div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+                {f.title}
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: f.color, letterSpacing: 1 }}>
+                {f.subtitle}
+              </div>
+            </div>
+
+            {/* Desc */}
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0, flex: 1 }}>
+              {f.desc}
+            </p>
+
+            {/* CTA */}
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.8rem',
+              color: f.action ? f.color : 'var(--text-muted)',
+              letterSpacing: 0.5, marginTop: 4,
+            }}>
+              {f.cta}
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  )
+}
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 // ─── Login Screen ─────────────────────────────────────────────────────────────
 function LoginScreen() {
@@ -2529,7 +2749,7 @@ function LoginScreen() {
 }
 
 export default function App() {
-  const [view, setView] = useState('library')   // 'library' | 'category' | 'chapter' | 'quiz' | 'dashboard' | 'theory' | 'theory-subject'
+  const [view, setView] = useState('landing')   // 'landing' | 'library' | 'category' | 'chapter' | 'quiz' | 'dashboard' | 'theory' | 'theory-subject'
   const [selectedChapter, setSelectedChapter] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [selectedTheoryCategory, setSelectedTheoryCategory] = useState(null)
@@ -2655,7 +2875,7 @@ export default function App() {
 
           {/* Logo */}
           <button
-            onClick={() => { setView('library'); setMobileMenuOpen(false) }}
+            onClick={() => { setView('landing'); setMobileMenuOpen(false) }}
             style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: 0, flexShrink: 0 }}
           >
             <span style={{
@@ -2667,89 +2887,61 @@ export default function App() {
             </span>
           </button>
 
-          {/* Desktop Nav */}
-          <nav className="header-nav" style={{ display: 'flex', gap: 4 }}>
-            {[
-              { label: 'Library', val: 'library' },
-              { label: 'Theory',  val: 'theory' },
-              { label: 'Dashboard', val: 'dashboard' },
-            ].map(({ label, val }) => {
-              const isActive =
-                view === val ||
-                (val === 'library' && ['category','html','chapter','quiz'].includes(view)) ||
-                (val === 'theory'  && view === 'theory-subject')
-              return (
-                <button
-                  key={val}
-                  onClick={() => setView(val)}
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    padding: '6px 14px', borderRadius: 4,
-                    fontFamily: 'var(--font-mono)', fontSize: '0.85rem', letterSpacing: 0.5,
-                    color: isActive ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-                    borderBottom: isActive ? '2px solid var(--accent-cyan)' : '2px solid transparent',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  {label}
-                </button>
-              )
-            })}
-          </nav>
+          {/* Desktop Nav removed — logo navigates home */}
 
-          {/* Desktop right actions */}
-          <div className="header-actions-desktop" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Desktop right actions — pinned to top-right */}
+          <div className="header-actions-desktop" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
             {/* Progress pill */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 20, padding: '4px 12px' }}>
-              <div style={{ width: 60, height: 4, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 20, padding: '3px 10px' }}>
+              <div style={{ width: 48, height: 3, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${overallPct}%`, background: 'var(--accent-cyan)', borderRadius: 2, transition: 'width 0.4s' }} />
               </div>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{overallPct}%</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{overallPct}%</span>
             </div>
             {/* API status */}
             <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: 1,
-              padding: '3px 10px', borderRadius: 4, border: '1px solid',
+              fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: 1,
+              padding: '3px 9px', borderRadius: 4, border: '1px solid',
               borderColor: apiConfigured ? 'rgba(0,255,102,0.3)' : 'rgba(255,204,0,0.3)',
               color: apiConfigured ? 'var(--accent-green)' : 'var(--accent-yellow)',
               background: apiConfigured ? 'rgba(0,255,102,0.05)' : 'rgba(255,204,0,0.05)',
             }}>
-              {apiConfigured ? `● LIVE · ${providerLabel}` : '● DEMO MODE'}
+              {apiConfigured ? `● ${providerLabel}` : '● DEMO'}
             </div>
             {/* Theme toggle */}
             <button className="theme-toggle" onClick={() => setDarkMode(d => !d)} title={darkMode ? 'Light Mode' : 'Dark Mode'}>
               {darkMode ? '☀' : '🌙'}
             </button>
             {/* Settings */}
-            <button className="btn-console" onClick={() => setShowSettings(true)} style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
+            <button className="btn-console" onClick={() => setShowSettings(true)} style={{ padding: '5px 12px', fontSize: '0.78rem' }}>
               ⚙ SETTINGS
             </button>
             {/* User avatar + logout */}
             {user && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {user.user_metadata?.avatar_url ? (
                   <img src={user.user_metadata.avatar_url} alt="" referrerPolicy="no-referrer"
-                    style={{ width: 30, height: 30, borderRadius: '50%', border: '1px solid var(--border-color)', objectFit: 'cover' }} />
+                    style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid var(--border-color)', objectFit: 'cover' }} />
                 ) : (
                   <div style={{
-                    width: 30, height: 30, borderRadius: '50%', border: '1px solid var(--border-color)',
+                    width: 28, height: 28, borderRadius: '50%', border: '1px solid var(--border-color)',
                     background: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.75rem', color: '#000',
+                    fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.72rem', color: '#000',
                   }}>
                     {(user.user_metadata?.full_name || user.email || '?')[0].toUpperCase()}
                   </div>
                 )}
                 <button onClick={() => signOut()} style={{
                   background: 'none', border: '1px solid var(--border-color)', borderRadius: 6,
-                  color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px 10px',
-                  fontFamily: 'var(--font-mono)', fontSize: '0.72rem',
+                  color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px 9px',
+                  fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
                 }}>Sign out</button>
               </div>
             )}
           </div>
 
           {/* Mobile right: theme + hamburger */}
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button className="theme-toggle" style={{ display: 'none' /* shown via .header-actions-mobile CSS */ }}
               onClick={() => setDarkMode(d => !d)}>{darkMode ? '☀' : '🌙'}</button>
             <button
@@ -2765,25 +2957,6 @@ export default function App() {
 
           {/* Mobile nav dropdown */}
           <div className={`mobile-nav-panel ${mobileMenuOpen ? 'open' : ''}`}>
-            {[
-              { label: '◈ Library', val: 'library' },
-              { label: '📚 Theory',  val: 'theory' },
-              { label: '📊 Dashboard', val: 'dashboard' },
-            ].map(({ label, val }) => {
-              const isActive = view === val ||
-                (val === 'library' && ['category','html','chapter','quiz'].includes(view)) ||
-                (val === 'theory'  && view === 'theory-subject')
-              return (
-                <button
-                  key={val}
-                  className={`mobile-nav-btn ${isActive ? 'active' : ''}`}
-                  onClick={() => { setView(val); setMobileMenuOpen(false) }}
-                >
-                  {label}
-                </button>
-              )
-            })}
-            <div className="mobile-nav-divider" />
             <div style={{ display: 'flex', gap: 8, padding: '4px 0', flexWrap: 'wrap' }}>
               <button className="theme-toggle" onClick={() => setDarkMode(d => !d)}>{darkMode ? '☀ Light' : '🌙 Dark'}</button>
               <button className="btn-console" onClick={() => { setShowSettings(true); setMobileMenuOpen(false) }} style={{ padding: '6px 14px', fontSize: '0.8rem' }}>
@@ -2812,7 +2985,14 @@ export default function App() {
       </header>
 
       {/* Main */}
-      <main className="main-content" style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: '32px 28px' }}>
+      <main className="main-content" style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: view === 'landing' ? '0' : '32px 28px' }}>
+        {view === 'landing' && (
+          <LandingPage
+            progress={progress}
+            onNavigate={(v) => { setView(v); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+            onOpenSettings={() => setShowSettings(true)}
+          />
+        )}
         {view === 'library' && (
           <LibraryView progress={progress} onOpenChapter={handleOpenChapter} />
         )}
