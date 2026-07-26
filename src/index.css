@@ -632,16 +632,16 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 
   /* Chatbot as full-width bottom sheet on mobile */
   .chatbot-panel {
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
+    bottom: 88px !important;  /* above mobile FAB */
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
     height: 60vh !important;
-    border-left: none;
-    border-radius: 20px 20px 0 0 !important;
-    box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+    border-radius: 16px !important;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
   }
   .chatbot-panel.hidden {
-    transform: translateY(100%) !important;
+    transform: translateY(calc(100% + 96px)) !important;
   }
   .chatbot-fab {
     bottom: 20px;
@@ -680,20 +680,19 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 /* ─── Chatbot Panel ──────────────────────────────────────────────────────────── */
 .chatbot-panel {
   position: fixed;
-  bottom: 0;
-  right: 0;
+  bottom: 96px;        /* 28px margin + 52px FAB height + 16px gap */
+  right: 20px;
   width: 380px;
   height: 50vh;
   background: rgba(18, 18, 21, 0.72);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border-left: 1px solid var(--border-color);
-  border-top: 1px solid var(--border-color);
-  border-radius: 16px 0 0 0;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   z-index: 90;
-  box-shadow: -6px -4px 32px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.45);
   transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
   overflow: hidden;
 }
