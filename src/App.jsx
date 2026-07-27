@@ -1,11 +1,18 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
 import { CATEGORIES, ALL_CHAPTERS as CHAPTERS } from './data/topics'
 import { getDocsUrl } from './data/docsMap'
 import { HTML_SECTIONS, hasTheory } from './data/htmlContent'
 import { DSA_QUESTIONS, JAVA_QUESTIONS } from './data/questions'
-import FlashcardManager from './components/FlashcardManager'
-import StaticContentViewer from './components/StaticContentViewer'
-import InterviewWhiteboard from './components/InterviewWhiteboard'
+const FlashcardManager    = lazy(() => import('./components/FlashcardManager'))
+const StaticContentViewer = lazy(() => import('./components/StaticContentViewer'))
+const InterviewWhiteboard = lazy(() => import('./components/InterviewWhiteboard'))
+
+// Shared fallback for lazy-loaded panels
+const LazyFallback = () => (
+  <div style={{ padding: '32px', textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-secondary)', letterSpacing: 1 }}>
+    Loading…
+  </div>
+)
 import { supabase, signInWithGoogle, signInWithGitHub, signOut } from './services/supabaseClient'
 import {
   generateChapterContent,
@@ -256,7 +263,7 @@ function CuratedDocsPanel() {
             <button
               onClick={() => setOpenCat(openCat === cat ? null : cat)}
               style={{
-                width: '100%', background: openCat === cat ? 'rgba(0,212,255,0.05)' : 'var(--bg-secondary)',
+                width: '100%', background: openCat === cat ? 'rgba(0,0,0,0.05)' : 'var(--bg-secondary)',
                 border: 'none', padding: '9px 14px', cursor: 'pointer',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 transition: 'background 0.2s',
@@ -421,7 +428,7 @@ function SettingsModal({ onClose, onSave }) {
                 style={{
                   display: 'inline-block', marginBottom: 16,
                   padding: '9px 18px', borderRadius: 6, cursor: 'pointer',
-                  background: 'rgba(0,212,255,0.08)', border: '1px solid var(--accent-cyan)',
+                  background: 'rgba(0,0,0,0.08)', border: '1px solid var(--accent-cyan)',
                   color: 'var(--accent-cyan)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem',
                   textDecoration: 'none', letterSpacing: 1,
                 }}
@@ -563,8 +570,8 @@ function ChapterCard({ chapter, progress, onClick }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
         <span style={{
           fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: 1,
-          color: 'var(--accent-cyan)', border: '1px solid rgba(0,212,255,0.3)',
-          padding: '2px 8px', borderRadius: 4, background: 'rgba(0,212,255,0.05)',
+          color: 'var(--accent-cyan)', border: '1px solid rgba(0,0,0,0.3)',
+          padding: '2px 8px', borderRadius: 4, background: 'rgba(0,0,0,0.05)',
         }}>
           {chapter.category}
         </span>
@@ -643,7 +650,7 @@ function QuestionsPanel({ questions = [], type = 'dsa' }) {
             ← QUESTIONS
           </button>
           <DiffBadge difficulty={selected.difficulty} />
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--accent-cyan)', border: '1px solid rgba(0,212,255,0.2)', padding: '2px 8px', borderRadius: 4 }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--accent-cyan)', border: '1px solid rgba(0,0,0,0.2)', padding: '2px 8px', borderRadius: 4 }}>
             {selected.topic}
           </span>
           <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', flex: 1 }}>
@@ -725,7 +732,7 @@ function QuestionsPanel({ questions = [], type = 'dsa' }) {
         {/* Java Q&A layout */}
         {type === 'java' && (
           <>
-            <div style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 8, padding: '20px 24px', marginBottom: 16 }}>
+            <div style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(0,0,0,0.15)', borderRadius: 8, padding: '20px 24px', marginBottom: 16 }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--accent-cyan)', letterSpacing: 1, marginBottom: 10 }}>QUESTION</div>
               <p style={{ color: 'var(--text-primary)', fontSize: '1rem', fontWeight: 500, lineHeight: 1.6 }}>{selected.question}</p>
             </div>
@@ -774,10 +781,12 @@ function QuestionsPanel({ questions = [], type = 'dsa' }) {
           </button>
           {showWb && (
             <div style={{ marginTop: 14 }}>
-              <InterviewWhiteboard
-                questionId={selected.id}
-                question={type === 'dsa' ? selected.description : selected.question}
-              />
+              <Suspense fallback={<LazyFallback />}>
+                <InterviewWhiteboard
+                  questionId={selected.id}
+                  question={type === 'dsa' ? selected.description : selected.question}
+                />
+              </Suspense>
             </div>
           )}
         </div>
@@ -916,7 +925,9 @@ function CategoryView({ category, progress, onOpenChapter, onBack }) {
       )}
 
       {activeTab === 'flashcards' && (
-        <FlashcardManager section={category.id.toLowerCase().replace(/\s+/g, '-')} />
+        <Suspense fallback={<LazyFallback />}>
+          <FlashcardManager section={category.id.toLowerCase().replace(/\s+/g, '-')} />
+        </Suspense>
       )}
 
       {activeTab === 'chapters' && (
@@ -1000,9 +1011,15 @@ function TheorySubjectView({ subject, onBack }) {
         ))}
       </div>
 
-      {subTab === 'guides' && <StaticContentViewer categoryId={subject.id} onAskBot={handleDeepDive} />}
+      {subTab === 'guides' && (
+        <Suspense fallback={<LazyFallback />}>
+          <StaticContentViewer categoryId={subject.id} onAskBot={handleDeepDive} />
+        </Suspense>
+      )}
       {subTab === 'flashcards' && (
-        <FlashcardManager section={subject.id.toLowerCase().replace(/\s+/g, '-')} />
+        <Suspense fallback={<LazyFallback />}>
+          <FlashcardManager section={subject.id.toLowerCase().replace(/\s+/g, '-')} />
+        </Suspense>
       )}
       {subTab === 'questions' && subjectQuestions.length > 0 && (
         <QuestionsPanel questions={subjectQuestions} type={qType} />
@@ -1073,8 +1090,8 @@ function TheoryView({ onOpenSubject }) {
                 <span style={{ fontSize: '1.6rem' }}>{subj.icon}</span>
                 <span style={{
                   fontFamily: 'var(--font-mono)', fontSize: '0.68rem', padding: '3px 8px',
-                  borderRadius: 4, background: 'rgba(0,212,255,0.1)', color: 'var(--accent-cyan)',
-                  border: '1px solid rgba(0,212,255,0.25)',
+                  borderRadius: 4, background: 'rgba(0,0,0,0.1)', color: 'var(--accent-cyan)',
+                  border: '1px solid rgba(0,0,0,0.25)',
                 }}>
                   {items.length} guides
                 </span>
@@ -1158,7 +1175,7 @@ function LibraryView({ progress, onOpenChapter }) {
   ]
 
   const pillStyle = (active) => ({
-    background: active ? 'rgba(0,212,255,0.12)' : 'var(--bg-secondary)',
+    background: active ? 'rgba(0,0,0,0.12)' : 'var(--bg-secondary)',
     border: `1px solid ${active ? 'var(--accent-cyan)' : 'var(--border-color)'}`,
     color: active ? 'var(--accent-cyan)' : 'var(--text-secondary)',
     borderRadius: 20, padding: '4px 14px', cursor: 'pointer',
@@ -1213,7 +1230,7 @@ function LibraryView({ progress, onOpenChapter }) {
             <button
               onClick={() => { setActiveCat('ALL'); setLibTab('chapters'); setDrawerOpen(false) }}
               style={{
-                background: activeCat === 'ALL' ? 'rgba(0,212,255,0.08)' : 'none',
+                background: activeCat === 'ALL' ? 'rgba(0,0,0,0.08)' : 'none',
                 border: 'none', borderLeft: activeCat === 'ALL' ? '3px solid var(--accent-cyan)' : '3px solid transparent',
                 cursor: 'pointer', padding: '12px 20px',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -1237,7 +1254,7 @@ function LibraryView({ progress, onOpenChapter }) {
                     key={cat.id}
                     onClick={() => { setActiveCat(cat.id); setLibTab('chapters'); setDrawerOpen(false) }}
                     style={{
-                      width: '100%', background: isActive ? 'rgba(0,212,255,0.08)' : 'none',
+                      width: '100%', background: isActive ? 'rgba(0,0,0,0.08)' : 'none',
                       border: 'none', borderLeft: isActive ? '3px solid var(--accent-cyan)' : '3px solid transparent',
                       cursor: 'pointer', padding: '12px 20px',
                       display: 'flex', alignItems: 'center', gap: 12,
@@ -1304,7 +1321,7 @@ function LibraryView({ progress, onOpenChapter }) {
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{
               fontFamily: 'var(--font-mono)', fontSize: '0.72rem',
-              background: 'rgba(0,212,255,0.1)', border: '1px solid var(--accent-cyan)',
+              background: 'rgba(0,0,0,0.1)', border: '1px solid var(--accent-cyan)',
               color: 'var(--accent-cyan)', borderRadius: 12, padding: '2px 10px',
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
@@ -1386,7 +1403,9 @@ function LibraryView({ progress, onOpenChapter }) {
               </button>
             ))}
           </div>
-          <FlashcardManager section={flashCat.toLowerCase().replace(/\s+/g, '-')} />
+          <Suspense fallback={<LazyFallback />}>
+            <FlashcardManager section={flashCat.toLowerCase().replace(/\s+/g, '-')} />
+          </Suspense>
         </div>
       )}
 
@@ -2245,9 +2264,9 @@ function DashboardView({ progress, onOpenChapter }) {
                 background: d.count === 0
                   ? 'var(--bg-tertiary)'
                   : d.count === 1
-                  ? 'rgba(0,212,255,0.25)'
+                  ? 'rgba(0,0,0,0.25)'
                   : d.count === 2
-                  ? 'rgba(0,212,255,0.55)'
+                  ? 'rgba(0,0,0,0.55)'
                   : 'var(--accent-cyan)',
                 border: d.key === today.toISOString().slice(0, 10) ? '1px solid var(--accent-cyan)' : '1px solid transparent',
               }}
@@ -2256,7 +2275,7 @@ function DashboardView({ progress, onOpenChapter }) {
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
           <span>Less</span>
-          {['var(--bg-tertiary)', 'rgba(0,212,255,0.25)', 'rgba(0,212,255,0.55)', 'var(--accent-cyan)'].map(bg => (
+          {['var(--bg-tertiary)', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.55)', 'var(--accent-cyan)'].map(bg => (
             <div key={bg} style={{ width: 12, height: 12, borderRadius: 2, background: bg }} />
           ))}
           <span>More</span>
@@ -2501,14 +2520,14 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
         {/* faint grid bg */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 0,
-          backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 65%)',
+          backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(0,0,0,0.08) 0%, transparent 65%)',
           pointerEvents: 'none',
         }} />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20,
-            background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.2)',
+            background: 'rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.2)',
             borderRadius: 20, padding: '5px 16px',
             fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--accent-cyan)', letterSpacing: 1,
           }}>
@@ -2517,7 +2536,7 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
           </div>
 
           <h1 style={{ fontSize: 'clamp(2.4rem, 6vw, 4rem)', fontWeight: 800, margin: '0 0 20px', lineHeight: 1.1, letterSpacing: -1 }}>
-            <span style={{ color: 'var(--accent-cyan)', textShadow: '0 0 40px rgba(0,212,255,0.3)' }}>Engineer</span>
+            <span style={{ color: 'var(--accent-cyan)', textShadow: '0 0 40px rgba(0,0,0,0.3)' }}>Engineer</span>
             {' '}your way<br />to your dream offer.
           </h1>
 
@@ -2532,7 +2551,7 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
                 🔥 {streak.count}-day streak
               </div>
             )}
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.2)', borderRadius: 20, padding: '6px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.2)', borderRadius: 20, padding: '6px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>
               📖 {readCount} / {totalChaps} chapters read
             </div>
           </div>
@@ -2656,7 +2675,7 @@ function LoginScreen() {
       {/* Background grid */}
       <div style={{
         position: 'fixed', inset: 0, zIndex: 0,
-        backgroundImage: 'linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px)',
+        backgroundImage: 'linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)',
         backgroundSize: '40px 40px',
         pointerEvents: 'none',
       }} />
@@ -2665,13 +2684,13 @@ function LoginScreen() {
         position: 'relative', zIndex: 1,
         background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
         borderRadius: 16, padding: '52px 48px', maxWidth: 420, width: '100%', textAlign: 'center',
-        boxShadow: '0 0 60px rgba(0,212,255,0.06)',
+        boxShadow: '0 0 60px rgba(0,0,0,0.06)',
       }}>
         {/* Logo */}
         <div style={{ marginBottom: 12 }}>
           <span style={{
             fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '2rem', letterSpacing: 4,
-            color: 'var(--accent-cyan)', textShadow: '0 0 20px rgba(0,212,255,0.4)',
+            color: 'var(--accent-cyan)', textShadow: '0 0 20px rgba(0,0,0,0.4)',
           }}>
             ENGINE<span style={{ color: 'var(--text-primary)' }}>X</span>
           </span>
@@ -2866,7 +2885,7 @@ export default function App() {
       {/* Header */}
       <header style={{
         borderBottom: '1px solid var(--border-color)',
-        background: darkMode ? 'rgba(10,10,12,0.95)' : 'rgba(244,244,248,0.95)',
+        background: darkMode ? 'rgba(26,0,0,0.97)' : 'rgba(0,0,0,0.97)',
         backdropFilter: 'blur(12px)',
         position: 'sticky', top: 0, zIndex: 100,
       }}>
@@ -2881,7 +2900,7 @@ export default function App() {
             <span style={{
               fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '1.2rem',
               color: 'var(--accent-cyan)', letterSpacing: 2,
-              textShadow: '0 0 12px rgba(0,212,255,0.4)',
+              textShadow: '0 0 12px rgba(0,0,0,0.4)',
             }}>
               ENGINE<span style={{ color: 'var(--text-primary)' }}>X</span>
             </span>
