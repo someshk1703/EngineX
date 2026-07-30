@@ -1,20 +1,21 @@
 :root {
-  --bg-primary: #1a0000;
-  --bg-secondary: #6b0000;
-  --bg-tertiary: #880000;
-  --accent-cyan: #ff6666;
-  --accent-cyan-glow: rgba(255, 102, 102, 0.25);
+  --bg-primary: #000000;
+  --bg-secondary: #031e2a;
+  --bg-tertiary: #03354c;
+  --accent-cyan: #ff0000;
+  --accent-cyan-glow: rgba(255, 0, 0, 0.25);
   --accent-green: #00e676;
   --accent-green-glow: rgba(0, 230, 118, 0.15);
   --accent-red: #ff3333;
-  --accent-red-glow: rgba(255, 51, 51, 0.2);
+  --accent-red-glow: rgba(255, 51, 51, 0.15);
   --accent-yellow: #ffcc00;
-  --border-color: #9a0000;
-  --border-color-glow: rgba(255, 102, 102, 0.35);
+  --border-color: #03354c;
+  --border-color-glow: rgba(255, 0, 0, 0.4);
+  --card-gradient: linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(140,140,140,0.02) 100%);
   
-  --text-primary: #f5f0f0;
-  --text-secondary: #c4a8a8;
-  --text-muted: #8a6060;
+  --text-primary: #f0f0f5;
+  --text-secondary: #9ea0ab;
+  --text-muted: #5e606a;
   
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   --font-sans: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
@@ -24,35 +25,37 @@
 
 /* ─── Light Theme ──────────────────────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg-primary: #000000;
-  --bg-secondary: #031e2a;
-  --bg-tertiary: #03354c;
-  --accent-cyan: #ff0000;
-  --accent-cyan-glow: rgba(0, 0, 0, 0.25);
-  --accent-green: #00e676;
-  --accent-green-glow: rgba(0, 230, 118, 0.15);
-  --accent-red: #ff3333;
-  --accent-red-glow: rgba(255, 51, 51, 0.15);
-  --accent-yellow: #ffcc00;
-  --border-color: #03354c;
-  --border-color-glow: rgba(0, 0, 0, 0.4);
-  --text-primary: #f0f0f5;
-  --text-secondary: #9ea0ab;
-  --text-muted: #5e606a;
-}
-[data-theme="light"] body {
-  background-color: var(--bg-primary);
+  --bg-primary: #d3d3d3;
+  --bg-secondary: #e8e8e8;
+  --bg-tertiary: #f0f0f0;
+  --accent-cyan: #cc0000;
+  --accent-cyan-glow: rgba(204, 0, 0, 0.28);
+  --accent-green: #006622;
+  --accent-green-glow: rgba(0, 102, 34, 0.15);
+  --accent-red: #cc0000;
+  --accent-red-glow: rgba(204, 0, 0, 0.18);
+  --accent-yellow: #8a6000;
+  --border-color: rgba(201, 162, 38, 0.4);
+  --border-color-glow: rgba(201, 162, 38, 0.5);
+  --card-gradient: linear-gradient(145deg, rgba(255,255,255,0.6) 0%, rgba(180,20,20,0.08) 100%);
+  --text-primary: #111111;
+  --text-secondary: #3a3a3a;
+  --text-muted: #707070;
 }
 [data-theme="light"] .markdown-body code {
-  background-color: #eeeef4;
-  color: #c0165a;
+  background-color: #2e2020;
+  color: #ff9999;
 }
 [data-theme="light"] .markdown-body pre {
-  background-color: #eeeef4 !important;
+  background-color: #2e2020 !important;
   border-color: var(--border-color);
 }
 [data-theme="light"] .markdown-body pre code {
-  color: #1a1a2e;
+  color: #f8f8f2;
+}
+[data-theme="light"] .header-glow-line {
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+  box-shadow: 0 0 10px var(--border-color-glow);
 }
 
 * {
@@ -62,12 +65,15 @@
 }
 
 body {
-  background-color: var(--bg-primary);
+  background: linear-gradient(180deg, #1f0000 0%, #000000 28%) fixed;
   color: var(--text-primary);
   font-family: var(--font-sans);
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+[data-theme="light"] body {
+  background: var(--bg-primary);
 }
 
 /* Custom scrollbars */
@@ -94,8 +100,8 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 /* Header Glowing Accent Line */
 .header-glow-line {
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-  box-shadow: 0 0 10px var(--accent-cyan);
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+  box-shadow: 0 0 10px var(--border-color-glow);
 }
 
 /* Terminal Container Styling */
@@ -213,7 +219,7 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 
 /* Chapter Card */
 .chapter-card {
-  background: var(--bg-secondary);
+  background: var(--card-gradient);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 20px;
@@ -236,9 +242,9 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
   transition: background-color var(--transition-speed);
 }
 .chapter-card:hover {
-  border-color: var(--border-color-glow);
+  border-color: var(--border-color);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 28px rgba(201, 162, 38, 0.2);
 }
 .chapter-card:hover::after {
   background: var(--accent-cyan);
@@ -400,7 +406,7 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 
 /* Quiz Option Card */
 .quiz-option {
-  background: var(--bg-secondary);
+  background: var(--card-gradient);
   border: 1px solid var(--border-color);
   padding: 16px 20px;
   border-radius: 6px;
@@ -472,7 +478,7 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 }
 
 .metric-card {
-  background: var(--bg-secondary);
+  background: var(--card-gradient);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 24px;
@@ -684,7 +690,7 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
   right: 20px;
   width: 380px;
   height: 50vh;
-  background: rgba(26, 0, 0, 0.88);
+  background: rgba(0, 3, 30, 0.88);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--border-color);

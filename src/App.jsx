@@ -2586,7 +2586,7 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
           <div
             key={f.title}
             style={{
-              background: 'var(--bg-secondary)',
+              background: 'var(--card-gradient)',
               border: '1px solid var(--border-color)',
               borderRadius: 12, padding: '28px',
               display: 'flex', flexDirection: 'column', gap: 16,
@@ -2884,8 +2884,9 @@ export default function App() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <header style={{
-        borderBottom: '1px solid var(--border-color)',
-        background: darkMode ? 'rgba(26,0,0,0.97)' : 'rgba(0,0,0,0.97)',
+        background: darkMode
+          ? 'rgba(0,0,0,0.97)'
+          : 'linear-gradient(180deg, rgba(160,10,10,0.95) 0%, rgba(211,211,211,0.98) 100%)',
         backdropFilter: 'blur(12px)',
         position: 'sticky', top: 0, zIndex: 100,
       }}>
