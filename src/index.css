@@ -1,21 +1,22 @@
 :root {
-  --bg-primary: #000000;
-  --bg-secondary: #031e2a;
-  --bg-tertiary: #03354c;
-  --accent-cyan: #ff0000;
-  --accent-cyan-glow: rgba(255, 0, 0, 0.25);
-  --accent-green: #00e676;
-  --accent-green-glow: rgba(0, 230, 118, 0.15);
-  --accent-red: #ff3333;
-  --accent-red-glow: rgba(255, 51, 51, 0.15);
-  --accent-yellow: #ffcc00;
-  --border-color: #03354c;
-  --border-color-glow: rgba(255, 0, 0, 0.4);
-  --card-gradient: linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(140,140,140,0.02) 100%);
+  /* ── Night mode — Ink & Signal ── */
+  --bg-primary: #0F1115;
+  --bg-secondary: #171A20;
+  --bg-tertiary: #262A32;
+  --accent-cyan: #4C82FF;
+  --accent-cyan-glow: rgba(76, 130, 255, 0.28);
+  --accent-green: #E8A33D;
+  --accent-green-glow: rgba(232, 163, 61, 0.2);
+  --accent-red: #E05555;
+  --accent-red-glow: rgba(224, 85, 85, 0.18);
+  --accent-yellow: #E8A33D;
+  --border-color: #262A32;
+  --border-color-glow: rgba(76, 130, 255, 0.35);
+  --card-gradient: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(140,140,155,0.01) 100%);
   
-  --text-primary: #f0f0f5;
-  --text-secondary: #9ea0ab;
-  --text-muted: #5e606a;
+  --text-primary: #E8E6E1;
+  --text-secondary: #8B8F98;
+  --text-muted: #5a5e66;
   
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
   --font-sans: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
@@ -24,38 +25,39 @@
 }
 
 /* ─── Light Theme ──────────────────────────────────────────────────────────── */
+/* ─── Day Theme — Ink & Signal ─────────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg-primary: #d3d3d3;
-  --bg-secondary: #e8e8e8;
-  --bg-tertiary: #f0f0f0;
-  --accent-cyan: #cc0000;
-  --accent-cyan-glow: rgba(204, 0, 0, 0.28);
-  --accent-green: #006622;
-  --accent-green-glow: rgba(0, 102, 34, 0.15);
-  --accent-red: #cc0000;
-  --accent-red-glow: rgba(204, 0, 0, 0.18);
-  --accent-yellow: #8a6000;
-  --border-color: rgba(201, 162, 38, 0.4);
-  --border-color-glow: rgba(201, 162, 38, 0.5);
-  --card-gradient: linear-gradient(145deg, rgba(255,255,255,0.6) 0%, rgba(180,20,20,0.08) 100%);
-  --text-primary: #111111;
-  --text-secondary: #3a3a3a;
-  --text-muted: #707070;
+  --bg-primary: #F7F5F1;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #EDE8E0;
+  --accent-cyan: #1E4FD8;
+  --accent-cyan-glow: rgba(30, 79, 216, 0.22);
+  --accent-green: #C97A1A;
+  --accent-green-glow: rgba(201, 122, 26, 0.18);
+  --accent-red: #C63B3B;
+  --accent-red-glow: rgba(198, 59, 59, 0.15);
+  --accent-yellow: #C97A1A;
+  --border-color: #E4DFD6;
+  --border-color-glow: rgba(30, 79, 216, 0.3);
+  --card-gradient: #FFFFFF;
+  --text-primary: #1C1B1A;
+  --text-secondary: #6B6560;
+  --text-muted: #9e9993;
 }
 [data-theme="light"] .markdown-body code {
-  background-color: #2e2020;
-  color: #ff9999;
+  background-color: #EDE8E0;
+  color: #1E4FD8;
 }
 [data-theme="light"] .markdown-body pre {
-  background-color: #2e2020 !important;
+  background-color: #EDE8E0 !important;
   border-color: var(--border-color);
 }
 [data-theme="light"] .markdown-body pre code {
-  color: #f8f8f2;
+  color: #1C1B1A;
 }
 [data-theme="light"] .header-glow-line {
-  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-  box-shadow: 0 0 10px var(--border-color-glow);
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  box-shadow: 0 0 8px var(--accent-cyan-glow);
 }
 
 * {
@@ -65,7 +67,7 @@
 }
 
 body {
-  background: linear-gradient(180deg, #1f0000 0%, #000000 28%) fixed;
+  background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans);
   min-height: 100vh;
@@ -100,8 +102,8 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 /* Header Glowing Accent Line */
 .header-glow-line {
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-  box-shadow: 0 0 10px var(--border-color-glow);
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  box-shadow: 0 0 10px var(--accent-cyan-glow);
 }
 
 /* Terminal Container Styling */
@@ -213,7 +215,7 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
 .category-btn.active {
   border-color: var(--accent-cyan);
   color: var(--accent-cyan);
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(76, 130, 255, 0.06);
   box-shadow: inset 3px 0 0 var(--accent-cyan);
 }
 
@@ -690,7 +692,7 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
   right: 20px;
   width: 380px;
   height: 50vh;
-  background: rgba(0, 3, 30, 0.88);
+  background: rgba(23, 26, 32, 0.92);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--border-color);
