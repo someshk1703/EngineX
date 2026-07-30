@@ -1,5 +1,6 @@
 // EngineX Service Worker — Cache-first for static assets, network-first for API
-const CACHE_NAME = 'enginex-v2'
+// ⚠️ Bump CACHE_NAME whenever CSS/JS changes need to reach users immediately
+const CACHE_NAME = 'enginex-v7'
 const STATIC_ASSETS = ['/', '/index.html', '/manifest.json']
 
 self.addEventListener('install', (event) => {
