@@ -2885,8 +2885,8 @@ export default function App() {
       {/* Header */}
       <header style={{
         background: darkMode
-          ? 'rgba(0,0,0,0.97)'
-          : 'linear-gradient(180deg, rgba(160,10,10,0.95) 0%, rgba(211,211,211,0.98) 100%)',
+          ? 'rgba(15,17,21,0.97)'
+          : 'rgba(247,245,241,0.97)',
         backdropFilter: 'blur(12px)',
         position: 'sticky', top: 0, zIndex: 100,
       }}>
