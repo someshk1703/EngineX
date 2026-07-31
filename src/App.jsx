@@ -6,6 +6,8 @@ import { DSA_QUESTIONS, JAVA_QUESTIONS } from './data/questions'
 const FlashcardManager    = lazy(() => import('./components/FlashcardManager'))
 const StaticContentViewer = lazy(() => import('./components/StaticContentViewer'))
 const InterviewWhiteboard = lazy(() => import('./components/InterviewWhiteboard'))
+const DrawingCanvas       = lazy(() => import('./components/DrawingCanvas'))
+const CollabCoder         = lazy(() => import('./components/CollabCoder'))
 
 // Shared fallback for lazy-loaded panels
 const LazyFallback = () => (
@@ -2473,22 +2475,22 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
     {
       icon: '👥',
       title: 'Collab Coder',
-      subtitle: 'Coming Soon',
-      desc: 'Real-time collaborative coding environment. Pair-program with peers, share sessions, and tackle interview problems together.',
-      badge: 'Coming Soon',
+      subtitle: 'RGA CRDT Engine',
+      desc: 'Real-time collaborative coding environment powered by the RGA CRDT algorithm. Pair-program with peers, share sessions, and tackle interview problems together.',
+      badge: 'NEW',
       color: 'var(--accent-green)',
-      action: null,
-      cta: 'Join Waitlist',
+      action: () => onNavigate('collab'),
+      cta: 'Open Collab Coder →',
     },
     {
       icon: '🖊',
       title: 'EX-Draw',
-      subtitle: 'Coming Soon',
+      subtitle: 'Infinite Whiteboard',
       desc: 'Infinite whiteboard for system design interviews. Draw architectures, annotate diagrams, and export to share with interviewers.',
-      badge: 'Coming Soon',
+      badge: 'Powered by Excalidraw',
       color: 'var(--accent-yellow)',
-      action: null,
-      cta: 'Join Waitlist',
+      action: () => onNavigate('drawing'),
+      cta: 'Open Whiteboard →',
     },
     {
       icon: '◑',
@@ -2767,12 +2769,34 @@ function LoginScreen() {
   )
 }
 
+// ── sessionStorage nav-state helpers ─────────────────────────────────────────
+const NAV_KEY = 'ex_nav'
+function loadNav() {
+  try { return JSON.parse(sessionStorage.getItem(NAV_KEY) || '{}') } catch { return {} }
+}
+function saveNav(patch) {
+  try {
+    const prev = loadNav()
+    sessionStorage.setItem(NAV_KEY, JSON.stringify({ ...prev, ...patch }))
+  } catch {}
+}
+
 export default function App() {
-  const [view, setView] = useState('landing')   // 'landing' | 'library' | 'category' | 'chapter' | 'quiz' | 'dashboard' | 'theory' | 'theory-subject'
-  const [selectedChapter, setSelectedChapter] = useState(null)
-  const [selectedCategory, setSelectedCategory] = useState(null)
-  const [selectedTheoryCategory, setSelectedTheoryCategory] = useState(null)
-  // selectedHtmlItem removed — theory is now inline via StaticContentViewer
+  // Restore view + selected-item IDs from sessionStorage so auth-triggered
+  // remounts (TOKEN_REFRESHED, transient SIGNED_OUT) don't kick users back home.
+  const [view, setView] = useState(() => loadNav().view || 'landing')
+  const [selectedChapter, setSelectedChapter] = useState(() => {
+    const id = loadNav().chapterId
+    return id ? CHAPTERS.find(c => c.id === id) ?? null : null
+  })
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    const id = loadNav().categoryId
+    return id ? CATEGORIES.find(c => c.id === id) ?? null : null
+  })
+  const [selectedTheoryCategory, setSelectedTheoryCategory] = useState(() => {
+    const id = loadNav().theoryCategoryId
+    return id ? THEORY_SUBJECTS.find(s => s.id === id) ?? null : null
+  })
   const [progress, setProgress] = useState(loadProgress)
   const [showSettings, setShowSettings] = useState(false)
   const [apiConfigured, setApiConfigured] = useState(hasApiKey)
@@ -2782,7 +2806,15 @@ export default function App() {
   const [user, setUser] = useState(undefined)
   const [authLoading, setAuthLoading] = useState(true)
 
+  // Persist nav state whenever it changes
+  useEffect(() => { saveNav({ view }) }, [view])
+  useEffect(() => { saveNav({ chapterId: selectedChapter?.id ?? null }) }, [selectedChapter])
+  useEffect(() => { saveNav({ categoryId: selectedCategory?.id ?? null }) }, [selectedCategory])
+  useEffect(() => { saveNav({ theoryCategoryId: selectedTheoryCategory?.id ?? null }) }, [selectedTheoryCategory])
+
   // ── Supabase auth ─────────────────────────────────────────────────────────
+  const signOutPendingRef = useRef(null)
+
   useEffect(() => {
     // Failsafe: never leave app stuck on INITIALIZING for >4s
     const timeout = setTimeout(() => setAuthLoading(false), 4000)
@@ -2800,12 +2832,31 @@ export default function App() {
       })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+      const nextUser = session?.user ?? null
+      if (_event === 'SIGNED_OUT') {
+        // Debounce SIGNED_OUT — token refreshes can fire a brief SIGNED_OUT
+        // before TOKEN_REFRESHED. Wait 2 s; cancel if a new session arrives.
+        signOutPendingRef.current = setTimeout(() => {
+          setUser(null)
+          setAuthLoading(false)
+          clearTimeout(timeout)
+        }, 2000)
+        return
+      }
+      if (signOutPendingRef.current) {
+        clearTimeout(signOutPendingRef.current)
+        signOutPendingRef.current = null
+      }
+      setUser(nextUser)
       setAuthLoading(false)
       clearTimeout(timeout)
     })
 
-    return () => { subscription.unsubscribe(); clearTimeout(timeout) }
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+      if (signOutPendingRef.current) clearTimeout(signOutPendingRef.current)
+    }
   }, [])
 
   useEffect(() => {
@@ -2823,6 +2874,14 @@ export default function App() {
       saveProgress(next)
       return next
     })
+  }
+
+  // Explicit sign-out: clear nav state immediately so it doesn't restore on next login
+  const handleSignOut = () => {
+    try { sessionStorage.removeItem(NAV_KEY) } catch {}
+    if (signOutPendingRef.current) { clearTimeout(signOutPendingRef.current); signOutPendingRef.current = null }
+    setUser(null)
+    signOut()
   }
 
   const handleOpenChapter = (chapter) => {
@@ -2951,7 +3010,7 @@ export default function App() {
                     {(user.user_metadata?.full_name || user.email || '?')[0].toUpperCase()}
                   </div>
                 )}
-                <button onClick={() => signOut()} style={{
+                <button onClick={handleSignOut} style={{
                   background: 'none', border: '1px solid var(--border-color)', borderRadius: 6,
                   color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px 9px',
                   fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
@@ -2983,7 +3042,7 @@ export default function App() {
                 ⚙ Settings
               </button>
               {user && (
-                <button onClick={() => signOut()} style={{
+                <button onClick={handleSignOut} style={{
                   background: 'none', border: '1px solid var(--border-color)', borderRadius: 6,
                   color: 'var(--text-secondary)', cursor: 'pointer', padding: '6px 14px',
                   fontFamily: 'var(--font-mono)', fontSize: '0.8rem',
@@ -3005,7 +3064,7 @@ export default function App() {
       </header>
 
       {/* Main */}
-      <main className="main-content" style={{ flex: 1, maxWidth: 1400, width: '100%', margin: '0 auto', padding: view === 'landing' ? '0' : '32px 28px' }}>
+      <main className="main-content" style={{ flex: 1, maxWidth: (view === 'drawing' || view === 'collab') ? '100%' : 1400, width: '100%', margin: '0 auto', padding: (view === 'landing' || view === 'drawing' || view === 'collab') ? '0' : '32px 28px' }}>
         {view === 'landing' && (
           <LandingPage
             progress={progress}
@@ -3055,6 +3114,21 @@ export default function App() {
             onBack={() => setView('chapter')}
             onComplete={handleQuizComplete}
           />
+        )}
+        {view === 'drawing' && (
+          <Suspense fallback={<LazyFallback />}>
+            <DrawingCanvas
+              darkMode={darkMode}
+              onBack={() => { setView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+            />
+          </Suspense>
+        )}
+        {view === 'collab' && (
+          <Suspense fallback={<LazyFallback />}>
+            <CollabCoder
+              onBack={() => { setView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+            />
+          </Suspense>
         )}
         {view === 'dashboard' && (
           <div>
