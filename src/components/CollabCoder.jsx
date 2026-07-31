@@ -253,15 +253,19 @@ export default function CollabCoder({ onBack }) {
   const [iframeKey, setIframeKey] = useState(0)
   const [status, setStatus] = useState('loading') // 'loading' | 'ready' | 'error'
   const [session, setSession] = useState(null)
+  const [sessionLoading, setSessionLoading] = useState(true)
 
   // Questions panel
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [qFilter, setQFilter] = useState('DSA')
   const [selectedQ, setSelectedQ] = useState(null)
 
-  // Sync session from EngineX Supabase for auto sign-in + executor auth
+  // Load session; hold iframe until session state is known so the URL hash tokens are present from first load
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      setSessionLoading(false)
+    })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setSession(s))
     return () => subscription.unsubscribe()
   }, [])
@@ -425,6 +429,25 @@ export default function CollabCoder({ onBack }) {
                 Currently pointing to: <span style={{ color: 'var(--accent-cyan)' }}>{url}</span>
               </p>
             </div>
+          ) : sessionLoading ? (
+            /* Hold iframe until session is resolved so token hash is present from first load */
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', letterSpacing: 1 }}>
+                CONNECTING…
+              </span>
+            </div>
+          ) : !session ? (
+            /* Not signed in to EngineX — prompt to sign in so tokens can be passed */
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 20, padding: 32 }}>
+              <div style={{ fontSize: '2rem' }}>🔐</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>Sign in to EngineX first</div>
+              <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: 420, lineHeight: 1.7, fontSize: '0.88rem' }}>
+                Sign in to EngineX with GitHub so your session can be passed directly to the CRDT editor — no second login required.
+              </p>
+              <a href={iframeSrc} target="_blank" rel="noopener noreferrer" className="btn-console" style={{ padding: '8px 18px', fontSize: '0.8rem', textDecoration: 'none' }}>
+                ↗ Open CRDT in new tab
+              </a>
+            </div>
           ) : (
             <iframe
               key={iframeKey}
@@ -432,6 +455,7 @@ export default function CollabCoder({ onBack }) {
               title="Collab Coder — CRDT Collaborative Editor"
               style={{ width: '100%', height: '100%', border: 'none' }}
               allow="clipboard-read; clipboard-write"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"
               onLoad={() => setStatus('ready')}
               onError={() => setStatus('error')}
             />
