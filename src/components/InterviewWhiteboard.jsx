@@ -20,6 +20,14 @@ const STARTERS = {
   SQL:          `-- SQL — Whiteboard Mode\n\nSELECT column\nFROM table\nWHERE condition\nORDER BY column;\n`,
 }
 
+const THEORY_STARTERS = {
+  Java:         `// Java Theory — Explain in your own words\n\n// Key concept:\n//\n// How it works:\n//\n// Example:\n//\n// Edge cases / gotchas:\n//`,
+  JavaScript:   `// JS Theory — Explain in your own words\n\n// Key concept:\n//\n// How it works:\n//`,
+  Python:       `# Python Theory — Explain in your own words\n\n# Key concept:\n#\n# How it works:\n#`,
+  Pseudocode:   `// Concept breakdown\n\n// 1.\n// 2.\n// 3.`,
+  SQL:          `-- SQL Theory\n\n-- Key concept:\n--\n-- Example query:\nSELECT ...;`,
+}
+
 function useTimer() {
   const [secs, setSecs] = useState(0)
   const [on, setOn]     = useState(false)
@@ -42,11 +50,12 @@ function LineNumbers({ code, fontSize }) {
   )
 }
 
-export default function InterviewWhiteboard({ questionId = 'default', question = '' }) {
+export default function InterviewWhiteboard({ questionId = 'default', question = '', questionType = 'dsa' }) {
+  const starters = questionType === 'java' ? THEORY_STARTERS : STARTERS
   const key   = `enginex_wb_${questionId}`
   const saved = store.get(key) || {}
   const [lang, setLang]         = useState(saved.lang || 'Java')
-  const [code, setCode]         = useState(saved.code ?? STARTERS['Java'])
+  const [code, setCode]         = useState(saved.code ?? starters['Java'])
   const [notes, setNotes]       = useState(saved.notes || '')
   const [fs, setFs]             = useState(14)
   const [showNotes, setShowNotes] = useState(true)
@@ -54,10 +63,23 @@ export default function InterviewWhiteboard({ questionId = 'default', question =
   const timer = useTimer()
   const taRef = useRef(null)
 
+  // Reset all state when switching to a different question
+  useEffect(() => {
+    const s = store.get(`enginex_wb_${questionId}`) || {}
+    const st = questionType === 'java' ? THEORY_STARTERS : STARTERS
+    setLang(s.lang || 'Java')
+    setCode(s.code ?? st['Java'])
+    setNotes(s.notes || '')
+    setSavedAt(null)
+    timer.reset()
+  // timer.reset is stable — only re-run when questionId changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questionId])
+
   useEffect(() => {
     const t = setTimeout(() => { store.set(key, { lang, code, notes }); setSavedAt(new Date().toLocaleTimeString()) }, 800)
     return () => clearTimeout(t)
-  }, [lang, code, notes, key])
+  }, [lang, code, notes, questionId])
 
   const handleKeyDown = (e) => {
     if (e.key !== 'Tab') return
@@ -68,8 +90,8 @@ export default function InterviewWhiteboard({ questionId = 'default', question =
     requestAnimationFrame(() => { ta.selectionStart = ta.selectionEnd = s+4 })
   }
 
-  const changeLang = l => { setLang(l); setCode(STARTERS[l]) }
-  const reset = () => { if (!window.confirm('Clear whiteboard?')) return; setCode(STARTERS[lang]); setNotes(''); timer.reset() }
+  const changeLang = l => { setLang(l); setCode(starters[l]) }
+  const reset = () => { if (!window.confirm('Clear whiteboard?')) return; setCode(starters[lang]); setNotes(''); timer.reset() }
   const tc = timer.secs > 2700 ? 'var(--accent-red)' : timer.secs > 1500 ? 'var(--accent-yellow)' : 'var(--accent-green)'
 
   const btn = { background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', borderRadius: 4, padding: '3px 8px', fontSize: '0.75rem', cursor: 'pointer', fontFamily: 'var(--font-mono)', transition: 'all 0.15s' }
@@ -104,7 +126,7 @@ export default function InterviewWhiteboard({ questionId = 'default', question =
 
       {/* Question strip */}
       {question && (
-        <div style={{ padding: '10px 16px', background: 'rgba(0,212,255,0.04)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.6 }}>
+        <div style={{ padding: '10px 16px', background: 'rgba(0,212,255,0.04)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.6, maxHeight: 100, overflowY: 'auto' }}>
           <span style={{ color: 'var(--accent-cyan)', fontWeight: 600, marginRight: 8, fontFamily: 'var(--font-mono)' }}>Q.</span>{question}
         </div>
       )}

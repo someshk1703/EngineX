@@ -787,6 +787,7 @@ function QuestionsPanel({ questions = [], type = 'dsa' }) {
                 <InterviewWhiteboard
                   questionId={selected.id}
                   question={type === 'dsa' ? selected.description : selected.question}
+                  questionType={type}
                 />
               </Suspense>
             </div>
@@ -2534,7 +2535,7 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
             fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--accent-cyan)', letterSpacing: 1,
           }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-green)', display: 'inline-block' }} />
-            FAANG &amp; Big 4 Interview Prep Console
+            Your unfair advantage in the interview room
           </div>
 
           <h1 style={{ fontSize: 'clamp(2.4rem, 6vw, 4rem)', fontWeight: 800, margin: '0 0 20px', lineHeight: 1.1, letterSpacing: -1 }}>
@@ -2543,7 +2544,7 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
           </h1>
 
           <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto 36px', lineHeight: 1.7 }}>
-            AI-powered study chapters, visual theory guides, flashcards, quizzes, and a smart progress dashboard — all in one dark-themed console.
+            Stop grinding scattered tabs. Master DSA, system design, and Java in one focused console — then walk in and own the room.
           </p>
 
           {/* Streak + progress pills */}
@@ -2699,7 +2700,7 @@ function LoginScreen() {
         </div>
 
         <p style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', marginBottom: 36, letterSpacing: 1 }}>
-          FAANG &amp; Big 4 Interview Prep Console
+          Your unfair advantage in the interview room
         </p>
 
         <p style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '1rem', marginBottom: 28 }}>

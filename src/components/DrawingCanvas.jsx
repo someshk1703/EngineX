@@ -112,7 +112,7 @@ function saveDrawingState(elements, appState, files) {
 }
 
 export default function DrawingCanvas({ onBack, darkMode = true }) {
-  const excalidrawRef = useRef(null)
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null)
   const [savedAt, setSavedAt] = useState(null)
   const [exportMsg, setExportMsg] = useState('')
   const saveTimer = useRef(null)
@@ -140,7 +140,7 @@ export default function DrawingCanvas({ onBack, darkMode = true }) {
   useEffect(() => () => clearTimeout(saveTimer.current), [])
 
   const handleExportPng = async () => {
-    const api = excalidrawRef.current
+    const api = excalidrawAPI
     if (!api) return
     try {
       const blob = await exportToBlob({
@@ -165,7 +165,7 @@ export default function DrawingCanvas({ onBack, darkMode = true }) {
   }
 
   const handleExportSvg = async () => {
-    const api = excalidrawRef.current
+    const api = excalidrawAPI
     if (!api) return
     try {
       const svg = await exportToSvg({
@@ -190,7 +190,7 @@ export default function DrawingCanvas({ onBack, darkMode = true }) {
   }
 
   const handleClear = () => {
-    const api = excalidrawRef.current
+    const api = excalidrawAPI
     if (!api) return
     if (window.confirm('Clear the canvas? This cannot be undone.')) {
       api.resetScene()
@@ -294,7 +294,7 @@ export default function DrawingCanvas({ onBack, darkMode = true }) {
         {/* Canvas */}
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
           <Excalidraw
-            ref={excalidrawRef}
+            excalidrawAPI={setExcalidrawAPI}
             theme={darkMode ? 'dark' : 'light'}
             initialData={initialData ? {
               elements: initialData.elements || [],
