@@ -15,7 +15,15 @@ const LazyFallback = () => (
     Loading…
   </div>
 )
-import { supabase, signInWithGoogle, signInWithGitHub, signOut } from './services/supabaseClient'
+import {
+  supabase,
+  signInWithGoogle,
+  signInWithGitHub,
+  signInWithEmail,
+  signUpWithEmail,
+  resetPasswordForEmail,
+  signOut,
+} from './services/supabaseClient'
 import {
   generateChapterContent,
   generateChapterQuiz,
@@ -2653,10 +2661,26 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
-// ─── Login Screen ─────────────────────────────────────────────────────────────
+// ─── Login / Signup Screen ────────────────────────────────────────────────────
+const inputStyle = {
+  width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid var(--border-color)',
+  background: 'rgba(255,255,255,0.04)', color: 'var(--text-primary)', fontSize: '0.9rem',
+  outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
+}
+
 function LoginScreen() {
-  const [loading, setLoading] = useState(null) // 'google' | 'github' | null
+  const [mode, setMode]       = useState('signin') // 'signin' | 'signup' | 'forgot'
+  const [loading, setLoading] = useState(null) // 'google' | 'github' | 'email' | null
   const [error, setError]     = useState(null)
+  const [notice, setNotice]   = useState(null)
+  const [fullName, setFullName]     = useState('')
+  const [email, setEmail]           = useState('')
+  const [password, setPassword]     = useState('')
+  const [confirmPwd, setConfirmPwd] = useState('')
+
+  const switchMode = (next) => {
+    setMode(next); setError(null); setNotice(null)
+  }
 
   const handleGoogle = async () => {
     setLoading('google'); setError(null)
@@ -2668,6 +2692,45 @@ function LoginScreen() {
     setLoading('github'); setError(null)
     const { error: err } = await signInWithGitHub()
     if (err) { setError(err.message); setLoading(null) }
+  }
+
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault()
+    setError(null); setNotice(null)
+
+    if (!email || !password) { setError('Email and password are required.'); return }
+
+    if (mode === 'signup') {
+      if (password.length < 8) { setError('Password must be at least 8 characters.'); return }
+      if (password !== confirmPwd) { setError('Passwords do not match.'); return }
+
+      setLoading('email')
+      const { data, error: err } = await signUpWithEmail(email, password, fullName.trim())
+      setLoading(null)
+      if (err) { setError(err.message); return }
+      // Supabase returns a user with no session when email confirmation is required.
+      if (data?.user && !data.session) {
+        setNotice('Account created! Check your inbox to confirm your email before signing in.')
+        setMode('signin')
+      }
+      return
+    }
+
+    if (mode === 'forgot') {
+      setLoading('email')
+      const { error: err } = await resetPasswordForEmail(email)
+      setLoading(null)
+      if (err) { setError(err.message); return }
+      setNotice('Password reset link sent — check your inbox.')
+      setMode('signin')
+      return
+    }
+
+    // signin
+    setLoading('email')
+    const { error: err } = await signInWithEmail(email, password)
+    setLoading(null)
+    if (err) { setError(err.message); return }
   }
 
   return (
@@ -2699,13 +2762,85 @@ function LoginScreen() {
           </span>
         </div>
 
-        <p style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', marginBottom: 36, letterSpacing: 1 }}>
+        <p style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', marginBottom: 32, letterSpacing: 1 }}>
           Your unfair advantage in the interview room
         </p>
 
-        <p style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '1rem', marginBottom: 28 }}>
-          Sign in to continue
+        <p style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '1rem', marginBottom: 24 }}>
+          {mode === 'signup' ? 'Create your account' : mode === 'forgot' ? 'Reset your password' : 'Sign in to continue'}
         </p>
+
+        {/* Email / password form */}
+        <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'left', marginBottom: 20 }}>
+          {mode === 'signup' && (
+            <input
+              type="text" placeholder="Full name" value={fullName}
+              onChange={e => setFullName(e.target.value)} style={inputStyle} autoComplete="name"
+            />
+          )}
+          <input
+            type="email" placeholder="Email" value={email} required
+            onChange={e => setEmail(e.target.value)} style={inputStyle} autoComplete="email"
+          />
+          {mode !== 'forgot' && (
+            <input
+              type="password" placeholder="Password" value={password} required
+              onChange={e => setPassword(e.target.value)} style={inputStyle}
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+            />
+          )}
+          {mode === 'signup' && (
+            <input
+              type="password" placeholder="Confirm password" value={confirmPwd} required
+              onChange={e => setConfirmPwd(e.target.value)} style={inputStyle} autoComplete="new-password"
+            />
+          )}
+
+          {mode === 'signin' && (
+            <button type="button" onClick={() => switchMode('forgot')} style={{
+              alignSelf: 'flex-end', background: 'none', border: 'none', cursor: 'pointer',
+              color: 'var(--accent-cyan)', fontSize: '0.78rem', padding: 0,
+            }}>
+              Forgot password?
+            </button>
+          )}
+
+          <button
+            type="submit"
+            disabled={!!loading}
+            style={{
+              marginTop: 4, padding: '13px 20px', borderRadius: 10, border: 'none',
+              background: 'var(--accent-cyan)', color: '#04121a', fontWeight: 700,
+              cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.95rem',
+              opacity: loading && loading !== 'email' ? 0.5 : 1,
+            }}
+          >
+            {loading === 'email'
+              ? 'Please wait…'
+              : mode === 'signup' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Sign in'}
+          </button>
+        </form>
+
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 24 }}>
+          {mode === 'signup' ? (
+            <>Already have an account?{' '}
+              <button type="button" onClick={() => switchMode('signin')} style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', fontWeight: 600, padding: 0 }}>Sign in</button>
+            </>
+          ) : mode === 'forgot' ? (
+            <button type="button" onClick={() => switchMode('signin')} style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', fontWeight: 600, padding: 0 }}>Back to sign in</button>
+          ) : (
+            <>Don't have an account?{' '}
+              <button type="button" onClick={() => switchMode('signup')} style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', fontWeight: 600, padding: 0 }}>Sign up</button>
+            </>
+          )}
+        </p>
+
+        {/* Divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-color)' }} />
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-secondary)', letterSpacing: 1 }}>OR</span>
+          <div style={{ flex: 1, height: 1, background: 'var(--border-color)' }} />
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Google */}
@@ -2756,6 +2891,11 @@ function LoginScreen() {
           </button>
         </div>
 
+        {notice && (
+          <p style={{ marginTop: 20, color: 'var(--accent-green, #2ecc71)', fontSize: '0.85rem', fontFamily: 'var(--font-mono)' }}>
+            ✓ {notice}
+          </p>
+        )}
         {error && (
           <p style={{ marginTop: 20, color: 'var(--accent-red, #ff4444)', fontSize: '0.85rem', fontFamily: 'var(--font-mono)' }}>
             ⚠ {error}

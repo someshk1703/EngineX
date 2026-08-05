@@ -27,6 +27,27 @@ export async function signOut() {
   return supabase.auth.signOut()
 }
 
+export async function signUpWithEmail(email, password, fullName) {
+  return supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: fullName ? { full_name: fullName } : undefined,
+      emailRedirectTo: window.location.origin,
+    },
+  })
+}
+
+export async function signInWithEmail(email, password) {
+  return supabase.auth.signInWithPassword({ email, password })
+}
+
+export async function resetPasswordForEmail(email) {
+  return supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin,
+  })
+}
+
 export async function getSession() {
   const { data } = await supabase.auth.getSession()
   return data.session
