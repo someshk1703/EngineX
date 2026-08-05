@@ -1,6 +1,7 @@
 export const CATEGORIES = [
   { id: "DSA",            name: "Data Structures & Algorithms", icon: "🧩" },
   { id: "Java",           name: "Java",                         icon: "☕" },
+  { id: "TypeScript",     name: "TypeScript",                   icon: "🔷" },
   { id: "System Design",  name: "System Design & Architecture", icon: "🏗️" },
   { id: "Full Stack",     name: "Full Stack Development",       icon: "🌐" },
   { id: "Cloud & DevOps", name: "Cloud & DevOps",               icon: "☁️" },
@@ -1035,7 +1036,901 @@ Highlight the outcome. Use **quantifiable metrics** where possible (e.g., "reduc
         explanation: "Disagreements are natural. Interviewers want to see that you communicate professionally, present data-backed arguments, compromise, and align with the final decision ('disagree and commit')."
       }
     ]
+  },
+
+  // ─── TypeScript ─────────────────────────────────────────────────────────────
+  {
+    id: "ts-fundamentals",
+    title: "TypeScript Type System & Core Concepts",
+    category: "TypeScript",
+    complexity: "Easy",
+    tags: ["typescript", "types", "interfaces", "type-aliases", "enums", "tuples", "narrowing"],
+    description: "Master TypeScript's structural type system: primitives, interfaces, type aliases, enums, tuples, and type narrowing with control flow analysis.",
+    fallbackContent: `# TypeScript Type System & Core Concepts
+
+## Introduction
+TypeScript is a **statically typed superset of JavaScript** that compiles to plain JS. Its type system is **structural** (duck typing) rather than nominal — two types are compatible if they have the same shape, regardless of name.
+
+## Core Type Primitives
+
+\`\`\`typescript
+// Primitives
+let name: string = "Alice";
+let age: number = 30;
+let active: boolean = true;
+let nothing: null = null;
+let undef: undefined = undefined;
+let sym: symbol = Symbol("id");
+let big: bigint = 9007199254740991n;
+
+// Any and Unknown (avoid any, prefer unknown)
+let data: unknown = fetchData();
+if (typeof data === "string") {
+  console.log(data.toUpperCase()); // safe — narrowed to string
+}
+
+// Void and Never
+function log(msg: string): void { console.log(msg); }
+function fail(msg: string): never { throw new Error(msg); }
+\`\`\`
+
+## Interfaces vs Type Aliases
+
+\`\`\`typescript
+// Interface — extendable, better for object shapes
+interface User {
+  id: number;
+  name: string;
+  email?: string;          // optional
+  readonly createdAt: Date; // immutable after creation
+}
+
+interface Admin extends User {
+  role: "admin" | "superadmin";
+}
+
+// Type alias — flexible, supports unions/intersections/primitives
+type ID = string | number;
+type Point = { x: number; y: number };
+type Named = { name: string };
+
+// Intersection type (combines shapes)
+type Employee = User & { department: string };
+\`\`\`
+
+> **Rule of thumb**: Use \`interface\` for public API shapes (extendable). Use \`type\` for complex unions, intersections, or when aliasing primitives.
+
+## Enums
+
+\`\`\`typescript
+// Numeric enum (auto-increments)
+enum Direction { Up, Down, Left, Right } // 0, 1, 2, 3
+
+// String enum (explicit values, safer)
+enum Status {
+  Pending  = "PENDING",
+  Active   = "ACTIVE",
+  Inactive = "INACTIVE",
+}
+
+// Const enum (erased at compile time — no runtime object)
+const enum LogLevel { Debug, Info, Warn, Error }
+const level: LogLevel = LogLevel.Warn; // compiled to: const level = 2
+\`\`\`
+
+## Tuples
+
+\`\`\`typescript
+// Fixed-length, ordered array with per-index types
+type Pair<A, B> = [A, B];
+type RGB = [number, number, number];
+type NamedEntry = [string, ...number[]]; // rest element
+
+const coord: RGB = [255, 128, 0];
+const [r, g, b] = coord; // destructuring
+
+// Labelled tuples (TS 4.0+)
+type Range = [start: number, end: number];
+\`\`\`
+
+## Type Narrowing
+
+TypeScript narrows types inside control flow branches using:
+
+\`\`\`typescript
+function process(value: string | number | null) {
+  if (value === null) return;                    // null guard
+  if (typeof value === "string") {
+    console.log(value.toUpperCase());            // narrowed: string
+  } else {
+    console.log(value.toFixed(2));               // narrowed: number
   }
+}
+
+// 'in' narrowing
+interface Cat { meow(): void; }
+interface Dog { bark(): void; }
+function speak(animal: Cat | Dog) {
+  if ("meow" in animal) animal.meow();           // Cat
+  else animal.bark();                            // Dog
+}
+
+// instanceof narrowing
+function format(val: Date | string) {
+  if (val instanceof Date) return val.toISOString();
+  return val.trim();
+}
+
+// Discriminated union (exhaustive narrowing)
+type Shape =
+  | { kind: "circle";    radius: number }
+  | { kind: "rectangle"; width: number; height: number };
+
+function area(s: Shape): number {
+  switch (s.kind) {
+    case "circle":    return Math.PI * s.radius ** 2;
+    case "rectangle": return s.width * s.height;
+  }
+}
+\`\`\`
+
+## Key Interview Questions
+
+- **What's the difference between \`interface\` and \`type\`?** Interfaces support declaration merging and extending; type aliases are more flexible (unions, intersections). Prefer \`interface\` for OOP-style shapes, \`type\` for algebraic types.
+- **Why use \`unknown\` over \`any\`?** \`unknown\` forces you to narrow the type before use; \`any\` bypasses the type checker entirely.
+- **What is structural typing?** TypeScript checks shape compatibility, not name. \`{ name: string }\` is assignable to \`interface Named { name: string }\` even if not explicitly declared.
+`
+  },
+  {
+    id: "ts-advanced-types",
+    title: "Advanced Types: Unions, Mapped Types & Template Literals",
+    category: "TypeScript",
+    complexity: "Hard",
+    tags: ["mapped-types", "conditional-types", "template-literals", "utility-types", "infer", "distributive"],
+    description: "Deep dive into TypeScript's powerful type-level programming: mapped types, conditional types, template literal types, and the built-in utility types.",
+    fallbackContent: `# Advanced Types: Unions, Mapped Types & Template Literals
+
+## Union & Intersection Types
+
+\`\`\`typescript
+// Union — value is one of the types
+type StringOrNumber = string | number;
+
+// Intersection — value satisfies ALL types
+type AdminUser = User & { permissions: string[] };
+
+// Discriminated unions — best pattern for modelling state machines
+type AsyncState<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error";   error: Error };
+\`\`\`
+
+## Mapped Types
+
+Mapped types transform every key of an existing type:
+
+\`\`\`typescript
+// Generic mapped type pattern
+type Readonly<T>  = { readonly [K in keyof T]: T[K] };
+type Partial<T>   = { [K in keyof T]?: T[K] };
+type Required<T>  = { [K in keyof T]-?: T[K] }; // remove optionality
+type Mutable<T>   = { -readonly [K in keyof T]: T[K] }; // remove readonly
+
+// Remap keys with 'as'
+type Getters<T> = {
+  [K in keyof T as \`get\${Capitalize<string & K>}\`]: () => T[K];
+};
+
+interface Person { name: string; age: number; }
+type PersonGetters = Getters<Person>;
+// { getName: () => string; getAge: () => number }
+\`\`\`
+
+## Conditional Types
+
+\`\`\`typescript
+// T extends U ? TrueType : FalseType
+type IsString<T> = T extends string ? true : false;
+
+// Distributive conditional types (apply to each union member)
+type Unwrap<T> = T extends Promise<infer U> ? U : T;
+type Flat<T>   = T extends Array<infer U>   ? U : T;
+
+type UnwrappedUser = Unwrap<Promise<User>>; // User
+type ArrayItem     = Flat<string[]>;         // string
+
+// Complex: extract only function-valued keys
+type FunctionKeys<T> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never;
+}[keyof T];
+\`\`\`
+
+## The \`infer\` Keyword
+
+\`\`\`typescript
+// Extract return type from a function
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+// Extract parameter types
+type Parameters<T> = T extends (...args: infer P) => any ? P : never;
+
+// Extract element type from an array
+type ElementType<T> = T extends (infer E)[] ? E : never;
+
+// Deeply unwrap nested Promises
+type DeepAwaited<T> = T extends Promise<infer U>
+  ? DeepAwaited<U>
+  : T;
+\`\`\`
+
+## Template Literal Types
+
+\`\`\`typescript
+// Build string union types programmatically
+type EventName = "click" | "focus" | "blur";
+type Handler   = \`on\${Capitalize<EventName>}\`; // "onClick" | "onFocus" | "onBlur"
+
+// Route params extraction
+type ExtractParam<Route extends string> =
+  Route extends \`\${string}:\${infer Param}/\${infer Rest}\`
+    ? Param | ExtractParam<\`/\${Rest}\`>
+    : Route extends \`\${string}:\${infer Param}\`
+    ? Param
+    : never;
+
+type Params = ExtractParam<"/users/:id/posts/:postId">; // "id" | "postId"
+\`\`\`
+
+## Built-in Utility Types Cheatsheet
+
+| Utility | Description |
+|---|---|
+| \`Partial<T>\` | All properties optional |
+| \`Required<T>\` | All properties required |
+| \`Readonly<T>\` | All properties readonly |
+| \`Record<K, V>\` | Object type with keys K and values V |
+| \`Pick<T, K>\` | Subset of properties |
+| \`Omit<T, K>\` | All properties except K |
+| \`Exclude<T, U>\` | Remove U members from T union |
+| \`Extract<T, U>\` | Keep only U members from T union |
+| \`NonNullable<T>\` | Remove null and undefined |
+| \`ReturnType<F>\` | Return type of a function |
+| \`Parameters<F>\` | Parameter tuple of a function |
+| \`ConstructorParameters<C>\` | Constructor parameter tuple |
+| \`InstanceType<C>\` | Instance type of a class |
+| \`Awaited<T>\` | Recursively unwraps Promise |
+
+\`\`\`typescript
+// Practical usage
+type CreateUserDTO = Omit<User, "id" | "createdAt">;
+type UserUpdate    = Partial<Pick<User, "name" | "email">>;
+type ApiResponse<T> = { data: T; error: null } | { data: null; error: string };
+\`\`\`
+`
+  },
+  {
+    id: "ts-generics",
+    title: "Generics & Type Inference",
+    category: "TypeScript",
+    complexity: "Medium",
+    tags: ["generics", "constraints", "inference", "type-parameters", "variance", "covariance"],
+    description: "Write reusable, type-safe code with generics. Master constraints, default type parameters, variance, and how TypeScript infers types automatically.",
+    fallbackContent: `# Generics & Type Inference
+
+## Generic Functions
+
+\`\`\`typescript
+// Basic generic — T inferred from argument
+function identity<T>(value: T): T { return value; }
+const num = identity(42);        // T inferred as number
+const str = identity("hello");   // T inferred as string
+
+// Multiple type parameters
+function zip<A, B>(a: A[], b: B[]): [A, B][] {
+  return a.map((item, i) => [item, b[i]]);
+}
+
+// Generic arrow function (JSX ambiguity — use constraint or trailing comma)
+const first = <T,>(arr: T[]): T | undefined => arr[0];
+\`\`\`
+
+## Constraints
+
+\`\`\`typescript
+// extends constraint — restrict what T can be
+function getLength<T extends { length: number }>(val: T): number {
+  return val.length;
+}
+
+// keyof constraint — safe property access
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+// Multiple constraints
+function merge<T extends object, U extends object>(t: T, u: U): T & U {
+  return { ...t, ...u };
+}
+
+// Default type parameter
+type Container<T = string> = { value: T };
+const box: Container = { value: "default" };     // T = string
+const numBox: Container<number> = { value: 42 }; // T = number
+\`\`\`
+
+## Generic Interfaces & Classes
+
+\`\`\`typescript
+// Generic interface
+interface Repository<T, ID = number> {
+  findById(id: ID): Promise<T | null>;
+  findAll(): Promise<T[]>;
+  save(entity: T): Promise<T>;
+  delete(id: ID): Promise<void>;
+}
+
+// Generic class
+class Stack<T> {
+  private items: T[] = [];
+
+  push(item: T): void     { this.items.push(item); }
+  pop(): T | undefined    { return this.items.pop(); }
+  peek(): T | undefined   { return this.items[this.items.length - 1]; }
+  get size(): number      { return this.items.length; }
+  isEmpty(): boolean      { return this.items.length === 0; }
+}
+
+const stack = new Stack<number>();
+stack.push(1); stack.push(2);
+\`\`\`
+
+## Contextual Type Inference
+
+\`\`\`typescript
+// TypeScript infers T from usage context
+const nums = [1, 2, 3];                    // inferred: number[]
+const mapped = nums.map(n => n * 2);       // inferred: number[]
+
+// Const assertion — narrow to literal types
+const config = { host: "localhost", port: 3000 } as const;
+// type: { readonly host: "localhost"; readonly port: 3000 }
+
+// satisfies operator (TS 4.9) — validate without widening
+const palette = {
+  red: [255, 0, 0],
+  green: "#00ff00",
+} satisfies Record<string, string | number[]>;
+palette.red;   // inferred as number[], not string | number[]
+palette.green; // inferred as string
+\`\`\`
+
+## Variance (Covariance & Contravariance)
+
+\`\`\`typescript
+// Covariant: can use subtype where supertype expected (return positions)
+type Producer<out T> = () => T;
+// const p: Producer<Animal> = (): Dog => new Dog(); // OK — Dog extends Animal
+
+// Contravariant: requires supertype where subtype expected (parameter positions)
+type Consumer<in T> = (val: T) => void;
+// const c: Consumer<Dog> = (val: Animal) => {}; // OK — Animal is wider
+
+// Functions are bivariant in TS method syntax, contravariant in function syntax
+interface Contravariant<in T> { method(arg: T): void; }
+
+// In practice: out = only in return types, in = only in parameter types
+\`\`\`
+
+## Advanced Inference Patterns
+
+\`\`\`typescript
+// Infer from tuple → function overloads
+type Head<T extends unknown[]> = T extends [infer H, ...unknown[]] ? H : never;
+type Tail<T extends unknown[]> = T extends [unknown, ...infer T] ? T : [];
+
+// Builder pattern with fluent types
+class QueryBuilder<T extends object> {
+  private filters: Partial<T> = {};
+  where<K extends keyof T>(key: K, val: T[K]): QueryBuilder<T> {
+    this.filters[key] = val;
+    return this;
+  }
+  build(): Partial<T> { return this.filters; }
+}
+\`\`\`
+`
+  },
+  {
+    id: "ts-classes-decorators",
+    title: "Classes, Decorators & OOP in TypeScript",
+    category: "TypeScript",
+    complexity: "Medium",
+    tags: ["classes", "decorators", "access-modifiers", "abstract", "mixins", "metadata"],
+    description: "TypeScript OOP patterns: access modifiers, abstract classes, method/property decorators, mixins, and metadata reflection for frameworks like NestJS and Angular.",
+    fallbackContent: `# Classes, Decorators & OOP in TypeScript
+
+## Class Fundamentals
+
+\`\`\`typescript
+class Animal {
+  // Access modifiers: public (default), private, protected, readonly
+  readonly species: string;
+  #sound: string;              // ES private field (not accessible via any type cast)
+
+  constructor(
+    public name: string,       // shorthand — declares and assigns in one step
+    protected age: number,
+    species: string,
+    sound: string
+  ) {
+    this.species = species;
+    this.#sound  = sound;
+  }
+
+  speak(): string { return \`\${this.name} says \${this.#sound}\`; }
+}
+
+class Dog extends Animal {
+  constructor(name: string, age: number) {
+    super(name, age, "Canis lupus", "woof");
+  }
+
+  fetch(item: string): string { return \`\${this.name} fetches \${item}\`; }
+}
+\`\`\`
+
+## Abstract Classes & Interfaces
+
+\`\`\`typescript
+// Abstract class — cannot be instantiated, defines contract
+abstract class Shape {
+  abstract area(): number;
+  abstract perimeter(): number;
+
+  describe(): string {
+    return \`Area: \${this.area().toFixed(2)}, Perimeter: \${this.perimeter().toFixed(2)}\`;
+  }
+}
+
+class Circle extends Shape {
+  constructor(private radius: number) { super(); }
+  area()      { return Math.PI * this.radius ** 2; }
+  perimeter() { return 2 * Math.PI * this.radius; }
+}
+
+// Interface — pure contract, no implementation
+interface Serializable {
+  serialize(): string;
+  deserialize(data: string): this;
+}
+
+// Class implementing multiple interfaces
+class User implements Serializable, Comparable<User> {
+  serialize(): string { return JSON.stringify(this); }
+  // ...
+}
+\`\`\`
+
+## Decorators (TypeScript 5 / Stage 3)
+
+\`\`\`typescript
+// Class decorator — wraps / enhances a class
+function singleton<T extends { new(...args: any[]): {} }>(ctor: T) {
+  let instance: InstanceType<T>;
+  return class extends ctor {
+    constructor(...args: any[]) {
+      if (!instance) { super(...args); instance = this as any; }
+      return instance;
+    }
+  };
+}
+
+@singleton
+class Database {
+  connect() { console.log("Connected"); }
+}
+
+// Method decorator
+function log(target: any, key: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.value;
+  descriptor.value = function (...args: any[]) {
+    console.log(\`Calling \${key} with\`, args);
+    return original.apply(this, args);
+  };
+  return descriptor;
+}
+
+class Service {
+  @log
+  fetchUser(id: number) { return { id, name: "Alice" }; }
+}
+
+// Property decorator (dependency injection pattern — NestJS style)
+function Injectable() { return (target: any) => target; }
+function Inject(token: string) {
+  return (target: any, key: string) => {
+    Object.defineProperty(target, key, {
+      get: () => container.resolve(token),
+      enumerable: true,
+    });
+  };
+}
+\`\`\`
+
+## Mixins
+
+\`\`\`typescript
+// Mixin pattern — compose behaviour from multiple classes
+type Constructor<T = {}> = new (...args: any[]) => T;
+
+function Timestamped<TBase extends Constructor>(Base: TBase) {
+  return class extends Base {
+    createdAt = new Date();
+    updatedAt = new Date();
+    touch() { this.updatedAt = new Date(); }
+  };
+}
+
+function Activatable<TBase extends Constructor>(Base: TBase) {
+  return class extends Base {
+    isActive = false;
+    activate()   { this.isActive = true; }
+    deactivate() { this.isActive = false; }
+  };
+}
+
+class User { constructor(public name: string) {} }
+const TimestampedUser = Timestamped(User);
+const ActivatableUser = Activatable(Timestamped(User));
+
+const user = new ActivatableUser("Alice");
+user.activate();
+console.log(user.isActive, user.createdAt);
+\`\`\`
+
+## Key Interview Questions
+
+- **When to use abstract class vs interface?** Abstract classes when sharing implementation/state across related types; interfaces for pure contracts with multiple unrelated implementors.
+- **ES private (#) vs TypeScript private?** \`#field\` is a JS runtime private field (truly inaccessible). \`private\` is TypeScript-only — stripped at compile time, accessible via type assertions.
+- **What's the difference between \`implements\` and \`extends\`?** \`extends\` inherits implementation; \`implements\` only enforces shape (no inheritance).
+`
+  },
+  {
+    id: "ts-react-patterns",
+    title: "TypeScript with React: Component Patterns & Hooks",
+    category: "TypeScript",
+    complexity: "Medium",
+    tags: ["react", "tsx", "props", "hooks", "generics", "forwardref", "context", "discriminated-unions"],
+    description: "Type React apps confidently: functional components, hook signatures, generic components, forwardRef, context with proper types, and discriminated union prop patterns.",
+    fallbackContent: `# TypeScript with React: Component Patterns & Hooks
+
+## Component Prop Types
+
+\`\`\`typescript
+// Basic props
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  variant?: "primary" | "secondary" | "danger";
+  disabled?: boolean;
+  children?: React.ReactNode;    // any renderable node
+}
+
+const Button: React.FC<ButtonProps> = ({ label, onClick, variant = "primary", disabled }) => (
+  <button className={\`btn btn-\${variant}\`} onClick={onClick} disabled={disabled}>
+    {label}
+  </button>
+);
+
+// Prefer explicit return type annotation over React.FC
+function Card({ title, children }: { title: string; children: React.ReactNode }): JSX.Element {
+  return <div className="card"><h2>{title}</h2>{children}</div>;
+}
+\`\`\`
+
+## Discriminated Union Props (variant pattern)
+
+\`\`\`typescript
+type AlertProps =
+  | { variant: "info";    message: string }
+  | { variant: "error";   message: string; onRetry?: () => void }
+  | { variant: "success"; message: string; onDismiss: () => void };
+
+function Alert(props: AlertProps) {
+  switch (props.variant) {
+    case "error":
+      return <div>{props.message} {props.onRetry && <button onClick={props.onRetry}>Retry</button>}</div>;
+    case "success":
+      return <div>{props.message} <button onClick={props.onDismiss}>✕</button></div>;
+    default:
+      return <div>{props.message}</div>;
+  }
+}
+\`\`\`
+
+## Generic Components
+
+\`\`\`typescript
+// Generic list component
+interface ListProps<T> {
+  items: T[];
+  renderItem: (item: T, index: number) => React.ReactNode;
+  keyExtractor: (item: T) => string;
+  emptyState?: React.ReactNode;
+}
+
+function List<T>({ items, renderItem, keyExtractor, emptyState }: ListProps<T>) {
+  if (!items.length) return <>{emptyState ?? <p>No items</p>}</>;
+  return (
+    <ul>
+      {items.map((item, i) => (
+        <li key={keyExtractor(item)}>{renderItem(item, i)}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Usage — T inferred from items prop
+<List
+  items={users}
+  renderItem={(user) => <span>{user.name}</span>}
+  keyExtractor={(user) => user.id.toString()}
+/>
+\`\`\`
+
+## Typing Hooks
+
+\`\`\`typescript
+// useState — T inferred or explicit
+const [count, setCount] = useState(0);                  // inferred: number
+const [user, setUser]   = useState<User | null>(null);  // explicit
+
+// useRef — current may be null on mount
+const inputRef = useRef<HTMLInputElement>(null);
+inputRef.current?.focus();
+
+// useReducer with discriminated union actions
+type Action =
+  | { type: "increment" }
+  | { type: "decrement" }
+  | { type: "reset";    payload: number };
+
+function reducer(state: number, action: Action): number {
+  switch (action.type) {
+    case "increment": return state + 1;
+    case "decrement": return state - 1;
+    case "reset":     return action.payload;
+  }
+}
+
+// Custom hook with explicit return type
+function useToggle(initial = false): [boolean, () => void, () => void] {
+  const [value, setValue] = useState(initial);
+  return [value, () => setValue(true), () => setValue(false)];
+}
+\`\`\`
+
+## Context API with TypeScript
+
+\`\`\`typescript
+interface ThemeContextValue {
+  theme: "light" | "dark";
+  toggle: () => void;
+}
+
+const ThemeContext = React.createContext<ThemeContextValue | undefined>(undefined);
+
+export function useTheme(): ThemeContextValue {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
+  return ctx;
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  return (
+    <ThemeContext.Provider value={{ theme, toggle: () => setTheme(t => t === "dark" ? "light" : "dark") }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+\`\`\`
+
+## forwardRef
+
+\`\`\`typescript
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  error?: string;
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, ...rest }, ref) => (
+    <div>
+      <label>{label}</label>
+      <input ref={ref} {...rest} />
+      {error && <p className="error">{error}</p>}
+    </div>
+  )
+);
+Input.displayName = "Input";
+\`\`\`
+
+## Event Handler Types
+
+\`\`\`typescript
+// Common event handlers
+const handleChange  = (e: React.ChangeEvent<HTMLInputElement>)  => {};
+const handleSubmit  = (e: React.FormEvent<HTMLFormElement>)      => { e.preventDefault(); };
+const handleClick   = (e: React.MouseEvent<HTMLButtonElement>)   => {};
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {};
+const handleDrop    = (e: React.DragEvent<HTMLDivElement>)       => {};
+\`\`\`
+`
+  },
+  {
+    id: "ts-compiler-tooling",
+    title: "tsconfig, Compiler Options & Build Tooling",
+    category: "TypeScript",
+    complexity: "Easy",
+    tags: ["tsconfig", "strict", "module-resolution", "paths", "project-references", "tsc", "esbuild", "vite"],
+    description: "Configure TypeScript for production: strict mode flags, module resolution strategies, path aliases, project references for monorepos, and integrating with Vite/esbuild.",
+    fallbackContent: `# tsconfig, Compiler Options & Build Tooling
+
+## Essential tsconfig.json
+
+\`\`\`json
+{
+  "compilerOptions": {
+    // Type checking strictness
+    "strict": true,                    // enables all strict flags below
+    "noImplicitAny": true,             // error on implicit any
+    "strictNullChecks": true,          // null/undefined not assignable to other types
+    "strictFunctionTypes": true,       // stricter function type contravariance
+    "noUncheckedIndexedAccess": true,  // T[i] returns T | undefined
+    "exactOptionalPropertyTypes": true, // ? means absent, not undefined
+
+    // Code quality
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Module system
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",     // for Vite/esbuild (TS 5.0+)
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+
+    // Output
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,               // emit .d.ts files
+    "declarationMap": true,            // source maps for .d.ts
+    "sourceMap": true,
+
+    // Interop
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,           // required for esbuild/Vite
+
+    // Paths
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@utils/*": ["./src/utils/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
+\`\`\`
+
+## Module Resolution Modes
+
+| Mode | Use case |
+|---|---|
+| \`node\` | Classic Node.js (CommonJS, pre-TS 5) |
+| \`node16\` / \`nodenext\` | ESM + CJS hybrid (Node ≥ 16) |
+| \`bundler\` | Vite, esbuild, Webpack (TS 5.0+) |
+| \`classic\` | Legacy — avoid |
+
+## Project References (Monorepo)
+
+\`\`\`json
+// Root tsconfig.json
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/server" },
+    { "path": "./packages/client" }
+  ]
+}
+
+// packages/server/tsconfig.json
+{
+  "compilerOptions": {
+    "composite": true,          // required for references
+    "outDir": "dist"
+  },
+  "references": [
+    { "path": "../shared" }     // depends on shared
+  ]
+}
+\`\`\`
+
+Build with: \`tsc --build\` (incremental, respects dependency order)
+
+## Path Aliases with Vite
+
+\`\`\`typescript
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      "@components": path.resolve(__dirname, "./src/components"),
+    },
+  },
+});
+\`\`\`
+
+## Strict Mode Flags Explained
+
+\`\`\`typescript
+// strictNullChecks — null/undefined must be handled explicitly
+function greet(name: string | null) {
+  // without strictNullChecks: name.toUpperCase() — OK
+  // with strictNullChecks: must narrow first
+  if (!name) return "Hello!";
+  return \`Hello, \${name.toUpperCase()}\`;
+}
+
+// noUncheckedIndexedAccess — array access returns T | undefined
+const arr: number[] = [1, 2, 3];
+const first = arr[0]; // type: number | undefined
+if (first !== undefined) console.log(first * 2); // safe
+
+// exactOptionalPropertyTypes
+interface Config { timeout?: number; }
+const cfg: Config = {};
+cfg.timeout = undefined; // ERROR with exactOptionalPropertyTypes
+\`\`\`
+
+## Type Declaration Files
+
+\`\`\`typescript
+// mylib.d.ts — declare types for untyped JS modules
+declare module "my-legacy-lib" {
+  export function process(input: string): string;
+  export const version: string;
+}
+
+// Augment existing modules
+declare module "express" {
+  interface Request {
+    user?: { id: string; role: string };
+  }
+}
+
+// Global augmentation
+declare global {
+  interface Window {
+    analytics: { track(event: string, props?: object): void };
+  }
+}
+\`\`\`
+`
+  },
 ];
 
 // Combine all remaining headers without fallback contents so they can be generated or have basic defaults

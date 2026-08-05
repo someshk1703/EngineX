@@ -154,6 +154,14 @@ export const DOCS_MAP = {
   'the web browser internals': 'https://web.dev/howbrowserswork/',
   'encoding and serialization': 'https://developer.mozilla.org/en-US/docs/Glossary/Serialization',
 
+  // ─── TypeScript ─────────────────────────────────────────────────────────────
+  'typescript type system & core concepts': 'https://www.typescriptlang.org/docs/handbook/2/basic-types.html',
+  'advanced types: unions, mapped types & template literals': 'https://www.typescriptlang.org/docs/handbook/2/types-from-types.html',
+  'generics & type inference': 'https://www.typescriptlang.org/docs/handbook/2/generics.html',
+  'classes, decorators & oop in typescript': 'https://www.typescriptlang.org/docs/handbook/2/classes.html',
+  'typescript with react: component patterns & hooks': 'https://react-typescript-cheatsheet.netlify.app/',
+  'tsconfig, compiler options & build tooling': 'https://www.typescriptlang.org/tsconfig',
+
   // ─── Soft Skills ───────────────────────────────────────────────────────────
   'engineering leadership':   'https://www.amazon.com/Manager%27s-Path-Leaders-Navigating-Growth/dp/1491973897',
   'communication skills':     'https://www.amazon.com/Crucial-Conversations-Talking-Stakes-Second/dp/0071771328',
