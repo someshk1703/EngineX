@@ -708,7 +708,7 @@ code, pre, .font-mono, input.api-input, .code-snippet, .cli-prompt {
   background: rgba(255, 255, 255, 0.72);
 }
 .chatbot-panel.hidden {
-  transform: translateX(100%);
+  transform: translateX(calc(100% + 40px));
 }
 .chatbot-fab {
   position: fixed;

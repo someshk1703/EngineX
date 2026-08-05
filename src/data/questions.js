@@ -2593,3 +2593,7 @@ public class Singleton {
 }`,
   },
 ]
+
+// Questions grouped per category id (used by CategoryView / LibraryView)
+export const QUESTIONS_MAP = { DSA: DSA_QUESTIONS, Java: JAVA_QUESTIONS }
+
