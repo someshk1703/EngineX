@@ -2204,6 +2204,14 @@ function LoginScreen() {
       const { data, error: err } = await signUpWithEmail(email, password, fullName.trim())
       setLoading(null)
       if (err) { setError(err.message); return }
+      // Supabase obfuscates "email already registered" as a fake success with an empty
+      // identities array (no error) to prevent account enumeration — it does NOT update
+      // the existing account's password, so the password just entered here won't work.
+      if (data?.user && data.user.identities?.length === 0) {
+        setError('An account with this email already exists. Sign in instead, or use "Forgot password?" if you don\'t remember your credentials.')
+        setMode('signin')
+        return
+      }
       // Supabase returns a user with no session when email confirmation is required.
       if (data?.user && !data.session) {
         setNotice('Account created! Check your inbox to confirm your email before signing in.')
@@ -2226,7 +2234,16 @@ function LoginScreen() {
     setLoading('email')
     const { error: err } = await signInWithEmail(email, password)
     setLoading(null)
-    if (err) { setError(err.message); return }
+    if (err) {
+      // Supabase returns the same generic message for "wrong password" and "email not
+      // confirmed yet" to avoid leaking account state — surface both possibilities.
+      setError(
+        err.message === 'Invalid login credentials'
+          ? 'Invalid email or password. If you just signed up, make sure you\'ve confirmed your email first.'
+          : err.message
+      )
+      return
+    }
   }
 
   return (
