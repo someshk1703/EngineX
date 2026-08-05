@@ -2,19 +2,15 @@ import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
 import { CATEGORIES, ALL_CHAPTERS as CHAPTERS } from './data/topics'
 import { getDocsUrl } from './data/docsMap'
 import { HTML_SECTIONS, hasTheory } from './data/htmlContent'
-import { DSA_QUESTIONS, JAVA_QUESTIONS } from './data/questions'
+import { QUESTIONS_MAP } from './data/questions'
+import ChapterCard from './components/shared/ChapterCard'
+import QuestionsPanel from './components/shared/QuestionsPanel'
+import LazyFallback from './components/shared/LazyFallback'
 const FlashcardManager    = lazy(() => import('./components/FlashcardManager'))
 const StaticContentViewer = lazy(() => import('./components/StaticContentViewer'))
-const InterviewWhiteboard = lazy(() => import('./components/InterviewWhiteboard'))
 const DrawingCanvas       = lazy(() => import('./components/DrawingCanvas'))
-const CollabCoder         = lazy(() => import('./components/CollabCoder'))
-
-// Shared fallback for lazy-loaded panels
-const LazyFallback = () => (
-  <div style={{ padding: '32px', textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-secondary)', letterSpacing: 1 }}>
-    Loading…
-  </div>
-)
+const ExCoder              = lazy(() => import('./components/ExCoder'))
+const CategoryView         = lazy(() => import('./components/CategoryView'))
 import {
   supabase,
   signInWithGoogle,
@@ -57,9 +53,6 @@ const NOTES_KEY     = 'enginex_notes'
 const STREAK_KEY    = 'enginex_streak'
 const THEME_KEY     = 'enginex_theme'
 const CONTENT_CACHE = 'enginex_content_cache'
-
-// Questions per category
-const QUESTIONS_MAP = { DSA: DSA_QUESTIONS, Java: JAVA_QUESTIONS }
 
 function loadNotes() {
   try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '{}') } catch { return {} }
@@ -569,397 +562,21 @@ function SettingsModal({ onClose, onSave }) {
 }
 
 // ─── Chapter Card ─────────────────────────────────────────────────────────────
-function ChapterCard({ chapter, progress, onClick }) {
-  const chProg = progress[chapter.id]
-  const isRead = !!chProg?.read
-  const quizScore = chProg?.quizScore
-  const hasQuiz = quizScore !== undefined
-
-  return (
-    <div className={`chapter-card ${isRead ? 'completed' : ''}`} onClick={onClick}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: 1,
-          color: 'var(--accent-cyan)', border: '1px solid rgba(0,0,0,0.3)',
-          padding: '2px 8px', borderRadius: 4, background: 'rgba(0,0,0,0.05)',
-        }}>
-          {chapter.category}
-        </span>
-        <span style={{
-          fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
-          color: chapter.complexity === 'Hard' ? 'var(--accent-red)' : chapter.complexity === 'Medium' ? 'var(--accent-yellow)' : 'var(--accent-green)',
-        }}>
-          {chapter.complexity}
-        </span>
-      </div>
-
-      <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)', lineHeight: 1.4 }}>
-        {chapter.title}
-      </h3>
-      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5, flex: 1, marginBottom: 16 }}>
-        {chapter.description}
-      </p>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-        {chapter.tags.slice(0, 3).map(tag => (
-          <span key={tag} className="tech-tag">{tag}</span>
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-        {isRead
-          ? <span style={{ fontSize: '0.8rem', color: 'var(--accent-green)', fontFamily: 'var(--font-mono)' }}>✓ READ</span>
-          : <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>○ UNREAD</span>
-        }
-        {hasQuiz
-          ? <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)', color: quizScore >= 70 ? 'var(--accent-green)' : 'var(--accent-yellow)' }}>
-              QUIZ: {quizScore}%
-            </span>
-          : <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>QUIZ: —</span>
-        }
-      </div>
-    </div>
-  )
-}
+// (moved to ./components/shared/ChapterCard.jsx so it can be shared with the
+// lazily-loaded CategoryView without pulling in the rest of App.jsx)
 
 // HtmlViewer removed — StaticContentViewer handles theory content inline
 
 // ─── Difficulty badge ─────────────────────────────────────────────────────────
-function DiffBadge({ difficulty }) {
-  const colors = { Easy: 'var(--accent-green)', Medium: 'var(--accent-yellow)', Hard: 'var(--accent-red)' }
-  return (
-    <span style={{
-      fontFamily: 'var(--font-mono)', fontSize: '0.68rem', letterSpacing: 1,
-      padding: '2px 8px', borderRadius: 4,
-      color: colors[difficulty] || 'var(--text-muted)',
-      border: `1px solid ${colors[difficulty] || 'var(--border-color)'}33`,
-      background: `${colors[difficulty] || 'var(--border-color)'}10`,
-    }}>
-      {difficulty}
-    </span>
-  )
-}
+// (moved to ./components/shared/DiffBadge.jsx)
 
 // ─── Questions Panel (DSA coding problems + Java conceptual Q&A) ──────────────
-function QuestionsPanel({ questions = [], type = 'dsa' }) {
-  const [filter, setFilter]   = useState('ALL')
-  const [selected, setSelected] = useState(null)
-  const [showHint, setShowHint]  = useState(false)
-  const [showSol, setShowSol]    = useState(false)
-  const [showWb, setShowWb]      = useState(false)
-
-  const filtered = filter === 'ALL' ? questions : questions.filter(q => q.difficulty === filter)
-
-  const openQ = (q) => { setSelected(q); setShowHint(false); setShowSol(false); setShowWb(false) }
-
-  if (selected) {
-    return (
-      <div style={{ maxWidth: 820, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
-          <button className="btn-console" onClick={() => setSelected(null)} style={{ padding: '5px 12px', fontSize: '0.78rem' }}>
-            ← QUESTIONS
-          </button>
-          <DiffBadge difficulty={selected.difficulty} />
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--accent-cyan)', border: '1px solid rgba(0,0,0,0.2)', padding: '2px 8px', borderRadius: 4 }}>
-            {selected.topic}
-          </span>
-          <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', flex: 1 }}>
-            {selected.title}
-          </h2>
-        </div>
-
-        {/* DSA problem layout */}
-        {type === 'dsa' && (
-          <>
-            <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '20px 24px', marginBottom: 16 }}>
-              <p style={{ color: 'var(--text-primary)', lineHeight: 1.7, marginBottom: 16 }}>{selected.description}</p>
-              {selected.examples.map((ex, i) => (
-                <div key={i} style={{ marginBottom: 12 }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 4 }}>Example {i + 1}</div>
-                  <div style={{ background: 'var(--bg-primary)', borderRadius: 4, padding: '10px 14px', fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>
-                    <div><span style={{ color: 'var(--accent-cyan)' }}>Input: </span><span style={{ color: 'var(--text-secondary)' }}>{ex.input}</span></div>
-                    <div><span style={{ color: 'var(--accent-green)' }}>Output: </span><span style={{ color: 'var(--text-secondary)' }}>{ex.output}</span></div>
-                    {ex.explanation && <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{ex.explanation}</div>}
-                  </div>
-                </div>
-              ))}
-              {selected.constraints?.length > 0 && (
-                <div style={{ marginTop: 12 }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 6, letterSpacing: 1 }}>CONSTRAINTS</div>
-                  <ul style={{ paddingLeft: 20, color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.8 }}>
-                    {selected.constraints.map((c, i) => <li key={i}>{c}</li>)}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* Hints */}
-            <div style={{ marginBottom: 12 }}>
-              <button
-                className="btn-console"
-                onClick={() => setShowHint(h => !h)}
-                style={{ padding: '6px 14px', fontSize: '0.78rem', borderColor: 'var(--accent-yellow)', color: 'var(--accent-yellow)' }}
-              >
-                {showHint ? '▼ HIDE HINTS' : '▶ SHOW HINTS'}
-              </button>
-              {showHint && (
-                <div style={{ marginTop: 10, background: 'rgba(255,204,0,0.05)', border: '1px solid rgba(255,204,0,0.2)', borderRadius: 6, padding: '14px 18px' }}>
-                  {selected.hints.map((h, i) => (
-                    <div key={i} style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.7, marginBottom: i < selected.hints.length - 1 ? 8 : 0 }}>
-                      <span style={{ color: 'var(--accent-yellow)', fontFamily: 'var(--font-mono)' }}>#{i + 1}</span> {h}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Solution */}
-            <div>
-              <button
-                className="btn-console btn-console-success"
-                onClick={() => setShowSol(s => !s)}
-                style={{ padding: '6px 14px', fontSize: '0.78rem' }}
-              >
-                {showSol ? '▼ HIDE SOLUTION' : '▶ REVEAL SOLUTION'}
-              </button>
-              {showSol && (
-                <div style={{ marginTop: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '20px 24px' }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', letterSpacing: 1, marginBottom: 8 }}>APPROACH</div>
-                  <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 16 }}>{selected.solution.approach}</p>
-                  <div style={{ background: 'var(--bg-primary)', borderRadius: 6, padding: '14px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-primary)', whiteSpace: 'pre', overflowX: 'auto', marginBottom: 14, lineHeight: 1.6, border: '1px solid var(--border-color)' }}>
-                    {selected.solution.code}
-                  </div>
-                  <div style={{ display: 'flex', gap: 16, fontFamily: 'var(--font-mono)', fontSize: '0.78rem' }}>
-                    <span><span style={{ color: 'var(--text-muted)' }}>Time: </span><span style={{ color: 'var(--accent-cyan)' }}>{selected.solution.complexity.time}</span></span>
-                    <span><span style={{ color: 'var(--text-muted)' }}>Space: </span><span style={{ color: 'var(--accent-cyan)' }}>{selected.solution.complexity.space}</span></span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* Java Q&A layout */}
-        {type === 'java' && (
-          <>
-            <div style={{ background: 'var(--bg-secondary)', border: '1px solid rgba(0,0,0,0.15)', borderRadius: 8, padding: '20px 24px', marginBottom: 16 }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--accent-cyan)', letterSpacing: 1, marginBottom: 10 }}>QUESTION</div>
-              <p style={{ color: 'var(--text-primary)', fontSize: '1rem', fontWeight: 500, lineHeight: 1.6 }}>{selected.question}</p>
-            </div>
-
-            <button
-              className="btn-console btn-console-success"
-              onClick={() => setShowSol(s => !s)}
-              style={{ padding: '6px 14px', fontSize: '0.78rem', marginBottom: 12 }}
-            >
-              {showSol ? '▼ HIDE ANSWER' : '▶ REVEAL ANSWER'}
-            </button>
-
-            {showSol && (
-              <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, padding: '20px 24px' }}>
-                {selected.answer.split('\n\n').map((para, i) => (
-                  <p key={i} style={{ color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: 12, whiteSpace: 'pre-wrap' }}>
-                    {para}
-                  </p>
-                ))}
-                {selected.keyPoints?.length > 0 && (
-                  <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(0,255,102,0.05)', border: '1px solid rgba(0,255,102,0.2)', borderRadius: 6 }}>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--accent-green)', letterSpacing: 1, marginBottom: 8 }}>KEY POINTS</div>
-                    <ul style={{ paddingLeft: 18, color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.8 }}>
-                      {selected.keyPoints.map((p, i) => <li key={i}>{p}</li>)}
-                    </ul>
-                  </div>
-                )}
-                {selected.codeExample && (
-                  <div style={{ marginTop: 14, background: 'var(--bg-primary)', borderRadius: 6, padding: '14px 16px', fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--text-primary)', whiteSpace: 'pre', overflowX: 'auto', border: '1px solid var(--border-color)', lineHeight: 1.6 }}>
-                    {selected.codeExample}
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* ── Interview Whiteboard ── */}
-        <div style={{ marginTop: 28 }}>
-          <button
-            className="btn-console"
-            onClick={() => setShowWb(w => !w)}
-            style={{ padding: '6px 14px', fontSize: '0.78rem', borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' }}
-          >
-            {showWb ? '▼ CLOSE WHITEBOARD' : '▶ OPEN WHITEBOARD'}
-          </button>
-          {showWb && (
-            <div style={{ marginTop: 14 }}>
-              <Suspense fallback={<LazyFallback />}>
-                <InterviewWhiteboard
-                  questionId={selected.id}
-                  question={type === 'dsa' ? selected.description : selected.question}
-                  questionType={type}
-                />
-              </Suspense>
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-      {/* Difficulty filter */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-        {['ALL', 'Easy', 'Medium', 'Hard'].map(d => (
-          <button
-            key={d}
-            onClick={() => setFilter(d)}
-            style={{
-              background: filter === d ? 'var(--accent-cyan)' : 'var(--bg-secondary)',
-              color: filter === d ? 'var(--bg-primary)' : 'var(--text-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 4, padding: '5px 14px', cursor: 'pointer',
-              fontFamily: 'var(--font-mono)', fontSize: '0.78rem', letterSpacing: 0.5,
-              transition: 'all 0.15s',
-            }}
-          >
-            {d}
-            <span style={{ marginLeft: 6, color: filter === d ? 'var(--bg-primary)' : 'var(--text-muted)', fontSize: '0.7rem' }}>
-              {d === 'ALL' ? questions.length : questions.filter(q => q.difficulty === d).length}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Question list */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {filtered.map((q, idx) => (
-          <button
-            key={q.id}
-            onClick={() => openQ(q)}
-            style={{
-              background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
-              borderRadius: 8, padding: '14px 18px', cursor: 'pointer', textAlign: 'left',
-              display: 'flex', alignItems: 'center', gap: 14, transition: 'border-color 0.15s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-cyan)'}
-            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
-          >
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', width: 24, flexShrink: 0 }}>
-              {String(idx + 1).padStart(2, '0')}
-            </span>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4, fontSize: '0.95rem' }}>{q.title}</div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>{q.topic}</div>
-            </div>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              {q.tags.slice(0, 2).map(t => <span key={t} className="tech-tag">{t}</span>)}
-              <DiffBadge difficulty={q.difficulty} />
-            </div>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginLeft: 4 }}>›</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
+// (moved to ./components/shared/QuestionsPanel.jsx)
 
 // TheoryPanel removed — replaced by StaticContentViewer component
 
-// ─── Category View (Theory | Questions | Flashcards) ─────────────────────────
-function CategoryView({ category, progress, onOpenChapter, onBack }) {
-  const questions    = QUESTIONS_MAP[category.id] || []
-  const chaptersInCat = CHAPTERS.filter(c => c.category === category.id)
-  const hasQuestions = questions.length > 0
-  const hasChapters  = chaptersInCat.length > 0
-  const qType        = category.id === 'Java' ? 'java' : 'dsa'
-
-  // Default tab priority: questions → flashcards → chapters
-  const defaultTab = hasQuestions ? 'questions' : 'flashcards'
-  const [activeTab, setActiveTab] = useState(defaultTab)
-
-  const tabs = [
-    hasQuestions        && { key: 'questions',  label: '💡 Questions', count: questions.length },
-    true                && { key: 'flashcards', label: '📌 Flashcards' },
-    hasChapters         && { key: 'chapters',   label: '◈ AI Chapters', count: chaptersInCat.length },
-  ].filter(Boolean)
-
-  const readCount = chaptersInCat.filter(c => progress[c.id]?.read).length
-
-  return (
-    <div>
-      {/* Category Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, flexWrap: 'wrap' }}>
-        <button className="btn-console" onClick={onBack} style={{ padding: '5px 12px', fontSize: '0.78rem' }}>
-          ← LIBRARY
-        </button>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: '1.4rem' }}>{category.icon}</span>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{category.name}</h1>
-          </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
-            {questions.length > 0 && `${questions.length} questions · `}
-            {hasChapters && `${readCount}/${chaptersInCat.length} chapters read`}
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 28 }}>
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '10px 18px',
-              fontFamily: 'var(--font-mono)', fontSize: '0.82rem', letterSpacing: 0.5,
-              color: activeTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-              borderBottom: `2px solid ${activeTab === tab.key ? 'var(--accent-cyan)' : 'transparent'}`,
-              transition: 'all 0.15s',
-              display: 'flex', alignItems: 'center', gap: 6,
-            }}
-          >
-            {tab.label}
-            {tab.count !== undefined && (
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: activeTab === tab.key ? 'var(--accent-cyan)' : 'var(--text-muted)' }}>
-                {tab.count}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab content */}
-      {activeTab === 'questions' && (
-        <QuestionsPanel questions={questions} type={qType} />
-      )}
-
-      {activeTab === 'flashcards' && (
-        <Suspense fallback={<LazyFallback />}>
-          <FlashcardManager section={category.id.toLowerCase().replace(/\s+/g, '-')} />
-        </Suspense>
-      )}
-
-      {activeTab === 'chapters' && (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: 20,
-        }}>
-          {chaptersInCat.map(chapter => (
-            <ChapterCard
-              key={chapter.id}
-              chapter={chapter}
-              progress={progress}
-              onClick={() => onOpenChapter(chapter)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
+// ─── Category View (Questions | Flashcards | Chapters) ───────────────────────
+// (moved to ./components/CategoryView.jsx and lazy-loaded — see `CategoryView` import above)
 
 // ─── Theory Subject View ──────────────────────────────────────────────────────
 function TheorySubjectView({ subject, onBack }) {
@@ -1145,17 +762,13 @@ function TheoryView({ onOpenSubject }) {
 // ─── Library View ─────────────────────────────────────────────────────────────
 const QUESTION_CATS = CATEGORIES.filter(cat => (QUESTIONS_MAP[cat.id] || []).length > 0)
 const TOTAL_QUESTIONS = Object.values(QUESTIONS_MAP).reduce((s, a) => s + a.length, 0)
+const SECTION_CATS = CATEGORIES.filter(cat => CHAPTERS.some(c => c.category === cat.id))
 
-function LibraryView({ progress, onOpenChapter }) {
+function LibraryView({ progress, onOpenChapter, onOpenCategory }) {
   const [libTab, setLibTab] = useState('chapters') // 'chapters' | 'flashcards' | 'questions'
 
-  // Chapters tab
+  // Chapters tab — search across all sections; empty search shows the section list
   const [search, setSearch]   = useState('')
-  const [sortBy, setSortBy]   = useState('default')
-  const [activeCat, setActiveCat] = useState('ALL')
-
-  // Hamburger topic drawer
-  const [drawerOpen, setDrawerOpen] = useState(false)
 
   // Flashcards tab
   const [flashCat, setFlashCat] = useState(CATEGORIES[0].id)
@@ -1163,21 +776,13 @@ function LibraryView({ progress, onOpenChapter }) {
   // Questions tab
   const [qCat, setQCat] = useState(QUESTION_CATS[0]?.id || 'DSA')
 
-  const filtered = CHAPTERS.filter(c => {
-    const matchCat = activeCat === 'ALL' || c.category === activeCat
+  const searchResults = (() => {
     const q = search.toLowerCase().trim()
-    const matchSearch = !q || c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q))
-    return matchCat && matchSearch
-  }).sort((a, b) => {
-    if (sortBy === 'quiz-asc')  return (progress[a.id]?.quizScore ?? Infinity)  - (progress[b.id]?.quizScore ?? Infinity)
-    if (sortBy === 'quiz-desc') return (progress[b.id]?.quizScore ?? -Infinity) - (progress[a.id]?.quizScore ?? -Infinity)
-    if (sortBy === 'recent') {
-      const da = progress[a.id]?.quizDate || progress[a.id]?.readDate || ''
-      const db = progress[b.id]?.quizDate || progress[b.id]?.readDate || ''
-      return db > da ? 1 : -1
-    }
-    return 0
-  })
+    if (!q) return []
+    return CHAPTERS.filter(c =>
+      c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q))
+    )
+  })()
 
   const LIB_TABS = [
     { key: 'chapters',   label: '◈ AI Chapters',  count: CHAPTERS.length },
@@ -1196,111 +801,6 @@ function LibraryView({ progress, onOpenChapter }) {
 
   return (
     <div style={{ position: 'relative' }}>
-
-      {/* ── Topic Drawer (hamburger sidebar) ─────────────────────────────── */}
-      {drawerOpen && (
-        <div
-          style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}
-          onClick={() => setDrawerOpen(false)}
-        >
-          {/* backdrop */}
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(3px)' }} />
-          {/* drawer panel */}
-          <div
-            className="topic-drawer"
-            style={{
-              position: 'relative', zIndex: 1,
-              width: 280, height: '100%',
-              background: 'var(--bg-secondary)',
-              borderRight: '1px solid var(--border-color)',
-              display: 'flex', flexDirection: 'column',
-              boxShadow: '4px 0 32px rgba(0,0,0,0.4)',
-              borderRadius: '0 20px 20px 0',
-              overflow: 'hidden',
-              animation: 'slideInLeft 0.22s ease',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            {/* drawer header */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '16px 20px', borderBottom: '1px solid var(--border-color)',
-            }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.85rem', color: 'var(--accent-cyan)', letterSpacing: 1 }}>
-                TOPICS
-              </span>
-              <button
-                onClick={() => setDrawerOpen(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1, padding: 4 }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* ALL option */}
-            <button
-              onClick={() => { setActiveCat('ALL'); setLibTab('chapters'); setDrawerOpen(false) }}
-              style={{
-                background: activeCat === 'ALL' ? 'rgba(0,0,0,0.08)' : 'none',
-                border: 'none', borderLeft: activeCat === 'ALL' ? '3px solid var(--accent-cyan)' : '3px solid transparent',
-                cursor: 'pointer', padding: '12px 20px',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                color: activeCat === 'ALL' ? 'var(--accent-cyan)' : 'var(--text-primary)',
-                fontFamily: 'var(--font-mono)', fontSize: '0.82rem',
-                transition: 'all 0.15s', textAlign: 'left',
-              }}
-            >
-              <span>All Topics</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{CHAPTERS.length}</span>
-            </button>
-
-            {/* category list */}
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              {CATEGORIES.map(cat => {
-                const n = CHAPTERS.filter(c => c.category === cat.id).length
-                if (n === 0) return null
-                const isActive = activeCat === cat.id
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => { setActiveCat(cat.id); setLibTab('chapters'); setDrawerOpen(false) }}
-                    style={{
-                      width: '100%', background: isActive ? 'rgba(0,0,0,0.08)' : 'none',
-                      border: 'none', borderLeft: isActive ? '3px solid var(--accent-cyan)' : '3px solid transparent',
-                      cursor: 'pointer', padding: '12px 20px',
-                      display: 'flex', alignItems: 'center', gap: 12,
-                      color: isActive ? 'var(--accent-cyan)' : 'var(--text-primary)',
-                      fontFamily: 'var(--font-mono)', fontSize: '0.82rem',
-                      transition: 'all 0.15s', textAlign: 'left',
-                    }}
-                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--bg-primary)' }}
-                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'none' }}
-                  >
-                    <span style={{ fontSize: '1rem', flexShrink: 0 }}>{cat.icon}</span>
-                    <span style={{ flex: 1, lineHeight: 1.3 }}>{cat.name}</span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', flexShrink: 0 }}>{n}</span>
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* progress bar at bottom */}
-            <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border-color)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                <span>Overall Progress</span>
-                <span>{CHAPTERS.filter(c => progress[c.id]?.read).length} / {CHAPTERS.length}</span>
-              </div>
-              <div style={{ height: 4, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%', borderRadius: 2, background: 'var(--accent-cyan)',
-                  width: `${Math.round((CHAPTERS.filter(c => progress[c.id]?.read).length / CHAPTERS.length) * 100)}%`,
-                  transition: 'width 0.4s',
-                }} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Library tab bar ──────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 0, borderBottom: '1px solid var(--border-color)', marginBottom: 28 }}>
@@ -1326,79 +826,74 @@ function LibraryView({ progress, onOpenChapter }) {
             )}
           </button>
         ))}
-
-        {/* active topic badge */}
-        {activeCat !== 'ALL' && (
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{
-              fontFamily: 'var(--font-mono)', fontSize: '0.72rem',
-              background: 'rgba(0,0,0,0.1)', border: '1px solid var(--accent-cyan)',
-              color: 'var(--accent-cyan)', borderRadius: 12, padding: '2px 10px',
-              display: 'flex', alignItems: 'center', gap: 6,
-            }}>
-              {CATEGORIES.find(c => c.id === activeCat)?.icon} {activeCat}
-              <button
-                onClick={() => setActiveCat('ALL')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--accent-cyan)', padding: 0, lineHeight: 1, fontSize: '0.8rem' }}
-              >✕</button>
-            </span>
-          </div>
-        )}
       </div>
 
-      {/* ── AI Chapters tab ── */}
+      {/* ── AI Chapters tab: Section List → drill into a section's topics ── */}
       {libTab === 'chapters' && (
         <div>
-          {/* Search + sort */}
-          <div style={{ marginBottom: 16, display: 'flex', gap: 10, alignItems: 'center' }}>
+          {/* Search across all sections */}
+          <div style={{ marginBottom: 20 }}>
             <input
               className="search-bar"
               type="text"
-              placeholder="🔍  Search chapters, tags, topics..."
+              placeholder="🔍  Search chapters, tags, topics across all sections..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ flex: 1 }}
+              style={{ width: '100%' }}
             />
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value)}
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', padding: '8px 10px', cursor: 'pointer', outline: 'none', flexShrink: 0 }}
-            >
-              <option value="default">Default order</option>
-              <option value="recent">Recently viewed</option>
-              <option value="quiz-asc">Score: Low → High</option>
-              <option value="quiz-desc">Score: High → Low</option>
-            </select>
           </div>
-          {/* Category filter pills */}
-          <div className="pill-row" style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
-            <button style={pillStyle(activeCat === 'ALL')} onClick={() => setActiveCat('ALL')}>All ({CHAPTERS.length})</button>
-            {CATEGORIES.map(cat => {
-              const n = CHAPTERS.filter(c => c.category === cat.id).length
-              return n > 0 && (
-                <button key={cat.id} style={pillStyle(activeCat === cat.id)} onClick={() => setActiveCat(cat.id)}>
-                  {cat.icon} {cat.name} ({n})
-                </button>
-              )
-            })}
-          </div>
-          {/* Count + clear */}
-          {(search || activeCat !== 'ALL') && (
-            <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                {filtered.length} result{filtered.length !== 1 ? 's' : ''}
-              </span>
-            </div>
-          )}
-          {/* Grid */}
-          <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-            {filtered.map(chapter => (
-              <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
-            ))}
-          </div>
-          {filtered.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-              No chapters match your search.
+
+          {search.trim() ? (
+            <>
+              <div style={{ marginBottom: 12 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+                {searchResults.map(chapter => (
+                  <ChapterCard key={chapter.id} chapter={chapter} progress={progress} onClick={() => onOpenChapter(chapter)} />
+                ))}
+              </div>
+              {searchResults.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                  No chapters match your search.
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
+              {SECTION_CATS.map(cat => {
+                const chaptersInCat = CHAPTERS.filter(c => c.category === cat.id)
+                const readN = chaptersInCat.filter(c => progress[c.id]?.read).length
+                const pct = chaptersInCat.length ? Math.round((readN / chaptersInCat.length) * 100) : 0
+                return (
+                  <button
+                    key={cat.id}
+                    className="chapter-card"
+                    onClick={() => onOpenCategory(cat)}
+                    style={{ textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 12 }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '1.6rem' }}>{cat.icon}</span>
+                      <span style={{
+                        fontFamily: 'var(--font-mono)', fontSize: '0.68rem', padding: '3px 8px',
+                        borderRadius: 4, background: 'rgba(0,0,0,0.1)', color: 'var(--accent-cyan)',
+                        border: '1px solid rgba(0,0,0,0.25)',
+                      }}>
+                        {chaptersInCat.length} chapters
+                      </span>
+                    </div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.05rem' }}>{cat.name}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      {readN}/{chaptersInCat.length} read
+                    </div>
+                    <div style={{ height: 4, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 2, background: 'var(--accent-cyan)', width: `${pct}%`, transition: 'width 0.4s' }} />
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           )}
         </div>
@@ -1442,6 +937,7 @@ function LibraryView({ progress, onOpenChapter }) {
     </div>
   )
 }
+
 
 // ─── Official Docs Modal ──────────────────────────────────────────────────────
 function DocsModal({ chapter, onClose }) {
@@ -2482,14 +1978,14 @@ function LandingPage({ onNavigate, onOpenSettings, progress }) {
       cta: 'Browse Theory →',
     },
     {
-      icon: '👥',
-      title: 'Collab Coder',
-      subtitle: 'RGA CRDT Engine',
-      desc: 'Real-time collaborative coding environment powered by the RGA CRDT algorithm. Pair-program with peers, share sessions, and tackle interview problems together.',
+      icon: '⌨',
+      title: 'EX-Coder',
+      subtitle: 'AI Code Reviewer',
+      desc: 'Type your solution directly in EngineX and have the AI agent evaluate it for correctness, complexity, and style — no external tools required.',
       badge: 'NEW',
       color: 'var(--accent-green)',
-      action: () => onNavigate('collab'),
-      cta: 'Open Collab Coder →',
+      action: () => onNavigate('excoder'),
+      cta: 'Open EX-Coder →',
     },
     {
       icon: '🖊',
@@ -3205,7 +2701,7 @@ export default function App() {
       </header>
 
       {/* Main */}
-      <main className="main-content" style={{ flex: 1, maxWidth: (view === 'drawing' || view === 'collab') ? '100%' : 1400, width: '100%', margin: '0 auto', padding: (view === 'landing' || view === 'drawing' || view === 'collab') ? '0' : '32px 28px' }}>
+      <main className="main-content" style={{ flex: 1, maxWidth: (view === 'drawing' || view === 'excoder') ? '100%' : 1400, width: '100%', margin: '0 auto', padding: (view === 'landing' || view === 'drawing' || view === 'excoder') ? '0' : '32px 28px' }}>
         {view === 'landing' && (
           <LandingPage
             progress={progress}
@@ -3214,7 +2710,7 @@ export default function App() {
           />
         )}
         {view === 'library' && (
-          <LibraryView progress={progress} onOpenChapter={handleOpenChapter} />
+          <LibraryView progress={progress} onOpenChapter={handleOpenChapter} onOpenCategory={handleOpenCategory} />
         )}
         {view === 'theory' && (
           <TheoryView
@@ -3232,12 +2728,14 @@ export default function App() {
           />
         )}
         {view === 'category' && selectedCategory && (
-          <CategoryView
-            category={selectedCategory}
-            progress={progress}
-            onOpenChapter={handleOpenChapter}
-            onBack={() => setView('library')}
-          />
+          <Suspense fallback={<LazyFallback />}>
+            <CategoryView
+              category={selectedCategory}
+              progress={progress}
+              onOpenChapter={handleOpenChapter}
+              onBack={() => setView('library')}
+            />
+          </Suspense>
         )}
 
         {view === 'chapter' && selectedChapter && (
@@ -3264,9 +2762,9 @@ export default function App() {
             />
           </Suspense>
         )}
-        {view === 'collab' && (
+        {view === 'excoder' && (
           <Suspense fallback={<LazyFallback />}>
-            <CollabCoder
+            <ExCoder
               onBack={() => { setView('landing'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
             />
           </Suspense>

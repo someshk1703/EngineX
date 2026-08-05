@@ -465,6 +465,72 @@ Your role:
   }
 }
 
+// ─── EX-Coder chatbot: coding-problem-aware conversation ─────────────────────
+export async function generateCoderChatMessage(question, code, language, history, userMessage) {
+  const provider = getProvider();
+  const model    = resolveModel(provider, getSelectedModel());
+
+  const codeBlock = code?.trim()
+    ? `\n\nThe candidate's current ${language} code:\n\`\`\`${language}\n${code}\n\`\`\``
+    : "";
+
+  const systemPrompt = `You are a senior software engineer and FAANG interview coach embedded inside EngineX's EX-Coder tool. The user is working on the problem: "${question.title}" (${question._cat || question.category || ""}).
+
+PROBLEM: ${question.description || question.question || ""}
+
+Your role:
+- Help the user think through the problem, debug their code, and understand tradeoffs — nudge them toward the answer rather than just handing over a full solution unless they explicitly ask for it
+- Reference their current code when relevant
+- Keep responses concise and conversational — this is chat, not an essay
+- Use code when helpful; keep examples short
+- Tone: like a brilliant senior engineer mentoring a junior — direct, friendly, clear${codeBlock}`;
+
+  const msgs = history.map(m => ({ role: m.role, content: m.content }));
+  msgs.push({ role: "user", content: userMessage });
+
+  try {
+    switch (provider) {
+      case "github":
+      case "openai": {
+        const url   = provider === "github" ? GITHUB_MODELS_API_URL : OPENAI_API_URL;
+        const token = provider === "github" ? getGitHubPat()       : getOpenAiKey();
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+          body: JSON.stringify({ model, messages: [{ role: "system", content: systemPrompt }, ...msgs], max_tokens: 1200 }),
+        });
+        if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
+        return (await res.json()).choices[0].message.content;
+      }
+      case "gemini": {
+        const apiKey = getGeminiKey();
+        const url    = `${GEMINI_API_BASE}/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const geminiMsgs = msgs.map(m => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] }));
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ system_instruction: { parts: [{ text: systemPrompt }] }, contents: geminiMsgs, generationConfig: { maxOutputTokens: 1200 } }),
+        });
+        if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
+        return (await res.json()).candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+      }
+      default: {
+        const apiKey = getApiKey();
+        const res = await fetch(ANTHROPIC_API_URL, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-api-key": apiKey, "anthropic-version": ANTHROPIC_VERSION, "anthropic-dangerous-direct-browser-access": "true" },
+          body: JSON.stringify({ model, max_tokens: 1200, system: systemPrompt, messages: msgs }),
+        });
+        if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
+        return (await res.json()).content[0].text;
+      }
+    }
+  } catch (error) {
+    console.error("Coder chatbot error:", error);
+    throw error;
+  }
+}
+
 // ─── Generate Chapter Quiz ────────────────────────────────────────────────────
 export async function generateChapterQuiz(chapter, numQuestions = 8) {
   const refContext = buildRefContext(chapter);
@@ -505,6 +571,88 @@ Each object in the array must have exactly these fields:
     }
   } catch (error) {
     console.error("Error generating chapter quiz:", error);
+    throw error;
+  }
+}
+
+// ─── EX-Coder: AI code evaluation ─────────────────────────────────────────────
+// Judges a candidate's typed solution against a DSA/Java question the same way
+// a human interviewer would — no code execution, purely LLM review.
+export async function evaluateCode(question, code, language) {
+  const systemPrompt = `You are a senior software engineer acting as a strict but constructive code reviewer for a FAANG-style technical interview practice tool.
+
+You will be given a coding problem and a candidate's solution written in ${language}. Evaluate it as an interviewer would: reason through the logic line by line, check correctness against the stated examples and constraints, and assess efficiency.
+
+The candidate is only expected to write the core algorithm/method itself, exactly like a whiteboard or LeetCode-style answer. Do NOT require, expect, or penalize the absence of a runnable program wrapper — no "public class Main", no "public static void main", no package declarations or import statements. Judge only the algorithmic logic, data structures, and correctness of the code actually written; never comment on or deduct points for missing boilerplate/entry-point code.
+
+You MUST return ONLY a valid JSON object. Do not wrap it in markdown code fences. Do not write any text before or after the JSON.
+Your entire response must parse successfully with JSON.parse(). Follow these strict JSON rules:
+- Every string value must be plain text on a single line — never include literal line breaks inside a string; use " " or "; " instead of a newline.
+- Escape every double-quote character that appears inside a string value as \\".
+- Do not use markdown code fences or backtick code blocks inside string values; refer to identifiers/code in plain text instead.
+- Keep every string field concise (under ~200 characters) so the response stays short and valid.
+
+The JSON object must have exactly these fields:
+- "verdict": one of "correct", "partially_correct", "incorrect" — does the solution solve the problem?
+- "score": integer 0-100 — overall quality score (correctness + efficiency + code quality)
+- "summary": string — 1-2 sentence overall assessment
+- "complexity": { "time": string, "space": string, "assessment": string } — Big-O of the submitted code and whether it's optimal for this problem
+- "strengths": array of strings — what the candidate did well (empty array if none)
+- "issues": array of strings — bugs, missed edge cases, or correctness problems (empty array if none)
+- "suggestions": array of strings — concrete improvements: style, efficiency, readability (empty array if none)
+- "edgeCasesMissed": array of strings — specific edge cases not handled (empty array if none)`;
+
+  const examplesBlock = question.examples?.length
+    ? `EXAMPLES:\n${question.examples.map(ex => `Input: ${ex.input}\nOutput: ${ex.output}`).join("\n")}`
+    : "";
+  const constraintsBlock = question.constraints?.length
+    ? `CONSTRAINTS:\n${question.constraints.join("\n")}`
+    : "";
+
+  const userMessage = `PROBLEM: ${question.title}
+CATEGORY: ${question._cat || question.category || ""}
+DIFFICULTY: ${question.difficulty || "N/A"}
+DESCRIPTION: ${question.description || question.question || ""}
+${examplesBlock}
+${constraintsBlock}
+
+CANDIDATE'S ${language.toUpperCase()} SOLUTION:
+\`\`\`${language}
+${code}
+\`\`\`
+
+Evaluate this solution now.`;
+
+  const stripFences = (raw) => {
+    let t = raw.trim();
+    if (t.startsWith("```")) t = t.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
+    return t;
+  };
+
+  const tryParse = (raw) => {
+    try { return JSON.parse(raw); } catch { /* fall through */ }
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (match) { try { return JSON.parse(match[0]); } catch { /* fall through */ } }
+    return null;
+  };
+
+  try {
+    const first = stripFences(await callAI(systemPrompt, userMessage, 3000));
+    let parsed = tryParse(first);
+    if (parsed) return parsed;
+
+    // First attempt produced invalid/truncated JSON — ask the model to repair it rather than failing outright.
+    const repairPrompt = `Your previous response was not valid, complete JSON and could not be parsed. Return ONLY a corrected, complete, valid JSON object with the exact same fields as requested. Keep every string field short (under 150 characters), on a single line, with any double-quotes escaped as \\". Do not add commentary or code fences.
+
+BROKEN RESPONSE:
+${first.slice(0, 4000)}`;
+    const repaired = stripFences(await callAI(systemPrompt, repairPrompt, 3000));
+    parsed = tryParse(repaired);
+    if (parsed) return parsed;
+
+    throw new Error("Could not parse evaluation JSON after a repair attempt. Raw output: " + repaired.slice(0, 120) + "...");
+  } catch (error) {
+    console.error("Error evaluating code:", error);
     throw error;
   }
 }
