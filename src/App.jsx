@@ -46,20 +46,13 @@ import {
   REFERENCE_DOCS,
   resolveModel,
 } from './services/claudeService'
+import ChapterNotes from './components/notebook/ChapterNotes'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PROGRESS_KEY  = 'enginex_progress'
-const NOTES_KEY     = 'enginex_notes'
 const STREAK_KEY    = 'enginex_streak'
 const THEME_KEY     = 'enginex_theme'
 const CONTENT_CACHE = 'enginex_content_cache'
-
-function loadNotes() {
-  try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '{}') } catch { return {} }
-}
-function saveNotes(notes) {
-  localStorage.setItem(NOTES_KEY, JSON.stringify(notes))
-}
 
 function loadStreak() {
   try { return JSON.parse(localStorage.getItem(STREAK_KEY) || '{"count":0,"lastDate":null}') } catch { return { count: 0, lastDate: null } }
@@ -1120,17 +1113,8 @@ function ChatbotPanel({ chapter, isOpen, onClose, pendingQuestion, onPendingCons
 }
 
 // ─── Notes Panel ──────────────────────────────────────────────────────────────
-function NotesPanel({ chapterId }) {
+function NotesPanel({ chapterId, chapterTitle, chapterHtml }) {
   const [expanded, setExpanded] = useState(false)
-  const [notes, setNotes] = useState(() => loadNotes()[chapterId] || '')
-
-  const handleChange = (e) => {
-    const val = e.target.value
-    setNotes(val)
-    const all = loadNotes()
-    all[chapterId] = val
-    saveNotes(all)
-  }
 
   return (
     <div style={{ marginTop: 24, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 8, overflow: 'hidden' }}>
@@ -1147,21 +1131,13 @@ function NotesPanel({ chapterId }) {
       </button>
       {expanded && (
         <div style={{ padding: '0 16px 16px' }}>
-          <textarea
-            className="notes-textarea"
-            value={notes}
-            onChange={handleChange}
-            placeholder="Jot down key points, mnemonics, or things you want to remember..."
-            rows={6}
-          />
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 6 }}>
-            Auto-saved to browser storage
-          </div>
+          <ChapterNotes topicKey={chapterId} topicTitle={chapterTitle} chapterHtml={chapterHtml} />
         </div>
       )}
     </div>
   )
 }
+
 
 // ─── Chapter View ─────────────────────────────────────────────────────────────
 function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
@@ -1401,7 +1377,7 @@ function ChapterView({ chapter, onBack, onStartQuiz, progress, onMarkRead }) {
               </div>
 
               {/* Notes */}
-              <NotesPanel chapterId={chapter.id} />
+              <NotesPanel chapterId={chapter.id} chapterTitle={chapter.title} chapterHtml={markdownToHtml(content)} />
             </>
           )}
         </div>
@@ -2465,7 +2441,6 @@ export default function App() {
   useEffect(() => { saveNav({ chapterId: selectedChapter?.id ?? null }) }, [selectedChapter])
   useEffect(() => { saveNav({ categoryId: selectedCategory?.id ?? null }) }, [selectedCategory])
   useEffect(() => { saveNav({ theoryCategoryId: selectedTheoryCategory?.id ?? null }) }, [selectedTheoryCategory])
-
   // ── Supabase auth ─────────────────────────────────────────────────────────
   const signOutPendingRef = useRef(null)
 
@@ -2798,7 +2773,6 @@ export default function App() {
           </div>
         )}
       </main>
-
       {/* Settings Modal */}
       {showSettings && (
         <SettingsModal

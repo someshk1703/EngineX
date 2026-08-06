@@ -92,3 +92,10 @@ From Constitution:
 ---
 
 <!-- AUTO-UPDATE: Do not manually edit below this line -->
+
+## Active Technologies
+- JavaScript (ES2022), React 18.2 — matches the rest of `src/` (no TypeScript in this app, unlike the CRDT workspace) + Existing: `react`, `@supabase/supabase-js`. New: `dompurify` (sanitize imported chapter HTML before it becomes persisted, editable content — OWASP XSS mitigation). No drag/resize library added — implemented with native Pointer Events + inline styles, matching this app's existing hand-rolled CSS-in-JS convention (no component library/UI kit is used anywhere in `src/`). (001-notebook-personal-notion)
+- Supabase Postgres (new tables `notebooks`, `notebook_blocks`) + Supabase Storage (new bucket `notebook-images`) — reuses the same Supabase project already wired for auth via `src/services/supabaseClient.js` (001-notebook-personal-notion)
+
+## Recent Changes
+- 001-notebook-personal-notion: Added JavaScript (ES2022), React 18.2 — matches the rest of `src/` (no TypeScript in this app, unlike the CRDT workspace) + Existing: `react`, `@supabase/supabase-js`. New: `dompurify` (sanitize imported chapter HTML before it becomes persisted, editable content — OWASP XSS mitigation). No drag/resize library added — implemented with native Pointer Events + inline styles, matching this app's existing hand-rolled CSS-in-JS convention (no component library/UI kit is used anywhere in `src/`).

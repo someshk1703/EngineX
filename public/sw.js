@@ -1,6 +1,6 @@
 // EngineX Service Worker — Cache-first for static assets, network-first for API
 // ⚠️ Bump CACHE_NAME whenever CSS/JS changes need to reach users immediately
-const CACHE_NAME = 'enginex-v13'
+const CACHE_NAME = 'enginex-v14'
 const STATIC_ASSETS = ['/', '/index.html', '/manifest.json']
 
 self.addEventListener('install', (event) => {
@@ -22,10 +22,10 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Skip non-GET, chrome-extension, and cross-origin API calls
+  // Skip non-GET, chrome-extension, and cross-origin API calls (e.g. Supabase REST)
   if (request.method !== 'GET') return
   if (url.protocol === 'chrome-extension:') return
-  if (url.hostname !== self.location.hostname && !url.pathname.startsWith('/')) return
+  if (url.hostname !== self.location.hostname) return
 
   // Network-first for navigation (HTML pages)
   if (request.mode === 'navigate') {
